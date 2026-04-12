@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02616v1/fig-001.webp",
+      "caption": "Figure 4. Evolution of the adaptive mixing parameter α across different clinical themes. The parameter is initialized with a low value and adaptively increases, indicating that the model initially prioritizes global knowledge synthesized from the collaborative network before gradually incorporating site-specific behavioral nuances from local data.",
+      "page": 7,
+      "index": 1,
+      "width": 968,
+      "height": 240
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02616v1/fig-002.webp",
+      "caption": "Table 1. Comparative performance summary across clinical themes. We categorize methods into Baseline (Local), Standard FL, and Personalized FL (PFL). Accuracy results demonstrate that adaptive personalization (APFL) consistently outperforms traditional federated baselines and isolated local training.",
+      "page": 7,
+      "index": 2,
+      "width": 664,
+      "height": 225
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02616v1/fig-003.webp",
+      "caption": "Figure 3. Performance evolution across 30 communication rounds for different clinical themes. The curves demonstrate the convergence characteristics of standard FL, parameter-wise PFL, and our adaptive personalization approach. APFL (red) consistently achieves superior stability and final recognition accuracy across all therapeutic domains.",
+      "page": 7,
+      "index": 3,
+      "width": 969,
+      "height": 282
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02616v1/fig-004.webp",
+      "caption": "Figure 2. Visualization of 3D skeletal data from the MMASD benchmark. (a) shows representative sequences for Roboticassisted therapy, Rhythm-based activities, and Yoga-based poses. (b) illustrates the 3D joint structure. This abstraction preserves kinetic motion for behavior analysis while raw biometric identifiers are removed.",
+      "page": 5,
+      "index": 4,
+      "width": 474,
+      "height": 658
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02616v1/fig-005.webp",
+      "caption": "Figure 1. Overview of the proposed Two-Layer Privacy framework. The first layer achieves privacy via skeletal abstraction, filtering out raw biometric identifiers from videos. This is done at each clinical site for their local video data (a demonstration is shown for ‘Clinical Site A’ in this figure). The second layer employs decentralized optimization (FL) using the efficient FreqMixFormer backbone to maintain data residency. Adaptive personalization layers (FedBN, FedPer, or APFL) are evaluated to handle clinical heterogeneity by adaptively mixing global knowledge with local specialization.",
+      "page": 4,
+      "index": 5,
+      "width": 872,
+      "height": 433
+    }
+  ]
+}
