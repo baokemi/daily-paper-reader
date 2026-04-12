@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06260v1/fig-001.webp",
+      "caption": "Figure 3: Inference-time scaling with S3 across datasets. Top row: accuracy vs. compute (NFE = steps × N × b) across multiple (N, b) settings. Bottom row: mean top-1 token confidence over denoising progress. Curves shown for Baseline, S3 (N=4, b=2, λ=1.0), and BoK (K=8).",
+      "page": 7,
+      "index": 1,
+      "width": 820,
+      "height": 353
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06260v1/fig-002.webp",
+      "caption": "Figure 1: Density–quality mismatch and trajectory search under S3 for MATH-500. Panels (a)-(c) illustrate the distributional mismatch between p0, the verifier landscape f (x), and the reward-tilted target p̃0. Panels (d)-(f) show the corresponding inference behavior of direct sampling versus S3 trajectory search and the resulting shift in verifier score distribution.",
+      "page": 3,
+      "index": 2,
+      "width": 826,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06260v1/fig-003.webp",
+      "caption": "Table 5: Average effective tokens (↓), total latency (↓, s), and wall time (↓, s) across all block sizes for LLaDA-8B-Instruct. Base: single-trajectory decoding; S3: multi-block decoding with BFS search and SSP resampling.",
+      "page": 18,
+      "index": 3,
+      "width": 690,
+      "height": 715
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06260v1/fig-004.webp",
+      "caption": "Figure 4: Accuracy (%) across block lengths K ∈ {2, 4, 8, 16, 32, 64} on four benchmarks. Results use LLaDA-8B-Instruct with N=4, b=2, and K=8. Orange bars denote S3, blue bars denote Baseline, and green bars denote BoK. An upward arrow (↑) indicates configurations where the leading method improves over the Baseline.",
+      "page": 8,
+      "index": 4,
+      "width": 826,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06260v1/fig-005.webp",
+      "caption": "Figure 2: S3: N particles are initialized at t=T [P1], then at each step expanded into Nb candidates, scored via one-step clean predictions x̂(i,j,t)0 [P2], and resampled to N particles via SSP [P3]. Final output is selected by majority voting at t=0.",
+      "page": 4,
+      "index": 5,
+      "width": 826,
+      "height": 383
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06260v1/fig-006.webp",
+      "caption": "Table 2: Ablation study decomposing the contributions of look-ahead search and Gibbs tilting in S3 (LLaDA-8B-Instruct, N=4, b=2, K=N·b=8, block length 64, generation length 128). ✓/× indicate whether each mechanism is active. Scores represent task accuracy (%).",
+      "page": 9,
+      "index": 6,
+      "width": 752,
+      "height": 184
+    }
+  ]
+}

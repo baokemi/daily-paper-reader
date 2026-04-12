@@ -1,0 +1,495 @@
+Title: Data Warmup: Complexity-Aware Curricula for Efficient Diffusion Training
+
+URL Source: https://arxiv.org/pdf/2604.07397v1
+
+Published Time: Fri, 10 Apr 2026 00:06:50 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Data Warmup: Complexity-Aware Curricula for Efficient Diffusion Training 
+
+## Jinhong Lin 1*† Pan Wang 2* Zitong Zhan 3 Lin Zhang 1 Pedro Morgado 11University of Wisconsin–Madison 2University of Pittsburgh 3University at Buffalo, SUNY    
+
+> {jlin398,lzhang756}@wisc.edu, paw101@pitt.edu, zitongz@sairlab.org, p.morgado.89@gmail.com
+
+## Abstract 
+
+A key inefficiency in diffusion training occurs when a ran-domly initialized network, lacking visual priors, encounters gradients from the full complexity spectrum—most of which it lacks the capacity to resolve. We propose Data Warmup, a curriculum strategy that schedules training images from simple to complex without modifying the model or loss. Each image is scored offline by a semantic-aware complexity met-ric combining foreground dominance (how much of the im-age salient objects occupy) and foreground typicality (how closely the salient content matches learned visual proto-types). A temperature-controlled sampler then prioritizes low-complexity images early and anneals toward uniform sampling. On ImageNet 256 ×256 with SiT backbones (S/2 to XL/2), Data Warmup improves IS by up to 6.11 and FID by up to 3.41, reaching baseline quality tens of thousands of iterations earlier. Reversing the curriculum (exposing hard images first) degrades performance below the uniform baseline, confirming that the simple-to-complex ordering it-self drives the gains. The method combines with orthogonal accelerators such as REPA and requires only ∼10 minutes of one-time preprocessing with zero per-iteration overhead. 
+
+## 1. Introduction 
+
+Training diffusion-based generative models [ 8 , 31 ] is noto-riously expensive: reaching high-fidelity synthesis [ 26 , 28 ]routinely costs hundreds of GPU-days. Much of this cost concentrates in the early optimization phase. A randomly ini-tialized network, with no learned visual priors, must denoise images that range from a single centered object to cluttered multi-object scenes with complex backgrounds. Forcing such a model to reconstruct difficult images from the start is wasteful: the gradients are noisy and uninformative, con-tributing little to learning while consuming full compute. 
+
+> *Equal contribution.
+> †Corresponding author.
+
+This intuition suggests a remedy rooted in curriculum learning [ 2 ]: expose the model to simple images first, letting it build basic visual priors, then gradually introduce harder examples as its capacity grows. No drawing teacher starts with Picasso’s Guernica. Yet applying this idea to diffusion training raises a concrete question: what makes an image “simple” for a diffusion model to learn? Pixel-level statis-tics such as frequency content or compressibility are poor proxies; what matters is the semantic structure of the scene. We propose Data Warmup , a curriculum learning strat-egy that answers this question with a semantic-aware image complexity metric. The key design insight is that difficulty for a generative model correlates with two scene-level prop-erties. First, foreground dominance : an image whose frame is filled by a single salient object is easier to denoise than one where the same object appears small against a cluttered background. Second, foreground typicality : a canonical, commonly seen view of an object is easier than an unusual angle or rare instance. We quantify both properties from pretrained DINO-v2 features in a single offline pass (Sec-tion 3.1) and combine them into a scalar score per image. A temperature-controlled sampler then uses these scores to bias early training toward low-complexity images, annealing toward uniform sampling over a warmup phase. Empirically, the curriculum direction proves critical. On ImageNet-1K with SiT-B/2 [ 19 ], Data Warmup substantially improves generation quality, while reversing the order (hard first) degrades both IS and FID below the uniform baseline. This rules out non-uniform sampling as the explanation: the simple-to-complex progression itself is the mechanism. Data Warmup further combines with the representation-alignment method REPA [ 37 ] for additional gains, all for roughly ten minutes of one-time offline preprocessing. Our main contributions are summarized as follows: • We identify the mismatch between data complexity and model readiness as a concrete source of early-stage train-ing inefficiency in diffusion models, and show that a simple-to-complex curriculum resolves it. • We introduce a semantic-aware image complexity metric— combining foreground dominance and typicality—that re-
+
+> arXiv:2604.07397v1 [cs.LG] 8 Apr 2026
+
+quires only a single feature-extraction pass and drives a temperature-controlled sampling schedule. • We demonstrate that Data Warmup improves IS by up to 6.11 and FID by up to 3.41 on ImageNet 256 ×256 across SiT scales (S/2 to XL/2), complements existing accelerators like REPA, and reveals a sharp asymmetry: the same curriculum applied in reverse hurts performance, establishing that ordering—not mere non-uniformity—is the mechanism. 
+
+## 2. Related work 
+
+Efforts to accelerate deep learning training generally fol-low three axes: structuring when data is presented, selecting 
+
+which data to train on, and modifying how the model pro-cesses that data. 
+
+2.1. Curriculum learning 
+
+Curriculum learning [ 2] formalizes the intuition that pre-senting training examples in a meaningful order—typically from easy to hard—can accelerate convergence and improve generalization. Early work demonstrated gains in language modeling and shape recognition by manually defining diffi-culty. Self-paced learning [ 14 ] automates this by letting the model’s own loss determine which samples are “easy”, grad-ually raising a threshold to include harder ones. Subsequent extensions incorporate both self-paced and teacher-guided signals [ 11 ], or use reinforcement learning to select curric-ula [5]. Curriculum strategies have proven effective across do-mains: in machine translation [ 25 ], where sentence length or rarity serves as a difficulty proxy; in reinforcement learning, where task complexity is staged [ 22 ]; and in object detection, where training proceeds from clean to noisy annotations [ 33 ]. However, most prior curricula rely on training-time signals (loss, gradient magnitude) that change every iteration, adding overhead and coupling the schedule to optimizer dynamics. Data Warmup departs from this paradigm in two ways. First, difficulty is determined entirely offline by a semantic complexity metric, decoupling the curriculum from training dynamics and introducing zero per-iteration cost. Second, we schedule via a temperature-controlled softmax rather than hard thresholding, ensuring a smooth transition that avoids abrupt distribution shifts. 
+
+2.2. Data selection for efficient training 
+
+A long line of work accelerates training by prioritizing infor-mative samples [ 32 ]. Classical importance-sampling meth-ods [ 1, 12 , 18 , 30 ] rank examples by training-time signals (gradient norms, loss values, or relevance to a validation set [ 20 ]) and oversample the highest-scoring ones. Coreset and gradient-matching approaches [ 13 , 21 ] take a different approach, selecting minimal subsets that approximate the full gradient. These methods share a common limitation: they depend on signals that are themselves expensive to com-pute during training and whose theoretical guarantees break down in the non-convex regimes of modern deep networks, yielding diminishing returns at scale. The closest precursor to our work is the prototype-based selection of [ 16 ], which ranks images by their distance to cluster centroids and uses this ranking to accelerate Masked Autoencoder [ 6 ] pretraining. We borrow the idea of offline, feature-based scoring but depart in two key ways: (1) we target generative diffusion training, whose learning dynamics differ fundamentally from masked reconstruction, and (2) we introduce foreground dominance as an additional complexity axis, capturing the observation that images with prominent, centered objects are easier for a generative model to learn first. 
+
+2.3. Accelerating diffusion model training 
+
+Within generative modeling, most acceleration strategies are model-centric : they modify architectures or training objectives. Architectural improvements include adapting transformer components for diffusion [ 34 ] and redesign-ing timestep conditioning [ 9 , 10 , 36 ], while masked gen-erative training reduces per-step computation by operating on partial inputs [ 38 ]. A second family leverages repre-sentation guidance , injecting knowledge from pretrained encoders to bootstrap the denoising network. REPA [ 37 ]aligns denoiser features with self-supervised vision encoders; SARA [ 3] extends this to structural and distributional align-ment; ERW [ 17 ] uses an external encoder to warm up inter-nal representations. All of these methods change the model or the loss; none change the order in which data is presented. Data Warmup is data-centric : it leaves the model and objective untouched, modulating only the sampling distribution. Because it op-erates on a separate axis, it combines readily with model-centric accelerators; we show additive gains when stacking Data Warmup on top of REPA (Section 4.1). 
+
+## 3. Method 
+
+Data Warmup operates in two stages: an offline step that assigns each training image a scalar complexity score Ω
+
+(Section 3.1), and a temperature-controlled sampler that uses these scores to present images from simple to complex dur-ing training (Section 3.2). Figures 1 and 2 illustrate them. 
+
+3.1. Semantic-aware Image Complexity 
+
+What makes an image easy or hard for a diffusion model to learn? Low-level statistics such as frequency content or compressibility are poor proxies: a cluttered photo and a textured close-up may have similar entropy yet pose very different challenges. We instead ground our complexity measure in the semantic structure of the scene along two dimensions: Figure 1. Image complexity. Data warmup is based on image complexity. We quantify image complexity via two factors: foreground dominance and foreground typicality. Foreground separation leverages features from DINO-v2 to isolate salient regions. Foreground dominance ( Ωdom ) measures the prominence of foreground elements, while foreground typicality ( Ωprot )assesses how representative a foreground is relative to learned prototypes. The overall complexity score ( Ωi) is derived by combining these two factors. 
+
+Figure 2. Data warmup. During diffusion training, images are sampled according to their complexity scores through a temperature-based scheduler. Initially, simpler images (low complexity scores) are prioritized, with the sampling distribution gradually shifting to uniformly cover the full dataset complexity. • Foreground dominance (Ωdom ): how much of the image is occupied by salient objects. A centered golden retriever filling the frame is simpler than the same dog as a small figure in a busy park. • Foreground typicality (Ωprot ): how representative the salient content is relative to visual prototypes. A canon-ical side-view photo of a dog is simpler than an unusual top-down angle of the same breed. Our ablations (Section 5) confirm that these two factors suffice; adding texture or compressibility features yields no further gain on curated datasets like ImageNet. Both factors require identifying which parts of an image are foreground. 
+
+3.1.1. Foreground-Background Separation 
+
+We leverage DINO-v2 [ 24 ], whose spatial token representa-tions correlate strongly with human visual saliency [ 35 ]. For each image i, we extract the L spatial token representations 
+
+zi, 1, . . . , zi,L ∈ Rd and compute the first principal compo-nent u1 ∈ Rd across the dataset. Projecting each token onto 
+
+u1 yields a per-location saliency score: 
+
+si,j = u⊤ 
+
+> 1
+
+zi,j , j = 1 , . . . , L. (1) Tokens scoring above a threshold θ are designated as fore-ground: 
+
+Zf g i = {zi,j | si,j > θ }Lj=1 . (2) Following [ 24 ], we set θ = 0 .05 . The resulting set Zf g i
+
+serves as the basis for both complexity factors. 
+
+3.1.2. Foreground Dominance Ωdom 
+
+The first factor measures how much of the image the fore-ground occupies. We define the background ratio rbg i =(L − Lf g i )/L , where Lf g i = |Zf g i |.A linear mapping from rbg i to complexity is a poor fit: the difference between 80% and 60% foreground coverage matters little for learning, whereas the drop from 40% to 20% signals a sharp increase in scene complexity. We capture this with a sigmoid correction: 
+
+Ωdom (zi) := 11 + e−(κr bg i +α(vmin )) , (3) where α(vmin ) = ln 
+
+ vmin 
+
+> 1−vmin
+
+
+
+, so that Ωdom = vmin 
+
+when rbg i = 0 . The steepness κ controls how sharply com-plexity grows with background proportion, and vmin > 0
+
+ensures that even fully foreground-dominated images retain a small non-zero score. We set κ = 12 .0 and vmin = 0 .002 
+
+based on our hyperparameter study (Table 6). Figure 3 visu-alizes the correction for varying κ and vmin .
+
+3.1.3. Foreground Typicality Ωprot 
+
+Foreground size alone is insufficient: a large but unusual foreground (e.g., an extreme close-up of an insect wing) can still be hard to learn. Since prototypical images are generally easier to learn [ 16 ], the second factor captures how typical 
+
+the foreground content is relative to common visual patterns in the dataset. We quantify typicality via clustering. For each image i,we average its foreground tokens into a single vector (using all tokens when no foreground is detected, a rare case on curated datasets like ImageNet): 
+
+¯zf g i =
+
+( 1
+
+> Lf g i
+
+P
+
+> z∈Zf g i
+
+z if Lf g i > 0
+
+> 1
+> L
+
+PLj=1 zi,j if Lf g i = 0 . (4) We apply k-means ( K=1000 for ImageNet) to the full set 
+
+{¯zf g i }Ni=1 , producing K centroids {μk}Kk=1 that serve as visual prototypes. Each image is assigned to its nearest centroid k(i) = arg min k ∥¯zf g i − μk∥2, and its typicality score is the distance to that centroid: 
+
+Ωprot (zi) := ∥¯zf g i − μk(i)∥2. (5) Low values indicate prototypical foregrounds; high values indicate outliers. 
+
+3.1.4. Overall Complexity Score 
+
+An image should count as simple only when it is both foreground-dominated and prototypical, so we combine the two factors multiplicatively: 
+
+Ω( zi) = Ω dom (zi) × Ωprot (zi). (6) A large but atypical foreground, or a prototypical object lost in clutter, each receive a high score. For brevity we write 
+
+Ωi = Ω( zi) below. Figure 4 shows example images at both ends of the spectrum. 
+
+3.2. Warmup Sampling Schedule 
+
+We implement the curriculum as a temperature-controlled softmax over complexity scores, where the temperature rises over time. 5               
+
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> 40
+> 45
+> 50
+> Steepness
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> Minimum Value  vmin
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> rbg
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> dom (rbg )
+> Varying Steepness
+> = 12, vmin = 0.002
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> rbg
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> dom (rbg )
+> Varying Minimum vmin
+> = 12, vmin = 0.002
+
+Figure 3. Illustration of the complexity correction function 
+
+Ωdom (rbg ; κ, v min ) (Eq. 3). Left: Varying steepness κ with fixed vmin = 0 .002 . Higher κ leads to a sharper transition. 
+
+Right: Varying minimum value vmin with fixed steepness 
+
+κ = 12 .0.
+
+Figure 4. ImageNet samples organized into low and high complexity according to Ω scores. Each row displays images from the same category. 
+
+Sampling probabilities. At training iteration t, image i is sampled with probability 
+
+P (i|t) = exp  − ˜Ωi/τ (t)PNj=1 exp  − ˜Ωj /τ (t) , (7) where N = |D| is the number of training images. When 
+
+τ is small, the distribution concentrates on low-Ω (simple) images; as τ → ∞ , it flattens to uniform sampling. However, the distribution of Ωi varies substantially across prototype clusters, which would bias the curriculum toward visual concepts with lower raw scores 1. We therefore nor-malize scores within each cluster before sampling: 
+
+˜Ωi = Ωi − Ωk(i)min 
+
+Ωk(i)max − Ωk(i)min 
+
+, (8) 
+
+> 1
+
+Similar biases were observed in [16]. 0 200 400 600 800 
+
+> Training Iteration
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> Effective dataset size | D (t)|
+> Power-2 Schedule
+> Warmup Iteration
+
+Figure 5. Schedule. Evolution of the effective dataset size |D τ (t)| (normalized by |D| ) using the power schedule. Warmup iterations set to Tw = 400 .where Ωk(i)min and Ωk(i)max are the extremes within cluster k(i).This ensures that at any temperature the sampler draws pro-portionally from all visual concepts, varying only the within-cluster difficulty. 
+
+Temperature annealing. Setting τ (t) directly is unintu-itive. Instead, we parameterize the schedule through the 
+
+effective dataset size |D τ (t)|, defined as the expected num-ber of unique images seen in one epoch under the current distribution [16]: 
+
+|D τ (t)| =
+
+> |D|
+
+X
+
+> i=1
+
+h
+
+1 − (1 − P (i|t)) |D| i
+
+. (9) Because |D τ | increases monotonically with τ , the tem-perature corresponding to any target effective size can be recovered efficiently via binary search. We schedule the effective dataset size to grow from an initial value |D 0| at t = 0 to its theoretical maximum 
+
+|D max | = |D| × (1 − 1/e ) at t = Tw, following a power-2 curve. The factor 1 − 1/e ≈ 0.632 is the expected fraction of distinct samples when drawing |D| times uniformly with replacement. 
+
+|D τ (t)| = |D 0| + ( |D max | − |D 0|) 1 −
+
+
+
+1 − tTw
+
+2+
+
+!
+
+,
+
+(10) where [·]+ = max(0 , ·). This schedule (Figure 5) accelerates rapidly through the simplest images and spends more iter-ations as the pool widens, since simple images need fewer exposures. For t > T w, we switch to uniform sampling (τ → ∞ ). Algorithm 1 summarizes the full pipeline. 
+
+## 4. Experiments 
+
+Setup. We train all models on ImageNet 256 ×256 [ 27 ] us-ing the SiT framework [ 19 ], a generalized flow and diffusion-
+
+Algorithm 1: Data Warmup 
+
+Input: Dataset D, pretrained DINO-v2 encoder ϕ,warmup iterations Tw, initial effective size 
+
+|D 0|, number of clusters K, sigmoid parameters κ, v min       
+
+> /* Stage 1: Offline complexity scoring */
+> 1
+
+foreach image i ∈ D do  
+
+> 2
+
+Extract spatial tokens {zi,j }Lj=1 ← ϕ(i); 
+
+> 3
+
+Compute saliency via PCA; partition tokens into 
+
+Zf g i (Eq. 2);  
+
+> 4
+
+Ωdom (zi) ← sigmoid (κ, v min , r bg i ) ; // Eq. 3 
+
+> 5
+
+¯zf g i ← mean (Zf g i ) ; // Eq. 4 
+
+> 6
+
+{μk}Kk=1 ← k-means ({¯zf g i }Ni=1 ); 
+
+> 7
+
+foreach image i ∈ D do  
+
+> 8
+
+Ωprot (zi) ← ∥ ¯zf g i − μk(i)∥2 ; // Eq. 5 
+
+> 9
+
+Ωi ← Ωdom × Ωprot ; normalize ˜Ωi within cluster k(i);     
+
+> /* Stage 2: Curriculum training */
+> 10
+
+for t = 1 , 2, . . . , T max do  
+
+> 11
+
+if t ≤ Tw then  
+
+> 12
+
+Compute target |D τ (t)| via power-2 schedule;  
+
+> 13
+
+Recover τ (t) by binary search;  
+
+> 14
+
+Sample batch with P (i|t) ∝ exp( − ˜Ωi/τ (t)) 
+
+; // Eq. 7 
+
+> 15
+
+else  
+
+> 16
+
+Sample batch uniformly;  
+
+> 17
+
+Update model with standard diffusion loss; based architecture. Images undergo ADM preprocessing [ 4 ]and are encoded into latents z ∈ R32 ×32 ×4 via the Stable Diffusion VAE [ 26 ]. We evaluate four backbone scales (SiT-S/2, B/2, L/2, XL/2) with 2 ×2 non-overlapping patches and a batch size of 256. All warmup runs use a 200k-iteration curriculum phase followed by 200k iterations of uniform sampling; baselines train for 400k iterations with uniform sampling throughout. Training runs on A100 GPUs; prepro-cessing timing is reported on a single H100. 
+
+Complexity preprocessing. We extract DINO-v2 features in a single pass and run mini-batch k-means to obtain the 
+
+Ωprot clusters. For Ωdom , we threshold at 0.05 following [ 24 ]. The entire offline pipeline (feature extraction plus clustering) takes approximately ten minutes on one H100. At train-ing time, only the softmax temperature in (7) changes per iteration, adding negligible overhead. 
+
+Metrics. We report FID [ 7 ], sFID [ 23 ], IS [ 29 ], and preci-sion/recall [15]. Table 1. Performance of SiT-B/2 on ImageNet-1K (256 ×256) with and without data warmup. The baseline employs uniform data sampling. “Inverse Data Warmup” prioritizes high-complexity samples during early training phases. ↑/↓ denote that higher/lower is better. Superscripts denote performance gains/losses in green/red. 
+
+IS ↑ FID ↓ sFID ↓ Pre. ↑ Rec. ↑
+
+SiT-B/2 [19] 41.40 36.16 6.80 0.52 0.63 + Data Warmup 45.70 ↑4.30 32.75 ↓3.41 6.56 ↓0.24 0.54 ↑0.02 0.63 + Inverse Data Warmup36.60 ↓4.80 41.05 ↑4.89 7.19 ↑0.39 0.49 ↓0.03 0.62 ↓0.01 
+
+Table 2. Performance of REPA on ImageNet-1K (256×256) with and without data warmup using SiT-B/2 backbone. ↑/↓
+
+denotes that higher/lower is better. Superscripts denote per-formance gains/losses in green/red. 
+
+IS ↑ FID ↓ sFID ↓ Pre. ↑ Rec. ↑
+
+REPA [37] 55.36 27.54 6.91 0.56 0.65 + Data Warmup 58.08 ↑2.72 25.84 ↓1.70 6.89 ↓0.02 0.57 ↑0.01 0.64 ↓0.01 
+
+4.1. Does Direction Matter? 
+
+We test whether the direction of the curriculum mat-ters, or whether any non-uniform sampling would suf-fice. We compare three protocols on ImageNet-1K with SiT-B/2: (1) uniform sampling (baseline), (2) Data Warmup (simple →complex), and (3) inverse warmup (complex →simple). The inverse schedule uses exactly the same non-uniform sampling mechanism but reverses the direction, isolating ordering as the only variable. Table 1 shows a clear asymmetry. Data Warmup improves IS by 4.30 and reduces FID by 3.41, while reversing the schedule actively degrades performance (IS −4.80, FID 
+
++4.89), landing well below the uniform baseline. The gap between the two curricula ( ∆IS ≈ 9, ∆FID ≈ 8) is far larger than either’s gap to the baseline, confirming that direction, not non-uniformity, is the key factor. 
+
+Compatibility with model-centric acceleration. Because Data Warmup operates solely on the data distribution, it should compose with methods that modify the model or loss. We verify this by stacking Data Warmup on top of REPA [ 37 ], a representation-alignment accelerator. As shown in Table 2, Data Warmup further improves REPA’s already strong results (IS +2.72, FID −1.70), suggesting that the two methods address different bottlenecks. 
+
+Table 3. SiT-B/2 evaluated on datasets of increasing size. 
+
+↑/↓ denotes that higher/lower is better. Superscripts denote performance gains/losses in green/red. 
+
+Dataset Model IS ↑ FID ↓ sFID ↓
+
+SiT-B/2 43.05 79.38 220.69 IN-100 + Warmup 28.75 ↓14.30 100.97 ↑21.59 225.38 ↑4.69 
+
+SiT-B/2 44.79 35.32 10.08 IN-500 + Warmup 50.90 ↑6.11 31.95 ↓3.37 10.03 ↓0.05 
+
+SiT-B/2 41.40 36.16 6.80 IN-1K + Warmup 45.70 ↑4.30 32.75 ↓3.41 6.56 ↓0.24 
+
+4.2. When Does Data Warmup Help—and When Does It Fail? 
+
+A curriculum that narrows the early training distribution necessarily trades diversity for focus. When is this trade-off beneficial, and when does it backfire? We probe two axes, dataset size and model capacity, to identify when it helps. 
+
+Dataset size: a diversity threshold. We train SiT-B/2 on three ImageNet subsets of increasing size: IN-100 ( ∼100 images/class), IN-500 ( ∼500), and IN-1K ( ∼1,000). The results (Table 3) reveal a clear threshold effect. On IN-100, Data Warmup hurts : IS drops by 14.30 and FID worsens by 21.59. The dataset is simply too small; concentrating early sampling on “simple” images starves the model of the diversity it needs to learn the full distribution, causing it to overfit to a narrow manifold of canonical examples. The picture reverses sharply at IN-500 and above. On IN-500, warmup improves IS by 6.11 and FID by 3.37, the largest gains in our experiments. On IN-1K, the improve-ments remain strong (IS +4.30, FID −3.41). The takeaway: Data Warmup requires enough diversity that focusing on simple samples early does not starve the model, a condition easily met by any practical large-scale dataset. Figure 6 visualizes the dynamics on IN-500. The warmed-up model pulls ahead from the earliest iterations, with the gap widening through the curriculum phase (40k–160k iterations) and persisting at 400k iterations with a lead of approximately 6 IS points. Data Warmup thus accelerates convergence and 
+
+improves final quality; it is not merely “front-loading” gains that the baseline eventually recovers. 
+
+Model capacity: consistent gains across scales. Ta-ble 4 evaluates four SiT backbones on ImageNet-1K. Data Warmup improves every model, with gains that grow with capacity: IS improvements range from +1.16 (SiT-S/2) to 
+
++5.96 (SiT-L/2). Larger models show bigger gains, possibly because they have more parameters to benefit from struc-tured early gradients; smaller models converge faster and 40K 80K 160K 240K 320K 400K 
+
+Training Iterations 
+
+> 10
+> 15
+> 30
+> 45
+> 60
+> Inception Score  SiT-B/2
+> SiT-B/2+Data Warmup
+
+Figure 6. Training curve. Inception scores of an SiT model trained on ImageNet-500 with and without data warmup. 
+
+Tw = 200 k
+
+Table 4. SiT backbones of varying size evaluated on Ima-geNet 1000 (256×256). ↑/↓ denotes that higher/lower is better. Superscripts denote performance gains/losses in green/red.                               
+
+> Model IS ↑FID ↓sFID ↓
+> SiT-S 24.39 58.34 9.30 + Warmup 25.55 ↑1.16 55.87 ↓2.47 9.16 ↓0.14
+> SiT-B 41.40 36.16 6.80 + Warmup 45.70 ↑4.30 32.75 ↓3.41 6.56 ↓0.24
+> SiT-L 71.48 18.79 5.14 + Warmup 77.44 ↑5.96 17.17 ↓1.62 5.14 ↓0.00
+> SiT-XL 75.40 17.67 5.15 + Warmup 80.07 ↑4.67 16.36 ↓1.31 5.13 ↓0.02
+
+spend less time in the regime where the curriculum matters most. 
+
+4.3. Are Both Complexity Factors Necessary? 
+
+We ablate the two components of the complexity score to un-derstand their individual and joint contributions, then verify sensitivity to the sigmoid hyperparameters in Ωdom .
+
+Individual vs. combined factors. Table 5 compares cur-ricula driven by Ωdom , Ωprot , and their product. Each factor independently improves over uniform sampling, with fore-ground dominance contributing the larger share (IS +3.02 vs. +1.51). Combining them yields gains (IS +4.30, FID 
+
+−3.41) that exceed the sum of the individual improvements, indicating a synergy: an image can have a dominant fore-ground yet be atypical, or be prototypical yet cluttered. The multiplicative score penalizes complexity along either axis. 
+
+Sigmoid hyperparameters. Table 6 varies the steepness 
+
+κ and floor vmin of the sigmoid correction in Ωdom . Per-
+
+Table 5. Performance comparison of SiT training strategies using the SiT-B/2 model on ImageNet-1K (256 ×256). ↑/↓
+
+denotes that higher/lower is better. Superscripts denote per-formance gains/losses in green/red. 
+
+IS ↑ FID ↓ sFID ↓
+
+Baseline 41.40 36.16 6.80 + Ωprot 42.91 ↑1.51 35.01 ↓1.15 6.72 ↓0.08 
+
++ Ωdom 44.42 ↑3.02 33.94 ↓2.22 6.53 ↓0.27 
+
++ Ωprot and Ωdom 45.70 ↑4.30 32.75 ↓3.41 6.56 ↓0.24 
+
+Table 6. Study of Ωdom hyper-parameters κ and vmin , eval-uated on SiT-B/2 (256×256). The impact of κ and vmin is evaluated around the optimal setting κ = 12 , v min = 0 .002 .
+
+Param Value IS ↑ FID ↓ sFID ↓
+
+10 45.01 33.14 6.63 
+
+12 45.69 32.75 6.56 κ
+
+16 44.94 33.21 6.63 0.02 44.19 34.07 6.68 
+
+vmin 0.002 45.69 32.75 6.56 
+
+formance is robust within a reasonable range: κ ∈ [10 , 16] 
+
+and vmin ∈ [0 .002 , 0.02] all outperform the baseline, with 
+
+κ = 12 , vmin = 0 .002 achieving the best overall results. 
+
+4.4. Qualitative Examples 
+
+To assess generation quality beyond aggregate metrics, we train a SiT-XL/2 model with REPA and Data Warmup for 2M iterations (classifier-free guidance w = 4 .0). Figure 7 shows samples for the class “Loggerhead Sea Turtle.” The model reproduces fine-grained details (shell scute patterns, skin textures, light caustics underwater) across diverse poses and environments, consistent with the hypothesis that easy-first curricula help establish structural priors early. 
+
+## 5. Discussion 
+
+Why does direction matter so strongly? The most striking result in our experiments is not that Data Warmup helps, but that reversing it actively hurts—landing well below even the uniform-sampling baseline (Section 4.1). We hypothesize that simple, foreground-dominated images provide a low-entropy gradient signal that guides the randomly initialized network toward a structured region of parameter space early on. Once these foundational priors are established, the model can meaningfully learn from harder, more ambiguous scenes. The inverse schedule does the opposite: it floods the blank-slate model with high-complexity images whose gradients conflict and average out, pushing the model into a flatter, less Figure 7. Generated samples for the class “Loggerhead Sea Turtle” from a SiT-XL/2 model trained with REPA and data warmup for 2M iterations (classifier-free guidance w = 4 .0). informative loss region from which recovery is slow. This interpretation aligns with recent analyses of loss landscape geometry in diffusion models [ 36 ] and suggests that the early training phase has an outsized, potentially irreversible influence on the trajectory of optimization. 
+
+The focus–diversity trade-off. The IN-100 failure (Sec-tion 4.2) reveals a design principle that extends beyond our specific method: any curriculum that narrows the training distribution must be backed by sufficient data diversity to avoid mode collapse . On IN-100 ( ∼130k images), concen-trating early sampling on simple examples leaves too few unique images per epoch, causing the model to overfit to a narrow manifold. On IN-500 and above, the dataset is rich enough that even a focused curriculum still exposes the model to substantial within-class variation. This thresh-old effect suggests that Data Warmup is naturally suited to the large-scale regimes where training cost is highest and acceleration is most valuable. 
+
+Limitations and future directions. Our complexity metric is computed offline from a frozen DINO-v2 backbone and remains static throughout training. An adaptive, loss-aware variant that re-scores images as the model improves could yield tighter curricula, especially in later training phases where the current schedule defaults to uniform sampling. More broadly, we have only evaluated Data Warmup on class-conditional image generation. Extending the framework to text-conditioned models—where prompt complexity intro-duces an entirely new curriculum axis (“a dog” vs. “a golden retriever playing fetch in a sunlit park with children”)—is a natural and promising direction. Finally, while our two-factor complexity metric suffices for curated datasets like ImageNet, richer metrics may be needed for uncurated, web-scale data where texture, occlusion, and label noise introduce additional difficulty dimensions. 
+
+## 6. Conclusion 
+
+This study identifies that training diffusion models uniformly over the full data distribution from the start is wasteful: the randomly initialized network cannot learn from complex scenes it does not yet understand. Data Warmup resolves this mismatch with a simple curriculum—score each im-age by foreground dominance and typicality, then anneal a temperature-controlled sampler from easy to hard. On ImageNet-256 with SiT backbones (S/2 to XL/2), this im-proves IS by up to 6.11 and FID by up to 3.41, reaching baseline quality tens of thousands of iterations earlier. The method stacks with REPA for further gains (IS +2.72, FID 
+
+−1.70) and costs only ∼10 minutes of offline preprocessing with zero per-iteration overhead. Perhaps most importantly, reversing the curriculum hurts —establishing that what mat-ters is not non-uniform sampling per se, but the simple-to-complex ordering that lets a model build structure before confronting complexity. 
+
+## References    
+
+> [1] Guillaume Alain, Alex Lamb, Chinnadhurai Sankar, Aaron Courville, and Yoshua Bengio. Variance reduction in
+
+sgd by distributed importance sampling. arXiv preprint arXiv:1511.06481 , 2015. 2 [2] Yoshua Bengio, Jérôme Louradour, Ronan Collobert, and Jason Weston. Curriculum learning. In Proceedings of the 26th annual international conference on machine learning ,pages 41–48, 2009. 1, 2 [3] Hesen Chen, Junyan Wang, Zhiyu Tan, and Hao Li. Sara: Structural and adversarial representation alignment for training-efficient diffusion models. arXiv preprint arXiv:2503.08253 , 2025. 2 [4] Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on image synthesis. Advances in neural information processing systems , 34:8780–8794, 2021. 5 [5] Alex Graves, Marc G Bellemare, Jacob Menick, Remi Munos, and Koray Kavukcuoglu. Automated curriculum learning for neural networks. International Conference on Machine Learning , 2017. 2 [6] Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross Girshick. Masked autoencoders are scalable vision learners, 2021. 2 [7] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bern-hard Nessler, and Sepp Hochreiter. Gans trained by a two time-scale update rule converge to a local nash equilibrium. 
+
+Advances in neural information processing systems , 30, 2017. 5[8] Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffu-sion probabilistic models. Advances in neural information processing systems , 33:6840–6851, 2020. 1 [9] Hui Ji and Pengfei Zhou. Advancing ppg-based continuous blood pressure monitoring from a generative perspective. In 
+
+Proceedings of the 22nd ACM Conference on Embedded Net-worked Sensor Systems , pages 661–674, 2024. 2 [10] Hui Ji, Wei Gao, and Pengfei Zhou. Translation from wear-able ppg to 12-lead ecg. arXiv preprint arXiv:2509.25480 ,2025. 2 [11] Lu Jiang, Deyu Meng, Qian Zhao, Shiguang Shan, and Alexander G Hauptmann. Self-paced curriculum learning. In Proceedings of the AAAI Conference on Artificial Intelli-gence , 2015. 2 [12] Angelos Katharopoulos and François Fleuret. Not all samples are created equal: Deep learning with importance sampling. In International conference on machine learning , pages 2525– 2534. PMLR, 2018. 2 [13] Krishnateja Killamsetty, Sivasubramanian Durga, Ganesh Ramakrishnan, Abir De, and Rishabh Iyer. Grad-match: Gra-dient matching based data subset selection for efficient deep model training. In International Conference on Machine Learning , pages 5464–5474. PMLR, 2021. 2 [14] M Pawan Kumar, Benjamin Packer, and Daphne Koller. Self-paced learning for latent variable models. In Advances in neural information processing systems , 2010. 2 [15] Tuomas Kynkäänniemi, Tero Karras, Samuli Laine, Jaakko Lehtinen, and Timo Aila. Improved precision and recall metric for assessing generative models. Advances in neural information processing systems , 32, 2019. 5 [16] Jinhong Lin, Cheng-En Wu, Huanran Li, Jifan Zhang, Yu Hen Hu, and Pedro Morgado. From prototypes to general distri-butions: An efficient curriculum for masked image modeling. 
+
+arXiv preprint arXiv:2411.10685 , 2024. 2, 4, 5 [17] Deyuan Liu, Peng Sun, Xufeng Li, and Tao Lin. Efficient gen-erative model training via embedded representation warmup. 
+
+arXiv preprint arXiv:2504.10188 , 2025. 2 [18] Ilya Loshchilov and Frank Hutter. Online batch selec-tion for faster training of neural networks. arXiv preprint arXiv:1511.06343 , 2015. 2 [19] Nanye Ma, Mark Goldstein, Michael S Albergo, Nicholas M Boffi, Eric Vanden-Eijnden, and Saining Xie. Sit: Exploring flow and diffusion-based generative models with scalable in-terpolant transformers. In European Conference on Computer Vision , pages 23–40. Springer, 2024. 1, 5, 6 [20] Sören Mindermann, Jan M Brauner, Muhammed T Razzak, Mrinank Sharma, Andreas Kirsch, Winnie Xu, Benedikt Hölt-gen, Aidan N Gomez, Adrien Morisot, Sebastian Farquhar, et al. Prioritized training on points that are learnable, worth learning, and not yet learnt. In International Conference on Machine Learning , pages 15630–15649. PMLR, 2022. 2 [21] Baharan Mirzasoleiman, Jeff Bilmes, and Jure Leskovec. Coresets for data-efficient training of machine learning mod-els. In International Conference on Machine Learning , pages 6950–6960. PMLR, 2020. 2 [22] Sanmit Narvekar, Bei Peng, Matteo Leonetti, Jivko Sinapov, Matthew E Taylor, and Peter Stone. Curriculum learning for reinforcement learning domains: A framework and survey. 
+
+Journal of Machine Learning Research , 21(181):1–50, 2020. 2[23] Charlie Nash, Jacob Menick, Sander Dieleman, and Peter W Battaglia. Generating images with sparse representations. 
+
+arXiv preprint arXiv:2103.03841 , 2021. 5 [24] Maxime Oquab, Timothée Darcet, Théo Moutakanni, Huy Vo, Marc Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa, Alaaeldin El-Nouby, et al. Dinov2: Learning robust visual features without supervision. arXiv preprint arXiv:2304.07193 , 2023. 3, 5 [25] Emmanouil Antonios Platanios, Otilia Stretcu, Graham Neu-big, Barnabás Póczos, and Tom M Mitchell. Competence-based curriculum learning for neural machine translation. In 
+
+North American Chapter of the Association for Computa-tional Linguistics , 2019. 2 [26] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022. 1, 5 [27] Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, San-jeev Satheesh, Sean Ma, Zhiheng Huang, Andrej Karpathy, Aditya Khosla, Michael Bernstein, et al. Imagenet large scale visual recognition challenge. International journal of computer vision , 115:211–252, 2015. 5 [28] Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Pho-torealistic text-to-image diffusion models with deep language understanding. Advances in neural information processing systems , 35:36479–36494, 2022. 1 [29] Tim Salimans, Ian Goodfellow, Wojciech Zaremba, Vicki Cheung, Alec Radford, and Xi Chen. Improved techniques for training gans. Advances in neural information processing systems , 29, 2016. 5 [30] Tom Schaul. Prioritized experience replay. arXiv preprint arXiv:1511.05952 , 2015. 2 [31] Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Ab-hishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. 
+
+arXiv preprint arXiv:2011.13456 , 2020. 1 [32] Pan Wang, Siwei Song, Hui Ji, Siqi Cao, Heng Yu, Zhijian Liu, Huanrui Yang, Yingyan (Celine) Lin, Beidi Chen, Mohit Bansal, Xiaoming Liu, Pengfei Zhou, Ming-Hsuan Yang, Tianlong Chen, and Jingtong Hu. From models to systems: A comprehensive survey of efficient multimodal learning. 
+
+TechRxiv , 2026. 2 [33] Xin Wang, Yudong Chen, and Wenwu Zhu. A survey on curriculum learning. IEEE Transactions on Pattern Analysis and Machine Intelligence , 44(9):4555–4576, 2021. 2 [34] ZiDong Wang, Zeyu Lu, Di Huang, Cai Zhou, Wanli Ouyang, et al. Fitv2: Scalable and improved flexible vision transformer for diffusion model. arXiv preprint arXiv:2410.13925 , 2024. 2[35] Takuto Yamamoto, Hirosato Akahoshi, and Shigeru Kitazawa. Emergence of human-like attention in self-supervised vi-sion transformers: an eye-tracking study. arXiv preprint arXiv:2410.22768 , 2024. 3 [36] Jingfeng Yao, Cheng Wang, Wenyu Liu, and Xinggang Wang. Fasterdit: Towards faster diffusion transformers training with-out architecture modification. Advances in Neural Informa-tion Processing Systems , 37:56166–56189, 2024. 2, 8 [37] Sihyun Yu, Sangkyung Kwak, Huiwon Jang, Jongheon Jeong, Jonathan Huang, Jinwoo Shin, and Saining Xie. Representa-tion alignment for generation: Training diffusion transformers is easier than you think. arXiv preprint arXiv:2410.06940 ,2024. 1, 2, 6 [38] Hongkai Zheng, Weili Nie, Arash Vahdat, and Anima Anand-kumar. Fast training of diffusion models with masked trans-formers. arXiv preprint arXiv:2306.09305 , 2023. 2

@@ -1,0 +1,826 @@
+Title: Jellyfish: Zero-Shot Federated Unlearning Scheme with Knowledge Disentanglement
+
+URL Source: https://arxiv.org/pdf/2604.04030v1
+
+Published Time: Tue, 07 Apr 2026 01:08:11 GMT
+
+Number of Pages: 38
+
+Markdown Content:
+# Jellyfish: Zero-Shot Federated Unlearning Scheme with Knowledge Disentanglement 
+
+## Houzhe Wang, Institute of Information Engineering, Chinese Academy of Sciences, Beijing, China, wanghouzhe@iie.ac.cn 
+
+## Xiaojie Zhu ∗
+
+## , King Abdullah University of Science and Technology, Thuwal, Kingdom of Saudi Arabia, xiaojie.zhu@kaust.edu.sa 
+
+## Chi Chen, Institute of Information Engineering, Chinese Academy of Sciences, Beijing, China, chenchi@iie.ac.cn 
+
+Abstract 
+
+With the increasing importance of data privacy and security, federated unlearn-ing emerges as a new research field dedicated to ensuring that once specific data is deleted, federated learning models no longer retain or disclose related information. In this paper, we propose a zero-shot federated unlearning scheme, named Jel-lyfish. It distinguishes itself from conventional federated unlearning frameworks in four key aspects: synthetic data generation, knowledge disentanglement, loss function design, and model repair. To preserve the privacy of forgotten data, we design a zero-shot unlearning mechanism that generates error-minimization noise as proxy data for the data to be forgotten. To maintain model utility, we first propose a knowledge disentanglement mechanism that regularises the output of the final convolutional layer by restricting the number of activated channels for the data to be forgotten and encouraging activation sparsity. Next, we construct a comprehensive loss function that incorporates multiple components, including hard loss, confusion loss, distillation loss, model weight drift loss, gradient harmo-nization, and gradient masking, to effectively align the learning trajectories of the objectives of “forgetting” and “retaining”. Finally, we propose a zero-shot repair mechanism that leverages proxy data to restore model accuracy within accept-able bounds without accessing users’ local data. To evaluate the performance of the proposed zero-shot federated unlearning scheme, we conducted comprehen-sive experiments across diverse settings. The results validate the effectiveness and robustness of the scheme. 
+
+Keywords: federated unlearning, knowledge disentanglement, zero-shot, model repair. 
+
+> ∗
+
+Corresponding author 
+
+1 
+
+> arXiv:2604.04030v1 [cs.CR] 5 Apr 2026 Fig. 1 The motivation for knowledge disentanglement. The upper diagram illustrates the phe-nomenon of inter-class feature mixing during the feature extraction process in conventional models. This mixing leads to the simultaneous activation of features for cats and dogs in the activation maps (as shown in the red areas), affecting the accurate representation of single-class features. The lower diagram demonstrates the effect after applying knowledge disentanglement, where the model learns to represent features with less mixing. The activation maps show clearer class specificity (blue is pri-marily related to cats, and yellow to dogs). This disentanglement reduces activation overlap between different classes, enhancing the model’s interpretability.
+
+# 1 Introduction 
+
+Federated learning represents an advanced distributed machine learning paradigm that enables multiple clients to collaboratively train a shared global model without the need to share their local data [1] [2]. This approach effectively overcomes a fundamental challenge in traditional machine learning by enabling model training without the need for centralized storage or processing of datasets. Federated learning overcomes this limitation by enabling distributed training, allowing data holders to retain ownership and control of their data while collaboratively contributing to the development of a global model. In this framework, participants only need to upload the updated parameters of their local models to a central server, which aggregates these updates to refine the global model. This approach effectively safeguards client data privacy by ensuring that raw data is retained locally. However, within the federated learning framework, users may request the removal of their contribution from the trained global model. Moreover, recent regulations such as the European Union’s General Data Protection Regulation (GDPR) [3] and the California Consumer Privacy Act (CCPA) [4] empower individuals with the right to demand the deletion of their private data from any part of the system within a reasonable time frame. Furthermore, even if the original data were never shared, the global machine learning model could still glean information about the clients [5] [6]. The predictions made by the global model could potentially leak client information [7][8]. Therefore, a compelling need arises for a method to effectively eliminate a client’s contribution from the trained global model. Two approaches exist to ensure that a global model forgets the contributions of a specific client. The first involves retraining the model from scratch after excluding 2the data of the target user [9]. The second approach directly removes the user infor-mation from the trained model’s parameters while preserving its overall utility[10]. However, retraining becomes impractical when dealing with large datasets and com-plex models due to its significant time and energy demands, high computational costs, and scalability challenges. Consequently, there is a growing interest in developing cost-effective federated machine unlearning algorithms that efficiently mitigate the influence of deleted data on trained models. To efficiently mitigate the impact of deleted data on trained models, we identi-fied the critical importance of knowledge disentanglement. As shown in Figure 1, we introduce the motivation for the disentanglement of knowledge. Conventional models extract mixed features from many classes [11], known as knowledge entanglement [12], hindering interpretability and class-specific feature representation. We aim to reduce mixed features through knowledge disentanglement, ensuring the extraction of fea-tures that correspond to only one (or a few) classes, making them class-specific. This enhances interpretability and strengthens the representation of class-related features. It ensures that the removal of specific data does not negatively impact the perfor-mance or accuracy of other unrelated data in the model. This process is essential to ensure that the removal of specific data does not negatively impact the performance or accuracy of other unrelated data in the model. However, disentangling knowledge is a challenging task, as representations from different classes often become interwined during the training process. This entanglement can lead to over-forgetfulness during the unlearning process, where removing data from one class inadvertently degrades the accuracy of other unrelated classes. Lin et al. highlighted that the most representative knowledge learned by machine learning models is the features extracted by the convo-lutional layers [12]. However, the features of different classes are intertwined, making it challenging to transfer knowledge of the target class without affecting other classes. Zhu et al. attempted to address the scenario in which there is a mismatch between the target concept label domain and the label domain of the data to be forgotten [13]. This misalignment can lead to two key issues: over-forgetfulness or insufficient forget-ting. Liang et al. pointed out that filters in CNNs typically extract features mixed with various semantic concepts, including objects, parts, scenes, textures, materials, and color categories [14]. Therefore, reducing entanglement is crucial for humans to interpret the concepts of filters. In addition, in conventional federated unlearning, users are required to submit the target data to be deleted to the server. This process often involves the use of private information, which raises concerns about maintaining the privacy and security of the user’s sensitive data during the unlearning process. Tarun et al. [15] and Chundawat et al. [16] observed that in specific cases, machine learning models are trained using sen-sitive data such as facial images and personal medical information. Given the highly sensitive nature of these data and the constraints imposed by data protection regula-tions such as GDPR [3] and CCPA [4], it may not be feasible to use the original data to perform the unlearning process, even when asked to forget. Lastly, the unlearn-ing process often involves two conflicting optimization objectives: first, ensuring that the model forgets the specified data, and second, preserving the model’s knowledge 3of the remaining data. Balancing these objectives is crucial to achieving efficient and effective unlearning without degrading the performance of non-removed data. Several studies [17–21] proposed perturbing model weights based on computational estimates of the impact of forgotten data. This technique selectively adjusts the param-eters most influenced by the removal of specific data, allowing the model to effectively forget the targeted information while preserving the integrity of the remaining learned knowledge. While these methods can effectively diminish the model’s capabilities on forgetting dataset Df , careful calibration is crucial to avoid over-forgetfulness. Exces-sive forgetting can lead to a significant decline in the model’s performance on the remaining dataset Dr after the removal of the targeted data, potentially resulting in a collapse of its overall effectiveness. To improve the model’s ability to retain knowledge of the non-targeted data, recent studies [15, 22–26] have incorporated training or distillation using Dr into the for-getting process. Unlike retraining from scratch, these methods selectively focus on reinforcing the model’s knowledge of the non-targeted data. By incorporating direct training signals from Dr, these methods guide the model to relearn essential informa-tion that may be inadvertently lost during the unlearning process, without the need for full retraining. Particularly, recent works [27–31] often incorporated multiple objectives into a sin-gle loss function, aiming for multi-objective optimization by minimizing the combined loss. However, since different components of the loss function correspond to distinct optimization paths, this results in optimization challenges [10]. To address the aforementioned challenges, we propose a novel federated unlearning paradigm, named Jellyfish. The key innovations of our work are highlighted as follows: 1. Knowledge disentanglement: To mitigate knowledge entanglement, we introduce a knowledge disentanglement mechanism that regularizes the output of the final convolutional layer by limiting the number of activation channels for the data to be forgotten and promoting sparsity in activations. 2. Zero-shot Unlearning and Repair Mechanism: To safeguard the privacy of for-gotten data, we design a zero-shot unlearning mechanism through generating error-minimization noise as proxy data for the forgotten data. Furthermore, to maintain model performance, we propose a zero-shot repair mechanism that lever-ages proxy data to restore accuracy within acceptable bounds without accessing users’ local data. 3. Multi-Objective Optimization with Gradient Harmonization and Masking: To rec-oncile conflicting optimization objectives, we design a comprehensive loss function that integrates hard loss, confusion loss, distillation loss, model weight drift loss, gradient harmonization, and gradient masking, effectively aligning the learning trajectories of the “forgetting” and “retaining” tasks. Finally, we conduct comprehensive experiments, and the results illustrate the effectiveness and robustness of the proposed scheme. 4Algorithm 1: Jellyfish: Zero-Shot Federated Unlearning Scheme 
+
+Input : initialized model parameter ω0, global model parameter ωt,reference model parameter ωref , disentangling learning rate μdis ,unlearning learning rate μun , repair learning rate μre , disentangling epoch number Edis , unlearning epoch number Eun , performance repair epoch number Ere (optional), user deletion request Df , user remaining dataset Dr (optional), disentangling threshold α
+
+Output: unlearned global model  
+
+> 1
+
+Procedure Federated Unlearning : 
+
+> 2
+
+Df , D r ← Error -M inimization N oise (Df , D r);  
+
+> 3
+
+ωref ← ωt; 
+
+> 4
+
+Disentangle :
+
+for epoch = 1 , 2, 3, . . . , E dis do  
+
+> 5
+
+foreach batch in Df do  
+
+> 6
+
+Ldisentangle ← calculate Disentangle loss( Df , α ) using equation 6;  
+
+> 7
+
+ωt ← ωt − μdis ∇ω Ldisentangle ; 
+
+> 8
+
+end  
+
+> 9
+
+end  
+
+> 10
+
+Unlearn :
+
+for epoch = 1 , 2, 3, . . . , E un do  
+
+> 11
+
+foreach batch in Df do  
+
+> 12
+
+Lunlearn ← calculate unlearn loss( batch, ω t, ω 0) using equation 8;  
+
+> 13
+
+Ldrift ← calculate drift loss( ωref , ω t) using equation 17;  
+
+> 14
+
+gf ← ∇ ω Lunlearn ; 
+
+> 15
+
+gr ← ∇ ω Ldrift ; 
+
+> 16
+
+g′ 
+
+> r
+
+← Gradient Masking( gr, g f , π ) using equation 21;  
+
+> 17
+
+G ← Gradient Harmonization( gf , g ′
+
+> r
+
+);  
+
+> 18
+
+ωt ← ωt − μun G using equation 20;  
+
+> 19
+
+end  
+
+> 20
+
+end  
+
+> 21
+
+Repair(optional): 
+
+Dr ← Nr list ; 
+
+> 22
+
+for epoch = 1 , 2, 3, . . . , E re do  
+
+> 23
+
+foreach batch in Dr do  
+
+> 24
+
+xr, y r ← Dr; 
+
+> 25
+
+Lrepair ← MSE( M (xr), y r);  
+
+> 26
+
+ωt ← ωt − μre ∇ωt Lrepair ; 
+
+> 27
+
+end  
+
+> 28
+
+end  
+
+> 29
+
+return ωt;52 Related Work 
+
+In this paper, we propose a federated unlearning scheme based on knowledge disen-tanglement. To properly position our contribution, we first review relevant prior work and then highlight the key differences between our approach and existing methods. 
+
+## 2.1 Exact Unlearning 
+
+Exact unlearning is based on the method of retraining from scratch. It mainly improves the training process of the model, so that when the model needs to forget data, it can reduce the computational and time costs of model training. Bourtoule et al. [32] introduced SISA training as an approach to alleviate the computational costs associated with forgetting. Building upon the SISA framework, several related studies have been proposed. The random forest algorithm improves the performance of the model by building multiple decision trees and summarizing their predictions [33]. In terms of unlearning, each tree corresponds to a slice in the SISA framework, trained independently and isolated from the influence of data points, so that when it is necessary to forget specific data points, only those trees that include the data point need to be retrained. DC-k-means [34], as an extension of k-means, uses a tree-based hierarchical clustering method to achieve exact unlearning. It randomly divides the data into multiple subsets and trains a k-means model on each subset, finally constructing the final clustering result by merging these models. KNOT [35] uses the SISA framework to implement client-level asynchronous exact unlearning. Through cluster aggregation, clients are grouped, and the server aggregates the model within the cluster, while each cluster trains independently. Data deletion requests only trigger retraining of clients in the same cluster. Additionally, there are researchers exploring the relationship between the model and data, as well as efforts focused on enhancing training efficiency. [36] draws inspiration from statistical query learning and designs an intermediate layer called “Summation”, which serves as a buffer between the machine learning algorithm and the training data, making the algorithm learn through summarized statistical infor-mation rather than original data. Liu et al. [37] uses the first-order Taylor expansion approximation technique to customize a rapid retraining algorithm based on diagonal experience FIM. 
+
+## 2.2 Approximate Unlearning 
+
+Approximate unlearning aims to minimize the impact of data that needs to be deleted or forgotten to an acceptable level while also achieving an efficient unlearning process. Compared to exact unlearning techniques, approximate unlearning offers sev-eral advantages, including better computational efficiency, lower storage costs, and greater flexibility. In terms of computational efficiency, approximate unlearning meth-ods reduce computational costs by minimizing rather than completely deleting the impact of data, as opposed to exact unlearning methods that require retraining with the remaining data [9]. For instance, the method proposed in [9] adjusts model param-eters to reduce the influence of specific data, thus reducing computational intensity compared to exact unlearning. Regarding storage overhead, approximate unlearning 6methods, such as those presented by Sekhari et al. in [38], store only necessary statis-tical information of the data, thereby significantly reducing storage costs. In terms of flexibility, approximate unlearning methods are highly adaptable, as they typically do not rely on specific learning models or data structures, allowing for broader applica-tion to a variety of learning algorithms [36]. This flexibility is related to the trade-off between completeness and efficiency made by approximate unlearning, allowing for adaptation to new data and tasks by accelerating the unlearning process and reducing costs while maintaining model performance. For example, Zhang et al. [39] eliminate client influence by extracting the weighted sum of gradient residuals from the global model and introducing Gaussian noise. This process is designed to achieve statistical indistinguishability between the unlearned and retrained models. Liu et al. [40] reconstruct the forgotten model using parameter updates stored on the server, introducing a novel calibration method to adjust client updates. This innovative approach aims to enhance the speed of unlearning while preserving model performance. Meng et al. [41] analyze the privacy threats in semantic communica-tion across its training, encoding, and transmission stages, demonstrating how defense techniques can enhance the privacy assurance of federated unlearning. This compre-hensive survey provides a valuable reference for constructing an end-to-end secure data lifecycle management framework. Additionally, Baumhauer et al. [42] and Thudi 
+
+et al. [43] emphasize the pursuit of higher efficiency in machine unlearning by relax-ing the requirements for both effectiveness and provability. Izzo et al. [44], Neel et al. [45], and Wu et al. [46] explore techniques for the server to effectively approxi-mate gradients during the unlearning process by leveraging historical gradients and model weights. Chourasia et al. [22] enhances model robustness in addressing data deletion. Halimi et al. [47] and Wu et al. [48] employed a gradient-based approach to forget data, using the gradient information from the forgetting set. Wu et al. [49] and Zhu et al. [50] explored knowledge distillation to selectively remove data from models, enhancing the unlearning process in federated learning environments. Wang et al. [30] propose Goldfish, an efficient federated unlearning framework, consisting of four mod-ules: basic model, loss function, optimization, and extension. Each module is crafted to enhance the practicality of the framework. 
+
+## 2.3 Zero-shot Unlearning 
+
+In recent years, a novel paradigm of machine unlearning, called zero-shot unlearning, has emerged. This approach aims to achieve unlearning without requiring access to the original data [51]. Chundawat et al. [16] were the pioneers in proposing methods for the zero-shot unlearning setup, where neither the retained data Dr nor the data requested for forget-ting Df are accessible. UNSIR [15] introduced the concept of zero-glance unlearning, a technique that allows data forgetting in a zero-observation privacy setting, where the model does not have visibility into the data categories that need to be forgotten. EMMN [16] is a zero-shot machine unlearning technique that extends UNSIR [15] by maximizing the loss related to the forgotten categories to obtain noise for data forget-ting and minimizing the loss of the remaining data to obtain noise for repair. Fan et al. 
+
+[52] demonstrate that diffusion models can effectively fit complex data distributions 7through a forward noising and reverse denoising process, thereby generating synthetic samples that preserve the statistical properties of the original data. Gated Knowledge Transfer (GKT) [16] is a zero-shot machine unlearning method aimed at achieving data forgetting through a knowledge distillation strategy. Zero-shot unlearning using Lips-chitz Regularization (JiT) [53] is also a zero-shot unlearning technique that leverages Lipschitz continuity to minimize the model’s output sensitivity to input perturbations [54], thereby achieving the forgetting of specific data points while maintaining the overall performance of the model. 
+
+## 2.4 Knowledge disentanglement 
+
+In the domain of knowledge disentanglement, recent research has primarily focused on effectively removing the influence of specific data points from machine learning models, with a strong emphasis on preserving data privacy. Zhu et al. [13] introduced a framework known as TARget-aware Forgetting (TARF), which is designed to achieve knowledge disentanglement by differentiating between concepts. The TARF framework isolates target concepts through annealed gradient ascent on data to be forgotten, combined with selective gradient descent on the remaining data. This approach enables more precise forgetting of specific concepts while preserving model performance. Zhu et al. ’s work offers a novel perspective in the field of machine unlearning, particularly for complex forgetting scenarios that require a careful balance between unlearning effectiveness and model performance retention. While effective in isolating target concepts, its requirement for direct access to the orig-inal forgetting data poses a privacy risk in federated settings, making it less suitable for strict privacy regulations like GDPR. Liang et al. [14] aimed to enhance the interpretability of Convolutional Neural Networks (CNNs) by introducing a learnable sparse Class-Specific Gate (CSG) struc-ture. This design encourages the development of class-specific filters, where each filter responds only to one or a few classes. Their approach effectively reduces the filter-class entanglement, i.e. , the complex correspondence between filters and classes. More-over, it demonstrates practical advantages in tasks such as object localization and adversarial sample detection. However, their method is primarily designed for model interpretability during training, not for the unlearning process post-training. Shen et al. [12] introduced the ERM-KTP method, which defines knowledge dis-entanglement from a knowledge perspective and proposes a knowledge-level machine decoupling approach. During training, an Entanglement Reduction Mask (ERM) is employed to reduce the entanglement of knowledge points across different classes. Upon receiving an unlearning request, the Knowledge Transfer and Prohibition (KTP) mechanism transfers the knowledge of non-target data points from the original model to a decoupled model, while explicitly prohibiting the transfer of target knowledge. This approach not only improves the interpretability of the disentanglement process but also achieves strong performance in terms of efficiency, fidelity, and scalability. Nevertheless, similar to [13], it operates under the assumption that the data to be forgotten is accessible, which conflicts with the zero-shot principle we aim to uphold. The proposed Jellyfish scheme distinguishes itself from existing federated unlearn-ing approaches through a systematic integration of adapted and novel components. 8While it incorporates effective concepts from prior work—such as the use of noise for inducing randomness [23] and error-minimization-based data proxying [16]—its core contributions are uniquely tailored to the federated setting. These contributions are fourfold: First, the framework establishes a complete zero-shot unlearning pipeline. Unlike methods that require access to the original forgotten data [12, 13], Jellyfish operates entirely using proxy data, ensuring that no raw data is accessed or transmitted during the unlearning process. Second, we introduce a novel knowledge disentanglement mechanism that is for-mally integrated as an optimization objective within the training process. This approach explicitly reduces feature entanglement across classes by sparsifying activa-tion channels related to the data to be forgotten, thereby enhancing both the precision of unlearning and model interpretability. Third, the loss function incorporates a new form of confusion loss and combines multiple objectives, including hard loss, distillation loss, model weight drift loss, gradient harmonization, and gradient masking, into a unified optimization framework. Fourth, the proposed zero-shot repair mechanism enables model performance recov-ery without relying on any original remaining data. By utilizing proxy data for repair, Jellyfish maintains full compliance with data privacy constraints while preserving model utility. In summary, Jellyfish advances the state of the art by introducing federated-specific innovations in disentanglement, loss design, and end-to-end zero-shot capability, setting it apart from existing partial or non-federated alternatives. 
+
+# 3 Preliminaries 
+
+In this section, we provide background on federated learning and federated unlearning. Additionally, the frequently used notations are summarized in Table 1.                   
+
+> Table 1 Summary of Notations Notations Description
+> Nclient Number of clients
+> cClient index
+> DComplete dataset
+> Dfforgetting dataset
+> Drremaining dataset
+> DcLocal dataset
+> A(·)Learning algorithm
+> U(·)Unlearning algorithm
+> ω0initialized global model
+> ωtglobal model at t-th round
+> ωtcClient c’s local model at t-th round
+> ωun Unlearned model
+> ω∗Retrained model
+
+93.1 Federated Learning 
+
+Federated Learning (FL) [2] is a distributed machine learning paradigm that has recently garnered significant attention. It allows individuals to collaborate in training a global machine learning model without the need to share their private training data with others. FL typically consists of a server and Nclients clients. During the FL training process, at the initial stage, each client c initializes its local client model ω0
+
+> c
+
+using the initialized global model ω0. In the subsequent rounds, each client c conducts local training using the current round t global model ωt and its local training data 
+
+Dc, with the learning algorithm denoted as A(ωtc, D c) = ωt+1  
+
+> c
+
+, and then sends its local model update ωt+1  
+
+> c
+
+to the server. After receiving model updates from all clients, the server utilizes a specific aggregation rule to combine the received model updates and update the global model. The updated global model ωt+1 is then distributed to all clients for the next round of training. For instance, the FedAvg [2] aggregation rule calculates the average of model updates to obtain the global model, which is used in non-adversarial scenarios. One advantage of FL over centralized learning is that clients no longer need to send their private training data to the server. The model aggregation scheme of FedAvg is shown as Equation 1: 
+
+ωt+1 = 1
+
+Nclients 
+
+> Nclients
+
+X
+
+> c=1
+
+ωt+1  
+
+> c
+
+(1) where Nclients is the total number of clients. 
+
+## 3.2 Federated Unlearning 
+
+Federated Unlearning (FU) has emerged as a critical strategy within FL, enabling the elimination of the influence of specific knowledge, whether individual data points, features, or broader data concepts, from a pre-trained FL model without requiring complete retraining from scratch. This capability is particularly crucial in federated environments, where data privacy and computational efficiency are paramount. The subset of knowledge designated for removal is referred to as the forgetting set. The primary objective of FU is to efficiently update the pre-trained FL model such that its performance closely approximates that of a model retrained from scratch, excluding the forgetting set, while preserving the integrity of the remaining knowledge. Upon receiving user deletion requests, this entire dataset D is partitioned into two disjoint subsets: the forgetting set Df and the retention set Dr, such that Df ∩Dr = ∅
+
+and Df ∪ Dr = D. Upon receiving unlearning requests, the server applies an unlearn-ing algorithm U (ωt, D f , D r ) = ωun , where ωun denotes the model parameters after unlearning. Note that Df and Dr are optional depending on the specific unlearning scenarios. As shown in the following equation, the optimization goal is to ensure that 
+
+ωun approximates the parameters ω∗ of a model retrained from scratch on Dr, thus maintaining performance while removing the influence of Df .min  
+
+> ωun
+
+Dis (ωun , ω ∗, D ) where ω∗ = A(ω0, D r ) (2) 10 Here, Dis denotes an evaluation function used to quantify the difference between two models ( e.g. , based on loss, accuracy on the same dataset, or other metrics). The task of federated unlearning inherently involves both “forgetting” and “remembering”, making it conceptually similar to multi-task learning [10]. In line with this perspec-tive, the loss function in Goldfish [30] is crafted to address multiple objectives: (1) minimizing the hard loss between model predictions and ground-truth labels on the remaining dataset Dr, (2) mitigating the bias in predictions on the removed dataset 
+
+Df , and (3) assessing the confidence of the model’s predictions on Df . In this paper, we adopt a similar principle and further enhance the loss function design by incorporating additional components aimed at improving overall performance and robustness. 
+
+# 4 Proposed Federated Unlearning Scheme: Jellyfish 
+
+In this section, we first provide an overview of the proposed federated unlearn-ing scheme: Jellyfish. We then introduce the approach for generating proxy data to approximate the forgotten data. Following this, we propose the knowledge disentan-glement technique tailored for forgotten data, and detail the novel construction of the loss function. Finally, we conclude with a description of the proposed model repair procedure. 
+
+## 4.1 Overview 
+
+In this section, we outline the proposed zero-shot federated unlearning scheme. As shown in Figure 2, when a user i issues a forgetting request for a dataset Dif , the server avoids direct data sharing by employing an error-minimization noise approach to generate proxy data that approximates the forgotten samples. Next, we perform knowledge disentanglement on the proxy data, constraining its influence within spe-cific channels of the model and minimizing its association with unrelated categories.             
+
+> Fig. 2 Proposed Jellyfish Scheme: 1○Noise Training: The user requests data deletion locally and trains proxy data Nfto replace the deleted data. 2○Knowledge Disentanglement: When the server receives the data, it first disentangles the data to reduce knowledge entanglement between categories. 3○Unlearn: The model is guided to forget by using an improved loss function and mechanisms like gradient harmonization. 4○Repair: If the model’s accuracy drops after unlearning, the proxy data of the remaining data Nris used to restore the model’s performance.
+
+11 Subsequently, we design a comprehensive loss function to guide the model through the forgetting process. This loss function consists of six components: hard loss, confusion loss, distillation loss, model weight drift loss, gradient harmonization, and gradient masking. The hard loss explicitly targets the information to be forgotten, while the confusion loss and distillation loss focus on redistributing the class-related informa-tion of the forgotten data. To mitigate the performance degradation resulting from the forgetting process, the model weight drift loss is introduced to compute the gra-dient updates that help preserve the model’s original performance. Additionally, a gradient harmonization mechanism is employed to resolve conflicts between gradient directions arising from the competing objectives of forgetting and retention. Finally, gradient masking is applied to suppress the retention of knowledge associated with forgotten data, ensuring a more precise and effective unlearning process. Once the server completes the unlearning process, it redistributes the unlearned global model to all users. If some users observe a significant decline in model performance, they can generate error-minimization noise to construct proxy data that approximates the removed dataset Dr . These proxy data are then sent to the server to initiate a repair process, which helps restore the model’s performance to an acceptable level. 
+
+## 4.2 Error-Minimization Noise 
+
+In federated learning, users collaboratively train a global model without sharing their raw data. However, when a user submits a data deletion request, the user must pro-vide the specific data to be removed, which poses a significant risk of data privacy leakage. This concern is especially critical in contexts involving sensitive information, such as facial images or personal medical records. Furthermore, strict data protection regulations, such as the GDPR [3] and CCPA[4], impose strict time constraints on pro-cessing user data deletion requests. As a result, even the data necessary for executing the unlearning process may be restricted from further use [15]. Our objective is to enable users to request immediate deletion of their data and ensure their complete removal from the trained model. After the model weights are updated, the model should no longer retain any information related to the deleted data. To preserve data privacy, we introduce zero-shot unlearning techniques into the federated unlearning framework. Unlike conventional federated unlearning methods, which typically require users to submit the data they wish to delete as part of a forgetting request processed by the central server, our approach eliminates the need for direct access to the original data, thus enhancing data privacy and compliance with strict regulatory requirements. To mitigate the potential data privacy risks associated with transmitting deletion requests to the server, inspired by [15, 16], we design an algorithm that generates error-minimization noise as a proxy for Df . Intuitively, this noise is not derived from the statistical properties of the original data but is generated through an adversarial optimization process. We start with a random noise matrix and iteratively adjust it by minimizing the prediction error of the current model on the target class (as defined in Equation 3). The core idea is to create synthetic data that the model confidently recognizes as the class to be forgotten, without this data containing any recognizable features from the actual private dataset. Since only the optimized 12 Algorithm 2: Error-Minimization Noise 
+
+Input : global model M , training noise learning rate μno , training noise epoch number Eno 
+
+Output: Nf , Nr (optional)  
+
+> 1
+
+Procedure Error-Minimization Noise( Nf , N r ): 
+
+> 2
+
+Nf list ← [ ];  
+
+> 3
+
+foreach Class data in Df do  
+
+> 4
+
+for epoch = 1 , 2, 3, . . . , E no do  
+
+> 5
+
+Get batch size B, channel dimension C, data size H, W from Class data;  
+
+> 6
+
+Initialize noise matrix Nf ∈ RB×C×H×W ; 
+
+> 7
+
+Nf ← TrainNoiseData( Class data, N f , μ no );  
+
+> 8
+
+Nf list.append (Nf );  
+
+> 9
+
+end  
+
+> 10
+
+end  
+
+> 11
+
+optional: 
+
+Nr list ← [ ];  
+
+> 12
+
+foreach Class data in Dr do  
+
+> 13
+
+for epoch = 1 , 2, 3, . . . , E no do  
+
+> 14
+
+Get batch size B, channel dimension C, data size H, W from Class data;  
+
+> 15
+
+Initialize noise matrix Nr ∈ RB×C×H×W ; 
+
+> 16
+
+Nr ← TrainNoiseData( Class data, N r , μ no );  
+
+> 17
+
+Nr list.append (Nr );  
+
+> 18
+
+end  
+
+> 19
+
+end  
+
+> 20
+
+return Nf list, N r list ; 
+
+> 21
+
+Procedure TrainNoiseData( Class data, N, μ no ): 
+
+> 22
+
+foreach batch in Class data do  
+
+> 23
+
+imgs, labels ← Class data;  
+
+> 24
+
+LN ← calculate noise loss using equation 3;  
+
+> 25
+
+N ← N − μno ∇N LN ; 
+
+> 26
+
+end  
+
+> 27
+
+return N ;noise, which is devoid of any genuine data patterns, is shared with the server, the privacy of the forgotten data is effectively preserved. Specifically, when a user i submits a deletion request Dif , which consists of nB batches, the user first locally trains a noise matrix N if (j) ∈ RB×C×H×W , where B represents the batch size, C is the number of channels, and H and W represent the dimensions of the actual sample size. N if (j) is initialized by sampling from a standard Gaussian distribution, i.e., N if (j) ∼ N (0 , 1), 13 which provides a neutral starting point for optimization. The index j corresponds to the batch number, where j ∈ [1 , n B ]. The noise matrix N if serves as a proxy for Dif ,and is transmitted to the server for use in the subsequent unlearning process. The noise matrix is optimized locally by minimizing the loss function in Equation 3: 
+
+LN if = 1
+
+nBnBX
+
+> j=1
+
+−yif (j) log M (N if (j)) (3) where yif (j) represents the class label of the data to be forgotten, nB denotes the num-ber of batches in the noise matrix, and M (N if (j)) refers to the predicted probability distribution generated by inputting the j-th batch of noise N if (j) into the classifier model being unlearned. In scenarios where multiple users i = 1 , 2, . . . , n f simultaneously submit deletion requests Dif , each user independently trains a noise matrix N if locally. These noise matrices serve as proxies for their respective deletion requests and are then transmitted to the central server for further unlearning processing. The local training process for each user (lines 4-9 in Algorithm 2) continues for a fixed number of epochs Eno , which serves as a straightforward convergence criterion to ensure computational efficiency and predictability. While users train their noise matrices independently, potential inconsistencies in noise quality across users are mitigated by the server-side aggrega-tion defined in Equation 4. This aggregation averages the contributions from all users, inherently reducing the variance introduced by any single low-quality noise matrix. Furthermore, all users adhere to the same hyperparameters (e.g., learning rate μno )during local noise training, promoting a baseline level of consistency in the optimiza-tion process across different clients. On the server side, the received noise matrices 
+
+{N 1 
+
+> f
+
+, N 2 
+
+> f
+
+, . . . , N nf 
+
+> f
+
+} are aggregated into a unified noise matrix set, denoted as Nf . This combined matrix Nf effectively simulates the collective influence of all the data tar-geted for deletion. The optimization objective for Nf is defined as the synthesis of the local optimization goals from each user. Specifically, this objective is expressed in Equation 4: 
+
+LNf = 1
+
+nfnf
+
+X
+
+> i=1
+
+1
+
+niBniBX
+
+> j=1
+
+−yif (j) log M (N if (j)) (4) where nf is the number of users, and niB is the i-th user’s batch number. To achieve effective unlearning, we minimize the error between the noise matrix and the forgotten class, ensuring that the noise matrix adequately replaces the deleted data Df . This approach enables zero-shot federated unlearning, where users send the trained noise matrix Nf to the server in place of the actual data, preserving data privacy while facilitating the unlearning process. In multi-class data scenarios, users can independently train a noise matrix for each class of data they wish to forget. These noise matrices are then transmitted to the server, where they are integrated into the unlearning process. This approach ensures both privacy preservation and compliance with unlearning requests across multiple data classes. 14 4.3 Knowledge Disentanglement of Forgotten Data 
+
+During the unlearning process, removing the forgetting data Df can inadvertently lead to the knowledge loss of the remaining dataset Dr if there is knowledge entanglement between the two. To mitigate this issue, it is essential to disentangle Df from Dr ,ensuring that the integrity of Dr is preserved. Liang et al. [14] and Lin et al. [12] introduced the use of a mask vector applied after the last convolutional layer to achieve class-specific feature representations. Their optimization objective promotes sparsity in the mask vectors for each class. Inspired by this approach, we regularize the output F conv ∈ RC×H×W of the last convolutional layer for the input Df to the model. To determine the importance of each channel, we calculate the L1 norm of its output feature map F conv i ∈ RH×W , where i ∈ C.Channels with larger L1 norms are considered more representative of the data from Df .The disentangling process involves suppressing the outputs of less important channels based on their L1 norms. Using a specified channel retention ratio α ∈ (0 , 1), we compute a threshold T hr to retain only the top α proportion of channels out of the total C channels. Channels with L1 norm values below T hr are suppressed. This process ensures the effective separation of Df ’s knowledge from the rest of the data. The procedure is mathematically described by Equations 5 and 6: 
+
+T hr = Threshold( α, F conv ) (5) 
+
+Ldisentangle = 1(1 − α)C
+
+> C
+
+X
+
+> i=1
+
+norms( F conv i ) (6) where norms( F conv i ) = 
+
+(
+
+∥F conv i ∥1 if ∥F conv i ∥1 < T hr 
+
+0 otherwise (7) By minimizing the loss Ldisentangle , the model undergoes knowledge disentan-glement, effectively reducing the entanglement of knowledge related to Df . This disentanglement process prepares the model for a more targeted and efficient forget-ting process, ensuring that the influence of the forgotten data is minimized while preserving the integrity of the remaining knowledge. 
+
+## 4.4 Loss Function Construction 
+
+The conventional approximate unlearning approach operates by building the global model from the previous iteration and selectively eliminating knowledge related to the deleted data in response to user deletion requests. The unlearning goal is to ensure that, after class-specific forgetting, the model behaves as if it had never been exposed to the deleted class data when processing future inputs. However, following the recent recommendation of [55–57], after forgetting, a model should not revert to making random predictions. Instead, it should classify the for-gotten samples into the most semantically similar remaining categories. Specifically, for each sample ( xf , y f ) ∈ Df , we first introduce a hard loss Lhard that penalizes the correct classification of the forgotten category. This encourages the model to revise 15 its predictions and shift away from the forgotten class [25, 58]. To further guide the unlearning process, we introduce a confusion loss Lconfusion , which leverages inter-class similarity to guide the model toward plausible alternative categories. Additionally, we incorporate a distillation loss Ldistillation , inspired by the method in [23], to introduce a degree of randomness. In this setup, an incompetent teacher model Mbad , which lacks exposure to the forgotten data, guides the unlearning of a student model M . Knowledge distillation is performed such that the student model’s output on Df aligns with that of the teacher. This approach ensures that only residual, non-target knowledge is retained by the student after unlearning. To precisely define the concept of guidance, we formulate our initial loss function as shown in Equation 8: 
+
+Lunlearn = Lhard + μcLconfusion + μdLdistillation (8) where the unlearning loss Lunlearn is defined as the weighted sum of three components: the hard loss Lhard , which measures the discrepancy between the output of the student model and the ground truth labels of the removed data; the confusion loss Lconfusion ,which captures the divergence between the student model’s output and the most semantically similar but incorrect class labels; and the distillation loss Ldistillation ,which enforces consistency between the outputs of the teacher model and the student model on the removed data. Constants μc and μd are hyperparameters that control the trade-off between confusion and distillation relative to the primary forgetting objective. “Forgetting” objective is driven by Lhard , which is therefore assigned the highest base weight. Lconfusion and Ldistillation act as auxiliary regularizers to guide the forgetting process more effectively, warranting lower weights. We elaborate on each of these loss components in the following paragraphs. 
+
+Hard Loss. Hard Loss quantifies the extent to which a model is penalized for correctly predicting data that has been designated for forgetting. During standard training, the model learns to minimize the loss across all samples, thus acquiring knowledge from the data. In contrast, the goal of unlearning is to reverse this process, that is, to maximize the model’s loss on the forgotten samples, effectively reducing its confidence and accuracy on them. To achieve this, we employ a cross-entropy loss function, as shown in Equation 9, where M (xf ) denotes the confidence with which the student model predicts the input feature vector xf as yf . Unlike the training process, 
+
+Lhard aims to reduce the accuracy of the student model on the forgotten samples. 
+
+Lhard = X  
+
+> (xf,y f)∈Df
+
+yf log M (xf ) (9) 
+
+Confusion Loss. The Confusion Loss Lconfusion is based on the model’s predicted probability distribution to find the closest non-correct class label for each sample. Specifically, for each sample ( xf , y f ) ∈ Df , we define the confidence of the global model M for the sample xf as P Mxf ∈ RNclass , where Nclass is the class number and 
+
+P Mxf can be calculated using the Equation 10: 16 P Mxf = exp ( zi)
+
+PNclass  
+
+> j=1
+
+exp ( zj ) (10) where zi represents the confidence of the model M in predicting xf as correct label 
+
+i (where i ∈ [1 , N class ]), and zj represents the confidence of the model M in predicting 
+
+xf as label j (where j ∈ [1 , N class ]). We find the closest non-correct class label yf ake to 
+
+xf based on the predicted probabilities of each class in P Mxf , as shown in Equation 11: 
+
+yfake = arg max 
+
+> i̸=yf
+
+P Mxf (i) where i ∈ [1 , N class ] (11) Finally, we use the cross-entropy loss function to align xf ’s output M (xf ) with its corresponding yfake , causing the model’s decision boundary to change and merging xf
+
+into the class yfake . The loss function is expressed as Equation 12: 
+
+Lconfusion = − X  
+
+> (xf,y f)∈Df
+
+yfake log M (xf ) (12) 
+
+Distillation Loss. Considering that some samples may encounter difficulties when finding yfake , where the confidence in non-correct classes is evenly matched, this sit-uation could lead to multiple possible yfake , resulting in an unclear forgetting target during the actual unlearning process. Consequently, this may cause the model to struggle with convergence. Therefore, we introduce a distillation loss to encourage randomness in the model’s predictions. We use the incompetent teacher model Mbad ’s output as the label for the student model M . The teacher model’s output vector is transformed into a prediction confi-dence vector through the softmax function. The confidence of Mbad for sample xf is represented as P Mbad  
+
+> xf
+
+∈ RNclass , which is calculated by Equation 13: 
+
+P Mbad  
+
+> xf
+
+=exp 
+
+ vi
+
+> T emp
+
+PNclass  
+
+> j=1
+
+exp 
+
+ vj
+
+> T emp
+
+ (13) where T emp represents the distillation temperature, vi indicates the teacher model 
+
+Mbad predicting xf as label i (where i ∈ [1 , N class ] ), vj indicates the teacher model 
+
+Mbad predicting xf as label j (where j ∈ [1 , N class ] ). Similarly, we define the con-fidence of the student model M for sample xf as P Mxf , which can be calculated by Equation 14: 
+
+P Mxf =exp 
+
+ zi
+
+> T emp
+
+PNclass  
+
+> j=1
+
+exp 
+
+ zj
+
+> T emp
+
+ (14) where zi indicates the student model M predicting xf as label i (where i ∈
+
+[1 , N class ]), and zj indicates the student model M predicting xf as label j (where 
+
+j ∈ [1 , N class ] ). Finally, we define Ldistillation as follows: 17 Ldistillation = DKL (P Mbad  
+
+> xf
+
+|| P Mxf ) = 1
+
+|Df |
+
+X 
+
+> xf∈Df
+
+P Mbad  
+
+> xf
+
+log P Mbad 
+
+> xf
+
+P Mxf
+
+(15) The formula shows that the greater the difference in prediction distributions between the teacher and student models on the forgotten dataset, the larger the loss value. To reduce the bias caused by a single teacher model, we introduce a set of teacher models Tset = {Ti}NT
+
+> i=1
+
+, where NT is the number of teacher models used. Finally, 
+
+Ldistillation is expressed as Equation 16: 
+
+Ldistillation = 1
+
+NT
+
+DKL (P Mbad  
+
+> xf
+
+|| P Mxf ) = 1
+
+NT
+
+1
+
+|Df |
+
+X 
+
+> xf∈Df
+
+P Mbad  
+
+> xf
+
+log P Mbad 
+
+> xf
+
+P Mxf
+
+(16) In addition to the three primary losses mentioned above, we further enrich and optimize the overall loss function by incorporating model weight drift loss, gradient harmonization, and gradient masking. 
+
+Model Weight Drift Loss. During the unlearning process, a decline in the model’s performance is inevitable. Starting with the original model, which has already reached convergence, the ideally unlearned model should remain close to the original model in parameter space to preserve the same prediction performance on the remaining data. Therefore, we define the model parameter drift loss as shown in Equation 17. 
+
+Ldrift = 12 ∥ωun − ωt∥22 (17) where ωun represents the model parameters during unlearning, and ωt represents the parameters before unlearning. By minimizing the change in model parameters, we encourage the model parameters to remain as close as possible to the original model in the parameter space during the unlearning process. We achieve the “forgetting” task of the model by minimizing the Lunlearn loss and the “remembering” task by minimizing the Ldrift . Therefore, the total loss L during the model optimization process can be expressed as Equation 18: 
+
+L = Lunlearn + Ldrift (18) The update of model parameters can be expressed as: 
+
+ωun = ωun − μ∇ω L = ωun − μ∇ω Lunlearn − μ∇ω Ldrift (19) where μ is the learning rate during the model update process. For clarity in the following explanation, we denote the gradient of Lunlearn with respect to the model parameters as gf , representing the gradient generated by the “forgetting” task, and the gradient of Ldrift with respect to the model parameters as gr , representing the gradient generated by the “remembering” task. 18 Gradient Harmonization. In the process of unlearning, forgetting and remem-bering typically represent two conflicting optimization paths. Optimizing a model to remember generalized knowledge may inadvertently cause the model to retain all knowledge, including knowledge that should be forgotten. In contrast, prioritizing for-getting might prevent the model from maintaining valuable generalized knowledge. This can lead to conflicts among gradients, thus diminishing the effectiveness of the overall optimization framework. Therefore, inspired by previous work in multitask learning [59, 60], we employ a gradient harmonization strategy that harmonizes the gradient directions of “remem-bering” and “forgetting” through gradient projection[61]. This gradient harmonization strategy effectively reduces gradient conflicts, thereby achieving a consistent and efficient optimization path that satisfies the dual objectives of learning and unlearning. To be more precise, when dealing with two gradient vectors, one resulting from the forgetting task ( gf ) and the other from the remembering task ( gr ), these gradients often clash during the optimization process. A common approach to simultaneously optimizing both tasks is simply adding gr and gf together to derive the final gradient to update the target model. However, this method may not be optimal, as conflicting gradients tend to cancel each other out, thereby reducing overall efficiency. To address this issue, we use a gra-dient projection method to harmonize the gradients associated with our two primary objectives [61], as detailed below. First, we calculate the cosine similarity between the two gradients, cos( gr, g f ) =     
+
+> gr·gf
+> ∥gr∥∥ gf∥
+
+. If the cosine similarity is less than zero, it indicates that there are conflicting components between the two gradient vectors. The gradient harmonization strategy involves computing the projection of the gradient vector gf in the direction of gr .The conflicting component can be expressed as gr ·gf   
+
+> ∥gr∥
+> gr
+> ∥gr∥
+
+, and by subtracting this component from gf , we obtain the projection gradient of gf in the direction orthogonal to gr . If the cosine similarity is greater than or equal to zero, it suggests that gr and 
+
+gf are not in conflict, and thus gradient harmonization is unnecessary. The corrected gradient g′ 
+
+> f
+
+can be represented by Equation 20: 
+
+g′ 
+
+> f
+
+=
+
+(gf − gr ·gf   
+
+> ∥gr∥
+> gr
+> ∥gr∥
+
+if cos( gr, g f ) < 0
+
+gf otherwise (20) To achieve complete “forgetting” while preserving knowledge that is essential for “remembering”, we employ a method of linearly combining the adjusted gradient vector g′ 
+
+> f
+
+with gr, resulting in the final composite gradient G, expressed as G = g′ 
+
+> f
+
++gr .This composite gradient eliminates the conflicting parts between gf and gr. This approach aims to ensure that during the optimization process, we do not disrupt the model’s “memory” of generalized knowledge, but focus on achieving this through “forgetting” of specific knowledge. In this way, the forgetting feedback becomes more consistent and efficient. 
+
+Gradient Masking The gradient mask is designed to prevent the retention of knowl-edge related to forgotten data Df in the model’s parameters. Since the model weight drift vector contains information about the original model, which may also include 19 knowledge from the forgotten data, we aim to prevent the gradient gr from carry-ing any information related to Df . Specifically, we calculate the cross-entropy loss 
+
+l(xf , y f ; ωt) = −yf log M (xf ; ωt) using the forgotten data ( xf , y f ) ∈ Df in the orig-inal model ωt. Taking the deviation of this loss with respect to ωt, we obtain the corresponding gradient ∇ω l(xf , y f ; ωt). To isolate the parameters mostly affected by 
+
+Df , we observe that the parameters with larger norm updates in the gradient are more strongly correlated with the forgotten data, which is consistent with [62]. We then define a threshold π, and for all parameter positions in the model, we apply a gradient mask: we set the mask to 1 for positions where the gradient value is less than the threshold, and 0 for the remaining positions, as shown in Equation 21: 
+
+ms = 1( ∇ω l(( xf , y f ); ωt) < π ) where (xf , y f ) ∈ Df (21) where the notation |·| represents the operation of taking the absolute value. The result-ing mask ms has the same size as the model’s parameters. To restrict the knowledge from Df , we perform an element-wise multiplication (also known as the Hadamard product) of ms with gr:
+
+g′ 
+
+> r
+
+= gr ⊙ ms (22) where ⊙ denotes the element-wise multiplication. By using the masked gradient for model updates, g′ 
+
+> r
+
+will mostly contain the knowledge from Dr.
+
+## 4.5 Repair 
+
+After the unlearning process, the server distributes the unlearned global model to all users. Upon receiving the global model, each client evaluates its performance on their local remaining dataset. Specifically, each user i calculates the percentage drop in accuracy on their remaining dataset Dir as shown in Equation 23. ∆Acc i = Acc it − Acc it+1 
+
+Acc it
+
+× 100% (23) When user i detects a significant performance drop, the user can initiate the model repair process. The error minimization noise method generates proxy data N ir for its remaining data Dir. The user i trains N ir locally by minimizing the following loss function, ensuring that the proxy data effectively captures the characteristics of Dir
+
+without retaining any information from the deleted data, as shown in Equation 24: 
+
+LN ir = 1
+
+nBnBX
+
+> j=1
+
+−yir(j) log M (N ir(j)) (24) Here, yir(j) represents the class label of Dir(j), nB denotes the batch number of the noise matrix, and M (N ir(j)) indicates the predicted probability distribution obtained by inputting the j-th batch of noise into the classifier model targeted for unlearning. 20 To address the coordination across multiple users in the federated repair process, we detail the following mechanisms. (1) Aggregation of Nr: When multiple users sub-mit their proxy repair data ( N 1 
+
+> r
+
+, N 2 
+
+> r
+
+, . . . ), the server aggregates them using a weighted average scheme, similar to the FedAvg algorithm. The weight for each user i is pro-portional to the size of their remaining dataset |Dir|, ensuring a balanced contribution that reflects the data distribution. The aggregated proxy data Nr is then used for the repair optimization in Equation 24. (2) Global Repair Scope: The repair process is designed to update the global model. Once the server performs the repair using 
+
+Nr, the updated global model ωt+1 is distributed to all clients, not just the ones who triggered the repair. This maintains model consistency across the federation. (3) Pre-vention of Repeated Repair Interference: To prevent unnecessary or conflicting repairs triggered by minor performance fluctuations, a global accuracy drop threshold δ is established. A repair request from user i is only accepted if ∆ Acc i > δ . Furthermore, as outlined in Algorithm 1 (lines 21-28), the repair is an optional, one-time proce-dure following the unlearning step, which effectively avoids repeated repair cycles and potential interference between different users’ Nr .In addition to the aspects mentioned above, it is crucial to recognize that during the federated learning process, malicious clients may submit harmful model updates, potentially causing significant damage to model performance [63, 64]. Various defense mechanisms can be employed to detect and mitigate the impact of these malicious updates. These strategies typically involve inspecting or directly computing with model weights, such as utilizing output predictions [65], intermediate states ( e.g. ,logits) [66], or different norms ( e.g. , L2 norm or cosine distance) to assess discrep-ancies between local models and the global model [67, 68] Moreover, FreqFed [69] offers an alternative defense by transforming model updates into the frequency domain to analyze their frequency components. Combined with automated clustering, it can effectively identify and remove potentially malicious updates. 
+
+(a) (b) (c)  
+
+> Fig. 3 Performance Metrics on Test Set. (a) JSD on Test Set, (b) L2 on Test Set, (c) p-value on Test Set.
+
+# 5 Experiment 
+
+In this section, we begin by outlining the objectives of the experiments. Next, we describe the experimental setup. Finally, we present and analyze the results of the 21 various experiments, offering insights into the performance of our approach compared to the existing methods. 
+
+## 5.1 Experimental Goal 
+
+Our experimental objective is to validate the effectiveness of the proposed scheme in accomplishing the task of forgetting specific data categories. Subsequently, we aim to assess the contribution of each module within the proposed method. 1. Zero-shot federated unlearning. We will conduct comparative experiments to assess whether synthetic data can effectively substitute for actual data in achieving data category forgetting. Specifically, we will examine the difference between the experimental results obtained with real data versus those with proxy data. 2. Knowledge disentanglement method. We will perform comparative experiments to verify whether the disentangling operation can effectively address the knowledge entanglement between different categories. We will investigate whether the forget-ting of categories, after disentangling, leads to a significant collateral decline in the accuracy of other categories, in addition to the target category. 3. Impact of loss function components. We will explore the impact of different parts of the loss function, including the effects of the proposed loss function components and the gradient harmony mechanism, on the performance of the unlearning process. 4. Comparison with the state of the art. We will evaluate whether the proposed unlearning method outperforms other existing unlearning techniques. 
+
+## 5.2 Experimental Setup 
+
+In the experiment, all models are implemented using PyTorch and executed on two machines: one equipped with an NVIDIA 2080 Ti GPU and another with an NVIDIA 4090 D GPU. 
+
+Dataset Description . In the experiments, we utilized three publicly available ML datasets: MNIST [70], CIFAR-10 [71], and CIFAR-100 [71]. As shown in Table 2, these datasets encompass varying attributes, dimensions, and the number of categories.                  
+
+> Table 2 Dataset Description Dataset Dimensions Classes Training Test MNIST 784 10 60000 10000 CIFAR-10 3072 10 50000 10000 CIFAR-100 3072 100 50000 10000
+
+Models . Following the most related works [23, 72, 73], we adopt four different models for our evaluation. In particular, the model for MNIST is a traditional LeNet-5 model [37] [70], which consists of 2 convolution layers, 2 max pool layers, and 2 fully connected layers for prediction output. The model selected for CIFAR-10 is ResNet32, a variant of the Residual Network (ResNet) architecture proposed by He et al. [74]. It 22 comprises 32 layers, structured with multiple residual blocks that enable the network to learn residual functions relative to its input. The model chosen for CIFAR-100 is ResNet56, an advanced variant of ResNet architecture introduced by He et al. [74]. This model, tailored for the CIFAR-100 dataset, comprises 56 layers with multiple residual blocks. 
+
+Hyperparameters . Our hyperparameter settings are aligned with those of Hitaj 
+
+et al. [72]. For the MNIST dataset, we utilize a batch size of 100, a learning rate of 0.01, and the SGD optimizer. For the CIFAR-10 and CIFAR-100 datasets, we use a batch size of 128, a learning rate of 0.01, and the Adam optimizer. In the category unlearning task, following [23], we set the number of categories to be forgotten to either 1 or 20% of the total category count. α is set to 0.9. The values of μc and μd
+
+were determined through a grid search on a validation set derived from the training data, using a representative scenario involving single-class unlearning on CIFAR-10. Both parameters are ultimately set to 0.5. 
+
+Evaluation Metrics . Based on the experimental setup of [23, 55, 75], we mea-sure the effectiveness of different forgetting learning methods using precision on the remaining dataset and precision on the forgotten dataset. Furthermore, we use L2 distance, Jensen-Shannon Divergence (JSD), and T-test to quantify the similarity between the model after applying the proposed unlearning approach and the retrained model. A smaller JSD and L2 distance indicates a higher similarity between the two distributions. A T-test is a statistical method used to determine if there is a significant difference between the means of two groups. In a T-test, the p-value (probability value) indicates the probability of obtaining the observed results (or more extreme) if the null hypothesis ( i.e. , the means of two groups are equal) is true. The smaller the p-value, the stronger the evidence against the null hypothesis, indicating a greater likelihood of a significant difference between the means of the two samples. 
+
+Baselines . To compare with the most recent and relevant work and demonstrate the effectiveness of the proposed approach, we establish the following baselines. The first baseline, denoted as B1, retrains the model from scratch [39]. It is the golden baseline of machine unlearning. The second baseline, denoted as B2, is the original model that is fine-tuned on the forget-set Df following the negative direction of the gradient descent[18]. The third baseline, denoted as B3, is the original model that is fine-tuned with the forget-set Df , randomly selecting a label to compute the cross-entropy loss function[18]. The fourth baseline, denoted as B4, is the original model that is fine-tuned only on the retain-set with a large learning rate to remove the knowl-edge on the forget-set and maximize the accuracy on the retain-set[18]. B2, B3, and 
+
+B4 are the most classic and commonly used baseline methods in the field of machine unlearning. They can also be adapted for use in federated unlearning scenarios. The fifth baseline, denoted as B5, employs an incompetent teacher model similar to our unlearning approach [23]. The sixth baseline, denoted as B6, CONFUSE[62], designs a Confusion Loss and performs Saliency-guided federated unlearning. The seventh base-line, denoted as B7, QuickDrop[76], reverse training (stochastic GA) on the distilled dataset, and fine-tuning with a few original data samples. It considers the zero-sample 23 (a) (b)   
+
+> Fig. 4 Comparison of accuracy on remaining and forgotten data using real and proxy data for unlearning. (a) accuracy on remaining data, and (b) accuracy on forgotten data.
+> Fig. 5 Accuracy of non-target categories before and after disentangling.
+
+unlearning process in federated unlearning. B6 and B7 are the most advanced meth-ods in the field of federated unlearning. The eighth baseline, denoted as B8, SCalable Remembering and Unlearning unBound (SCRUB)[77], is the state-of-the-art unlearn-ing method for deep learning settings, which uses a teacher-student network to address the forgetting problem. The ninth baseline, denoted as B9, NegGrad+[77], is a fine-tuning-based unlearning approach that achieves precise forgetting through a multitask setting of the loss function. 
+
+5.2.1 Baseline Implementation Details 
+
+The baseline methods B2, B3, B4, B7,B8, and B9 were originally designed for central-ized settings, requiring direct access to the forget set Df or its gradients on the server. To enable comparison in the federated learning context, we adapted these methods by migrating their unlearning processes to the server-only. 24 For methods B5 and B6, which were specifically designed for federated learning, we implemented them strictly according to their original papers. Their unlearning processes are executed on the client-side, with only model updates being aggregated on the server, thus fully complying with the zero-shot threat model requirements. The retraining method ( B1) serves as the performance upper bound, where the model is trained on the server using the complete original data Df . This configura-tion explicitly violates the zero-shot threat model, but its results provide a crucial theoretical performance ceiling for evaluating the effectiveness of other methods. This experimental design aims to establish a comprehensive and rigorous perfor-mance benchmark. Through the transparent adaptation strategies described above, we enable advanced methods originally designed for centralized settings to participate in federated environment evaluations. The experimental results demonstrate that the Jellyfish method, while strictly adhering to the zero-shot threat model (where the server cannot access any form of raw or proxy data), remains highly competitive com-pared to these advanced baseline methods operating under relaxed assumptions. This strongly validates the practical value and advantages of Jellyfish in privacy-preserving federated unlearning. 
+
+## 5.3 Experimental Result 
+
+Unlearning Approach Evaluation . For the unlearning task, we follow the method-ology outlined in [23], using the MNIST, CIFAR-10, and CIFAR-100 datasets to study category unlearning. Specifically, we focus on single-category unlearning and randomly select 20% of the total categories for unlearning[23]. The number of categories in the specific forgetting process is denoted as N um f . We measure the model’s test accuracy separately for the remaining and unlearned categories. To verify whether the Jellyfish scheme genuinely eliminates generalizable knowl-edge about the forgotten data Df rather than merely obscuring the memorization of training instances, we focus on analyzing the model’s behavior on the test set. Per-formance metrics on the training set will be provided as supplementary material and moved to the appendix A for reference. We use the above evaluation metrics to assess the unlearning performance of both the baselines and our method. The experimental results are summarized in Table 3. From Table 3, our method demonstrates superior performance compared to other baselines in deleted data. Moreover, our approach achieves performance comparable to B1 in the remaining data. Additionally, we employed Jensen-Shannon Divergence (JSD), L2 distance, and T-test to quantify the similarity between the model after applying the proposed unlearning approach and the retrained model on test set. The results are shown in Figure 3. From the figure, we can learn that our approach has smaller L2 values. Moreover, our method has a lower JSD value compared to other baselines, indicating that the predictive results obtained through our method are closer to those obtained through B1. In the context of the T-test, our algorithm consistently yields smaller p-values in most cases. This suggests significant differences between the predictive patterns obtained through our algorithm and those generated by the original model. 25 Table 3  Category unlearning on MNIST, CIFAR-10, and CIFAR-100 datasets. Dataset  N um f Metrics  origin  B1 B2 B3 B4 B5 B6 B7 B8 B9 Ours MNIST 1 acc on  Dr 98.90%  99.04%  93.11%  92.71%  95.26%  93.13%  95.08%  96.50%  96.76%  96.54%  97.85% acc on  Df 99.59%  0.00%  0.00%  0.00%  6.26%  0.00%  1.73%  0.31%  0.00%  0.00%  0.00% 2 acc on  Dr 99.06%  97.53%  92.79%  85.84%  87.82%  89.71%  89.34%  90.34%  91.28%  87.83%  90.84% acc on  Df 99.38%  0.00%  0.16%  1.04%  4.68%  2.46%  4.11%  0.24%  0.03%  0.00%  0.00% CIFAR-10 1 acc on  Dr 90.13%  91.70%  85.73%  79.78%  68.11%  87.56%  85.71%  84.10%  88.50%  84.78%  87.23% acc on  Df 94.60%  0.00%  0.60%  4.94%  2.50%  7.57%  9.00%  0.20%  1.10%  0.00%  0.00% 2 acc on  Dr 90.13%  90.10%  82.06%  78.36%  86.55%  87.10%  86.85%  85.79%  85.99%  84.35%  87.39% acc on  Df 93.55%  0.00%  0.25%  6.95%  7.47%  5.02%  0.65%  1.75%  0.85%  0.00%  0.15% CIFAR-100 1 acc on  Dr 64.43%  80.71%  63.70%  53.58%  50.72%  62.07%  78.24%  65.24%  64.36%  62.91%  78.45% acc on  Df 84.00%  0.00%  1.00%  5.50%  6.00%  16.00%  1.00%  0.70%  0.96%  1.00%  1.00% 20  acc on  Dr 64.43%  78.13%  47.35%  47.22%  37.67%  55.01%  58.75%  51.96%  50.46%  50.59%  58.79% acc on  Df 63.60%  0.00%  0.00%  2.70%  8.60%  19.15%  2.90%  1.02%  2.11%  0.61%  1.25% 
+
+26 Table 4 Membership Inference Attack Success Rate. Dataset Data Partition Before Unlearned Retrained MNIST Dr 81.13% 79.40% 78.83%                  
+
+> Df80.57% 50.68% 50.10% CIFAR-10 Dr96.60% 83.45% 86.07%
+> Df97.96% 53.28% 50.07% CIFAR-100 Dr89.28% 89.61% 89.22%
+> Df89.34% 52.55% 51.87%
+
+Furthermore, to substantiate the privacy guarantees of the proposed unlearning scheme, we evaluated its resilience against Membership Inference Attacks (MIA), a standard method for quantifying privacy risk[78]. The MIA success rates on both 
+
+Dr and Df are summarized in Table 4. The experimental results demonstrate that Jellyfish effectively mitigates privacy risks. On Df , the MIA success rate drops dra-matically to a level close to 50%—equivalent to random guessing—and aligns closely with the retrained model ( B1). This indicates that the unlearned model successfully removes the membership information of Df , making it statistically indistinguishable from unseen data. Concurrently, the MIA success rate on Dr remains stable, confirming that the unlearning process precisely targets the forgotten data without compromis-ing the privacy or utility of the retained data. These findings provide strong empirical evidence that Jellyfish fulfills the core privacy objective of the “right to be forgotten” by concretely reducing susceptibility to real-world privacy attacks. 
+
+Computational Efficiency Analysis. To assess the practical deployability of the Jellyfish scheme in resource-constrained federated learning, we performed a com-parative analysis of its computational overhead against two baseline methods, B1 and 
+
+B7. The evaluation focuses on three core metrics: total execution time, average batch processing time, and GPU memory consumption, as summarized in Table 5. In terms of time efficiency, Jellyfish performs comparably to B7 and significantly outperforms B1 in both total and per-iteration execution time. Regarding GPU mem-ory usage, Jellyfish consumes 4.45 GB on CIFAR-10 (higher than B7’s 3.12 GB) and 1.89 GB on CIFAR-100 (more efficient than B7’s 1.62 GB). The results confirm Jellyfish’s comprehensive advantage in computational effi-ciency. While B7 excels in individual metrics on certain datasets, Jellyfish demon-strates superior overall execution time. This efficiency is attributed to its knowledge disentanglement and gradient harmonization mechanisms, which enable the target per-formance to be reached in fewer communication rounds. Notably, on the more complex CIFAR-100 dataset, Jellyfish outperforms the baselines in both total time and memory usage, highlighting its scalability for handling complex models and data distributions. Analysis reveals that Jellyfish’s additional overhead primarily originates from client-side proxy data ( Nf ) generation and server-side knowledge disentanglement. However, this overhead is minimal: the one-time Nf generation is lightweight, as evi-denced by Jellyfish’s lower total time compared to B1, and disentanglement incurs 27 Table 5 Computational Efficiency Comparison of Different Unlearning Methods. Metric Method Dataset MNIST CIFAR-10 CIFAR-100 Average Batch Time (s/epoch)                            
+
+> B12.64 15.36 23.75
+> B76.91 4.51 5.14 Ours 3.25 4.49 5.62 Total Time (s)
+> B1903.27 2379.3 3081.23
+> B715.44 115.39 154.05 Ours 31.77 67.21 85.33 GPU Memory (GB)
+> B10.98 0.95 0.64
+> B71.95 3.12 1.62 Ours 2.48 4.45 1.89
+
+negligible cost, reflected in the low average batch time. The performance gains from reduced knowledge entanglement far outweigh this modest computational cost. 
+
+Zero-Shot Method Evaluation . We compared the accuracy obtained on the remaining data and forgotten data in the testing set when unlearning was performed with real data and proxy data, respectively. The results are shown in Figure 4, the horizontal coordinate labeled “MNIST/1” indicates the accuracy when forgetting cat-egory number 1 in the MNIST dataset, and so on. From Figure 4, we can learn that the results obtained using real and proxy data are not significantly different. The greatest difference is observed when forgetting 20 categories of the CIFAR-100 dataset, but the values are still within an acceptable range. Therefore, this demonstrates that the use of proxy data can achieve zero-shot unlearning tasks. 
+
+Knowledge Disentanglement Method Evaluation. To validate the effective-ness of the proposed disentangling method, we conducted our study on the CIFAR-10 dataset, comparing the accuracy of non-target categories when each category was unlearned. Ideally, after decoupling between different categories, the accuracy of non-target categories should not decrease significantly, and the accuracy range of non-target categories should remain within a narrow margin. We used box plots to summarize the accuracy of other categories when each category was forgotten, and the results are shown in Figure 5. From the figure, we can learn that the accuracy after disentangling is more concentrated, with fewer outliers and a higher overall level, proving that the disentangling method has reduced the entanglement of knowledge between categories. 
+
+Ablation Study. To comprehensively evaluate the contribution of each compo-nent in the proposed Jellyfish framework, we conducted an extensive ablation study on the CIFAR-10 dataset under the setting of forgetting one class. We compared the complete Jellyfish method against several variants: without knowledge disentangle-ment, without gradient harmonization, without gradient masking, without hard loss, without confusion loss, without distillation loss, without drift loss, and a variant using real data instead of proxy data (Jellyfish-real-data). For each variant, we report the accuracy on Dr and Df , as well as the L2 distance and JSD compared to the retrained model (approximation quality). The results are summarized in Table 5.3. 28 Table 6 Ablation Study of the Importance of Different Components.                                           
+
+> Variant Acc on DrAcc on DfL2 JSD
+> Without Disentanglement 84.02% 0.00% 0.28344 0.63013 Without Gradient Harmonization 75.20% 0.00% 0.59916 0.63013 Without Gradient Masking 90.21% 81.10% 0.94388 0.69315 Without Hard Loss 97.87% 32.60% 0.93813 0.69315 Without Confusion Loss 85.60% 0.00% 0.22123 0.63013 Without Distillation Loss 87.13% 0.00% 0.17709 0.63013 Without Drift Loss 84.02% 0.00% 0.29615 0.60635 Jellyfish-real-data 88.56% 0.00% 0.10596 0.60635 Complete Jellyfish 87.85% 0.00% 0.12762 0.60635
+
+The results demonstrate that the complete Jellyfish method achieves a balance between utility preservation (87.85% accuracy on Dr) and effective forgetting (0.00% accuracy on Df ), with low L2 distance and JSD to the retrained model. The variant without gradient masking exhibits a severe failure in forgetting, with Df accuracy remaining at 81.10%, indicating that gradient masking is crucial for preventing the retention of forgotten knowledge. The removal of hard loss also significantly impairs forgetting quality (32.60% accuracy on Df ), underscoring its necessity for explicitly penalizing correct predictions on forgotten data. The removal of gradient harmoniza-tion leads to the lowest utility preservation (75.20% accuracy on Dr), highlighting its role in balancing the conflicting objectives of forgetting and remembering. Knowl-edge disentanglement and drift loss contribute to stable utility preservation, as their removal results in a noticeable drop in Dr accuracy. The performance of the Jellyfish-real-data variant is comparable to the complete method, validating the effectiveness of the proposed proxy data approach. Components such as confusion loss and distil-lation loss show relatively minor individual impacts on the primary metrics in this setting but contribute to the overall robustness. By analyzing the data, the ablation study confirms that the key components of Jellyfish—particularly gradient masking, hard loss, and gradient harmonization—are essential for achieving high-performance federated unlearning. The collective inte-gration of these components enables Jellyfish to effectively forget target data while maintaining model utility and closely approximating the retrained model. 
+
+Repair Evaluation. To validate the zero-shot repair mechanism’s effectiveness, we experimented on the CIFAR-10 dataset, focusing on a client that experienced a notable accuracy decline. The client generated proxy data Nr for its remaining dataset Dr using the error-minimization noise technique. The model’s performance on the client’s local test set was evaluated across four stages: before unlearning, after unlearning, after repair, and after full retraining from scratch. The results are summarized in Table 7. 29 Table 7 Evaluation of Repair Mechanism.           
+
+> Stage Accuracy Accuracy Gap vs. Retrained Model
+> Before Unlearning 93.90% +1.64% Unlearned 85.41% -6.85% Repaired 91.88% -0.38% Retrained 92.26% 0.00%
+
+# 6 Conclusion 
+
+In this paper, we propose a zero-shot federated unlearning scheme that enhances the privacy of forgotten data by a novel zero-shot learning mechanism. Additionally, we design a new loss function that integrates the proposed knowledge disentanglement technique and harmonizes the conflicting objectives of forgetting and retaining knowl-edge through a carefully constructed combination of various losses. To preserve model performance without relying on any remaining data, we further introduce a zero-shot repair mechanism. Finally, we conduct comprehensive experiments to validate the effectiveness and robustness of the proposed federated unlearning scheme. 
+
+# Declarations 
+
+## Funding 
+
+This work is supported by the Strategic Priority Research Program of the Chinese Academy of Sciences, Grant No. XDB0690303. 
+
+## Conflict of interest/Competing interests 
+
+We have no Conflict of interest. 
+
+## Code availability 
+
+Our source code is available at https://anonymous.4open.science/r/Jellyfish-B4CD. 
+
+# References 
+
+[1] Koneˇ cn` y, J., McMahan, H.B., Yu, F.X., Richt´ arik, P., Suresh, A.T., Bacon, D.: Federated learning: Strategies for improving communication efficiency. arXiv preprint arXiv:1610.05492 (2016) [2] McMahan, B., Moore, E., Ramage, D., Hampson, S., Arcas, B.A.: Communication-efficient learning of deep networks from decentralized data. In: Artificial Intelligence and Statistics, pp. 1273–1282 (2017). PMLR [3] Regulation, G.D.P.: General data protection regulation (gdpr). Intersoft Consult-ing, Accessed in October 24 (1) (2018) 30 [4] Pardau, S.L.: The california consumer privacy act: Towards a european-style privacy regime in the united states. J. Tech. L. & Pol’y 23 , 68 (2018) [5] Nasr, M., Shokri, R., Houmansadr, A.: Comprehensive privacy analysis of deep learning. In: Proceedings of the 2019 IEEE Symposium on Security and Privacy (SP), pp. 1–15 (2018) [6] Song, M., Wang, Z., Zhang, Z., Song, Y., Wang, Q., Ren, J., Qi, H.: Analyzing user-level privacy attack against federated learning. IEEE Journal on Selected Areas in Communications 38 (10), 2430–2444 (2020) [7] Salem, A., Zhang, Y., Humbert, M., Berrang, P., Fritz, M., Backes, M.: Ml-leaks: Model and data independent membership inference attacks and defenses on machine learning models. arXiv preprint arXiv:1806.01246 (2018) [8] Bagdasaryan, E., Veit, A., Hua, Y., Estrin, D., Shmatikov, V.: How to back-door federated learning. In: International Conference on Artificial Intelligence and Statistics, pp. 2938–2948 (2020). PMLR [9] Guo, C., Goldstein, T., Hannun, A., Van Der Maaten, L.: Certified data removal from machine learning models. arXiv preprint arXiv:1911.03030 (2019) [10] Jeong, H., Ma, S., Houmansadr, A.: Sok: Challenges and opportunities in federated unlearning. arXiv preprint arXiv:2403.02437 (2024) [11] Zhang, Q., Wu, Y.N., Zhu, S.-C.: Interpretable convolutional neural networks. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp. 8827–8836 (2018) [12] Lin, S., Zhang, X., Chen, C., Chen, X., Susilo, W.: Erm-ktp: Knowledge-level machine unlearning via knowledge transfer. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 20147–20155 (2023) [13] Zhu, J., Han, B., Yao, J., Xu, J., Niu, G., Sugiyama, M.: Decoupling the class label and the target concept in machine unlearning. arXiv preprint arXiv:2406.08288 (2024) [14] Liang, H., Ouyang, Z., Zeng, Y., Su, H., He, Z., Xia, S.-T., Zhu, J., Zhang, B.: Training interpretable convolutional neural networks by differentiating class-specific filters. In: Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part II 16, pp. 622–638 (2020). Springer [15] Tarun, A.K., Chundawat, V.S., Mandal, M., Kankanhalli, M.: Fast yet effec-tive machine unlearning. IEEE Transactions on Neural Networks and Learning Systems (2023) 31 [16] Chundawat, V.S., Tarun, A.K., Mandal, M., Kankanhalli, M.: Zero-shot machine unlearning. IEEE Transactions on Information Forensics and Security (2023) [17] Foster, J., Schoepf, S., Brintrup, A.: Fast machine unlearning without retraining through selective synaptic dampening. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 38, pp. 12043–12051 (2024) [18] Golatkar, A., Achille, A., Soatto, S.: Eternal sunshine of the spotless net: Selective forgetting in deep networks. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 9304–9312 (2020) [19] Golatkar, Aditya and Achille, Alessandro and Soatto, Stefano: Forgetting outside the box: Scrubbing deep networks of information accessible from input-output observations. In: Computer Vision–ECCV 2020: 16th European Conference, Glas-gow, UK, August 23–28, 2020, Proceedings, Part XXIX 16, pp. 383–398 (2020). Springer [20] Liu, J., Xue, M., Lou, J., Zhang, X., Xiong, L., Qin, Z.: Muter: Machine unlearning on adversarially trained models. In: Proceedings of the IEEE/CVF International Conference on Computer Vision, pp. 4892–4902 (2023) [21] Mehta, R., Pal, S., Singh, V., Ravi, S.N.: Deep unlearning via randomized condi-tionally independent hessians. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 10422–10431 (2022) [22] Chourasia, R., Shah, N.: Forget unlearning: Towards true data-deletion in machine learning. In: International Conference on Machine Learning, pp. 6028– 6073 (2023). PMLR [23] Chundawat, V.S., Tarun, A.K., Mandal, M., Kankanhalli, M.: Can bad teaching induce forgetting? unlearning in deep networks using an incompetent teacher. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 37, pp. 7210–7217 (2023) [24] Fan, C., Liu, J., Zhang, Y., Wong, E., Wei, D., Liu, S.: Salun: Empowering machine unlearning via gradient-based weight saliency in both image classification and generation. arXiv preprint arXiv:2310.12508 (2023) [25] Graves, L., Nagisetty, V., Ganesh, V.: Amnesiac machine learning. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 35, pp. 11516–11524 (2021) [26] Kim, J., Woo, S.S.: Efficient two-stage model retraining for machine unlearning. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 4361–4369 (2022) [27] Alam, M., Lamri, H., Maniatakos, M.: Get rid of your trail: Remotely eras-ing backdoors in federated learning. IEEE Transactions on Artificial Intelligence 32 (2024) [28] Xia, H., Xu, S., Pei, J., Zhang, R., Yu, Z., Zou, W., Wang, L., Liu, C.: Fedme 2: Memory evaluation & erase promoting federated unlearning in dtmn. IEEE Journal on Selected Areas in Communications (2023) [29] Dinsdale, N.K., Jenkinson, M., Namburete, A.I.: Fedharmony: Unlearning scan-ner bias with distributed data. In: International Conference on Medical Image Computing and Computer-Assisted Intervention, pp. 695–704 (2022). Springer [30] Wang, H., Zhu, X., Chen, C., Esteves-Ver´ ıssimo, P.: Goldfish: An efficient federated unlearning framework. arXiv preprint arXiv:2404.03180 (2024) [31] Wang, W., Tian, Z., Zhang, C., Liu, A., Yu, S.: Bfu: Bayesian federated unlearning with parameter self-sharing. In: Proceedings of the 2023 ACM Asia Conference on Computer and Communications Security, pp. 567–578 (2023) [32] Bourtoule, L., Chandrasekaran, V., Choquette-Choo, C.A., Jia, H., Travers, A., Zhang, B., Lie, D., Papernot, N.: Machine unlearning. In: 2021 IEEE Symposium on Security and Privacy (SP), pp. 141–159 (2021). IEEE [33] Brophy, J., Lowd, D.: Machine unlearning for random forests. In: International Conference on Machine Learning, pp. 1092–1104 (2021). PMLR [34] Ginart, A., Guan, M., Valiant, G., Zou, J.Y.: Making ai forget you: Data dele-tion in machine learning. Advances in neural information processing systems 32 
+
+(2019) [35] Su, N., Li, B.: Asynchronous federated unlearning. In: IEEE INFOCOM 2023-IEEE Conference on Computer Communications, pp. 1–10 (2023). IEEE [36] Cao, Y., Yang, J.: Towards making systems forget with machine unlearning. In: 2015 IEEE Symposium on Security and Privacy, pp. 463–480 (2015). IEEE [37] Liu, Y., Xu, L., Yuan, X., Wang, C., Li, B.: The right to be forgotten in federated learning: An efficient realization with rapid retraining. In: IEEE INFOCOM 2022-IEEE Conference on Computer Communications, pp. 1749–1758 (2022). IEEE [38] Sekhari, A., Acharya, J., Kamath, G., Suresh, A.T.: Remember what you want to forget: Algorithms for machine unlearning. Advances in Neural Information Processing Systems 34 , 18075–18086 (2021) [39] Zhang, L., Zhu, T., Zhang, H., Xiong, P., Zhou, W.: Fedrecovery: Differentially private machine unlearning for federated learning frameworks. IEEE Transactions on Information Forensics and Security (2023) [40] Liu, G., Ma, X., Yang, Y., Wang, C., Liu, J.: Federaser: Enabling efficient client-level data removal from federated learning models. In: 2021 IEEE/ACM 29th 33 International Symposium on Quality of Service (IWQOS), pp. 1–10 (2021). IEEE [41] Meng, R., Gao, S., Fan, D., Gao, H., Wang, Y., Xu, X., Wang, B., Lv, S., Zhang, Z., Sun, M., et al.: A survey of secure semantic communications. Journal of Network and Computer Applications, 104181 (2025) [42] Baumhauer, T., Sch¨ ottle, P., Zeppelzauer, M.: Machine unlearning: Linear filtration for logit-based classifiers. Machine Learning 111 (9), 3203–3226 (2022) [43] Thudi, A., Jia, H., Shumailov, I., Papernot, N.: On the necessity of auditable algo-rithmic definitions for machine unlearning. In: 31st USENIX Security Symposium (USENIX Security 22), pp. 4007–4022 (2022) [44] Izzo, Z., Smart, M.A., Chaudhuri, K., Zou, J.: Approximate data deletion from machine learning models. In: International Conference on Artificial Intelligence and Statistics, pp. 2008–2016 (2021). PMLR [45] Neel, S., Roth, A., Sharifi-Malvajerdi, S.: Descent-to-delete: Gradient-based meth-ods for machine unlearning. In: Algorithmic Learning Theory, pp. 931–962 (2021). PMLR [46] Wu, Y., Dobriban, E., Davidson, S.: Deltagrad: Rapid retraining of machine learn-ing models. In: International Conference on Machine Learning, pp. 10355–10366 (2020). PMLR [47] Halimi, A., Kadhe, S., Rawat, A., Baracaldo, N.: Federated unlearning: How to efficiently erase a client in fl? arXiv preprint arXiv:2207.05521 (2022) [48] Wu, L., Guo, S., Wang, J., Hong, Z., Zhang, J., Ding, Y.: Federated unlearning: Guarantee the right of clients to forget. IEEE Network 36 (5), 129–135 (2022) [49] Wu, C., Zhu, S., Mitra, P.: Federated unlearning with knowledge distillation. arXiv preprint arXiv:2201.09441 (2022) [50] Zhu, X., Li, G., Hu, W.: Heterogeneous federated knowledge graph embedding learning and unlearning. In: Proceedings of the ACM Web Conference 2023, pp. 2444–2454 (2023) [51] Ghazal, A.: Zero-shot machine unlearning using gans (2024) [52] Fan, D., Meng, R., Xu, X., Liu, Y., Nan, G., Feng, C., Han, S., Gao, S., Xu, B., Niyato, D., et al.: Generative diffusion models for wireless networks: Fundamental, architecture, and state-of-the-art. arXiv preprint arXiv:2507.16733 (2025) [53] Foster, J., Fogarty, K., Schoepf, S., ¨Oztireli, C., Brintrup, A.: Zero-shot machine unlearning at scale via lipschitz regularization. arXiv preprint arXiv:2402.01401 (2024) 34 [54] Yoshida, Y., Miyato, T.: Spectral norm regularization for improving the general-izability of deep learning. arXiv preprint arXiv:1705.10941 (2017) [55] Cotogni, M., Bonato, J., Sabetta, L., Pelosin, F., Nicolosi, A.: Duck: Distance-based unlearning via centroid kinematics. arXiv preprint arXiv:2312.02052 (2023) [56] Huang, Y., Gupta, S., Song, Z., Li, K., Arora, S.: Evaluating gradient inver-sion attacks and defenses in federated learning. Advances in Neural Information Processing Systems 34 (2021) [57] Sun, H., Zhu, T., Chang, W., Zhou, W.: Generative adversarial networks unlearning. arXiv preprint arXiv:2308.09881 (2023) [58] Jang, J., Yoon, D., Yang, S., Cha, S., Lee, M., Logeswaran, L., Seo, M.: Knowl-edge unlearning for mitigating privacy risks in language models. arXiv preprint arXiv:2210.01504 (2022) [59] Pan, J., Foo, L.G., Zheng, Q., Fan, Z., Rahmani, H., Ke, Q., Liu, J.: Gradmdm: Adversarial attack on dynamic networks. IEEE Transactions on Pattern Analysis and Machine Intelligence 45 (9), 11374–11381 (2023) [60] Yu, T., Kumar, S., Gupta, A., Levine, S., Hausman, K., Finn, C.: Gradient surgery for multi-task learning. Advances in Neural Information Processing Systems 33 ,5824–5836 (2020) [61] Huang, M.H., Foo, L.G., Liu, J.: Learning to unlearn for robust machine unlearning. arXiv preprint arXiv:2407.10494 (2024) [62] Meerza, S.I.A., Sadovnik, A., Liu, J.: Confuse: Confusion-based federated unlearning with salience exploration. In: 2024 IEEE Computer Society Annual Symposium on VLSI (ISVLSI), pp. 427–432 (2024). IEEE [63] Yin, D., Chen, Y., Kannan, R., Bartlett, P.: Byzantine-robust distributed learn-ing: Towards optimal statistical rates. In: International Conference on Machine Learning, pp. 5650–5659 (2018). Pmlr [64] Li, X.: Improved model poisoning attacks and defenses in federated learning with clustering. Master’s thesis, University of Waterloo (2022) [65] Cao, X., Jia, J., Gong, N.Z.: Provably secure federated learning against malicious clients. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 35, pp. 6885–6893 (2021) [66] Rieger, P., Nguyen, T.D., Miettinen, M., Sadeghi, A.-R.: Deepsight: Mitigating backdoor attacks in federated learning through deep model inspection. arXiv preprint arXiv:2201.00763 (2022) [67] Nguyen, T.D., Rieger, P., De Viti, R., Chen, H., Brandenburg, B.B., Yalame, 35 H., M¨ ollering, H., Fereidooni, H., Marchal, S., Miettinen, M., et al. : {FLAME }:Taming backdoors in federated learning. In: 31st USENIX Security Symposium (USENIX Security 22), pp. 1415–1432 (2022) [68] Fung, C., Yoon, C.J., Beschastnikh, I.: The limitations of federated learning in sybil settings. In: 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020), pp. 301–316 (2020) [69] Fereidooni, H., Pegoraro, A., Rieger, P., Dmitrienko, A., Sadeghi, A.-R.: Freqfed: A frequency analysis-based approach for mitigating poisoning attacks in federated learning. arXiv preprint arXiv:2312.04432 (2023) [70] LeCun, Y., Bottou, L., Bengio, Y., Haffner, P.: Gradient-based learning applied to document recognition. Proceedings of the IEEE 86 (11), 2278–2324 (1998) [71] Krizhevsky, A., Hinton, G., et al.: Learning multiple layers of features from tiny images (2009) [72] Hitaj, B., Ateniese, G., Perez-Cruz, F.: Deep models under the gan: informa-tion leakage from collaborative deep learning. In: Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security, pp. 603–618 (2017) [73] Gong, X., Chen, Y., Yang, W., Wang, Q., Gu, Y., Huang, H., Shen, C.: Redeem myself: Purifying backdoors in deep learning models using self attention distil-lation. In: 2023 IEEE Symposium on Security and Privacy (SP), pp. 755–772 (2023). IEEE [74] He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image recogni-tion. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp. 770–778 (2016) [75] Huang, M.H., Foo, L.G., Liu, J.: Learning to unlearn for robust machine unlearning. In: European Conference on Computer Vision, pp. 202–219 (2025). Springer [76] Dhasade, A., Ding, Y., Guo, S., Kermarrec, A.-M., Vos, M., Wu, L.: Quickdrop: Efficient federated unlearning via synthetic data generation. In: Proceedings of the 25th International Middleware Conference, pp. 266–278 (2024) [77] Kurmanji, M., Triantafillou, P., Hayes, J., Triantafillou, E.: Towards unbounded machine unlearning. Advances in neural information processing systems 36 
+
+(2024) [78] Hu, H., Salcic, Z., Sun, L., Dobbie, G., Yu, P.S., Zhang, X.: Membership infer-ence attacks on machine learning: A survey. ACM Computing Surveys (CSUR) 
+
+54 (11s), 1–37 (2022) 36 Appendix A Experimental Results on the Training Set 
+
+This section presents the experimental results of the unlearning approach evaluation on the training set. Table A1 shows the model’s test accuracy is reported separately for Dr and Df on the training set. Figure A1 illustrates the JSD, L2 distance, and T-test performance metrics evaluated on the test set. 
+
+(a) (b) (c)  
+
+> Fig. A1 Performance Metrics on Train Set. (a) JSD on Train Set, (b) L2 on Train Set, (c) p-value on Train Set.
+
+37 Table A1  Category unlearning on MNIST, CIFAR-10, and CIFAR-100 datasets (Train). Dataset  N um f Metrics  origin  B1 B2 B3 B4 B5 B6 B7 B8 B9 Ours MNIST 1 acc on  Dr 99.88%  99.80%  93.68%  93.61%  96.31%  94.01%  96.02%  96.20%  96.80%  97.53%  98.48% acc on  Df 99.89%  0.00%  0.00%  0.20%  6.50%  0.00%  1.50%  0.45%  0.00%  0.00%  0.00% 2 acc on  Dr 99.87%  98.30%  93.04%  86.18%  87.93%  90.00%  89.29%  90.14%  91.46%  91.06%  92.26% acc on  Df 99.83%  0.00%  0.87%  1.47%  4.62%  2.97%  4.05%  0.12%  0.00%  0.00%  0.00% CIFAR-10 1 acc on  Dr 99.86%  99.80%  95.78%  90.56%  97.72%  96.71%  95.69%  93.62%  97.15%  94.62%  98.49% acc on  Df 100.00%  0.00%  0.00%  5.35%  1.57%  7.54%  6.74%  0.00%  0.00%  0.00%  0.00% 2 acc on  Dr 99.88%  99.61%  90.50%  91.83%  96.90%  96.04%  95.60%  94.68%  93.83%  93.33%  98.48% acc on  Df 99.79%  0.00%  0.00%  7.72%  8.54%  5.14%  0.00%  0.00%  0.00%  0.00%  0.00% CIFAR-100 1 acc on  Dr 99.11%  99.10%  97.92%  77.23%  98.72%  98.41%  97.64%  97.91%  98.59%  98.15%  99.33% acc on  Df 100.00%  0.00%  0.00%  4.14%  0.00%  5.65%  0.00%  0.00%  0.00%  0.00%  0.00% 20  acc on  Dr 99.09%  99.02%  64.29%  68.17%  91.53%  62.70%  72.08%  67.79%  65.34%  67.89%  76.58% acc on  Df 99.07%  0.00%  0.00%  3.77%  10.26%  12.38%  4.59%  1.36%  1.63%  0.57%  0.62% 
+
+38

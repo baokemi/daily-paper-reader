@@ -1,0 +1,118 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-001.webp",
+      "caption": "Figure 1: Geometric interpretation of encoder assumptions.",
+      "page": 6,
+      "index": 1,
+      "width": 944,
+      "height": 855
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-002.webp",
+      "caption": "Figure 6: Values of (a) I and (b) R plotted versus the noise variance τ for diffusion models trained on different data representations. Pixel and latent curves denote models trained on FFHQ images and their pretrained NVAE latents, respectively. NVAE was pretrained on FFHQ, with spatial size 20× dz × dz (dz indicated in the legend). We show√ τ ∈ [0.01, 80], excluding smaller τ due to numerical instability.",
+      "page": 11,
+      "index": 2,
+      "width": 944,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-003.webp",
+      "caption": "Figure 8: FIR deviation DR vs. (a) τ and (b) d in toy settings. Data y ∼ N (0, I2) are embedded as x = (y1, y2, 0, . . . , 0) ∈ RD with D = 512, and z = (y1, y2, 0, . . . , 0) ∈ Rd. We compute DR from R(D)(µτ ) and R(d)((µZ)τ ) using diffusion models trained on x and z. Solid line y = D−d",
+      "page": 25,
+      "index": 3,
+      "width": 932,
+      "height": 320
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-004.webp",
+      "caption": "Figure 7: FIR deviation DR vs. (a) τ and (b) δ0 in toy settings. Data y ∼ N (0, I2) are embedded as x = (y1, y2, 0, . . . , 0) ∈ RD and encoded to z = E(x) ∈ Rd. We consider D = d = 2 and E(x) = Ax with A = diag( √ 1 + δ0, √ 1− δ0). We compute DR from R(D)(µτ ) and R(d)((µZ)τ ) using diffusion models trained on x and z. Solid line y = 1.25δ0 in (b) serve as linear references.",
+      "page": 25,
+      "index": 4,
+      "width": 932,
+      "height": 317
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-005.webp",
+      "caption": "Figure 9: FIR deviation DR vs. (a) τ and (b) ε0 in toy settings. Data y ∼ N (0, I2) are embedded as x = (y1, y2, 0, . . . , 0) ∈ RD and encoded to z = E(x) ∈ Rd. We consider D = d = 3 and E((x1, x2, 0), ε0) =( sin(ε0x1)/ε0, x2, (1− cos(ε0x1))/ε0 ) . We compute DR from R(D)(µτ ) and R(d)((µZ)τ ) using diffusion models trained on x and z.",
+      "page": 25,
+      "index": 5,
+      "width": 932,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-006.webp",
+      "caption": "Figure 13: Power spectra of FFHQ images and latent representations. (a) Power spectrum of FFHQ images. (b)–(d) Power spectra of NVAE latent representations with spatial resolutions dz = 32, 16, and 8. (e)–(f) Power spectra of GPE and VAE latent representations. The NVAE, GPE, and VAE models are pretrained on FFHQ images. For FFHQ images and NVAE latents, the spectrum is computed using the two-dimensional FFT over the spatial dimensions and averaged over channels. For the one-dimensional latent vectors produced by the GPE and VAE encoders, the spectrum is computed using a one-dimensional FFT along the latent dimension. The spectra are averaged over 10,000 samples drawn from the dataset. Both the frequency axis k and the power values P are normalized by the signal length (or spatial resolution for the 2D case). The zero-frequency (DC) component corresponding to the mean signal level is excluded.",
+      "page": 30,
+      "index": 6,
+      "width": 976,
+      "height": 953
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-007.webp",
+      "caption": "Figure 2: Values of I (left) and R (right) plotted versus the noise variance τ , computed from tiny diffusion models trained on different data representations. Pixel curves correspond to models trained on x ∼ N (0, I2). Latent curves correspond to models trained on encoded data z = E(x), where the pointwise activation E is indicated in the legend; for Leaky ReLU, α denotes the negative slope.",
+      "page": 7,
+      "index": 7,
+      "width": 940,
+      "height": 603
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-008.webp",
+      "caption": "Figure 12: Values of (a) I and (b) R plotted versus the noise variance τ for diffusion models trained on different data representations. The diffusion models use the U-Net architecture within the EDM framework. Pixel and latent curves denote models trained on FFHQ images and their pretrained NVAE latents, respectively. NVAE was pretrained on FFHQ, with spatial size 20× dz × dz (dz indicated in the legend). We show √ τ ∈ [0.01, 80], excluding smaller τ due to numerical instability.",
+      "page": 29,
+      "index": 8,
+      "width": 932,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-009.webp",
+      "caption": "Figure 5: (a) Samples from a diffusion model trained directly on 64× 64 FFHQ. (b, c) Samples from latent diffusion models trained on (b) GPE and (c) VAE representations. Generated latents are mapped back to image space using their respective decoders.",
+      "page": 10,
+      "index": 9,
+      "width": 944,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-010.webp",
+      "caption": "Table 3: FID measures the quality of generated images. For the pixel model, images are generated by sampling a diffusion model trained directly on FFHQ. For the GPE and VAE models, images are generated by sampling diffusion models trained in the latent space and decoding the generated latents using the corresponding decoder. The diffusion models use the U-Net architecture within the EDM framework.",
+      "page": 28,
+      "index": 10,
+      "width": 932,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-011.webp",
+      "caption": "Figure 11: Values of (a) I and (b) R plotted versus the noise variance τ , computed from diffusion models trained on different data representations. The diffusion models use the U-Net architecture within the EDM framework. The pixel curves correspond to models trained directly on FFHQ images. The latent curves correspond to models trained on latent representations of an image encoder (GPE or VAE) pretrained on FFHQ. We show √ τ ∈ [0.01, 80], excluding smaller τ due to numerical instability. (c) Scaled FIR deviation Dsc R versus τ , computed from R(D)(µτ ) and R(d)((µZ)τ ) obtained from the pixel-based and latent-based diffusion models described above. Here D = 64× 64× 3 and d = 256.",
+      "page": 28,
+      "index": 11,
+      "width": 472,
+      "height": 317
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-012.webp",
+      "caption": "Figure 3: FIR deviation DR vs. (a) δ0, (b) d, and (c) ε0 in toy settings. Data y ∼ N (0, I2) are embedded as x = (y1, y2, 0, . . . , 0) ∈ RD and encoded to z = E(x) ∈ Rd. We compute DR from R(D)(µτ ) and R(d)((µZ)τ ) using diffusion models trained on x and z. Curves denote fixed noise variance τ . Solid lines y = 1.25δ0 (a) and y = D−d",
+      "page": 8,
+      "index": 12,
+      "width": 932,
+      "height": 639
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-013.webp",
+      "caption": "Figure 10: (a) Samples from a diffusion model trained directly on 64× 64 FFHQ. (b, c) Samples from latent diffusion models trained on (b) GPE and (c) VAE representations. Generated latents are mapped back to image space using their respective decoders. The diffusion models use the U-Net architecture within the EDM framework.",
+      "page": 27,
+      "index": 13,
+      "width": 944,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02751v1/fig-014.webp",
+      "caption": "Figure 4: Values of (a) I and (b) R plotted versus the noise variance τ , computed from diffusion models trained on different data representations. The pixel curves correspond to models trained directly on FFHQ images. The latent curves correspond to models trained on latent representations of an image encoder (GPE or VAE) pretrained on FFHQ. We show √ τ ∈ [0.01, 80], excluding smaller τ due to numerical instability.",
+      "page": 9,
+      "index": 14,
+      "width": 932,
+      "height": 314
+    }
+  ]
+}

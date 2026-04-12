@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-001.webp",
+      "caption": "Fig. 6: Qualitative comparison on SD3-Medium . Since most open-source baselines only provide 4-step checkpoints, we first compare all methods at 4 steps for fairness. Our SFD already produces clearer and more appealing images, while other methods often show generation failures, color shifts, blur, or degraded aesthetics (red boxes). When pushed to 2 steps, 1.x-Distill still clearly surpasses all baselines.",
+      "page": 11,
+      "index": 1,
+      "width": 704,
+      "height": 481
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-002.webp",
+      "caption": "Table 7: Ablation of cache-aware training and compensation module designs. Top: different training settings for introducing block-level caching. Bottom: different implementations of the compensation module f(·) under the full DCT setting.",
+      "page": 25,
+      "index": 2,
+      "width": 679,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-003.webp",
+      "caption": "Table 8: Ablation of block selection on SD3-Medium. The first row reports the full two-stage SFD model without cache acceleration. The remaining rows compare different cached block ranges using the same simple residual MLP for error compensation.",
+      "page": 26,
+      "index": 3,
+      "width": 642,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-004.webp",
+      "caption": "Fig. 12: Effect of caching different block ranges. Early-block caching causes relatively mild degradation, while middle and late blocks lead to severe artifacts, consistent with their larger reuse error. With learnable compensation f(·), caching early blocks largely preserves image quality.",
+      "page": 26,
+      "index": 4,
+      "width": 565,
+      "height": 380
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-005.webp",
+      "caption": "Fig. 15: Additional qualitative comparison on SD3-Medium. Even with only 1.x NFE sampling, 1.x-Distill produces images with more realistic details than existing few-step baselines. Please zoom in for details.",
+      "page": 30,
+      "index": 5,
+      "width": 697,
+      "height": 991
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-006.webp",
+      "caption": "Fig. 1: Visual results. 1.x-Distill mitigates the mode collapse and quality degradation of vanilla DMD under extreme step reduction, delivering superior few-step results.",
+      "page": 2,
+      "index": 6,
+      "width": 723,
+      "height": 378
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-007.webp",
+      "caption": "Fig. 3: Overview of 1.x-Distill . Our guidance control (Sec. 3.2) and cache design (Sec. 3.4) are both constructed in the two-stage framework (Sec. 3.3). Stage I: Train the generator with DMD loss. Within DMD framework, we apply importance sampling on diffusion timestep t, and control the guidance according to sampled t when compute the real score. Stage II: Train the generator with pixel-space adversarial loss. Our GAN framework produces x̂0 along generator inference path, which naturally incorporates block-cache design. The generator and MLP module are jointly optimized.",
+      "page": 7,
+      "index": 7,
+      "width": 725,
+      "height": 371
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-008.webp",
+      "caption": "Fig. 14: Visual comparison of diversity under the 4-NFE setting distilled from SD3-Medium. Compared with two distribution-matching baselines, our approach produces more diverse samples while maintaining generation quality and prompt alignment.",
+      "page": 29,
+      "index": 8,
+      "width": 591,
+      "height": 850
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-009.webp",
+      "caption": "Table 6: Training configurations for SD3-Medium and SD3.5-Large.",
+      "page": 22,
+      "index": 9,
+      "width": 652,
+      "height": 599
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-010.webp",
+      "caption": "Table 1: Quantitative comparison on COCO-10K. ∗ indicates results reproduced by us due to missing official checkpoints. FID is computed between teacher samples and student samples. Img-free indicates the method does not use external real-image datasets during training.",
+      "page": 10,
+      "index": 10,
+      "width": 694,
+      "height": 492
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-011.webp",
+      "caption": "Fig. 4: Importance sampling in Stage I. Left : Under teacher scheduler (shift=3.0), we split timesteps from 1.0 to 0.0 into four windows to probe their effects. Right : Uniform sampling treats all timesteps equally, while our importance sampling downweights less informative ones and concentrates training on the more reliable region.",
+      "page": 8,
+      "index": 11,
+      "width": 724,
+      "height": 223
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-012.webp",
+      "caption": "Fig. 5: Caching for a distilled 2-step student. (a) We measure block-wise reuse error as the contribution change across adjacent steps on SD3-M, en = ∥∆n,t+1 − ∆n,t∥1, where ∆n,t = On,t− In,t. Early blocks exhibit consistently small en, indicating strong temporal redundancy and low reuse error. (b) Leveraging this property, we cache the contribution of a block segment [n,m] at step t0, ∆0 = Om,0− In,0, skip the segment at t1, and recover the output via Ôm,1 = In,1 + f(∆0).",
+      "page": 8,
+      "index": 12,
+      "width": 704,
+      "height": 237
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-013.webp",
+      "caption": "Fig. 13: Effect of different training objectives in DCT. Experiments are conducted on SD3-Medium with a cache block 3–8, using identical training configurations.",
+      "page": 27,
+      "index": 13,
+      "width": 635,
+      "height": 194
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-014.webp",
+      "caption": "Fig. 16: Additional qualitative comparison on SD3.5-Large. Even with only 1.x NFE sampling, 1.x-Distill produces images with more realistic details than existing fewstep baselines. Please zoom in for details.",
+      "page": 31,
+      "index": 14,
+      "width": 681,
+      "height": 1024
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04018v1/fig-015.webp",
+      "caption": "Fig. 2: An illustration of the effect of the teacher’s CFG in distillation. At the high-noise timestep t, teacher estimation with strong guidance vcfg real = vreal,c+(w− 1)(vreal,c−vreal,∅) tends to drives the student to collapse prematurely toward dominant modes. We propose to disable teacher CFG at t ∈ (0, α] during distribution matching, encouraging the student to cover more modes during early denoising trajectory.",
+      "page": 5,
+      "index": 15,
+      "width": 572,
+      "height": 219
+    }
+  ]
+}

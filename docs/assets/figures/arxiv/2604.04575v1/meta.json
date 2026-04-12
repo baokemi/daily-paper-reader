@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04575v1/fig-001.webp",
+      "caption": "Figure 2. Qualitative comparison of compositional generation behavior across different unlearning methods. While ACE and SPM preserve structure, aggressive methods (e.g., EraseDiff, SalUn) exhibit mode collapse (repetitive scenes despite differing seeds) or object loss, failing to bind attributes correctly.",
+      "page": 7,
+      "index": 1,
+      "width": 1036,
+      "height": 785
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04575v1/fig-002.webp",
+      "caption": "Table 3. Unlearning quality. ↑ indicates higher is better; ↓ indicates lower is better. UA: Unlearning Accuracy, RA: Retain Accuracy, FID: Fréchet Inception Distance.",
+      "page": 4,
+      "index": 2,
+      "width": 496,
+      "height": 391
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04575v1/fig-003.webp",
+      "caption": "Table 2. GenEval compositional results. ACE and SPM are the only methods to preserve or exceed baseline performance, while aggressive unlearning (EraseDiff, Scissorhands) leads to near-total collapse of compositional ability.",
+      "page": 4,
+      "index": 3,
+      "width": 818,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04575v1/fig-004.webp",
+      "caption": "Table 1. T2I-CompBench++ compositional results. Red and green percentages indicate relative performance changes compared to the SD 1.4 baseline.",
+      "page": 3,
+      "index": 4,
+      "width": 1036,
+      "height": 405
+    }
+  ]
+}

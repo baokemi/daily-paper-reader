@@ -1,0 +1,20 @@
+---
+title: "Correctness is its own reward: bootstrapping error signals in self-guided reinforcement learning"
+authors: "Gong, Z., Duarte, F., Mooney, R., Pearson, J."
+date: 2026-04-11
+pdf: "https://www.biorxiv.org/content/10.1101/2025.07.18.665446v3.full.pdf"
+tags: ["query:flrlvldm"]
+score: 9.0
+evidence: 自引导强化学习策略与奖励信号引导
+tldr: 本文提出了一种自引导强化学习机制，使智能体通过内部错误信号学习复杂行为。
+source: biorxiv
+selection_source: fresh_fetch
+figures_json: "[{\"url\": \"assets/figures/biorxiv/biorxiv-10-1101-2025-07-18-665446-v3/fig-001.webp\", \"caption\": \"Fig. 2. Four classes of models for local learning. (A) Feedforward model. Song-related premotor input directly drives excitatory neurons in secondary auditory areas, which receive both excitatory and inhibitory input from primary auditory areas. Plasticity takes place at the premotor→secondary auditory synapse (1). (B) Balanced excitation-inhibition (EI) networks with three potential sites of plasticity (2–4). As in (A), excitatory neurons in secondary auditory areas receive input from both primary auditory areas and premotor areas, as well as a local population of inhibitory interneurons. Numbers indicate the site(s) of plasticity in each of the three models. (C) Schematic of rate-based Hebbian and anti-Hebbian plasticity rules. Hebbian rules strengthen synaptic connections when postsynaptic excitation exceeds a threshold θ. Anti-Hebbian rules do the reverse. (D) Distributions of initial recurrent weights for the four types of connections. The bins at zero represent the 50% of connections in each model type that are set to 0 for sparsity. In general, inhibitory weights need to be stronger than excitatory weights to achieve EI balance. A detailed description of the parameters and construction of weights is in Methods and Table 1. (E) Illustration of EI balance. Left vertical axis: density of the distributions of E→E (blue), I→E (red), and their net inputs (gray); right vertical axis: output firing rate of the f-I curve (black). EI balance is achieved when the distribution of net inputs lies near the activation threshold of the f-I curve.\", \"page\": 3, \"index\": 1, \"width\": 532, \"height\": 566}]"
+motivation: 自引导强化学习策略与奖励信号引导。
+method: 方法与实现细节请参考摘要与正文。
+result: 结果与对比结论请参考摘要与正文。
+conclusion: 总体而言，该工作在所述任务上展示了有效性，并提供了可复用的思路或工具。
+---
+
+## Abstract
+Reinforcement learning (RL) offers a compelling account of how agents learn complex behaviors by trial and error, yet RL is predicated on the existence of a reward function provided by the agent's environment. By contrast, many skills are learned without external guidance, posing a challenge to RL's ability to account for self-directed learning. For instance, juvenile male zebra finches first memorize and then train themselves to reproduce the song of an adult male tutor through extensive practice. This process is believed to be guided by an internally computed assessment of performance quality, though the mechanism and development of this signal remain unknown. Here, we propose that, contrary to prevailing assumptions, tutor song memorization and performance assessment are subserved by the same neural circuit, one trained to predictively cancel tutor song. To test this hypothesis, we built models of a local forebrain circuit that uses contextual premotor signals to cancel tutor song auditory input via synaptic plasticity. After learning, excitatory projection neurons signaled mismatches between the tutor song and birds' own performance, best matching experimental data when learning involved anti-Hebbian plasticity in recurrent interneurons. We also found that learning proceeds by both sharpening error sensitivity and minimizing responses to the tutor song. Finally, the error signals produced by this model can train a simple RL agent to replicate the spectrograms of adult bird songs. These results suggest that local learning via predictive cancellation suffices for bootstrapping error signals capable of guiding self-directed learning of natural behaviors.

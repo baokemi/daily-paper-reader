@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-1101-2025-07-18-665446-v3/fig-001.webp",
+      "caption": "Fig. 2. Four classes of models for local learning. (A) Feedforward model. Song-related premotor input directly drives excitatory neurons in secondary auditory areas, which receive both excitatory and inhibitory input from primary auditory areas. Plasticity takes place at the premotor→secondary auditory synapse (1). (B) Balanced excitation-inhibition (EI) networks with three potential sites of plasticity (2–4). As in (A), excitatory neurons in secondary auditory areas receive input from both primary auditory areas and premotor areas, as well as a local population of inhibitory interneurons. Numbers indicate the site(s) of plasticity in each of the three models. (C) Schematic of rate-based Hebbian and anti-Hebbian plasticity rules. Hebbian rules strengthen synaptic connections when postsynaptic excitation exceeds a threshold θ. Anti-Hebbian rules do the reverse. (D) Distributions of initial recurrent weights for the four types of connections. The bins at zero represent the 50% of connections in each model type that are set to 0 for sparsity. In general, inhibitory weights need to be stronger than excitatory weights to achieve EI balance. A detailed description of the parameters and construction of weights is in Methods and Table 1. (E) Illustration of EI balance. Left vertical axis: density of the distributions of E→E (blue), I→E (red), and their net inputs (gray); right vertical axis: output firing rate of the f-I curve (black). EI balance is achieved when the distribution of net inputs lies near the activation threshold of the f-I curve.",
+      "page": 3,
+      "index": 1,
+      "width": 532,
+      "height": 566
+    }
+  ]
+}

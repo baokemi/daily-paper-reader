@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-001.webp",
+      "caption": "Table 3: Main results on QQP and Wiki-Auto. The best NAR results are bold and the second-best results are underlined. ‡, ×, and † indicate results reported by Gong et al. (2023a), Tang et al. (2023), and Chuang et al. (2024), respectively. ∗ indicates reproduced results. Other results are from their original papers.",
+      "page": 6,
+      "index": 1,
+      "width": 775,
+      "height": 431
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-002.webp",
+      "caption": "Figure 8: The empirical distribution of ϵit with different random values of t and i.",
+      "page": 15,
+      "index": 2,
+      "width": 948,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-003.webp",
+      "caption": "Table 16: Examples of 32-step long sequence generation on Lexically Constrained Generation with Plaid-1B. The Plaid-1B samples lack diversity while ours cover more word combinations.",
+      "page": 21,
+      "index": 3,
+      "width": 950,
+      "height": 500
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-004.webp",
+      "caption": "Table 17: Examples of 32-step long sequence generation on Negation with Plaid-1B. The results demonstrate that the Plaid-1B sample is likely memorized from the dataset when against an unusual pattern, while our method produces a normal paragraph that satisfies the constraint.",
+      "page": 21,
+      "index": 4,
+      "width": 950,
+      "height": 359
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-005.webp",
+      "caption": "Figure 6: Mean (top) and variance (bottom) ratio differences measured at different denoising steps. We manually select hyperparameters of the scaling terms to fit 20-step sampling.",
+      "page": 14,
+      "index": 5,
+      "width": 368,
+      "height": 442
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-006.webp",
+      "caption": "Figure 7: Inference mean λ̂t (top) and variance γ̂t (bottom) scaling factors of prediction mismatch in a pretrained network, plotted across timestep t for randomly selected embedding dimensions.",
+      "page": 14,
+      "index": 6,
+      "width": 366,
+      "height": 446
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-007.webp",
+      "caption": "Figure 1: Overview of FastDiSS. The tokenized sequence is first encoded to z0, while concurrently sampling the initial timestep t. Both z0 and t are passed into MANS to obtain the new timestep tθ. Subsequently, noise level at tθ is added to z0 using SCP to obtain z′ t. The rest is the same as in the training objective in Eq. 5.",
+      "page": 3,
+      "index": 7,
+      "width": 850,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-008.webp",
+      "caption": "Figure 9: Word cloud of the easy and hard tokens during training.",
+      "page": 18,
+      "index": 8,
+      "width": 711,
+      "height": 370
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-009.webp",
+      "caption": "Figure 10: SacreBLEU score on IWSLT14 De-En with various length beams and noise beams.",
+      "page": 18,
+      "index": 9,
+      "width": 412,
+      "height": 307
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-010.webp",
+      "caption": "Table 13: Examples of generation throughout the denoising process, with NFE = 2.",
+      "page": 19,
+      "index": 10,
+      "width": 721,
+      "height": 460
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-011.webp",
+      "caption": "Table 14: Examples of generation on Wiki-Auto dataset. The resulting outputs demonstrate higher coherence in the long-term context.",
+      "page": 19,
+      "index": 11,
+      "width": 935,
+      "height": 461
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-012.webp",
+      "caption": "Table 11: BLEU on IWSLT14 baseline under different SCP schedule parameters. Default denotes λt = 1 and γt = 0.",
+      "page": 17,
+      "index": 12,
+      "width": 850,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-013.webp",
+      "caption": "Table 12: The dataset details, model architectures, and hyperparameters used in our experiments.",
+      "page": 17,
+      "index": 13,
+      "width": 950,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-014.webp",
+      "caption": "Table 15: Examples of 32-step long sequence generation on Prefix Completion with Plaid-1B. The output results indicate that SCP helps maintain the coherence and fluency of the paragraph, while ensuring consistency across sentences.",
+      "page": 20,
+      "index": 14,
+      "width": 950,
+      "height": 1152
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05551v1/fig-015.webp",
+      "caption": "Table 2: Main results on IWSLT14, WMT14, and WMT16. The best NAR results are bold and the second-best results are underlined. ‡ indicates results reported by Ye et al. (2023). Other results are from their original papers.",
+      "page": 5,
+      "index": 15,
+      "width": 729,
+      "height": 358
+    }
+  ]
+}

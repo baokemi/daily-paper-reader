@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03537v1/fig-001.webp",
+      "caption": "Table 3: Qualitative examples generated at 512 sampling steps.",
+      "page": 21,
+      "index": 1,
+      "width": 827,
+      "height": 1346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03537v1/fig-002.webp",
+      "caption": "Figure 2: Memory effiency of TDLM. (Left) Throughput and peak memory comparison (denoted as size of the circle) across diffusion language models at different scales. (Right) Validation negative ELBO and average Flops/s of small scale models during training using full capacity of four 24 GB GPUs.",
+      "page": 7,
+      "index": 2,
+      "width": 809,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03537v1/fig-003.webp",
+      "caption": "Table 4: Qualitative examples generated at 1024 sampling steps.",
+      "page": 22,
+      "index": 3,
+      "width": 827,
+      "height": 1367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03537v1/fig-004.webp",
+      "caption": "Figure 6: Level-wise weighting schedules used in our ablations.",
+      "page": 18,
+      "index": 4,
+      "width": 814,
+      "height": 330
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03537v1/fig-005.webp",
+      "caption": "Figure 3: Left: Validation nagative ELBO of various branching factor K and cluster size ratio, plotted over training iterations. Solid lines indicate varying K and fixed cluster size ratio, while dashed lines indicate fixed K but varying cluster size. Middle: each bar indicates the cumulative validation negative ELBO obtained from a different tree construction, while each stack indicates the contribution of a particular tree height. (top stack indicates root level) Right: raw validation negative ELBO of each height level under different tree constructions.",
+      "page": 8,
+      "index": 5,
+      "width": 819,
+      "height": 246
+    }
+  ]
+}

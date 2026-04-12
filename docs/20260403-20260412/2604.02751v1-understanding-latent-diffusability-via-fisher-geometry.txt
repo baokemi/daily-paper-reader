@@ -1,0 +1,1962 @@
+Title: Understanding Latent Diffusability via Fisher Geometry
+
+URL Source: https://arxiv.org/pdf/2604.02751v1
+
+Published Time: Mon, 06 Apr 2026 00:32:18 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+# UNDERSTANDING LATENT DIFFUSABILITY VIA FISHER 
+
+# GEOMETRY 
+
+Jing Gu * Morteza Mardani † Wonjun Lee ‡ Dongmian Zou § Gilad Lerman *
+
+# ABSTRACT 
+
+Diffusion models often degrade when trained in latent spaces (e.g., VAEs), yet the formal causes remain poorly understood. We quantify latent-space diffusability through the rate of change of the Minimum Mean Squared Error (MMSE) along the diffusion trajectory. Our framework decomposes this MMSE rate into contributions from Fisher Information (FI) and Fisher Information Rate (FIR). We demonstrate that while global isometry ensures FI alignment, FIR is governed by the encoder’s local geometric properties. Our analysis explicitly decouples latent geometric distortion into three measurable penalties: dimensional compression, tangential distortion, and curvature injection. We derive theoretical conditions for FIR preservation across spaces, ensuring maintained diffusability. Experiments across diverse autoencoding architectures validate our framework and establish these efficient FI and FIR metrics as a robust diagnostic suite for identifying and mitigating latent diffusion failure. 
+
+# 1 Introduction 
+
+Diffusion models have revolutionized generative modeling by transforming noise into structured data through a learned reverse process [ 11 ]. While these models excel in high-dimensional pixel spaces, computational constraints often necessitate their application within the compressed latent spaces of pre-trained autoencoders [ 26 ]. However, a persistent and poorly understood phenomenon remains: diffusion models often degrade or fail entirely when applied directly to the latent spaces of standard autoencoders, including Variational Autoencoders (VAEs) [ 16 , 27 ]. Recent literature refers to this mismatch between diffusion dynamics in pixel space and latent space as the diffusability problem [28]. Current explanations for this failure typically point to the “geometric distortion” introduced by standard encoders, which warp the data manifold and create regions that diverge from the Gaussian prior assumed by the diffusion process [ 2 , 21 ]. In response, various empirical methods have emerged to mitigate this issue, such as geometry-preserving adaptations (e.g., Geometry Preserving Encoder/Decoder (GPE) [ 20 ]), explicit target latent geometries [ 6 , 22 , 34 ], and modified training objectives [17, 33, 10, 3]. (We provide a comprehensive discussion of these related works in Appendix A.) Despite these empirical advances, the underlying causes of latent diffusion failure remain theoretically obscured. Crucially, the literature lacks a formal, quantitative framework for measuring how “diffusible” a latent space is before 
+
+committing to the computationally expensive training of a full diffusion model. In this paper, we demystify latent-space diffusability through the rigorous lens of Fisher geometry [ 1 ], complementing recent information-geometric perspectives on diffusion trajectories [ 13 ]. We analyze diffusability via denoising complexity , quantified by the rate of change of the Minimum Mean Squared Error (MMSE) along the continuous diffusion trajectory. We show that this denoising complexity fundamentally decomposes into two terms: the Fisher Information (FI) and its rate of dissipation, which we define as the Fisher Information Rate (FIR). To match pixel-space diffusability, encoders must preserve both FI and FIR. Stabilizing FI requires global near-isometry (Section 3), while stabilizing FIR imposes stricter constraints: the encoder must be locally near-isometric 
+
+> ∗
+
+School of Mathematics, University of Minnesota 
+
+> †
+
+NVIDIA 
+
+> ‡
+
+Department of Mathematics, The Ohio State University 
+
+> §
+
+Zu Chongzhi Center and DIRC, Duke Kunshan University 
+
+> arXiv:2604.02751v1 [cs.LG] 3 Apr 2026
+
+Understanding Latent Diffusability via Fisher Geometry and approximately flat (Section 3.2). Critically, our analysis explicitly decouples the penalties of intrinsic geometric distortion (local curvature and nonlinearity) from the baseline effects of dimensional compression. Our main contributions are as follows: 1. Theoretical Framework: We formalize the relationship between latent diffusability, denoising complexity (MMSE), and Fisher Information Geometry. 2. Geometric Bounds: We derive the explicit local curvature and isometry conditions necessary for FIR stability, mathematically separating geometric distortion from dimensional compression. 3. Empirical Diagnostic Suite: Extensive experiments on toy and FFHQ datasets validate our efficient FI and FIR metrics as robust predictors of latent diffusion performance. We show that unlike GPE [ 20 ], standard VAEs exhibit severe FIR deviations that correlate with generation failure. 
+
+# 2 Background 
+
+2.1 Score-based Diffusion Models 
+
+Continuous-time score-based models transform a data distribution into a noise prior. Let μ be a Borel probability measure on RD concentrated on a low-dimensional manifold M ⊂ RD . We consider a diffusion process parameterized by the noise variance τ := σ2(t), where a clean sample x0 ∼ μ is corrupted by standard Gaussian noise n ∼ N (0, ID ),yielding the noisy observation x = x0 + √τ n [29]. The marginal density of these noisy observations, known as the heat-smoothed density pτ (x), and the corresponding 
+
+probability flow ODE evolve as: 
+
+∂p τ
+
+∂τ = 12 ∆xpτ and dx = − 12 ∇x log pτ (x)dτ. (1) Generating samples requires a neural approximation of the score function 
+
+sτ (x) = ∇x log pτ (x). (2) Learning sτ is challenging because the intrinsic geometry of M induces high-frequency variations in directions normal to the manifold. 
+
+2.2 Latent Diffusion and the Geometry Gap 
+
+To reduce computational costs, diffusion is often performed in the compressed latent space Z of a pre-trained autoen-coder [ 26 ]. However, standard VAEs regularize Z toward a Gaussian prior using Kullback-Leibler divergence, which frequently causes “manifold crinkling” [ 2 ]. This phenomenon occurs when distant points on the data manifold X
+
+are mapped to adjacent latent coordinates to satisfy the prior, ensuring that Euclidean distances in Z fail to preserve the intrinsic data geometry. This creates a fundamental “geometry gap” between the spaces. Recent architectures address these geometric distortions by explicitly regularizing latent representations. For example, Geometry-Preserving Encoders (GPEs) align latent Euclidean geometry with data-space Euclidean geometry [ 20 ], while spherical and manifold autoencoders utilize non-Euclidean latent spaces to better capture complex data topologies [22, 34]. 
+
+2.3 The Diffusability Issue 
+
+A distribution’s diffusability —its ease of modeling via diffusion—depends on the score function’s smoothness and learnability. Structural irregularities or low-density regions cause poorly calibrated gradients, degrading sample fidelity. 
+
+Spectral Artifacts in Latent Spaces. Compressed latent spaces often exacerbate these irregularities. Spectral analyses show autoencoders introduce high-frequency components or singularities, impeding coarse-to-fine synthesis [ 28 ]. Even with smoother encodings [18, 19], diffusion remains unstable if the encoded manifold in Z lacks structural regularity. 
+
+Limitations of Metric Regularization. Recent techniques constrain the encoder Jacobian to enforce local isometry [ 5, 23 ]. While empirically addressing the geometry gap, they lack a formal information-geometric analysis of diffusability. To address this gap, we leverage Fisher geometry to establish a rigorous link between encoder geometry and denoising complexity, explaining why certain latent spaces remain difficult to diffuse despite geometric-preservation properties. 2Understanding Latent Diffusability via Fisher Geometry 
+
+2.4 Information-Geometric Formalism 
+
+We review two Fisher-information metrics. We address two different scenarios of a Borel probability measure μ on Rk:1) The setting of Section 2.1, where k = D and μ is concentrated on a manifold M ⊂ RD ; 2) The setting inspired by Section 2.2, with a latent space of dimension d < D , an encoder E : RD → Rd, and μ the pushforward measure of the former μ according to E. In both settings, for a noise variance τ > 0, the heat-smoothed measure μτ := μ ∗ N (0, τ Ik)
+
+admits a strictly positive, smooth probability density pτ (x). Its score sτ (x) is defined in (2) . Whenever μ, τ and k are clear from context, we may denote our metrics without the dimension superscript, (k), and the input measure, μτ .The Fisher Information (FI) of μτ is its square-averaged score and the Fisher Information Rate (FIR) is the dissipation rate of FI. That is, 
+
+I ≡ I (k)(μτ ) := Epτ
+
+∥sτ (x)∥2 and R ≡ R (k)(μτ ) := − ddτ I(k)(μτ ). (3) The next proposition establishes an exact representation of FIR, which emerges across information theory [ 7], Γ2 calculus for diffusion semigroups [ 4], and optimal transport [ 31 ]. We provide a proof in Appendix B.1. Let Hτ = ∇2 
+
+> x
+
+log pτ (x).
+
+Proposition 2.1 (Hessian representation of FIR) . For every τ > 0,
+
+R(k)(μτ ) = Epτ
+
+∥∇ xsτ (x)∥2
+
+> F
+
+ = Epτ
+
+Tr( H2 
+
+> τ
+
+) . (4) 
+
+Computational Efficiency. While the FIR involves the Frobenius norm of the score Jacobian, it remains computa-tionally tractable for high-dimensional neural networks. Using the Hutchinson trace estimator [ 12 ], we approximate the norm as R(τ ) = Ex,v[∥∇ xsτ (x)v∥2], where v is a random noise vector. The term ∇xsτ (x)v is efficiently evaluated as a Jacobian-vector product (JVP) in a single forward-mode pass, bypassing the need to explicitly compute or store the full Jacobian matrix. See Appendix C for more details. 
+
+# 3 Analysis of Diffusability via Fisher Information 
+
+To formalize “diffusability,” we analyze the sensitivity of the global Minimum Mean Squared Error (MMSE) to τ .Following the setting of Section 2.4, where either k = D or k = d, the error in estimating the clean signal x0 from its noisy observation x at variance τ is defined as MMSE (τ ) = E[∥x0 − E[x0|x]∥2].The I-MMSE identity [ 9], proved in Appendix B.2, establishes that the optimal denoising performance is fundamentally constrained by this information content: MMSE (τ ) = τ k − τ 2I(k)(μτ ). (5) Differentiating (5) and applying the definition of FIR yields the decomposition: 
+
+ddτ MMSE (τ )
+
+| {z }
+
+> Denoising Resistance
+
+= k − 2τ I(k)(μτ )
+
+| {z }
+
+> Intrinsic Noise Gain
+
++ τ 2R(k)(μτ ).
+
+| {z }
+
+> Geometric Complexity Penalty
+
+(6) This decomposition reveals that denoising difficulty is governed by two distinct factors: the Intrinsic Noise Gain ,which drives a baseline linear degradation, and the Geometric Complexity Penalty , which causes errors to compound quadratically at higher noise scales, as noted by the term τ 2. To ensure a latent space Z is as “diffusable” as the original data space X , an encoder must preserve both terms of this decomposition. In Section 3.1, we establish the first-order conditions required to preserve the Intrinsic Noise Gain. In Section 3.2, we establish the second-order conditions required to bound the Geometric Complexity Penalty. 
+
+3.1 Global Isometry and Fisher Preservation 
+
+To ensure the latent space Z inherits the denoising characteristics of the data space X , the encoder E : X → Z must tightly bound the metric distortion of the Fisher Information, I(k)(μτ ). This ensures the Intrinsic Noise Gain in (6) reflects genuine data complexity rather than artifacts of latent stretching or compression. 
+
+Proposition 3.1 (Fisher Information Bounds for Bi-Lipschitz Encoders) . Let M ⊂ RD be an m-dimensional smooth manifold and E : M → Rd be a smooth map. Assume the Jacobian of E is uniformly bounded in directions tangent to 
+
+M, that is, there exist constants c, C > 0 such that 
+
+c ∥v∥ ≤ ∥ JE (x) v∥ ≤ C ∥v∥, ∀x ∈ M and tangent vectors v,
+
+3Understanding Latent Diffusability via Fisher Geometry 
+
+Assume m ≤ d ≤ D. If the intrinsic manifold gradient of the log-volume element vanishes at x, i.e., 
+
+∇M log pdet( JE (x)⊤JE (x)) = 0 , then the manifold FI on M, I(D) = E[∥∇ M log pτ (x)∥2], is comparable with I(d) for z = E(x) ∈ Rd:
+
+1
+
+C2 I(D) ≤ I (d) ≤ 1
+
+c2 I(D).
+
+Equivalence ( I(d) = I(D)) occurs when E is an isometric embedding ( c = C = 1 ). 
+
+Proposition 3.1 shows that a near-isometric mapping ( c ≈ C ≈ 1) neutralizes first-order geometric distortion. Thus, the shift in baseline denoising error between X and Z reduces purely to the dimensionality gap, D − d.
+
+3.2 Fisher Information Rate and Second-Order Distortion 
+
+The dominant factor in diffusion difficulty at higher noise levels is the Geometric Complexity Penalty governed by the FIR, R(k)(μτ ). High-frequency manifold crinkling or structural irregularities inflate the score Jacobian ∇xsτ , causing denoising errors to compound quadratically as indicated by the factor τ 2 in (6) . Therefore, effective diffusion requires keeping this penalty low. Crucially, the FIR is mathematically driven by the magnitude of the score Jacobian (the Hessian of the log-density). To ensure this penalty is not artificially inflated by the encoder, we analyze how the encoder alters these second-order derivatives. Applying the chain rule to the score transformation sx(x) = JE (x)⊤sz(z), the data-space Hessian ∇2
+
+> x
+
+relates to the latent-space Hessian ∇2 
+
+> z
+
+via: 
+
+∇2 
+
+> x
+
+= JE (x)⊤∇2
+
+> z
+
+JE (x)
+
+| {z }
+
+> Inherited Curvature
+
++
+
+> d
+
+X
+
+> i=1
+
+[sz(z)] i∇2
+
+> x
+
+(Ei)
+
+| {z }
+
+> Curvature Injection
+
+.
+
+This decomposition reveals that even if the latent distribution is perfectly flat ( ∇2 
+
+> z
+
+= 0), a non-linear encoder injects artificial curvature via its own second derivatives, ∇2
+
+> x
+
+(Ei). For example, while a ReLU activation is 1-Lipschitz (stable at the first order), its second derivative contains a Dirac delta; this non-smooth “kink” introduces a score singularity that drives the FIR toward infinity. Because this injected curvature directly inflates the latent FIR, we need a metric to quantify how much the encoder distorts the natural geometric complexity of the data. To formalize this, we define the relative deviation between the FIR of the data space and the FIR of the latent space. 
+
+Definition 3.2 (FIR Deviation) . Let k = D, the intrinsic dimension of μ be m, and μZ := E#μ be its pushforward under E. Let μτ and (μZ )τ denote these distributions diffused at noise variance τ . The FIR deviation DR(τ ) and its 
+
+dimension-normalized counterpart Dsc 
+
+> R
+
+(τ ) are: 
+
+DR(τ ) := 1 − R(D)(μτ )
+
+R(d)(( μZ )τ ) , Dsc 
+
+> R
+
+(τ ) := 1 −
+
+ d − mD − m
+
+ R(D)(μτ )
+
+R(d)(( μZ )τ ) .
+
+3.3 Stability Theorems on Flat Support 
+
+To bound DR(τ ) and Dsc 
+
+> R
+
+(τ ), we decouple the encoder’s artificial curvature from the data’s intrinsic curvature by assuming the data lies on a flat, low-dimensional subspace. This isolates the encoder’s geometric impact in two stages: first, quantifying baseline metric distortion with a linear encoder, and second, bounding the exact curvature penalty of nonlinear encoders. 
+
+Assumption 3.3 (Flat Support and Linear Mapping ). Let M ⊂ RD be an m–dimensional linear subspace with an isometry U : Rm → M . Let μ := ( U#ρ) ⊗ δ0 be a probability measure on RD . Let m ≤ d ≤ D, and fix an isometry 
+
+V : Rm → Rd. Assume the encoder E : RD → Rd is linear on M such that E(Ux ) = V(Ax ) for an invertible 
+
+A ∈ Rm×m.
+
+Theorem 3.4 (Linear Stability) . Under Assumption 3.3, let μZ := E#μ. Assume A satisfies the near-isometry condition for some δ ∈ (0 , 1) : ∥A⊤A − Im∥2 ≤ δ. Then there exists C ≡ C(m) > 0 such that for all τ > 0:
+
+• If m = d = D, then DR(τ ) ≤ Cδ .
+
+• If m < d ≤ D, then Dsc 
+
+> R
+
+(τ ) ≤ C
+
+ D−dD−m + ( d − m)δ
+
+
+
+.
+
+4Understanding Latent Diffusability via Fisher Geometry While Theorem 3.4 isolates the first-order distortion ( δ), practical encoders are nonlinear. By imposing a global Taylor remainder bound, we constrain the Frobenius norm of the curvature injection term in expectation. 
+
+Theorem 3.5 (Nonlinear Stability) . Let the subspace M and probability measure μ be defined as in Assumption 3.3, but let E : RD → Rd be a nonlinear map. Assume E is C2 on M and satisfies the Taylor residual bound: 
+
+min 
+
+> x0∈M
+
+Z
+
+> M
+
+∥E(x) − (E(x0) + ∇E(x0)( x − x0)) ∥2 dμ (x) ≤ ε2. (7) 
+
+If each local Jacobian Ax0 = ∇E(x0) satisfies ∥A⊤ 
+
+> x0
+
+Ax0 − Im∥2 ≤ δ, then for some C(m) > 0 and all τ > 0:
+
+• If m = d = D, then DR(τ ) ≤ C(δ + ε/ √τ ).
+
+• If m < d ≤ D, then Dsc 
+
+> R
+
+(τ ) ≤ C
+
+ D−dD−m + ( d − m)δ + ε√τ
+
+
+
+.
+
+Geometric Interpretation of Encoding Distortion. Theorem 3.5 reveals that FIR deviation splits into three distinct penalties: a dimension mismatch (D − d), a tangential distortion (δ), and a nonlinearity penalty (ε/ √τ ). These distortions are visualized in Figure 1. To maintain data-level diffusability, an encoder must act as a local isometry (δ ≈ 0) and exhibit low curvature ( ε ≈ 0). 
+
+The High-Frequency Penalty ( ε/ √τ ). Heat diffusion at variance τ smooths the distribution over a spatial scale of order √τ . At small τ (low noise), the spatial smoothing scale is tiny. Consequently, high-frequency geometric distortions—such as the tight curvature shown in Figure 1(c)—heavily disrupt the local geometry, driving up the FIR deviation via the ε/ √τ term. As τ increases, the diffusion process naturally blurs out these tight geometric kinks, mitigating the penalty. The ratio ε/ √τ effectively measures whether the encoder’s artificial curvature survives the “diffusion lens.” The FIR framework thus provides a rigorous, task-independent metric to evaluate how well an encoder preserves intrinsic geometric dynamics across all noise scales. To apply the nonlinear stability guarantees of Theorem 3.5, we must verify that a learned embedding can actually control both the local Jacobian distortion δ and the global nonlinear remainder ε. The following proposition demonstrates that encoders trained via the GPE loss inherently satisfy these structural conditions. 
+
+Proposition 3.6. Let M ⊂ RD be a compact subset of an m-dimensional linear subspace with 0 ∈ M , and let DM =sup x,y∈M ∥x − y∥ denote its diameter. Let E ∈ C2(RD ) be an encoder achieving a GPE loss L(E) < ϵ GPE [20 ]. If sup x∈M ∥∇ 2E(x)∥2 ≤ LE , then E satisfies the conditions of Theorem 3.5 with local distortion and nonlinear remainder bounds: 
+
+δ = C1ϵ 14( m+5)  
+
+> GPE
+
+, ε =
+
+ L2 
+
+> E
+
+D4
+
+> M
+
+4 ϵ1/4GPE + C2 min 
+
+
+
+L2 
+
+> E
+
+, 1 + ϵ 14( m+5) 
+
+> GPE
+
+ 1/2
+
+,
+
+where C1 depends only on m, and C2 depends only on m, M , and μ.Remark 3.7 (On the Magnitude of ε). As the empirical loss ϵGPE → 0, the local Jacobian distortion δ strictly vanishes, whereas the nonlinear remainder bound converges to (C2 min {L2 
+
+> E
+
+, 1})1/2. L2-type distance losses (including the GPE encoder loss) do not inherently suppress high-frequency spatial oscillations. Thus, the uniform Hessian bound LE is not analytically forced to zero by the loss functional alone. To handle arbitrary variational pathologies where LE → ∞ , the global geometric term C2 acts as an absolute upper ceiling, ensuring the remainder never exceeds the intrinsic spatial variance of the data manifold. However, because the encoder E is parameterized by a neural network, the mapping is heavily regularized by the implicit spectral bias of gradient-based optimization, which strongly penalizes high-frequency modes [ 25 , 32 ]. In practice, the learned embedding possesses high global regularity, rendering the Hessian spectral norm LE strictly small. We emphasize that while this spectral regularization is widely observed empirically, this argument currently serves as a heuristic. A rigorous justification for bounding LE through the optimization dynamics of the network architecture remains an open question for future work. 
+
+# 4 Experiments 
+
+In our experiments, we compare FI, FIR, and FIR deviations computed from diffusion models trained in pixel space and in latent spaces produced by various encoders. We begin with Gaussian toy experiments and simple encoders to verify the theoretical results in Section 3. We then move to real-world image data and more complex autoencoders, including GPE, VAE, and NVAE. For all experiments, implementation details, including model architectures, training configurations, and sampling parameters, are provided in Appendix D. 5Understanding Latent Diffusability via Fisher Geometry 
+
+# M
+
+# local neighborhood 
+
+# E
+
+# linear approx. region (a) Ideal encoder: local isometry and low curvature 
+
+# M
+
+# local neighborhood 
+
+# E
+
+# distorted metric (b) Tangential Distortion: local stretching/compression with large δ
+
+# M
+
+# local neighborhood 
+
+# E
+
+# linear approx. region (c) Curvature Injection: high-frequency nonlinearity with large ε and small τ .Figure 1: Geometric interpretation of encoder assumptions. 
+
+4.1 FI and FIR Comparison in the Gaussian Toy Setting 
+
+In the Gaussian toy setting, we study how FI and FIR vary for tiny diffusion models trained on the data and on different encodings of the data. 
+
+4.1.1 Experimental Setup 
+
+We consider a two-dimensional Gaussian dataset and its pointwise nonlinear encodings. Specifically, we generate training data x ∼ N (0, I2) and construct encoded samples z = E(x), where the encoder E is applied pointwise to each coordinate of x. We then train the tiny diffusion model 5 with identical architecture and training settings separately on the original data x and the encoded data z. We evaluate the FI and FIR using the trained diffusion models. Details of the numerical estimation procedures are provided in Appendix C.  
+
+> 5We use the open-source implementation available at https://github.com/tanelp/tiny-diffusion .
+
+6Understanding Latent Diffusability via Fisher Geometry   
+
+> (a) (b)
+> (c) (d)
+
+Figure 2: Values of I (left) and R (right) plotted versus the noise variance τ , computed from tiny diffusion models trained on different data representations. Pixel curves correspond to models trained on x ∼ N (0, I2). Latent curves correspond to models trained on encoded data z = E(x), where the pointwise activation E is indicated in the legend; for Leaky ReLU, α denotes the negative slope. 
+
+4.1.2 Results 
+
+Figure 2 compares FI ( I) and FIR ( R) computed using diffusion models trained on original data x (denoted pixel in the legend) versus encoded data z = E(x) (denoted latent ). We consider encoders E given by common activation functions: ReLU, Leaky ReLU (with negative slope α), GELU, sigmoid, and tanh. Derivations for the theoretical properties of encoders, using Proposition 3.1 and discussion in Section 3.2, are provided in Appendix E. Comparison of FI across different encoders relative to the pixel baseline is shown in Figures 2(a) and (c). ReLU exhibits the largest deviation, consistent with Proposition 3.1, for which the derived FI upper bound diverges in the ReLU case (see Appendix E). In contrast, smooth activations (GELU, sigmoid, tanh) are locally bi-Lipschitz on the Gaussian data support, and their FI curves remain closer to the pixel baseline. For Leaky ReLU, as α approaches 1, the mapping becomes closer to an isometry, and the FI curve correspondingly moves toward the pixel baseline. We note that for 
+
+α = 2 , the FI curves are not strictly below the pixel baseline as suggested by Proposition 3.1, which may be due to numerical estimation error since FI is computed empirically from finite samples. Comparison for FIR is shown in Figures 2(b) and (d). ReLU exhibits the largest deviation from the pixel baseline, consistent with the discussion in Section 3.2, since it does not satisfy second-order regularity. Among the smooth activations (GELU, tanh, sigmoid), deviations are smaller, with activations of lower curvature tending to produce smaller deviations. Although Leaky ReLU does not satisfy the second-order regularity assumption, the observed deviation is not excessively large. We believe this is because R is estimated from finite data, and the Leaky ReLU encoder can be effectively approximated by a smoother mapping on the data support. As α approaches 1, the smooth approximation has lower curvature, and the observed deviation decreases accordingly. 
+
+4.2 FIR Deviation in the Gaussian Toy Setting 
+
+We study the behavior of FIR deviation in the Gaussian toy setting, and examine how FIR deviation is affected by perturbations of the data representation. 7Understanding Latent Diffusability via Fisher Geometry   
+
+> (a) (b)
+> (c) (d)
+
+Figure 3: FIR deviation DR vs. (a) δ0, (b) d, and (c) ε0 in toy settings. Data y ∼ N (0, I2) are embedded as 
+
+x = ( y1, y 2, 0, . . . , 0) ∈ RD and encoded to z = E(x) ∈ Rd. We compute DR from R(D)(μτ ) and R(d)(( μZ )τ ) using diffusion models trained on x and z. Curves denote fixed noise variance τ . Solid lines y = 1 .25 δ0 (a) and y = D−dD−2
+
+(b) serve as linear references. Encoder E setups: (a) D = d = 2 , E(x) = Ax with A = diag( √1 + δ0, √1 − δ0).(b) D = 512 with z = ( y1, y 2, 0, . . . , 0) ∈ Rd. (c) D = d = 3 with E(( x1, x 2, 0) , ε 0) =  sin( ε0x1)/ε 0, x 2, (1 −
+
+cos( ε0x1)) /ε 0
+
+.(d) Real data (Sec. 4.3): Dsc  
+
+> R
+
+vs. τ (D = 64 × 64 × 3, d = 256 ). FFHQ images x are encoded to latents z = E(x) via GPE or VAE (see legend). 
+
+4.2.1 Experimental Setup 
+
+Consider an intrinsic manifold of dimension m = 2 with data y ∼ N (0, I2). We embed this into a higher-dimensional ambient space as x = ( y1, y 2, 0, . . . , 0) ∈ RD , and construct latent representations z = E(x) ∈ Rd, where D, d ≥ 2.Using the same tiny diffusion model, training protocol, and FIR estimation procedure described in Section 4.1, we compute R(D)(μτ ) and R(d)(( μZ )τ ) using diffusion models trained on x and z, respectively, and use these values to compute the FIR deviations DR(τ ) and Dsc 
+
+> R
+
+(τ ).
+
+4.2.2 Results 
+
+For all experiments in this section, detailed derivations of the theoretical parameters using Theorem 3.4 and 3.5, and additional plots of the DR versus noise variance τ are provided in Appendix E. We begin with the case D = d = m = 2 .The encoded data are obtained via a linear transformation z = Ax , where A = diag( √1 + δ0, √1 − δ0). In this setting, ∥A⊤A − I∥2 = δ0, so the near-isometry condition in Theorem 3.4 is satisfied with deviation parameter δ = δ0.Figure 3(a) shows DR as a function of δ0 for fixed noise variances τ . For each fixed τ , DR increases approximately linearly with respect to δ0, consistent with Theorem 3.4, which predicts DR(τ ) ≤ Cδ 0. Note that we report curves at relatively small noise variances τ , as for large τ the FIR values become very small due to heavy smoothing, making the deviation numerically unstable and less informative. 8Understanding Latent Diffusability via Fisher Geometry  
+
+> (a) (b)
+
+Figure 4: Values of (a) I and (b) R plotted versus the noise variance τ , computed from diffusion models trained on different data representations. The pixel curves correspond to models trained directly on FFHQ images. The latent 
+
+curves correspond to models trained on latent representations of an image encoder (GPE or VAE) pretrained on FFHQ. We show √τ ∈ [0 .01 , 80] , excluding smaller τ due to numerical instability. Next, we consider D = 512 and varying latent dimension d. We take the latent representation z = ( y1, y 2, 0, . . . , 0) ∈
+
+Rd. Here, the encoder acts as the identity on the intrinsic subspace, from which we derive that the linear deviation parameter in Theorem 3.4 satisfies δ = 0 . The theorem then yields the bound for scaled FIR deviation Dsc  
+
+> R
+
+≤ C D−dD−m .Figure 3(b) reports Dsc  
+
+> R
+
+as a function of latent dimension d. Consistent with our predicted bound, the curves exhibit an almost linear downward trend. Finally, we consider D = d = 3 and z = E(x, ε 0), where E(x, ε 0) is a nonlinear embedding that wraps the 2D data manifold into a 3D cylinder of radius 1/ε 0, defined as E(( x1, x 2, 0) , ε 0) =  sin( ε0x1)/ε 0, x 2, (1 − cos( ε0x1)) /ε 0
+
+
+
+with ε0 > 0. With this construction, using the direct computation, we can derive the nonlinear deviation parameter ε
+
+in Theorem 3.5 as ε = √1.5ε0. In addition, the linear deviation parameter satisfies δ = 0 and the dimension-penalty term D−dD−m = 0 . Applying Theorem 3.5 therefore yields Dsc 
+
+> R
+
+(τ ) ≤ Cε 0/√τ . Figure 3(c) plots the scaled FIR deviation versus ε0 for fixed noise variance τ . For each fixed τ , the deviation grows approximately linearly with respect to ε0,consistent with the bound we derived. The linear trend is most evident for small τ . For larger τ , the deviation values are much smaller, which may make the FIR estimation error more prominent and thus visually weaken the linear pattern. 
+
+4.3 FI and FIR Comparison on FFHQ with GPE and VAE encoding 
+
+We extend the FI and FIR analysis to a real-world image dataset using FFHQ with GPE and VAE encodings. 
+
+4.3.1 Experimental Setup 
+
+We conduct experiments on the FFHQ dataset [ 15 ], which contains 70 ,000 high-quality face images. Images are downsampled to 64 × 64 , and a diffusion model is trained directly on the pixel data. For latent-space experiments, we consider both GPE[ 20 ] (Geometry Preserving Encoder/Decoder) and VAE models trained on the same FFHQ data. The two models share the same encoder–decoder architecture. We then train diffusion models on the latent representations produced by GPE and VAE, respectively. For the diffusion models, we use the official EDM [ 14 ] training framework with the diffusion transformer (DiT) architecture [ 24 ]. The model architecture and training setup are largely consistent between pixel-space and latent-space experiments. For completeness, Appendix H reports results for the experiments in this section and Section 4.4 using the original EDM U-Net architecture.. 
+
+4.3.2 Results 
+
+Figure 5 shows representative generated samples from the diffusion model trained on the pixel space and the latent representations of GPE and VAE. Figure 4 compares the FI and FIR for models trained in pixel space as well as for models trained on GPE and VAE latent representations, while Figure 3(d) displays the scaled FIR deviation. In computing the scaling factor, we set D = 3 × 64 × 64 , the dimension of the pixel space (image dimension), and 
+
+d = 256 , the latent dimension used for both GPE and VAE. We observe that the GPE-based curves lie consistently 9Understanding Latent Diffusability via Fisher Geometry   
+
+> (a) (b) (c)
+
+Figure 5: (a) Samples from a diffusion model trained directly on 64 × 64 FFHQ. (b, c) Samples from latent diffusion models trained on (b) GPE and (c) VAE representations. Generated latents are mapped back to image space using their respective decoders. closer to the pixel baseline than those of VAE for both FI and FIR. The better performance of GPE in terms of FI could be explained by Proposition 3.1. In Appendix F, we estimate the bi-Lipschitz constants c and C for both encoders. The estimates show that, compared with VAE, the GPE encoder mapping is significantly closer to an isometry: both c
+
+and C are close to 1, and the ratio C/c ≈ 1.18 , whereas it is substantially larger for the VAE encoder. According to Proposition 3.1, when c and C are close to 1, the FI in the latent space remains tightly bounded relative to the pixel baseline. The smaller FIR deviation observed for GPE can be explained by Proposition 3.6, which shows that the GPE encoder satisfies the conditions of Theorem 3.5. As a result, the deviation bound in Theorem 3.5 applies to the GPE latent representation. This provides a theoretical explanation for the empirical observation in Figure 3(d), where the GPE-based model exhibits substantially smaller FIR deviation than the VAE model, particularly at small noise levels τ .
+
+4.4 FI and FIR Comparison on FFHQ Data with NVAE encoding 
+
+We extend the FI and FIR comparison on the FFHQ dataset to include latent representations produced by NVAE models. 
+
+4.4.1 Experimental Setup 
+
+We use the FFHQ dataset downsampled to 64 × 64 resolution. For pixel-space experiments, we use the same trained diffusion model as in Section 4.3. To study latent-space behavior, we encode the same images using a pretrained NVAE model [ 30 ]. The NVAE encoder produces latent tensors of size 20 × dz × dz at multiple spatial resolutions, and we train separate diffusion models on the latents for each dz. All diffusion models are trained under the EDM framework using the DiT architecture as the score network. 
+
+4.4.2 Results 
+
+Figure 6 compares FI and FIR computed using diffusion models trained directly in pixel space versus NVAE latent representations with varying spatial resolutions dz. As dz increases, the FI and FIR curves for the latent models move closer to the pixel baseline. This behavior can be explained by the hierarchical structure of NVAE. Latent variables with larger dz lie closer to the input space and therefore preserve more of the local geometry of the data manifold, resulting in less distortion in the mapping from data space to the latent representation. We also observe that for both FI and FIR, the pixel and latent curves remain closely aligned for large τ , while the deviation increases noticeably once τ becomes smaller. A possible explanation is that when τ is large, the distribution 
+
+pτ is strongly smoothed by Gaussian noise, so the corresponding score functions become dominated by noise and the resulting FIR values carry limited geometric information about the underlying representation. 
+
+# 5 Conclusions 
+
+In this work, we introduced a formal information-geometric framework to demystify the “diffusability” of latent spaces in generative modeling. By decomposing denoising complexity—quantified by the rate of change of the MMSE—into Fisher Information (FI) and Fisher Information Rate (FIR), we identified the specific geometric properties required for successful latent diffusion. Our theoretical analysis explicitly decouples the effects of dimensional compression 10 Understanding Latent Diffusability via Fisher Geometry  
+
+> (a) (b)
+
+Figure 6: Values of (a) I and (b) R plotted versus the noise variance τ for diffusion models trained on different data representations. Pixel and latent curves denote models trained on FFHQ images and their pretrained NVAE latents, respectively. NVAE was pretrained on FFHQ, with spatial size 20 × dz × dz (dz indicated in the legend). We show √τ ∈ [0 .01 , 80] , excluding smaller τ due to numerical instability. from intrinsic geometric distortion, revealing that latent-space degradation is primarily driven by local curvature and non-linearity injected by the encoder. Specifically, we derived dual requirements for information-preserving encoders: they must be both near-isometric to stabilize global FI and near-harmonic to minimize the FIR-based geometric complexity penalty. Our experiments on toy Gaussian datasets and high-dimensional FFHQ images validate these metrics as a robust diagnostic suite. We showed that standard VAEs exhibit severe FIR deviations correlated with generation failure, whereas geometry-preserving approaches maintain better spectral regularity. By providing a task-independent way to evaluate latent spaces before training full diffusion models, our framework offers a principled foundation for designing more diffusible autoencoding architectures. 
+
+# Acknowledgements 
+
+This work was supported in part by the NVIDIA Academic Grants Program, startup funding from The Ohio State University (W. Lee) and NSF award DMS 2427955 (G. Lerman). 
+
+# References 
+
+[1] Amari, S.i.: Information Geometry and Its Applications, Applied Mathematical Sciences, vol. 194. Springer, Tokyo (2016). https://doi.org/10.1007/978-4-431-55978-8 [2] Arvanitidis, G., Hansen, L.K., Hauberg, S.: Latent space oddity: on the curvature of deep generative models. In: International Conference on Learning Representations (2018), https://openreview.net/forum?id= r1Y7pYxRb 
+
+[3] Baade, A., Chan, E.R., Sargent, K., Chen, C., Johnson, J., Adeli, E., Fei-Fei, L.: Latent forcing: Reordering the diffusion trajectory for pixel-space image generation. arXiv preprint arXiv:2602.11401 (2026) [4] Bakry, D., ´Emery, M.: Diffusions hypercontractives. In: S ´eminaire de Probabilit ´es XIX 1983/84. pp. 177–206. Springer (1985) [5] Chen, N., Klushyn, A., Ferroni, F., Bayer, J., Van Der Smagt, P.: Learning flat latent manifolds with VAEs. In: International Conference on Machine Learning (2020) [6] Cho, S., Lee, J., Kim, D.: Hyperbolic VAE via latent Gaussian distributions. Advances in Neural Information Processing Systems 36 , 569–588 (2023) [7] Costa, M.: A new entropy power inequality. IEEE Transactions on Information Theory 31 (6), 751–760 (1985) [8] Efron, B.: Tweedie’s formula and selection bias. Journal of the American Statistical Association 106 (496), 1602– 1614 (2011). https://doi.org/10.1198/jasa.2011.tm11181, https://doi.org/10.1198/jasa.2011.tm11181 ,pMID: 22505788 11 Understanding Latent Diffusability via Fisher Geometry [9] Guo, D., Shamai, S., Verdu, S.: Mutual information and minimum mean-square error in Gaussian channels. IEEE Transactions on Information Theory 51 (4), 1261–1282 (2005). https://doi.org/10.1109/TIT.2005.844072 [10] Heek, J., Hoogeboom, E., Mensink, T., Salimans, T.: Unified latents (ul): How to train your latents. arXiv preprint arXiv:2602.17270 (2026) [11] Ho, J., Jain, A., Abbeel, P.: Denoising diffusion probabilistic models. In: Larochelle, H., Ranzato, M., Had-sell, R., Balcan, M., Lin, H. (eds.) Advances in Neural Information Processing Systems. vol. 33, pp. 6840– 6851. Curran Associates, Inc. (2020), https://proceedings.neurips.cc/paper_files/paper/2020/ file/4c5bcfec8584af0d967f1ab10179ca4b-Paper.pdf 
+
+[12] Hutchinson, M.F.: A stochastic estimator of the trace of the influence matrix for laplacian smoothing splines. Communications in Statistics-Simulation and Computation 18 (3), 1059–1076 (1989) [13] Karczewski, R., Heinonen, M., Pouplin, A., Hauberg, S., Garg, V.K.: The spacetime of diffusion models: An information geometry perspective. In: The Fourteenth International Conference on Learning Representations (2026), https://openreview.net/forum?id=qCsbYJZRA5 
+
+[14] Karras, T., Aittala, M., Aila, T., Laine, S.: Elucidating the design space of diffusion-based generative models. Advances in neural information processing systems 35 , 26565–26577 (2022) [15] Karras, T., Laine, S., Aila, T.: A style-based generator architecture for generative adversarial networks. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 4401–4410 (2019) [16] Kingma, D.P., Welling, M.: Auto-encoding variational bayes. In: International Conference on Learning Represen-tations (2014) [17] Kouzelis, T., Kakogeorgiou, I., Gidaris, S., Komodakis, N.: EQ-VAE: Equivariance regularized latent space for improved generative image modeling. In: Forty-second International Conference on Machine Learning (2025) [18] Lee, H., Kim, M., Jang, S., Jeong, J., Hwang, S.J.: Enhancing variational autoencoders with smooth robust latent encoding. arXiv preprint arXiv:2504.17219 (2025) [19] Lee, J., Shin, J., Choi, H., Lee, J.: Latent diffusion models with masked autoencoders. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 17422–17431 (2025) [20] Lee, W., O’Neill, R.C.W., Zou, D., Calder, J., Lerman, G.: Geometry-preserving encoder/decoder in latent generative models (2025), https://arxiv.org/abs/2501.09876 
+
+[21] Lobashev, A., Guskov, D., Larchenko, M., Tamm, M.: Hessian geometry of latent space in generative models. In: Forty-second International Conference on Machine Learning (2025), https://openreview.net/forum?id= H8JTsbG4KW 
+
+[22] S ´aez de Oc ´ariz Borde, H., Arroyo, A., Morales, I., Posner, I., Dong, X.: Neural latent geometry search: Product manifold inference via gromov-hausdorff-informed bayesian optimization. Advances in Neural Information Processing Systems 36 , 38370–38403 (2023) [23] Palma, A., Rybakov, S., Hetzel, L., G ¨unnemann, S., Theis, F.J.: Enforcing latent euclidean geometry in single-cell VAEs for manifold interpolation. In: Forty-second International Conference on Machine Learning (2025), 
+
+https://openreview.net/forum?id=DoDXFkF10S 
+
+[24] Peebles, W., Xie, S.: Scalable diffusion models with transformers. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 4195–4205 (2023) [25] Rahaman, N., Baratin, A., Arpit, D., Draxler, F., Lin, M., Hamprecht, F., Bengio, Y., Courville, A.: On the spectral bias of neural networks. In: International conference on machine learning. pp. 5301–5310. PMLR (2019) [26] Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 10684–10695 (June 2022) [27] Shi, M., Wang, H., Zheng, W., Yuan, Z., Wu, X., Wang, X., Wan, P., Zhou, J., Lu, J.: Latent diffusion model without variational autoencoder. arXiv preprint arXiv:2510.15301 (2025) [28] Skorokhodov, I., Girish, S., Hu, B., Menapace, W., Li, Y., Abdal, R., Tulyakov, S., Siarohin, A.: Improving the diffusability of autoencoders. In: Forty-second International Conference on Machine Learning (2025), 
+
+https://openreview.net/forum?id=2hEDcA7xy4 
+
+[29] Song, Y., Sohl-Dickstein, J., Kingma, D.P., Kumar, A., Ermon, S., Poole, B.: Score-based generative modeling through stochastic differential equations. In: International Conference on Learning Representations (2021), 
+
+https://openreview.net/forum?id=PxTIG12RRHS 
+
+12 Understanding Latent Diffusability via Fisher Geometry [30] Vahdat, A., Kautz, J.: NVAE: A deep hierarchical variational autoencoder. Advances in neural information processing systems 33 , 19667–19679 (2020) [31] Villani, C.: Optimal transport: old and new, vol. 338. Springer Science & Business Media (2009) [32] Xu, Z.Q.J., Zhang, Y., Luo, T., Xiao, Y., Ma, Z.: Frequency principle: Fourier analysis sheds light on deep neural networks. arXiv preprint arXiv:1901.06523 (2019) [33] Yang, J., Li, T., Fan, L., Tian, Y., Wang, Y.: Latent denoising makes good visual tokenizers. In: The Four-teenth International Conference on Learning Representations (2026), https://openreview.net/forum?id= 1jBsi98fVe 
+
+[34] Yue, K., Jia, M., Hou, J., Goldstein, T.: Image generation with a sphere encoder (2026), https://arxiv.org/ abs/2602.15030 
+
+[35] Zheng, B., Ma, N., Tong, S., Xie, S.: Diffusion transformers with representation autoencoders. In: The Four-teenth International Conference on Learning Representations (2026), https://openreview.net/forum?id= 0u1LigJaab 
+
+13 Understanding Latent Diffusability via Fisher Geometry 
+
+# Supplementary Material 
+
+The appendices are organized as follows: Appendix A reviews related literature, while Appendix B contains all missing proofs and derivations. Practical estimation of FI and FIR is detailed in Appendix C, and Appendix D provides comprehensive experimental setups. Additional mathematical derivations and numerical supplements, relevant to the toy experimental settings, are provided in Appendices E and F. Finally, Appendices G–I present further numerical results and spectral analyses, relevant to the real experimental settings. 
+
+# A Related Works 
+
+The term “diffusability” was first introduced by Skorokhodov et al. [ 28 ] to describe the extent to which a latent space facilitates the diffusion process. The authors argued that high-frequency components in latent representations reduce diffusability, though they did not provide a rigorous quantitative measure for this effect. Subsequently, [ 35 ] offered further empirical evidence demonstrating that standard representation encoders often induce latent distributions that are inherently difficult for diffusion models to fit. Several follow-up works have aimed to improve diffusability through specific architectural or training modifications. For instance, [ 17 ] promoted diffusability by enforcing equivariance in the latent representation, while [ 33 ] targeted the corruption robustness of the latents. Taking a different angle, [ 10 ] improved diffusability by training the encoder to produce latents that already resemble mildly noised diffusion states, allowing the diffusion prior to denoise from a smoother, better-aligned distribution. Rather than modifying the latent distribution directly, [ 3] proposed denoising latent features early in the pipeline and using them to condition later pixel-space denoising, effectively simplifying the overall problem. Another distinct line of work focuses on explicitly constraining the latent geometry. In [ 34 ], latent codes are normalized to lie uniformly on a hypersphere. More broadly, alternative geometric priors for autoencoders have gained traction, including the use of hyperbolic latent spaces [6, 22]. While these prior works have successfully improved diffusability through empirical regularization and structural constraints, they largely lack a unified mathematical framework to quantify why certain representation spaces are easier to model than others. In contrast, our work provides a rigorous geometric analysis of diffusability. By explicitly bounding the Fisher Information Rate (FIR) of the encoded distributions, we establish formal guarantees on how linear encoders and geometric constraints fundamentally alter the stability of the diffusion process. 
+
+# B Supplementary Derivations and Proofs 
+
+B.1 Proof of Proposition 2.1 
+
+Fix τ > 0 and let pτ (x) be the smooth density of the noisy measure μτ . As defined in Section 2.4, the density is given by the convolution of the clean measure μ with the Gaussian kernel 
+
+ϕτ (z) = (2 πτ )−k/ 2 exp( −∥ z∥2/(2 τ )) (8) as follows: 
+
+pτ (x) = ( μ ∗ ϕτ )( x) = 
+
+Z
+
+> Rk
+
+ϕτ (x − x0) dμ (x0). (9) In view of this expression, pτ ∈ C∞(Rk), pτ > 0, and all derivatives of pτ decay at least as fast as a Gaussian. We express the Fisher Information (FI) as: 
+
+I(k)(μτ ) = 
+
+Z
+
+> Rk
+
+pτ (x)∥∇ x log pτ (x)∥2 dx =
+
+Z
+
+> Rk
+
+∥∇ xpτ (x)∥2
+
+pτ (x) dx. (10) Using the probabilistic heat equation ∂p τ 
+
+> ∂τ
+
+= 12 ∆xpτ from Equation (1), we differentiate I(k) with respect to τ :
+
+ddτ I(k)(μτ ) = 
+
+Z
+
+> Rk
+
+ 2∇xpτ · ∇ x(∂τ pτ )
+
+pτ
+
+− ∥∇ xpτ ∥2
+
+p2
+
+> τ
+
+∂τ pτ
+
+
+
+dx
+
+=
+
+Z
+
+> Rk
+
+ ∇xpτ · ∇ x(∆ xpτ )
+
+pτ
+
+− 12
+
+∥∇ xpτ ∥2
+
+p2
+
+> τ
+
+∆xpτ
+
+
+
+dx. (11) 14 Understanding Latent Diffusability via Fisher Geometry Integrating the first term by parts (where boundary terms vanish due to Gaussian decay): 
+
+Z
+
+> Rk
+
+∇xpτ · ∇ x(∆ xpτ )
+
+pτ
+
+dx = −
+
+Z
+
+> Rk
+
+∆xpτ div 
+
+ ∇xpτ
+
+pτ
+
+
+
+dx
+
+= −
+
+Z
+
+> Rk
+
+∆xpτ
+
+ ∆xpτ
+
+pτ
+
+− ∥∇ xpτ ∥2
+
+p2
+
+> τ
+
+
+
+dx. (12) Substituting this back into Equation (11) yields: 
+
+ddτ I(k)(μτ ) = 
+
+Z
+
+> Rk
+
+
+
+− (∆ xpτ )2
+
+pτ
+
++ 12 ∆xpτ
+
+∥∇ xpτ ∥2
+
+p2
+
+> τ
+
+
+
+dx. (13) To simplify, let f = log pτ , A = ∆ xf , and B = ∥∇ xf ∥2. Noting that ∆xpτ 
+
+> pτ
+
+= ∆ x log pτ + ∥∇ x log pτ ∥2 = A + B,we have: 
+
+ddτ I(k)(μτ ) = 
+
+Z
+
+> Rk
+
+pτ
+
+
+
+−(A + B)2 + 12 (A + B)B
+
+
+
+dx
+
+=
+
+Z
+
+> Rk
+
+pτ
+
+
+
+−A2 − 32 AB − 12 B2
+
+
+
+dx. (14) Now, let Hτ = ∇2 
+
+> x
+
+log pτ be the Hessian. The Euclidean Bochner identity for f = log pτ states: 
+
+12 ∆x∥∇ xf ∥2 = ∥∇ 2
+
+> x
+
+f ∥2 
+
+> F
+
++ ∇xf · ∇ x(∆ xf ). (15) Integrating 12 ∆xB and −∇ xf · ∇ xA against the density pτ via integration by parts, and noting that div (pτ ∇xf ) = 
+
+∇xpτ · ∇ xf + pτ ∆xf = pτ (B + A), we obtain: 
+
+Z
+
+pτ
+
+12 ∆xB d x =
+
+Z 12 B∆xpτ dx =
+
+Z
+
+pτ
+
+ 12 AB + 12 B2
+
+
+
+dx,
+
+−
+
+Z
+
+pτ ∇xf · ∇ xA d x =
+
+Z
+
+A div (pτ ∇xf ) dx =
+
+Z
+
+pτ (A2 + AB ) dx.
+
+Summing these yields the weighted Bochner identity: 
+
+Epτ [∥Hτ ∥2 
+
+> F
+
+] = Epτ
+
+
+
+A2 + 32 AB + 12 B2
+
+
+
+. (16) Comparing this to Equation (14), we find: 
+
+ddτ I(k)(μτ ) = −
+
+Z
+
+> Rk
+
+pτ ∥Hτ ∥2 
+
+> F
+
+dx = −Epτ
+
+Tr( H2 
+
+> τ
+
+) . (17) By Equation (3), R(k)(μτ ) = − ddτ I(k)(μτ ). Substituting the score sτ (x) = ∇x log pτ , we have ∇xsτ = Hτ , and 
+
+R(k)(μτ ) = Epτ [∥∇ xsτ (x)∥2 
+
+> F
+
+], which completes the proof. 
+
+B.2 Derivation of (5) and (6) In this section, we provide the detailed derivation for the I-MMSE identity and the Denoising Resistance decomposition. Consider a signal x ∈ Rk drawn from a distribution μ, and its corruption by additive white Gaussian noise n ∼ N (0, Ik),resulting in the noisy observation: 
+
+xτ = x + √τ n,
+
+where τ is the noise variance. The total variance of the corruption is E[∥x − xτ ∥2] = E[∥ − √τ n∥2] = τ k .Let ˆx(xτ ) = E[x | xτ ] be the MMSE estimator. We can decompose the total noise variance by adding and subtracting this estimator: 
+
+E[∥x − xτ ∥2] = E[∥(x − ˆx(xτ )) + (ˆ x(xτ ) − xτ )∥2]= E[∥x − ˆx(xτ )∥2] + E[∥ˆx(xτ ) − xτ ∥2] + 2 E[( x − ˆx(xτ )) ⊤(ˆ x(xτ ) − xτ )] . (18) 15 Understanding Latent Diffusability via Fisher Geometry The cross-term vanishes by the tower property of conditional expectation. Since (ˆ x(xτ ) − xτ ) is deterministic given 
+
+xτ , we have: 
+
+E[( x − ˆx(xτ )) ⊤(ˆ x(xτ ) − xτ )] = Exτ
+
+E[( x − ˆx(xτ )) ⊤(ˆ x(xτ ) − xτ ) | xτ ]
+
+= Exτ
+
+(E[x | xτ ] − ˆx(xτ )) ⊤(ˆ x(xτ ) − xτ )
+
+= Exτ
+
+(ˆ x(xτ ) − ˆx(xτ )) ⊤(ˆ x(xτ ) − xτ ) = 0 . (19) Next, we invoke Tweedie’s formula [ 8], which relates the residual of the MMSE estimator to the score function 
+
+sτ (xτ ) = ∇xτ log pτ (xτ ):
+
+ˆx(xτ ) − xτ = τ ∇xτ log pτ (xτ ) = τ sτ (xτ ). (20) Substituting (20) and the definition MMSE (k)(μτ ) = E[∥x − ˆx(xτ )∥2] into (18) yields: 
+
+τ k = MMSE (k)(μτ ) + τ 2Epτ [∥sτ (xτ )∥2] = MMSE (k)(μτ ) + τ 2I(k)(μτ ). (21) Rearranging for MMSE (k)(μτ ) directly recovers the I-MMSE identity (5) as established in [9]. To derive the Denoising Resistance, we differentiate (5) with respect to the noise variance τ using the product rule: 
+
+ddτ MMSE (k)(μτ ) = ddτ 
+
+
+
+kτ − τ 2I(k)(μτ )
+
+
+
+= k − 2τ I(k)(μτ ) − τ 2 ddτ I(k)(μτ ). (22) Substituting our definition of the Fisher Information Rate (FIR) from (3) , namely R(k)(μτ ) = − ddτ I(k)(μτ ), we obtain the fundamental decomposition: 
+
+ddτ MMSE (k)(μτ ) = k − 2τ I(k)(μτ )
+
+| {z }
+
+> Intrinsic Noise Gain
+
++ τ 2R(k)(μτ )
+
+| {z }
+
+> Geometric Complexity Penalty
+
+. (23) As noted in the main text, the Intrinsic Noise Gain represents the baseline linear increase in estimation error due to dimensionality k, attenuated by the current magnitude of information I(k). Conversely, the Geometric Complexity Penalty represents the additional difficulty imposed by the local curvature of the density. By Proposition 2.1, this term is governed by Epτ [∥∇ sτ ∥2 
+
+> F
+
+], indicating that distributions with rapidly changing score functions (high curvature) exhibit a faster degradation in denoising performance as noise scales. 
+
+B.3 Proof of Proposition 3.1 
+
+In this section, we prove that the Fisher Information (FI) in the latent space is bounded by the FI in the data space scaled by the bi-Lipschitz constants of the encoder. 
+
+Proof. Let M ⊂ RD and N ⊂ Rd be the data and latent manifolds, respectively. Let TxM and TzN denote the tangent spaces at x ∈ M and z = E(x) ∈ N . We denote the manifold score vectors (tangential gradients of the log-density) as: 
+
+s(D) 
+
+> τ
+
+(x) = ∇M log p(D) 
+
+> τ
+
+(x) ∈ TxM, and s(d) 
+
+> τ
+
+(z) = ∇N log p(d) 
+
+> τ
+
+(z) ∈ TzN . (24) Let JE (x) : TxM → TzN be the Jacobian of the encoder restricted to the tangent space. Under the change of variables on manifolds, the densities are related by p(d) 
+
+> τ
+
+(z) = p(D) 
+
+> τ
+
+(x)/pdet( JE (x)⊤JE (x)) .As noted in Section 2.4, assuming the log-volume gradient ∇M log 
+
+q
+
+det( J⊤ 
+
+> E
+
+JE ) is negligible (a property of near-isometric maps), the chain rule implies the score vectors transform via the adjoint Jacobian operator JE (x)⊤ : TzN → 
+
+TxM:
+
+s(D) 
+
+> τ
+
+(x) ≈ JE (x)⊤s(d) 
+
+> τ
+
+(z). (25) The bi-Lipschitz condition on E ensures that for any tangent vector v ∈ TxM, the singular values of JE (x) are bounded within [c, C ]. This implies that for the adjoint operator: 
+
+c∥s(d) 
+
+> τ
+
+(z)∥ ≤ ∥ JE (x)⊤s(d) 
+
+> τ
+
+(z)∥ ≤ C∥s(d) 
+
+> τ
+
+(z)∥. (26) Substituting (25) into this inequality and squaring all terms, we obtain: 
+
+c2∥s(d) 
+
+> τ
+
+(z)∥2 ≤ ∥ s(D) 
+
+> τ
+
+(x)∥2 ≤ C2∥s(d) 
+
+> τ
+
+(z)∥2. (27) 16 Understanding Latent Diffusability via Fisher Geometry To find the global Fisher Information, we integrate with respect to the probability measure. By the pushforward property of the encoder z = E(x), we have Ep(D)
+
+> τ
+
+[f (E(x))] = Ep(d)
+
+> τ
+
+[f (z)] . Applying this to our inequality: 
+
+c2I(d)(μτ ) ≤ I (D)(μτ ) ≤ C2I(d)(μτ ). (28) Rearranging these terms to isolate the latent Fisher Information I(d) yields: 
+
+1
+
+C2 I(D)(μτ ) ≤ I (d)(μτ ) ≤ 1
+
+c2 I(D)(μτ ). (29) This confirms that if c ≤ 1 ≤ C, the latent information is ”sandwiched” around the data information. Finally, we consider the effect on the Intrinsic Noise Gain G(τ ) = k − 2τ I(k). In the latent space, the ambient dimension k changes from D to d. Thus, the total shift in the MMSE rate is: 
+
+∆G(τ ) = ( d − D) − 2τ
+
+
+
+I(d) − I (D)
+
+. (30) Under perfect isometry ( c = C = 1 ), we have I(d) = I(D), and the degradation is driven solely by the dimensional compression penalty ∆d = D − d.
+
+B.4 Normal-Direction Decomposition for Subspace Measures 
+
+The following lemma establishes the “Dimensional Compression Penalty” by showing that normal noise directions contribute a constant, universal term to the FIR. It is used to prove Theorem 3.4 in Appendix B.5. 
+
+Lemma B.1 (Exact normal-direction contribution) . Let 1 ≤ m ≤ D and identify RD ∼= Rm × RD−m. Let ρ be a Borel probability measure on Rm, and define a measure μ on RD by μ := ρ ⊗ δ0. Recalling that ϕτ denotes the Gaussian kernel defined in (8) , we note that for every variance τ > 0, the smoothed density μτ factorizes as: 
+
+μτ (y, w ) = ( ρ ∗ ϕ(m) 
+
+> τ
+
+)( y) ϕ(D−m) 
+
+> τ
+
+(w), (y, w ) ∈ Rm × RD−m,
+
+and the Fisher Information Rate satisfies the exact splitting: 
+
+R(D)(μτ ) = R(m)(ρτ ) + D − mτ 2 .
+
+Proof. Fix τ > 0. By the definition of convolution and the product structure of the standard Gaussian kernel, we have μτ (y, w ) = R 
+
+> Rm
+
+ϕ(m) 
+
+> τ
+
+(y − y′) ϕ(D−m) 
+
+> τ
+
+(w) ρ(dy ′). This gives the claimed factorization. Using log μτ (y, w ) = log( ρ ∗ ϕ(m) 
+
+> τ
+
+)( y) + log ϕ(D−m) 
+
+> τ
+
+(w), the Hessian ∇2 log μτ is block diagonal: 
+
+∇2(y,w ) log μτ = diag 
+
+
+
+∇2 
+
+> y
+
+log( ρ ∗ ϕ(m) 
+
+> τ
+
+)( y), ∇2 
+
+> w
+
+log ϕ(D−m) 
+
+> τ
+
+(w)
+
+
+
+.
+
+Consequently, ∥∇ 2 log μτ ∥2 
+
+> F
+
+= ∥∇ 2 
+
+> y
+
+log ρτ ∥2 
+
+> F
+
++ ∥∇ 2 
+
+> w
+
+log ϕ(D−m) 
+
+> τ
+
+∥2 
+
+> F
+
+. Applying the identity from Theorem 2.1 and using Fubini’s theorem to integrate over Rm × RD−m:
+
+R(D)(μτ ) = R(m)(ρτ ) + 
+
+Z
+
+> RD−m
+
+ϕ(D−m) 
+
+> τ
+
+(w)∥∇ 2 
+
+> w
+
+log ϕ(D−m) 
+
+> τ
+
+(w)∥2 
+
+> F
+
+dw. 
+
+Since ∇2 
+
+> w
+
+log ϕ(D−m) 
+
+> τ
+
+(w) = − 1 
+
+> τ
+
+ID−m, the second term evaluates exactly to D−mτ 2 , noting R ϕτ = 1 .
+
+B.5 Proof of Theorem 3.4 (Linear Stability) 
+
+Proof. By Theorem B.1, R(D)(μτ ) = R(m)(ρτ ) + D−mτ 2 . Similarly, μZ is supported on an m-plane in Rd with tangential coordinate law A#ρ. Thus, 
+
+R(d)(μZ,τ ) = R(m)(( A#ρ)τ ) + d − mτ 2 .
+
+The difference is: 
+
+R(D)(μτ ) − R (d)(μZ,τ ) = 
+
+
+
+R(m)(ρτ ) − R (m)(( A#ρ)τ )
+
+
+
++ D − dτ 2 . (31) To bound the tangential distortion, let ν = A#ρ. Using polar decomposition A = RS where R is orthogonal and 
+
+S = ( A⊤A)1/2, we note that R preserves FIR. Under Assumption (NI A), the eigenvalues of S lie in [√1 − δ, √1 + δ].In particular, ∥S∥2 ≤ √1 + δ and ∥S−1∥2 ≤ 1/√1 − δ.17 Understanding Latent Diffusability via Fisher Geometry We use the elementary bound ∥MH ∥F ≤ ∥ M∥2∥H∥F . For any m × m matrix H, this gives: 
+
+∥S−⊤ HS −1∥F ≤ ∥ S−1∥22 ∥H∥F , ∥S−⊤ HS −1∥F ≥ ∥ S∥−22 ∥H∥F . (32) By coordinate transformation and the chain rule: 
+
+∇2 
+
+> y
+
+log ντ (y) = S−⊤  ∇2 
+
+> x
+
+log eντ (x) S−1
+
+> x=S−1y
+
+.
+
+Using the operator norm bounds from (32) , we obtain (1 + δ)−( m 
+
+> 2 +2)
+
+R(m)(ρτ ) ≤ R (m)(ντ ) ≤ (1 + δ) m 
+
+> 2 +2
+
+R(m)(ρτ ).Applying a Taylor expansion for δ ≤ 1, we find |R (m)(ντ ) − R (m)(ρτ )| ≤ C δ R(m)(ρτ ). Substituting this back into (31) and dividing by R(d)(μZ,τ ) yields the stated bounds for DR and Dsc 
+
+> R
+
+.
+
+B.6 Proof of Theorem 3.5 (Nonlinear Stability) 
+
+Proof. Fix τ > 0 and let ν = ( Ex0
+
+> lin
+
+)#μ. The bounded Hessian ∥∇ 2E∥ ≤ LE implies ∥E(x) − Ex0
+
+> lin
+
+(x)∥2 ≤ ε2
+
+(integrated over μ), thus W2(μZ , ν ) ≤ ε. Let η, ˜η be measures on Rd. We expand the FIR difference: 
+
+R(d)(ητ ) − R (d)(˜ ητ ) = 
+
+Z
+
+(ητ − ˜ητ )∥∇ 2 log ητ ∥2 
+
+> F
+
+dx +
+
+Z
+
+˜ητ (∥∇ 2 log ητ ∥2 
+
+> F
+
+− ∥∇ 2 log ˜ ητ ∥2 
+
+> F
+
+)dx. 
+
+Using the kernel bounds ∥∇ 2 log ητ ∥F ≤ C/τ and ∥ητ − ˜ητ ∥L1 ≤ Cτ −1/2W2(η, ˜η), we bound the first term by 
+
+Cτ −5/2W2(η, ˜η). Similarly, using the Frobenius difference identity ∥A∥2 − ∥ B∥2 = ( A − B) : ( A + B), the second term is also bounded by Cτ −5/2W2(η, ˜η). Applying this to η = μZ and ˜η = ν gives |R (d)(μZ,τ ) − R (d)(ντ )| ≤ Cε τ 5/2 .Combined with the linear results, this establishes the nonlinear stability bounds. 
+
+B.7 Proof of Theorem 3.6 (Application to GPE) 
+
+Proof. Following [ 20 ], an encoder minimizing the GPE loss satisfies a weak α-bi-Lipschitz property on a set A ⊂
+
+M × M where (μ × μ)( B) ≤ ϵ1/2 
+
+> GP E
+
+for B = Ac. Let Ωfib be points with ”good fibers” such that μ(By ) ≤ ϵ1/4 
+
+> GP E
+
+. By Chebyshev, μ(M \ Ωfib ) ≤ ϵ1/4 
+
+> GP E
+
+. For δ, the local distortion A(x) = R 
+
+> Sm−1
+
+(∥dE x(v)∥2 − 1) 2dv integrated over the sphere yields A(0) ≥ 2ωm 
+
+> m(m+2)
+
+∥A⊤ 
+
+> 0
+
+A0 − Im∥22. Inversion gives δ ∝ ϵ1/(4( m+5))  
+
+> GP E
+
+.For ε, the remainder R(x) = ∥E(x) − E(0) − ∇ E(0) x∥2 is analyzed in L1(M, μ ). Taylor’s theorem provides 
+
+R(x) ≤ L2 
+
+> E
+> 4
+
+∥x∥4. Integrating over M split into A0 (good slice) and B0 (bad slice): 
+
+Z
+
+> B0
+
+R(x)dμ (x) ≤ L2 
+
+> E
+
+D4
+
+> M
+
+4 μ(B0) ≤ L2 
+
+> E
+
+D4
+
+> M
+
+4 ϵ1/4 
+
+> GP E
+
+.
+
+For A0, we use the spatial expansion R(x) ≤ 2( eϵ1/4 
+
+> GP E
+
+− 1) + 2( eϵ1/4 
+
+> GP E
+
++ 1 + δ)M2. Combining these gives the bound for ε as derived in the main text. 
+
+# C Estimation of FI and FIR 
+
+In this section, we describe how the Fisher Information (FI) and Fisher Information Rate (FIR) are computed in our experiments based on trained diffusion models. We specifically focus on the computational strategies that allow these metrics to scale to high-dimensional neural architectures. 
+
+Fisher Information (FI). The FI can be expressed using the score function sτ (x) = ∇x log pτ (x). For a given noise variance τ > 0 and dimension D, the FI is calculated as: 
+
+I(D)(μτ ) = 
+
+Z
+
+> RD
+
+pτ (x) ∇x log pτ (x) 2 dx
+
+= Ex∼pτ
+
+∥sτ (x)∥2
+
+≈ 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+sτ (x(n)) 2.
+
+(33) where x(n) are samples drawn from the smoothed distribution pτ . In practice, these are obtained by adding Gaussian noise N (0, τ I) to clean data samples from the empirical distribution. 18 Understanding Latent Diffusability via Fisher Geometry 
+
+Fisher Information Rate (FIR). The FIR is computed as the dissipation rate of the FI. Using the Hessian representa-tion from Proposition 2.1, we have: 
+
+R(D) 
+
+> τ
+
+(μ) = − ddτ I(D)(μτ )= Ex∼pτ
+
+h
+
+tr 
+
+ ∇xsτ (x)2i 
+
+≈ 1
+
+N
+
+> N
+
+X
+
+> n=1
+
+tr 
+
+ ∇xsτ (x(n))2
+
+.
+
+For high-dimensional neural networks, explicitly forming the D×D score Jacobian ∇xsτ is computationally intractable, requiring O(D2) memory and O(D3) operations for the matrix square. We circumvent this by employing the 
+
+Hutchinson trace estimator [ 12 ]. Crucially, because the score is a conservative vector field, its Jacobian is a symmetric Hessian matrix ( ∇xsτ = ∇2 
+
+> x
+
+log pτ ). Therefore, the trace of its square equates to its squared Frobenius norm, which can be written as an expectation over probe vectors v:
+
+tr  (∇xsτ (x)) 2 = Ev
+
+h
+
+∇xsτ (x) v 2i
+
+≈ 1
+
+M
+
+> M
+
+X
+
+> m=1
+
+∇xsτ (x) v(m) 2,
+
+where the probe vectors v(m) are drawn independently from a Rademacher distribution (entries in {− 1, 1}). This leads to the empirical estimator: 
+
+R(D) 
+
+> τ
+
+(μ) ≈ 1
+
+N M 
+
+> N
+
+X
+
+> n=1
+> M
+
+X
+
+> m=1
+
+∇xsτ (x(n)) v(m) 2. (34) 
+
+Implementation via Directional Derivatives. The term ∇xsτ (x)v is a Jacobian-vector product (JVP) , representing the directional derivative of the score function. In modern auto-differentiation frameworks (e.g., torch.autograd. functional.jvp in PyTorch), this is evaluated in O(D) time—comparable to a single forward pass—without ever explicitly computing or storing the full Jacobian matrix. Alternatively, to avoid second-order automatic differentiation entirely or further reduce memory overhead, the term can be approximated via a first-order finite difference. For a small step size ε > 0:
+
+∇xsτ (x) v ≈ sτ (x + εv) − sτ (x)
+
+ε .
+
+This yields the gradient-free estimator: 
+
+R(D) 
+
+> τ
+
+(μ) ≈ 1
+
+N M 
+
+> N
+
+X
+
+> n=1
+> M
+
+X
+
+> m=1
+
+sτ (x(n) + εv(m)) − sτ (x(n))
+
+ε
+
+> 2
+
+.
+
+In our experiments, the JVP approach was found to be highly accurate and numerically stable, providing a scalable means to monitor the geometric complexity penalty during the diffusion process. 
+
+Score Function in Each Experiment. In practice, the score function is obtained directly from the trained diffusion model. For the experiments described in Section 4.1 and Section 4.2, we use a noise-prediction diffusion model. The empirical score is approximated using the model’s predicted noise ϵθ (x, t ):
+
+sτ (x) = ∇x log pτ (x) ≈ − 1
+
+pτ (t) ϵθ (xt, t ),
+
+where τ (t) is determined by the forward noising schedule. For the experiments described in Section 4.4 and Section 4.3, we use a denoiser parameterization. In this case, the score is approximated as 
+
+sτ (x) = ∇x log pτ (x) ≈ − x − Dθ (x, τ )
+
+τ ,
+
+19 Understanding Latent Diffusability via Fisher Geometry where Dθ (x, τ ) denotes the trained denoiser. In all experiments, FI and FIR are computed using equation 33 and equation 34. All required gradients are evaluated via automatic differentiation. For estimation of the values, we use N = 1000 samples and M = 50 Hutchinson probe vectors. In all experiments, FI and FIR are computed using equation 33 and equation 34. All required gradients are evaluated via automatic differentiation. For diffusion models with the EDM framework and DiT architecture trained directly on FFHQ images (Sections 4.4 and 4.3) and on GPE latent representations (Section 4.3), we use N = 200 samples and 
+
+M = 20 Hutchinson probe vectors due to the larger model size. For all other experiments, we use N = 1000 samples and M = 50 Hutchinson probe vectors. 
+
+# D Experimental Details 
+
+In this section, we provide the model architectures, training configurations, and sampling parameters used in our experiments. Each subsection corresponds to the experimental setting described in the main text. 
+
+D.1 FI and FIR Comparison in the Gaussian Toy Setting 
+
+For the experiment in Section 4.1, we first describe the architecture of the tiny diffusion model used in this setting. The denoising network in the tiny diffusion model is implemented as an MLP (multilayer perceptron). We use a hidden dimension of 128 with 3 hidden layers, and apply sinusoidal embeddings of dimension 128 to both the input data and the diffusion time. For all experiments, we use 50 ,000 training samples with batch size 256 and train for 200 epochs. The diffusion process uses 100 timesteps with a linear noise β-schedule. We use the AdamW optimizer with a learning rate of 5 × 10 −4.
+
+D.2 FIR Deviation in the Gaussian Toy Setting 
+
+This subsection provides the experimental details for the study in Section 4.2. The model and training configuration follows the Gaussian toy experiment in Section 4.1. The only modification concerns the input embedding used in the tiny diffusion model. In Section 4.1, sinusoidal embeddings were applied to the input coordinates. Since the experiments in this section consider data whose input dimension may exceed two, we instead use the identity embedding for all tiny diffusion models. 
+
+D.3 FI and FIR Comparison on FFHQ with GPE and VAE Encoding 
+
+This subsection provides the experimental details for the study described in Section 4.3. 
+
+GPE and VAE The GPE and VAE models employ the same fully convolutional encoder and decoder architectures and differ only in their training objectives, resulting in different latent representations while keeping the network architecture identical. We adopt the architecture configuration provided for the CelebA dataset at 64 × 64 resolution in the official implementation 6. The latent dimension is set to 256 .Both models are trained on FFHQ images at 64 × 64 resolution using a batch size of 100 and learning rate 1 × 10 −4.For GPE, training is performed in stages: the encoder is first trained for 8 hours, followed by training the decoder for 20 
+
+hours while keeping the encoder fixed. To improve robustness, the decoder is further trained for an additional 8 hours by adding Gaussian noise with standard deviation 0.05 to the encoder outputs before feeding them into the decoder. For the VAE model, we employ a β-annealing strategy, gradually increasing the KL-divergence weight β during training. Specifically, we begin with a warm-up phase using β ∈ { 0, 10 −3, 10 −2}, training each stage for 5 hours, followed by training with β = 0 .1 for 20 hours. 
+
+Diffusion models For the pixel-space experiment, we train a diffusion model directly on FFHQ images at 64 × 64 
+
+resolution. For the latent-space experiments, the trained GPE and VAE encoders produce latent vectors of dimension 
+
+256 . These vectors are reshaped into 16 ×16 tensors using a serpentine ordering and normalized using Gaussian statistics prior to diffusion training. Diffusion models are then trained separately on the GPE and VAE latent representations. 
+
+> 6https://github.com/wonjunee/GPE_codes
+
+20 Understanding Latent Diffusability via Fisher Geometry The diffusion model architecture and training setup are largely consistent between the pixel-space and latent-space experiments. We use a DiT backbone with hidden size 768 , depth 12 , and 12 attention heads as the score network, following the official implementation 7. The patch size is adjusted according to the input representation: since the pixel-space distribution and the GPE latent distribution benefit from finer spatial resolution for stable training, we use patch size 2 for the pixel-space model, patch size 1 for the GPE latent model, and patch size 2 for the VAE latent model. All diffusion models are trained within the EDM framework in the unconditional setting using the official implementa-tion 8. We use a batch size of 256 and dropout rate 0.05 , with no data augmentation. Optimization is performed using Adam with β1 = 0 .9, β2 = 0 .999 , and ϵ = 10 −8.For the pixel-space and GPE latent experiments, training is more computationally demanding and exhibits slower convergence. Therefore, we use the same training configuration for both settings: batch size 64 and a cosine learning-rate schedule with a 10 ,000 kimg warmup, maximum learning rate 3 × 10 −4, minimum learning rate 3 × 10 −7, and cycle length 200 ,000 kimg. The pixel-space model is trained for 40 ,000 kimg, the GPE latent model for 100 ,000 kimg, and the VAE latent model for 200 ,000 kimg, where “kimg” denotes thousands of images processed during training. For the VAE latent experiments, we use patch size 2, batch size 256 , and a learning-rate schedule consisting of a 10 ,000 
+
+kimg warmup followed by a constant learning rate of 1 × 10 −4.For sampling of the diffusion model, we follow the standard EDM procedure with 40 sampling steps, σmin = 0 .002 ,
+
+σmax = 80 , and Schurn = 0 .
+
+D.4 FI and FIR Comparison on FFHQ Data with NVAE Encoding 
+
+This subsection provides the experimental details for the study in Section 4.4. 
+
+NVAE To obtain latent representations of the FFHQ dataset, we use a publicly available pretrained NVAE model trained on FFHQ. 9 NVAE is a hierarchical variational autoencoder whose encoder produces multiple latent tensors at different spatial resolutions. To maintain consistency with the pixel-space experiments, we use 64 × 64 resolution images as input to the encoder. Although the pretrained NVAE model was originally trained on 256 × 256 images, the encoder is fully convolutional and can therefore process inputs of different spatial resolutions without modifying the architecture. 
+
+Diffusion models For the pixel-space experiments, we use the same diffusion model trained on FFHQ data as described in Section 4.3. For the latent-space experiments, the NVAE encoder produces latent tensors of size 20 × dz × dz at spatial resolutions 
+
+dz ∈ { 32 , 16 , 8, 4, 2}, where 20 denotes the channel dimension. Since multiple latent tensors exist at the same resolution level, we select a single representative latent for each dz, choosing the one closest to the input space in the encoder hierarchy. Diffusion models are then trained separately on the latent representations corresponding to each dz.For the latent-space experiments, the patch size of the diffusion models is adjusted according to the input spatial resolution. We use patch size 4 for dz = 32 , patch size 2 for dz ∈ { 16 , 8}, and patch size 1 for dz ∈ { 4, 2}. The learning rate is linearly warmed up for 10 ,000 kimg and then kept constant at 1 × 10 −4. Each model is trained for 
+
+200 ,000 kimg. All other model architecture and training parameters follow those in Section 4.3. 
+
+# E Gaussian Toy Experiment: Derivations and Additional Results 
+
+E.1 Derivation Relevant for the Experiment in Section 4.1 
+
+In this section, we provide derivations for the experiment in Section 4.1. We consider samples x ∼ N (0, I2) and construct encoded representations z = E(x), where the encoder E is applied pointwise. For E, we consider functions given by common activation functions, including ReLU, Leaky ReLU (with negative slope α), GELU, sigmoid, and tanh. We derive the Fisher information bounds in Proposition 3.1 and analyze the curvature of the encoder used in Section 3.2, relating to the discussion there on encoder curvature injection into the FIR.  
+
+> 7https://github.com/facebookresearch/DiT
+> 8https://github.com/NVlabs/edm
+> 9We use the publicly available pretrained NVAE model: https://github.com/NVlabs/NVAE .
+
+21 Understanding Latent Diffusability via Fisher Geometry 
+
+ReLU encoder Consider the pointwise ReLU encoder 
+
+E(x) = ReLU( x) = (max {x1, 0}, max {x2, 0}).
+
+We derive the FI bound in Proposition 3.1. Consider the pointwise ReLU encoder. Let x = ( x1, x 2) and 
+
+E(x) = ReLU( x) = (max {x1, 0}, max {x2, 0}).
+
+Its Jacobian is 
+
+JE (x) = 
+
+1x1>0 00 1x2>0
+
+
+
+,
+
+away from the nondifferentiable set {x1 = 0 } ∪ { x2 = 0 }. For any tangent vector v = ( v1, v 2),
+
+∥JE (x)v∥2 = 1x1>0v21 + 1x2>0v22 ≤ ∥ v∥2,
+
+so the upper Lipschitz constant is C = 1 and lower constant is c = 0 .Substituting these constants into Proposition 3.1 yields the bound 
+
+I(D) ≤ I (d) ≤ ∞ .
+
+Moreover, for this ReLU encoder E(x) = ( E1(x), E 2(x)) , the Hessians satisfy 
+
+∇2
+
+> x
+
+E1(x) = 
+
+δ(x1) 00 0
+
+
+
+, ∇2
+
+> x
+
+E2(x) = 
+
+0 00 δ(x2)
+
+
+
+,
+
+where δ(·) denotes the Dirac delta distribution. Thus the encoder curvature vanishes for x1̸ = 0 and x2̸ = 0 , since ReLU is piecewise linear. At x1 = 0 or x2 = 0 , the second derivatives become singular through the Dirac delta terms, introducing concentrated curvature. 
+
+Leaky ReLU encoder Next we consider the pointwise Leaky ReLU encoder with negative slope α > 0,
+
+E(x) = LeakyReLU α(x) = ( ϕα(x1), ϕ α(x2)) , ϕα(x) = 
+
+x, x > 0,αx, x ≤ 0.
+
+Its Jacobian is 
+
+JE (x) = 
+
+ϕ′
+
+> α
+
+(x1) 00 ϕ′
+
+> α
+
+(x2)
+
+
+
+, ϕ′
+
+> α
+
+(x) ∈ { α, 1}.
+
+Hence for any tangent vector v,
+
+∥JE (x)v∥2 = ϕ′
+
+> α
+
+(x1)2v21 + ϕ′
+
+> α
+
+(x2)2v22 .
+
+If 0 < α ≤ 1, then α2∥v∥2 ≤ ∥ JE (x)v∥2 ≤ ∥ v∥2, so c = α and C = 1 .If α > 1, then ∥v∥2 ≤ ∥ JE (x)v∥2 ≤ α2∥v∥2, so c = 1 and C = α.Substituting into Proposition 3.1 yields 
+
+
+
+I(D) ≤ I (d) ≤ 1
+
+α2 I(D), 0 < α ≤ 1,
+
+1
+
+α2 I(D) ≤ I (d) ≤ I (D), α > 1.
+
+For the Leaky ReLU encoder E(x) = ( E1(x), E 2(x)) with negative slope α > 0, the Hessians satisfy 
+
+∇2
+
+> x
+
+E1(x) = 
+
+(1 − α)δ(x1) 00 0
+
+
+
+, ∇2
+
+> x
+
+E2(x) = 
+
+0 00 (1 − α)δ(x2)
+
+
+
+,
+
+where δ(·) denotes the Dirac delta distribution. Thus the encoder curvature vanishes for x1̸ = 0 and x2̸ = 0 , since the map is piecewise linear. At x1 = 0 or x2 = 0 ,the second derivatives become singular through the Dirac delta terms, with magnitude proportional to 1 − α.22 Understanding Latent Diffusability via Fisher Geometry 
+
+E.2 Derivation Relevant for the Experiment in Section 4.2 
+
+In this section, we provide derivations for the experiment in Section 4.2. We consider data y ∼ N (0, I2) on a 2-dimensional intrinsic manifold, embedded in RD as x = ( y1, y 2, 0, . . . , 0) , with latent representations z = E(x) ∈ Rd.
+
+Linear Encoder We derive the deviation parameter δ in Theorem 3.4 for the linear encoder used in our experiment. Take D = d = m = 2 and consider the encoder 
+
+z = Ax , A = diag  p 1 + δ0, p1 − δ0
+
+.
+
+Then 
+
+A⊤A − I2 = diag(1 + δ0, 1 − δ0) − I2 = diag( δ0, −δ0).
+
+Therefore, 
+
+∥A⊤A − I2∥2 = δ0.
+
+Thus, we can take 
+
+δ = δ0.
+
+Dimension-Varying Encoder We provide derivation of the deviation parameter δ in Theorem 3.4. Take D = 512 
+
+and d ≥ m = 2 . For x = ( y1, y 2, 0, . . . , 0) ∈ RD , the encoder maps 
+
+z = E(x) = ( y1, y 2, 0, . . . , 0) ∈ Rd.
+
+Since the encoder acts as the identity on the intrinsic subspace, we may take 
+
+A = Im.
+
+Therefore 
+
+A⊤A − Im = 0, ∥A⊤A − Im∥2 = 0 ,
+
+and the deviation parameter in Theorem 3.4 satisfies 
+
+δ = 0 .
+
+Nonlinear Encoder Consider D = d = 3 . For x = ( y1, y 2, 0) , consider the encoder 
+
+E(( x1, x 2, 0) , ε 0) = 
+
+ sin( ε0x1)
+
+ε0
+
+, x 2, 1 − cos( ε0x1)
+
+ε0
+
+
+
+, ε0 > 0.
+
+We first provide derivation of the linear deviation parameter δ and the dimension penalty term in Theorem 3.5. Since 
+
+D = d, the dimension-penalty term D−dD−m = 0 .
+
+Nonlinear Encoder Consider D = d = 3 . For x = ( y1, y 2, 0) , define the encoder 
+
+E(( x1, x 2, 0) , ε 0) = 
+
+ sin( ε0x1)
+
+ε0
+
+, x 2, 1 − cos( ε0x1)
+
+ε0
+
+
+
+, ε0 > 0.
+
+We first derive the linear deviation parameter δ and the dimension penalty term in Theorem 3.5. Since D = d, the dimension-penalty term in Theorem 3.5 satisfies 
+
+D − dD − m = 0 .
+
+Next we derive the linear deviation parameter δ in Theorem 3.5. Let M ⊂ R3 denote the plane 
+
+M = {(x1, x 2, 0) : x1, x 2 ∈ R}.
+
+Then the distribution μ supported on M is the Gaussian measure 
+
+dμ (x1, x 2) = 12π e−(x21+x22)/2 dx 1dx 2.
+
+Let x0 = ( a, b, 0) . The Jacobian of E is 
+
+∇E(x0) = 
+
+cos( ε0a) 0 00 1 0sin( ε0a) 0 0
+
+!
+
+.
+
+23 Understanding Latent Diffusability via Fisher Geometry Then Ax0 = ∇E(x0) satisfies 
+
+A⊤ 
+
+> x0
+
+Ax0 =
+
+cos 2(ε0a) + sin 2(ε0a) 00 1
+
+
+
+= Im.
+
+Therefore 
+
+∥A⊤ 
+
+> x0
+
+Ax0 − Im∥2 = 0 ,
+
+and the linear deviation parameter in Theorem 3.5 satisfies 
+
+δ = 0 .
+
+Lastly, we explicitly compute the nonlinear deviation parameter ε appearing in Theorem 3.5. We compute the quantity in (7). Define the Taylor remainder 
+
+R(x, x0) = E(x) −  E(x0) + ∇E(x0)( x − x0).
+
+Since the second coordinate of E is linear, the remainder only appears in the first and third components. Let 
+
+t = ε0x1, t0 = ε0a. 
+
+Then 
+
+R1 = sin t − sin t0 − cos t0(t − t0)
+
+ε0
+
+,R3 = (1 − cos t) − (1 − cos t0) − sin t0(t − t0)
+
+ε0
+
+.
+
+By Taylor’s theorem with remainder, there exist ξ, η between t and t0 such that 
+
+sin t = sin t0 + cos t0(t − t0) − sin ξ
+
+2 (t − t0)2,
+
+1 − cos t = 1 − cos t0 + sin t0(t − t0) + cos η
+
+2 (t − t0)2.
+
+Therefore 
+
+R1 = − sin ξ
+
+2ε0
+
+(t − t0)2, R3 = cos η
+
+2ε0
+
+(t − t0)2.
+
+Using | sin | ≤ 1 and | cos | ≤ 1, we obtain 
+
+|R1| ≤ 12ε0
+
+(t − t0)2, |R3| ≤ 12ε0
+
+(t − t0)2.
+
+Since t − t0 = ε0(x1 − a),
+
+|R1| ≤ ε0
+
+2 (x1 − a)2, |R3| ≤ ε0
+
+2 (x1 − a)2.
+
+Consequently 
+
+∥R(x, x 0)∥2 = R21 + R23 ≤ ε20
+
+2 (x1 − a)4.
+
+Let X1 ∼ N (0 , 1) . Then the fourth moment is E[X41 ] = 3 . A direct computation gives 
+
+E[( X1 − a)4] = 3 + 6 a2 + a4.
+
+Therefore Z
+
+> M
+
+∥E(x) − (E(x0) + ∇E(x0)( x − x0)) ∥2dμ (x) ≤ ε20
+
+2 (3 + 6 a2 + a4) =: ε2.
+
+The right hand side is minimized when a = 0 , thus ε =
+
+q 32 ε0.
+
+E.3 Supplementary Plots 
+
+In Section 4.2, Figure 3 presents the FIR deviation DR as functions of the parameters δ0, d, and ε0 for fixed noise variance τ . Here we provide additional plots that instead show the dependence of DR on τ for the same experimental settings. These results are shown in Figures 7, 8, and 9. 24 Understanding Latent Diffusability via Fisher Geometry 
+
+(a) (b) 
+
+Figure 7: FIR deviation DR vs. (a) τ and (b) δ0 in toy settings. Data y ∼ N (0, I2) are embedded as 
+
+x = ( y1, y 2, 0, . . . , 0) ∈ RD and encoded to z = E(x) ∈ Rd. We consider D = d = 2 and E(x) = Ax with 
+
+A = diag( √1 + δ0, √1 − δ0). We compute DR from R(D)(μτ ) and R(d)(( μZ )τ ) using diffusion models trained on 
+
+x and z. Solid line y = 1 .25 δ0 in (b) serve as linear references. 
+
+(a) (b) 
+
+Figure 8: FIR deviation DR vs. (a) τ and (b) d in toy settings. Data y ∼ N (0, I2) are embedded as x =(y1, y 2, 0, . . . , 0) ∈ RD with D = 512 , and z = ( y1, y 2, 0, . . . , 0) ∈ Rd. We compute DR from R(D)(μτ ) and 
+
+R(d)(( μZ )τ ) using diffusion models trained on x and z. Solid line y = D−dD−2 in (b) serve as linear references. 
+
+(a) (b) 
+
+Figure 9: FIR deviation DR vs. (a) τ and (b) ε0 in toy settings. Data y ∼ N (0, I2) are embedded as 
+
+x = ( y1, y 2, 0, . . . , 0) ∈ RD and encoded to z = E(x) ∈ Rd. We consider D = d = 3 and E(( x1, x 2, 0) , ε 0) =  sin( ε0x1)/ε 0, x 2, (1 − cos( ε0x1)) /ε 0
+
+. We compute DR from R(D)(μτ ) and R(d)(( μZ )τ ) using diffusion models trained on x and z.25 Understanding Latent Diffusability via Fisher Geometry Model ˆc ˆC ˆC/ ˆc
+
+GPE 0.88 1.04 1.18 VAE 0.20 3.86 19.67 Table 1: Empirical estimates (ˆ c, ˆC) of the constants (c, C ) in Proposition 3.1 for encoders of the GPE and VAE trained on FFHQ. The ratio ˆC/ ˆc provides an empirical estimate of the bi-Lipschitz constant. 
+
+# F Bi-Lipschitz Constant Estimation for GPE and VAE 
+
+For the GPE and VAE models trained on FFHQ used in the experiments of Section 4.3, we estimate the bi-Lipschitz constants and the corresponding values of C and c used in the FI bound of Proposition 3.1. In Proposition 3.1, the constants c, C > 0 are defined through the Jacobian bounds 
+
+c ∥v∥ ≤ ∥ JE (x) v∥ ≤ C ∥v∥, ∀x ∈ M , ∀v ∈ TxM.
+
+To estimate these constants in practice, we use the global distance distortion of the encoder: 
+
+ˆc∥x1 − x2∥ ≤ ∥ E(x1) − E(x2)∥ ≤ ˆC∥x1 − x2∥.
+
+If E is differentiable, this global bi-Lipschitz bound implies ˆc∥v∥ ≤ ∥ JE (x)v∥ ≤ ˆC∥v∥ for all x and tangent vectors 
+
+v. Thus (ˆ c, ˆC) provide valid estimates for (c, C ) in Proposition 3.1. To estimate (ˆ c, ˆC), we sample 5000 images {xi} from the FFHQ dataset and compute their encoded representations 
+
+{E(xi)}. For each pair (i, j ), we evaluate the distortion ratio 
+
+rij = ∥E(xi) − E(xj )∥∥xi − xj ∥ .
+
+Using all pairs, we estimate the constants as 
+
+ˆc ≈ min  
+
+> i<j
+
+rij , ˆC ≈ max  
+
+> i<j
+
+rij .
+
+The resulting estimates are reported in Table 1, together with the ratio ˆC/ ˆc, which provides an empirical estimate of the bi-Lipschitz constant. 
+
+# G Additional Model Performance Results 
+
+This section reports additional quantitative results for the models used in the experiments in Section 4.3. Table 2 summarizes the reconstruction MSE of the GPE and VAE autoencoders trained on FFHQ, together with the FID scores of diffusion models trained in pixel space and on the corresponding latent representations. Table 2: Generation quality and reconstruction accuracy on FFHQ. FID (Fr ´echet Inception Distance) measures the quality of generated images. For the pixel model, images are generated by sampling a diffusion model trained directly on FFHQ. For the GPE and VAE models, images are generated by sampling diffusion models trained in the latent space and decoding the generated latents using the corresponding decoder. The diffusion models use the DiT architecture within the EDM framework. Reconstruction performance for the GPE and VAE trained on FFHQ is reported as mean squared error (MSE). 
+
+Model Generation FID Reconstruction MSE 
+
+Pixel Diffusion 3.04 –GPE (Latent Diffusion) 74.36 0.0018 VAE (Latent Diffusion) 56.05 0.014 
+
+# H FFHQ Experiments Using the EDM U-Net Architecture 
+
+This section reports additional results for the experiments in Section 4.3 and Section 4.4 using the original EDM U-Net architecture provided in the official EDM implementation, instead of the DiT backbone. 26 Understanding Latent Diffusability via Fisher Geometry   
+
+> (a) (b) (c)
+
+Figure 10: (a) Samples from a diffusion model trained directly on 64 × 64 FFHQ. (b, c) Samples from latent diffusion models trained on (b) GPE and (c) VAE representations. Generated latents are mapped back to image space using their respective decoders. The diffusion models use the U-Net architecture within the EDM framework. 
+
+H.1 FI and FIR Comparison on FFHQ with GPE and VAE encoding H.1.1 Experimental Setup 
+
+The experimental setup largely follows that of Section 4.3. We use the same pretrained GPE and VAE models trained on the FFHQ dataset and follow the same procedures for both the pixel-space and latent-space experiments. The main difference lies in the diffusion model architecture. Instead of the DiT backbone used in the main experiments, we employ the original convolutional U-Net architecture within the EDM framework provided in the official implemen-tation 10 . For the pixel-space experiment, where the diffusion model is trained directly on FFHQ images at 64 × 64 
+
+resolution, we use the pretrained checkpoint provided in the official EDM repository. For the latent-space experiments, diffusion models are trained on the GPE and VAE latent representations using the same U-Net architecture and a similar training configuration as the pixel-based model, with residual block configuration 
+
+(1 , 2, 2, 2) across the resolution levels. For training, we use a batch size of 256 , dropout rate 0.05 , and a learning-rate schedule consisting of a 10 ,000 kimg warmup followed by a constant learning rate of 1 × 10 −4. Optimization is performed using Adam with β1 = 0 .9,
+
+β2 = 0 .999 , and ϵ = 10 −8. Models are trained for 200 ,000 kimg. The pretrained pixel-space model uses data augmentation with probability 0.15 , while no data augmentation is applied when training diffusion models on the latent representations. For sampling, we follow the standard EDM procedure with 50 steps, σmin = 0 .002 , and σmax = 80 . We set Schurn = 0 
+
+for the pixel-space and VAE latent models, and Schurn = 20 for the GPE latent model. 
+
+H.1.2 Results 
+
+Figure 10 shows representative samples generated by diffusion models trained on pixel-space FFHQ images as well as on the latent representations produced by GPE and VAE. Table 3 reports the FID scores of diffusion models trained on pixel-space images and on the corresponding latent representations. Figure 11(a) and (b) compare the FI and FIR for models trained in pixel space and on the latent representations of GPE and VAE, while Figure 11(c) shows the scaled FIR deviation. In computing the scaling factor, we set D = 3 × 64 × 64 ,the dimension of the pixel space, and d = 256 , the latent dimension used for both GPE and VAE. Overall, these results are consistent with those reported in Section 4.3 using diffusion models with the DiT architecture. 
+
+H.2 FI and FIR Comparison on FFHQ Data with NVAE encoding H.2.1 Experimental Setup 
+
+The experimental setup largely follows that of Section 4.4. We use the same pretrained NVAE model trained on the FFHQ dataset and follow the same experimental procedure. The main difference is that the diffusion models here use the original convolutional U-Net architecture within the EDM framework, instead of the DiT backbone used in the main experiments. 
+
+> 10 https://github.com/NVlabs/edm
+
+27 Understanding Latent Diffusability via Fisher Geometry Table 3: FID measures the quality of generated images. For the pixel model, images are generated by sampling a diffusion model trained directly on FFHQ. For the GPE and VAE models, images are generated by sampling diffusion models trained in the latent space and decoding the generated latents using the corresponding decoder. The diffusion models use the U-Net architecture within the EDM framework. 
+
+Model Generation FID 
+
+Pixel Diffusion 2.56 GPE (Latent Diffusion) 48.16 VAE (Latent Diffusion) 62.51  
+
+> (a) (b)
+> (c)
+
+Figure 11: Values of (a) I and (b) R plotted versus the noise variance τ , computed from diffusion models trained on different data representations. The diffusion models use the U-Net architecture within the EDM framework. The pixel 
+
+curves correspond to models trained directly on FFHQ images. The latent curves correspond to models trained on latent representations of an image encoder (GPE or VAE) pretrained on FFHQ. We show √τ ∈ [0 .01 , 80] , excluding smaller 
+
+τ due to numerical instability. (c) Scaled FIR deviation Dsc  
+
+> R
+
+versus τ , computed from R(D)(μτ ) and R(d)(( μZ )τ ) obtained from the pixel-based and latent-based diffusion models described above. Here D = 64 × 64 × 3 and d = 256 .For the pixel-space experiments, we use the same diffusion model trained on FFHQ data as described in Appendix H.1. For the latent-space experiments, we train separate diffusion models on the NVAE latent representations at each spatial resolution dz ∈ { 32 , 16 , 8, 4, 2}. The diffusion architecture and training setup follow those described in the previous subsection H.1, except for small latent resolutions where we slightly simplify the U-Net: for dz = 4 we use residual block configuration (1 , 2, 2) , and for dz = 2 we use (1 , 2) , due to the limited spatial resolution of the inputs. 
+
+H.2.2 Results 
+
+Figure 12 compares the FI and FIR computed from diffusion models trained directly in pixel space with those obtained from models trained on NVAE latent representations at different spatial resolutions dz. The results are consistent with those reported in Section 4.4 using the diffusion model with the DiT architecture. 28 Understanding Latent Diffusability via Fisher Geometry  
+
+> (a) (b)
+
+Figure 12: Values of (a) I and (b) R plotted versus the noise variance τ for diffusion models trained on different data representations. The diffusion models use the U-Net architecture within the EDM framework. Pixel and latent curves denote models trained on FFHQ images and their pretrained NVAE latents, respectively. NVAE was pretrained on FFHQ, with spatial size 20 × dz × dz (dz indicated in the legend). We show √τ ∈ [0 .01 , 80] , excluding smaller τ due to numerical instability. 
+
+# I Spectra and Connection to Fisher Geometry 
+
+In the main text, we introduce Fisher information (FI) and Fisher information rate (FIR) as tools for analyzing the diffusability of autoencoder representations. In this section, we examine spectral analysis as an alternative perspective for studying diffusability. Corresponding to the experiments in Sections 4.3 and 4.4, which compare FI and FIR between pixel space and latent space, we analyze the power spectra of FFHQ images and of latent representations produced by the GPE, VAE, and NVAE encoders. This analysis provides a complementary view of the signal structure and allows us to contrast the information revealed by spectral behavior with that captured by FI and FIR. We use the same 64 × 64 resolution FFHQ images and the same NVAE, GPE, and VAE models trained on FFHQ data as in the experiments in Sections 4.3 and 4.4. For FFHQ images and the NVAE latent representations, which are two-dimensional spatial tensors, we compute the two-dimensional power spectrum by applying the Fast Fourier Transform (FFT) over the spatial dimensions. For multi-channel inputs, the resulting spectra are averaged across channels to obtain a single spectrum per sample. For the latent representations produced by the GPE and VAE encoders, the latent variable for each sample is a one-dimensional vector. To analyze their frequency characteristics, we compute the one-dimensional power spectrum using the discrete Fourier transform (FFT) along the latent dimension. Each latent vector is normalized prior to the transform. Both the frequency axis k and the power values P are normalized by the signal length (or spatial resolution for the 2D case). To obtain a stable estimate, the spectrum is averaged over 10 ,000 samples drawn from the dataset. The zero-frequency (DC) component corresponding to the mean signal level is excluded from the plots. Figure 13(a) shows the power spectrum of FFHQ images. Figures (b)–(d) show the spectra of NVAE latent representa-tions at different spatial resolutions. Although these spectra also decrease with frequency, their shapes differ from the pixel-space spectrum in (a), and the decay behavior varies across resolutions, indicating a mismatch with the spectral structure of the original images. Figures (e) and (f) show the spectra of the GPE and VAE latent representations. Unlike the pixel spectrum in (a), these spectra exhibit strong oscillations and lack a clear monotonic decay, further deviating from the spectral behavior of the original images. Overall, the latent spectra do not always align with the spectrum of the original images. This suggests that spectral statistics alone may not be the most reliable diagnostic for assessing diffusability. In contrast, the FI and FIR analysis in Sections 4.3 and 4.4 provides a more consistent characterization of the diffusability of the corresponding representations. We also note that spectral statistics are not permutation invariant: for example, randomly shuffling the pixels of an image would destroy its spectrum by removing the spatial structure on which the Fourier transform relies. In contrast, FI and FIR depend on the geometry of the probability density through the score norm ∥∇ x log p(x)∥2, and are therefore invariant under permutations of coordinates. 29 Understanding Latent Diffusability via Fisher Geometry       
+
+> (a) FFHQ Images (b) NVAE latents ( dz= 32 )
+> (c) NVAE latents ( dz= 16 )(d) NVAE latents ( dz= 8 )
+> (e) GPE latents (f) VAE latents
+
+Figure 13: Power spectra of FFHQ images and latent representations. (a) Power spectrum of FFHQ images. (b)–(d) Power spectra of NVAE latent representations with spatial resolutions dz = 32 , 16 , and 8. (e)–(f) Power spectra of GPE and VAE latent representations. The NVAE, GPE, and VAE models are pretrained on FFHQ images. For FFHQ images and NVAE latents, the spectrum is computed using the two-dimensional FFT over the spatial dimensions and averaged over channels. For the one-dimensional latent vectors produced by the GPE and VAE encoders, the spectrum is computed using a one-dimensional FFT along the latent dimension. The spectra are averaged over 10 ,000 samples drawn from the dataset. Both the frequency axis k and the power values P are normalized by the signal length (or spatial resolution for the 2D case). The zero-frequency (DC) component corresponding to the mean signal level is excluded. 30

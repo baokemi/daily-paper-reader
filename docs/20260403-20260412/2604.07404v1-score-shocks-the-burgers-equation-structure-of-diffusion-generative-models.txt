@@ -1,0 +1,2839 @@
+Title: Score Shocks: The Burgers Equation Structure of Diffusion Generative Models
+
+URL Source: https://arxiv.org/pdf/2604.07404v1
+
+Published Time: Fri, 10 Apr 2026 00:04:29 GMT
+
+Number of Pages: 41
+
+Markdown Content:
+# Score Shocks: The Burgers Equation Structure of Diffusion Generative Models 
+
+Krisanu Sarkar Indian Institute of Technology Bombay Mumbai, India 
+
+# Contents 
+
+1 Introduction 32 Related Work 42.1 Score-Based Diffusion Models . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42.2 Phase Transitions and Symmetry Breaking in Diffusion . . . . . . . . . . . . . . . . . 52.3 The Score PDE and Non-Conservative Learned Scores . . . . . . . . . . . . . . . . . 62.4 The Burgers Equation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62.5 Stochastic Localization and Optimal Transport . . . . . . . . . . . . . . . . . . . . . 63 Preliminaries 73.1 Forward diffusion processes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 73.2 Diffusion-time reparametrization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 83.3 The score function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 83.4 Notation for Gaussian mixtures . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 93.5 The Cole–Hopf transformation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 94 The Score–Burgers Correspondence 94.1 The one-dimensional score PDE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10 4.2 Identification with the Burgers equation . . . . . . . . . . . . . . . . . . . . . . . . . 10 4.3 Physical-time formulation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 4.4 Connection to the score Fokker–Planck equation . . . . . . . . . . . . . . . . . . . . 11 4.5 Informal summary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 5 Interfacial Structure and Speciation 11 5.1 Exact score for a symmetric two-component mixture . . . . . . . . . . . . . . . . . . 12 5.2 The midpoint derivative of the score and the critical time . . . . . . . . . . . . . . . 12 5.3 The background-subtracted interfacial shock profile . . . . . . . . . . . . . . . . . . . 13 5.4 The exact local binary-boundary theorem . . . . . . . . . . . . . . . . . . . . . . . . 15 5.5 The Gaussian specialization and the spectral threshold . . . . . . . . . . . . . . . . . 17 5.6 The Rankine–Hugoniot condition for asymmetric mixtures . . . . . . . . . . . . . . . 18 5.7 The Lax entropy condition and mode stability . . . . . . . . . . . . . . . . . . . . . . 18 6 Error Amplification at Score Shocks 19 1
+
+> arXiv:2604.07404v1 [cond-mat.stat-mech] 8 Apr 2026
+
+6.1 Trajectory divergence near the interfacial layer . . . . . . . . . . . . . . . . . . . . . 19 6.2 The Grönwall bound with score error . . . . . . . . . . . . . . . . . . . . . . . . . . . 20 6.3 The amplification exponent in closed form . . . . . . . . . . . . . . . . . . . . . . . . 21 6.4 KL and total variation bounds . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22 7 Multi-Dimensional Extension 22 7.1 The vector Burgers system . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23 7.2 Curl preservation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23 7.3 Shock surfaces in Rd . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25 7.4 A Gaussian-mixture specialization of the local criterion in Rd . . . . . . . . . . . . . 25 8 The VP-SDE via Coordinate Reduction 26 8.1 The VP score PDE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26 8.2 The rescaling transformation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27 8.3 VP speciation time . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 8.4 VP interfacial width . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 8.5 Summary: VP reduces to VE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 9 Correction Terms for Asymmetric Mixtures 28 9.1 Posterior responsibilities at the weighted mean . . . . . . . . . . . . . . . . . . . . . 29 9.2 The corrected Jacobian . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30 9.3 The corrected speciation time . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31 9.4 The exact non-perturbative criterion . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 10 Numerical Verification 32 10.1 Verification of the score PDE (Theorems 4.1 and 4.3) . . . . . . . . . . . . . . . . . . 33 10.2 Verification of the speciation time (Theorem 5.11) . . . . . . . . . . . . . . . . . . . . 33 10.3 Verification of the interfacial profile (Proposition 5.4) . . . . . . . . . . . . . . . . . . 33 10.4 Verification of the beyond-Gaussian local theorem on a quartic well . . . . . . . . . . 33 10.5 Verification of the amplification exponent (Theorem 6.3) . . . . . . . . . . . . . . . . 34 10.6 Verification of curl preservation (Theorem 7.5) . . . . . . . . . . . . . . . . . . . . . . 34 10.7 Verification of the VP–VE equivalence (Theorem 8.5) . . . . . . . . . . . . . . . . . . 34 10.8 Verification of correction terms (Theorems 9.5 and 9.7) . . . . . . . . . . . . . . . . . 34 11 Conclusion 35 11.1 Summary of contributions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35 11.2 Implications for practice . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36 11.3 Limitations and open problems . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36 11.4 Closing remark . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37 2Abstract          
+
+> We analyze the score field of a diffusion generative model through a Burgers-type evolution law. For VE diffusion, the heat-evolved data density implies that the score obeys viscous Burgers in one dimension and the corresponding irrotational vector Burgers system in Rd, giving a PDE view of speciation transitions as the sharpening of inter-mode interfaces. For any binary decomposition of the noised density into two positive heat solutions, the score separates into a smooth background and a universal tanh interfacial term determined by the component log-ratio; near a regular binary mode boundary this yields a normal criterion for speciation. In symmetric binary Gaussian mixtures, the criterion recovers the critical diffusion time detected by the midpoint derivative of the score and agrees with the spectral criterion of Biroli, Bonnaire, de Bortoli, and Mézard (2024). After subtracting the background drift, the inter-mode layer has a local Burgers tanh profile, which becomes global in the symmetric Gaussian case with width σ2
+> τ/a . We also quantify exponential amplification of score errors across this layer, show that Burgers dynamics preserves irrotationality, and use a change of variables to reduce the VP-SDE to the VE case, yielding a closed-form VP speciation time. Gaussian-mixture formulas are verified to machine precision, and the local theorem is checked numerically on a quartic double-well.
+
+# 1 Introduction 
+
+Diffusion generative models are now a standard paradigm in modern machine learning, with strong results in image synthesis [Dhariwal and Nichol, 2021, Rombach et al., 2022], video generation [Ho et al., 2022], audio synthesis, and scientific applications ranging from molecular design to weather prediction. The framework, introduced by Sohl-Dickstein et al. [2015] and developed into its modern form by Song and Ermon [2019], Ho et al. [2020], and Song et al. [2021b], rests on two complementary processes. The forward process gradually corrupts data with noise according to a stochastic differential equation (SDE), transforming any data distribution into an approximately Gaussian prior. The reverse process inverts this corruption by learning the score function —the gradient of the log-density of the noised data, ∇x log pt(x)—and using it to drive a reverse-time SDE [Anderson, 1982] or a deterministic probability flow ODE [Song et al., 2021b]. Despite their empirical triumph, the mathematical structures governing the score function’s behavior during the generative process remain only partially understood. A growing body of work in statistical physics has revealed that the reverse-time dynamics of diffusion models exhibit phase transitions : moments at which generative trajectories spontaneously commit to distinct data modes through a mechanism akin to symmetry breaking in equilibrium systems [Raya and Ambrogioni, 2023, Biroli and Mézard, 2023, Biroli et al., 2024, Ambrogioni, 2025b]. Biroli et al. [2024] identified three dynamical regimes—a noise-dominated regime, a speciation transition where coarse class structure emerges, and a collapse transition where trajectories lock onto individual training points—and characterized these using mean-field methods from spin-glass theory. Concurrently, Sclocchi et al. [2024] showed that hierarchical data structure is revealed through successive phase transitions, while Li and Chen [2024] established non-asymptotic “critical window” bounds for feature emergence. On the PDE side, Lai et al. [2023] derived a Fokker–Planck equation governing the evolution of the score and used it as a training regularizer, and very recently Vuong et al. [2025] demonstrated empirically that trained score networks produce non-conservative vector fields, reinterpreting diffusion models through the lens of Wasserstein gradient flows. 
+
+Contribution. We study the score field of a diffusion model through its Burgers structure. In one dimension, the score of any VE diffusion satisfies the viscous Burgers equation exactly; in 
+
+Rd, it satisfies the corresponding vector Burgers system. This follows directly from the Cole–Hopf 3transform applied to the heat equation governing the forward process. The results fall into four levels: a Burgers correspondence for general diffusions, a local binary-boundary theorem for arbitrary smooth densities, closed-form statements for symmetric binary Gaussian mixtures, and asymptotic or corrected criteria for more general asymmetric settings. This leads to several concrete consequences: (i) Speciation threshold and Burgers interpretation. At any regular binary mode boundary, the normal Hessian decomposes as ∂nsn = ∂n ¯sn + κ2/4, separating a smooth background term from a universal positive interfacial contribution. For symmetric binary mixtures, this local criterion reduces to the midpoint derivative condition sx(0 , τ ∗) = 0 and agrees with the spectral criterion of Biroli et al. [2024]. (ii) Interfacial profile at mode boundaries. For any binary heat decomposition, the background-subtracted normal score has a local tanh interfacial profile in boundary-normal coordinates; in the symmetric Gaussian case, after removing the ambient Gaussian drift, the profile is global and its width is explicit. (iii) Error amplification. Score-estimation errors are amplified near the interfacial layer by a factor exp (Λ) with Λ ≈ SNR /2, giving a PDE-theoretic explanation for the sensitivity of sample quality to low-noise score accuracy [Song and Ermon, 2020, Karras et al., 2022]. (iv) Curl preservation. The vector Burgers dynamics preserves irrotationality, so the non-conservative components observed by Vuong et al. [2025] in trained networks are attributable to approximation error rather than to the underlying dynamics. (v) VP-to-VE reduction. A coordinate transformation reduces the VP-SDE (Ornstein–Uhlenbeck) score equation to the pure VE Burgers case, yielding closed-form VP speciation times and interfacial widths within a single analytical framework. All formal statements are proved in the text. The Gaussian-mixture predictions are verified to machine precision ( ∼10 −9), and the general local theorem is checked numerically on a non-Gaussian quartic double-well. The numerical checks are modest in scale and are included mainly to verify the formulas stated above. 
+
+Organization. Sections 2 and 3 collect related work and notation. The Burgers correspondence is derived in Section 4, and the interfacial theory is developed in Section 5. The later sections treat error amplification, higher-dimensional extensions, the VP reduction, correction terms, numerical checks, and concluding remarks. 
+
+# 2 Related Work 
+
+Our work sits at the intersection of three lines of research: the mathematical theory of diffusion generative models, the statistical physics of generative processes, and the classical PDE theory of the Burgers equation. We survey each in turn, emphasizing the gaps that our contribution fills. 
+
+2.1 Score-Based Diffusion Models 
+
+The idea of generating samples by learning the score function and running Langevin dynamics was introduced by Song and Ermon [2019], building on the score matching framework of Hyvärinen [2005] and the denoising score matching perspective of Vincent [2011]. Ho et al. [2020] developed Denoising 4Diffusion Probabilistic Models (DDPMs), connecting the forward process to a discrete Markov chain and training via a reweighted variational bound. The continuous-time unification came with Song et al. [2021b], who showed that both the Noise Conditional Score Network (NCSN) framework and DDPM are discretizations of forward and reverse SDEs, with the reverse dynamics depending on the score through the celebrated result of Anderson [1982]. This SDE perspective enabled the derivation of deterministic samplers (the probability flow ODE), exact likelihood computation, and principled noise schedule design [Song et al., 2021a, Kingma et al., 2021, Karras et al., 2022]. The convergence theory of diffusion models has advanced rapidly. De Bortoli [2022] established convergence under the manifold hypothesis. Chen et al. [2023] proved polynomial-time sampling guarantees under minimal assumptions, showing that the total variation distance between the generated and true distributions is controlled by the L2 score estimation error integrated over time. Benton et al. [2024] sharpened these bounds using stochastic localization, achieving nearly d-linear convergence. Lee et al. [2023] and Tang and Zhao [2024] provided accessible surveys of the theoretical landscape. Our work complements this literature by revealing the PDE structure of the score itself. While the convergence theory treats the score as a generic vector field and bounds the effect of estimation error, our Burgers equation framework shows where in space-time the score is most fragile (at the shocks) and why (the classical gradient blowup of inviscid Burgers), providing geometric insight that the L2-based bounds do not capture. 
+
+2.2 Phase Transitions and Symmetry Breaking in Diffusion 
+
+A parallel line of investigation, rooted in statistical physics, has uncovered the dynamical phase structure of diffusion models. Raya and Ambrogioni [2023] first identified spontaneous symmetry breaking in the reverse generative process: at a critical noise level, the score field bifurcates and generative trajectories commit to distinct modes. Biroli and Mézard [2023] analyzed this phenomenon in very high dimensions using methods from random matrix theory and the statistical mechanics of disordered systems, showing that speciation occurs at a noise level determined by the spectrum of the data covariance. The comprehensive framework of Biroli et al. [2024], published in Nature Communications , delineated three dynamical regimes—noise-dominated, speciation, and collapse— and characterized the speciation crossover through a spectral analysis of the empirical covariance, with the collapse transition governed by an “excess entropy” quantity reminiscent of the glass transition. These results were extended in several directions. Sclocchi et al. [2024] demonstrated that hierarchical data gives rise to a cascade of speciation transitions, each corresponding to the emergence of progressively finer structure. Li and Chen [2024] provided non-asymptotic “critical window” bounds for the time interval during which features emerge, complementing the asymptotic analysis of Biroli et al. [2024]. Ambrogioni [2025b] reformulated the entire framework in the language of equilibrium statistical thermodynamics, defining a free energy landscape whose minima correspond to data modes and whose phase transitions are mean-field in character. Very recently, Ambrogioni [2025a] connected the score divergence to entropy production rates and showed that the variance of pathwise conditional entropy peaks at the speciation time, providing an information-theoretic diagnostic. On the memorization side, Bonnaire et al. [2025] and Achilli et al. [2025] studied how approximate score learning prevents the collapse transition in practical models. Our contribution provides a PDE-theoretic counterpart to these statistical-physics results. The paper is organized around a nested hierarchy of statements. First, the score of any VE diffusion obeys Burgers exactly. Second, near any regular binary mode boundary, the score admits an exact decomposition into a smooth background plus a universal 12 tanh (ϕ/ 2) ∇ϕ layer. Third, in 5Gaussian mixture models these general structures become explicit formulas for the threshold, profile, amplification exponent, and boundary motion. This hierarchy is what allows the symmetric Gaussian case to serve both as a solvable model and as a faithful specialization of the more general local theorem. 
+
+2.3 The Score PDE and Non-Conservative Learned Scores 
+
+The PDE governing the time evolution of the score was derived by Lai et al. [2023], who termed it the “score Fokker–Planck equation” and showed that enforcing it as a regularizer during training improves both log-likelihood and the conservativity (curl-freeness) of the learned score. Their empirical observation that trained scores have non-negligible curl was strikingly confirmed by Vuong et al. [2025], who showed that trained diffusion networks violate both integral and differential constraints required of gradient fields, and proposed reinterpreting diffusion models as learning velocity fields of Wasserstein gradient flows [Jordan et al., 1998, Ambrosio et al., 2005] rather than true score functions. Our work places these findings in a unified PDE framework. We note in particular that the “score Fokker–Planck equation” of Lai et al. [2023] can be written as the viscous Burgers equation after the identification u = −2s. A later section proves (Theorem 7.5) that the Burgers dynamics preserves irrotationality: the vorticity ωij = ∂isj − ∂j si satisfies a linear parabolic equation with zero initial data and therefore remains zero. This provides a theoretical guarantee that the curl observed by Vuong et al. [2025] and Lai et al. [2023] cannot come from the exact Burgers dynamics itself; within our framework, it must arise from approximation, discretization, or modeling error. Furthermore, we connect the non-conservative components to the theory of entropy-violating weak solutions of the Burgers equation [Lax, 1957], suggesting a practical diagnostic for score network quality. 
+
+2.4 The Burgers Equation 
+
+The Burgers equation ut + u u x = ν u xx was introduced by Burgers [1948] as a simplified model of turbulence and has since become one of the canonical nonlinear PDEs in mathematical physics. The seminal discovery that it can be linearized via the Cole–Hopf transformation—independently by Hopf [1950] and Cole [1951]—reduces it to the heat equation and enables exact solutions for arbitrary initial data. In the inviscid limit ν → 0, smooth solutions break down in finite time through the formation of shocks —discontinuities across which the Rankine–Hugoniot conditions [Rankine, 1870, Hugoniot, 1889] determine the jump relations. The selection of physically relevant (entropy-satisfying) weak solutions is governed by the Lax entropy condition [Lax, 1957]. The comprehensive treatment by Whitham [1974] and the modern PDE perspective of Evans [2010] provide the mathematical foundations we employ. The Burgers equation arises naturally in the study of the Kardar–Parisi–Zhang (KPZ) equation for interface growth [Kardar et al., 1986] and appears throughout fluid dynamics, cosmology, and traffic flow modeling. Its appearance in the context of diffusion generative models, however, helps organize several phenomena that are otherwise studied separately. The Cole–Hopf transform links the score s = ∂x log p to the Burgers velocity u = −2s whenever p satisfies the heat equation—a mathematically elementary observation whose implications for generative modeling are developed in the sections that follow. 
+
+2.5 Stochastic Localization and Optimal Transport 
+
+A related analytical framework uses stochastic localization [El Alaoui et al., 2022] to study the convergence of diffusion-based sampling algorithms. Montanari [2023] showed that stochastic 6localization provides an elegant generalization of diffusion models, and Benton et al. [2024] leveraged this connection for sharp convergence bounds. The stochastic interpolant framework of Albergo et al. [2023] and the flow matching perspective of Lipman et al. [2023], Liu et al. [2023] provide further connections between diffusion, optimal transport, and score-based generation. Our Burgers equation perspective is complementary to these approaches. Stochastic localization analyzes the convergence of the distribution to the target; the Burgers framework analyzes the 
+
+dynamics of the score field itself , revealing its singularity structure. The two perspectives meet at the speciation time, which appears as a critical localization time in the stochastic localization framework and as a shock-like threshold in the Burgers framework. Taken together, these ingredients connect the Burgers equation with the score field of diffusion generative models. The tools involved are standard—the Cole–Hopf transform, Rankine–Hugoniot conditions, and Grönwall bounds—but their combination gives a direct link between the PDE and statistical-physics viewpoints used later in the paper. 
+
+# 3 Preliminaries 
+
+We fix notation and recall the SDE framework for diffusion generative models, following the unified treatment of Song et al. [2021b]. Throughout, we work in Rd (with d = 1 made explicit where the one-dimensional theory is invoked) and use Einstein summation convention only when stated. 
+
+3.1 Forward diffusion processes 
+
+A diffusion generative model is defined by a forward SDE that progressively corrupts data into noise: 
+
+dXt = f (Xt, t ) dt + g(t) dWt, X0 ∼ p0, (1) where f : Rd × [0 , T ] → Rd is the drift, g : [0 , T ] → R>0 is the scalar diffusion coefficient, Wt is a standard d-dimensional Wiener process, and p0 is the data distribution [Song et al., 2021b]. The marginal density p(x, t ) of Xt satisfies the Fokker–Planck equation (FPE): 
+
+∂p ∂t = −∇ · (f p) + g(t)2
+
+2 ∆p. (2) We consider two standard instantiations. 
+
+Variance-Exploding (VE) SDE. Setting f = 0, the forward process is pure diffusion [Song and Ermon, 2019, 2020]: 
+
+dXt = g(t) dWt, X0 ∼ p0. (3) The FPE reduces to the heat equation with time-dependent diffusivity ν(t) = g(t)2/2:
+
+∂p ∂t = ν(t) ∆ p. (4) The conditional distribution is Xt | X0 ∼ N (X0, σ 2VE (t) I), where σ2VE (t) = R t 
+
+> 0
+
+g(s)2 ds .7Variance-Preserving (VP) SDE. Setting f (x, t ) = − 12 β(t)x with a positive schedule β(t) yields the Ornstein–Uhlenbeck (OU) forward process [Ho et al., 2020, Song et al., 2021b]: 
+
+dXt = − 12 β(t) Xt dt + pβ(t) dWt. (5) Define the signal attenuation α(t) = exp  − 12
+
+R t 
+
+> 0
+
+β(s) ds . Then Xt | X0 ∼ N  α(t)X0, (1 − α(t)2)I,and the FPE is: ∂p ∂t = β(t)2 ∇ · (x p) + β(t)2 ∆p. (6) 
+
+3.2 Diffusion-time reparametrization 
+
+For the VE-SDE, define the cumulative diffusion time :
+
+τ (t) = 12
+
+Z t
+
+> 0
+
+g(s)2 ds = σ2VE (t)2 . (7) Under this change of variable, dτ = ν(t) dt , and (4) becomes the standard heat equation with unit diffusion coefficient: ∂p ∂τ = ∆ p. (8) We write pτ (x) ≡ p(x, τ ). The solution is the convolution pτ = p0 ∗ Gτ , where Gτ (x) = (4 πτ )−d/ 2 exp (−| x|2/(4 τ )) is the heat kernel [Evans, 2010]. For τ > 0, strict positivity of Gτ
+
+ensures pτ (x) > 0 for all x ∈ Rd, so that log pτ and all its derivatives are well-defined and smooth. 
+
+Remark 3.1. Unless otherwise stated, all analysis in Sections 4 and 5 is conducted in τ -time with the VE-SDE. The extension to physical time t is recovered by the substitution ∂τ 7 → ν(t)−1∂t, and the VP case is treated in Section 8 via a coordinate transformation that reduces it to the VE setting. 
+
+3.3 The score function 
+
+Definition 3.2 (Score function) . The score function of the noised density pτ is the vector field 
+
+s(x, τ ) = ∇x log pτ (x) = ∇pτ (x)
+
+pτ (x) . (9) 
+
+In one dimension ( d = 1 ), we write s(x, τ ) = ∂x log pτ (x).
+
+The score is the central object in score-based generative modeling [Song and Ermon, 2019, Hyvärinen, 2005]. It determines the reverse-time SDE [Anderson, 1982] 
+
+dXt = f (Xt, t ) − g(t)2s(Xt, t ) dt + g(t) d ¯Wt, (10) where ¯Wt is a reverse-time Wiener process, and the deterministic probability flow ODE [Song et al., 2021b] 
+
+dx
+
+dt = f (x, t ) − g(t)2
+
+2 s(x, t ). (11) In practice, a neural network sθ(x, t ) is trained to approximate s via the denoising score matching objective [Vincent, 2011, Song et al., 2021b]: 
+
+L(θ) = EtEX0 EXt|X0
+
+λ(t) ∥sθ(Xt, t ) − ∇ Xt log p(Xt | X0)∥2, (12) where λ(t) is a positive weighting function. 83.4 Notation for Gaussian mixtures 
+
+Our main analytical results concern data distributions that are finite Gaussian mixtures: 
+
+p0(x) = 
+
+> K
+
+X
+
+> k=1
+
+wk N (x; μk, σ 20 Id), (13) with weights wk > 0 summing to one, means μk ∈ Rd, and common component variance σ20 . Under the VE forward process at diffusion time τ , the noised density is 
+
+pτ (x) = 
+
+> K
+
+X
+
+> k=1
+
+wk N (x; μk, σ 2 
+
+> τ
+
+Id), σ2 
+
+> τ
+
+:= σ20 + 2 τ. (14) We define the weighted mean ¯x = P 
+
+> k
+
+wkμk, centered means νk = μk − ¯x, and the between-class covariance 
+
+W =
+
+> K
+
+X
+
+> k=1
+
+wk νkν⊤ 
+
+> k
+
+, (15) which is positive semidefinite with rank (W ) ≤ min (K − 1, d ). Its eigenvalues λ1 ≥ λ2 ≥ · · · ≥ λd ≥ 0
+
+and orthonormal eigenvectors e1, . . . , ed will play a central role in the speciation analysis of Section 5. 
+
+3.5 The Cole–Hopf transformation 
+
+We recall the classical result that connects the heat equation to the Burgers equation [Hopf, 1950, Cole, 1951]. 
+
+Proposition 3.3 (Cole–Hopf; Hopf, 1950, Cole, 1951) . Let φ(x, τ ) be a positive smooth solution of the heat equation φτ = ν φ xx in one spatial dimension. Define 
+
+u(x, τ ) = −2ν ∂xφφ = −2ν ∂ x log φ. (16) 
+
+Then u satisfies the viscous Burgers equation: 
+
+∂u ∂τ + u ∂u ∂x = ν ∂2u∂x 2 . (17) The Burgers equation (17) was introduced by Burgers [1948] as a one-dimensional model of turbulence. The transformation (16) , discovered independently by Hopf [1950] and Cole [1951], reduces it to the linear heat equation and provides explicit solutions for arbitrary initial data. In the inviscid limit ν → 0, the equation uτ + u u x = 0 develops gradient catastrophes in finite time— shock waves —whose structure is governed by the Rankine–Hugoniot jump conditions [Rankine, 1870, Hugoniot, 1889] and the Lax entropy condition [Lax, 1957]. The comprehensive treatment by Whitham [1974] and the modern PDE framework of Evans [2010] provide the mathematical foundations we employ. 
+
+# 4 The Score–Burgers Correspondence 
+
+The basic identification behind the rest of the paper is the following: the score function of a VE diffusion model satisfies a viscous Burgers equation. 94.1 The one-dimensional score PDE 
+
+Theorem 4.1 (Score PDE) . Let p(x, τ ) be a positive smooth solution of the heat equation (8) in one spatial dimension ( d = 1 ). Then the score function s(x, τ ) = ∂x log p(x, τ ) satisfies the nonlinear parabolic PDE 
+
+∂s ∂τ = ∂2s∂x 2 + 2 s ∂s ∂x . (18) 
+
+Proof. Since s = px/p , we have px = s p . Differentiating gives 
+
+pxx = ( s p )x = sx p + s p x = ( sx + s2) p, (19) 
+
+pxxx = (sx + s2) p 
+
+> x
+
+= ( sxx + 2 s s x) p + ( sx + s2) s p = ( sxx + 3 s s x + s3) p. (20) Differentiating s = px/p with respect to τ and using the heat equation gives 
+
+∂τ s = (∂τ px) p − px (∂τ p)
+
+p2 = ∂τ px
+
+p − s ∂τ pp = pxxx 
+
+p − s pxx 
+
+p . (21) Substituting (19) and (20) yields 
+
+∂τ s = ( sxx + 3 s s x + s3) − s (sx + s2) = sxx + 2 s s x. (22) In particular, the nonlinear score PDE is obtained exactly from the heat flow; no approximation enters at this stage. 
+
+Remark 4.2 (Conservation form) . Equation (18) can be written in divergence (conservation) form: 
+
+∂s ∂τ = ∂∂x 
+
+ sx + s2. (23) 
+
+This form is natural for the analysis of weak solutions and will be used in the interfacial analysis of Section 5. 
+
+4.2 Identification with the Burgers equation 
+
+Theorem 4.3 (Score–Burgers correspondence) . Under the hypotheses of Theorem 4.1, the function 
+
+u(x, τ ) = −2 s(x, τ ) satisfies the viscous Burgers equation with unit viscosity: 
+
+∂u ∂τ + u ∂u ∂x = ∂2u∂x 2 . (24) 
+
+Proof. From u = −2s, we have s = −u/ 2, sx = −ux/2, sxx = −uxx /2, and sτ = −uτ /2. Substituting into (18): 
+
+− uτ
+
+2 = − uxx 
+
+2 + 2 
+
+
+
+− u
+
+2
+
+ 
+
+− ux
+
+2
+
+
+
+= − uxx 
+
+2 + u u x
+
+2 .
+
+Multiplying by −2: uτ = uxx − u u x, which is (24). So every one-dimensional VE score field can be read as a Burgers velocity after the simple rescaling u = −2s.
+
+Remark 4.4 (Exactness) . This identification is an identity rather than an approximation. It can be read off directly from Theorem 3.3 by setting φ = pτ , which solves the heat equation (8) in τ -time with ν = 1 , and observing that the Cole–Hopf variable (16) becomes u = −2 ∂x log pτ = −2 s. The observation that the “score Fokker–Planck equation” of Lai et al. [2023] is the Burgers equation does not appear explicitly there. 
+
+10 4.3 Physical-time formulation 
+
+Reverting from τ -time to the physical time t of the VE-SDE (3) using ∂τ = ν(t)−1∂t yields: 
+
+Corollary 4.5 (Score PDE in physical time) . In the physical time t of the VE-SDE with diffusion coefficient g(t), the score satisfies 
+
+∂s ∂t = ν(t)
+
+ ∂2s∂x 2 + 2 s ∂s ∂x 
+
+
+
+, ν(t) = g(t)2
+
+2 , (25) 
+
+and u = −2s satisfies the viscous Burgers equation with time-dependent viscosity: 
+
+∂u ∂t + ν(t) u ∂u ∂x = ν(t) ∂2u∂x 2 . (26) The appearance of ν(t) as a time-dependent viscosity means that the Burgers dynamics is “fast” when the noise injection rate g(t) is large and “slow” when g(t) is small. This has direct implications for the noise schedule design: the inviscid limit (where shocks form) is approached whenever ν(t) → 0,i.e., at the beginning of the forward process and—critically—at the end of the reverse (generative) process when noise is nearly removed. 
+
+4.4 Connection to the score Fokker–Planck equation 
+
+Lai et al. [2023] derived the PDE governing the time evolution of the score by differentiating the Fokker–Planck equation (2) . They termed the result the “score Fokker–Planck equation” (score FPE) and used it as a training regularizer, showing empirically that enforcing it improves both log-likelihood and the conservativity of the learned score. In the VE setting, their score FPE is simply our (18) . To see this, note that the general form given by Lai et al. [2023, Eq. (8)] reduces, for the VE-SDE with f = 0 and scalar g(t), to 
+
+∂tsi = ν(t)∆si + 2 sj ∂j si
+
+,
+
+which is the d-dimensional generalization of (25) (the vector Burgers system; see Section 7). The connection to the Burgers equation appears not to have been noted in their work. 
+
+4.5 Informal summary 
+
+Up to the fixed rescaling u = −2s, the score of a VE diffusion model is a Burgers velocity field. Reverse time lowers the noise, so the effective viscosity drops and the boundary layers sharpen. The next section works this out first in the symmetric binary case. 
+
+# 5 Interfacial Structure and Speciation 
+
+The symmetric binary Gaussian mixture is the cleanest place to see the mechanism. There the score profile, the normal Hessian, and the interfacial width are all explicit. The local theorem comes out of that calculation, and only afterwards do we return to the mixture-specific consequences. 11 5.1 Exact score for a symmetric two-component mixture 
+
+Consider the symmetric binary Gaussian mixture in one dimension: 
+
+p0(x) = 12 N (x; −a, σ 20 ) + 12 N (x; a, σ 20 ), (27) with mode half-separation a > 0 and component variance σ20 > 0. Under the VE forward process at diffusion time τ , the noised density is 
+
+pτ (x) = 12 N (x; −a, σ 2 
+
+> τ
+
+) + 12 N (x; a, σ 2 
+
+> τ
+
+), σ2 
+
+> τ
+
+= σ20 + 2 τ. (28) 
+
+Proposition 5.1 (Exact score formula) . The score of the noised density (28) is 
+
+s(x, τ ) = − xσ2
+
+> τ
+
++ aσ2
+
+> τ
+
+tanh 
+
+ a x σ2
+
+> τ
+
+
+
+. (29) 
+
+Proof. Let φ±(x) = N (x; ±a, σ 2 
+
+> τ
+
+). Then ∂xφ± = −(x ∓ a) σ−2 
+
+> τ
+
+φ±, and the score is 
+
+s = 
+
+> 12
+
+∂xφ− + 12 ∂xφ+12 φ− + 12 φ+
+
+= − xσ2
+
+> τ
+
++ aσ2
+
+> τ
+
+· φ+ − φ−
+
+φ+ + φ−
+
+.
+
+We compute the ratio. Since φ± ∝ exp  −(x ∓ a)2/(2 σ2 
+
+> τ
+
+),
+
+φ+
+
+φ−
+
+= exp 
+
+ (x + a)2 − (x − a)2
+
+2σ2
+
+> τ
+
+
+
+= exp 
+
+ 4ax 
+
+2σ2
+
+> τ
+
+
+
+= exp 
+
+ 2ax σ2
+
+> τ
+
+
+
+,
+
+where we expanded (x + a)2 − (x − a)2 = 4 ax . Therefore, 
+
+φ+ − φ−
+
+φ+ + φ−
+
+= e2ax/σ 2 
+
+> τ
+
+− 1
+
+e2ax/σ 2 
+
+> τ
+
++ 1 = tanh 
+
+ ax σ2
+
+> τ
+
+
+
+.
+
+The score profiles and their Burgers transform are shown in Figure 1. Across diffusion times, the score develops the narrow inter-mode transition whose background-subtracted form becomes the Burgers shock analyzed below. 
+
+5.2 The midpoint derivative of the score and the critical time 
+
+The quantity sx(0 , τ ) = ∂2 
+
+> x
+
+log pτ (0) is the midpoint derivative of the score, equivalently the one-dimensional Hessian of log pτ at the mode boundary. Its behavior governs the transition from unimodal to bimodal structure. 
+
+Proposition 5.2 (Midpoint derivative of the score) . For the symmetric binary mixture (27) ,
+
+sx(0 , τ ) = a2 − σ2
+
+> τ
+
+σ4
+
+> τ
+
+. (30) 
+
+In particular, sx(0 , τ ) = 0 if and only if σ2 
+
+> τ
+
+= a2.Proof. Differentiating (29) with respect to x:
+
+sx(x, τ ) = − 1
+
+σ2
+
+> τ
+
++ a2
+
+σ4
+
+> τ
+
+sech 2
+
+ ax σ2
+
+> τ
+
+
+
+.
+
+At x = 0 : sech 2(0) = 1 , giving sx(0 , τ ) = −σ−2 
+
+> τ
+
++ a2 σ−4 
+
+> τ
+
+= ( a2 − σ2 
+
+> τ
+
+)/σ 4 
+
+> τ
+
+.12 6 4 2 0 2 4 6             
+
+> x
+> 3
+> 2
+> 1
+> 0
+> 1
+> 2
+> 3
+> s(x, )
+> (a) Score function s(x,)
+> = 0.2
+> = 1.0
+> = 4.0 ( *)
+> = 6.0
+> = 12.0
+> 6420246
+> x
+> 6
+> 4
+> 2
+> 0
+> 2
+> 4
+> 6
+> u(x, ) =  2s(x, )
+> (b) Burgers velocity u=2s
+> = 0.2
+> = 1.0
+> = 4.0
+> = 6.0
+> = 12.0
+
+Figure 1: Symmetric binary Gaussian mixture at several diffusion times. Panel (a) traces the exact score s(x, τ ); the central transition sharpens as τ ↓ 0, and the critical time τ ∗ = 4 .0 is marked. Panel (b) displays the Burgers variable u = −2s for the same slices. Its linear background remains visible; subtracting 2x/σ 2 
+
+> τ
+
+isolates the tanh layer described in Proposition 5.4. The sign of sx(0 , τ ) determines the local shape of log pτ at the midpoint: 
+
+• If σ2 
+
+> τ
+
+> a 2 (i.e., τ > τ ∗): sx(0 , τ ) < 0, so x = 0 is a local maximum of log pτ —the density appears unimodal .
+
+• If σ2 
+
+> τ
+
+< a 2 (i.e., τ < τ ∗): sx(0 , τ ) > 0, so x = 0 is a local minimum of log pτ —the density is 
+
+bimodal .The transition occurs at the critical diffusion time :
+
+Definition 5.3 (Speciation time) . The speciation time for the symmetric binary mixture (27) is 
+
+τ ∗ = a2 − σ20
+
+2 , (31) 
+
+assuming a > σ 0 (modes separated by more than one standard deviation). At τ = τ ∗, σ2  
+
+> τ∗
+
+=
+
+σ20 + 2 τ ∗ = a2.
+
+In the reverse generative process, which traverses diffusion time from τT ≫ 1 down to τ = 0 ,the speciation time τ ∗ marks the moment at which the unimodal score field bifurcates: a single attractor at x = 0 splits into two attractors near x = ±a. This is the speciation transition of Biroli et al. [2024], who identified it (in a high-dimensional mean-field framework) as a symmetry-breaking phase transition between their Regime I (noise-dominated) and Regime II (class-committed). This change of local geometry is shown in Figure 2, where the midpoint derivative crosses zero at τ ∗ and the associated interfacial width varies linearly with diffusion time. 
+
+5.3 The background-subtracted interfacial shock profile 
+
+For the symmetric binary mixture, the inter-mode layer separates cleanly from the ambient Gaussian drift. After subtracting that linear background term, the remaining profile is the classical viscous Burgers shock. 13 0 2 4 6 8 10 12                 
+
+> Diffusion time
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> sx(0,  )
+> Bimodal
+> (sx> 0) Unimodal
+> (sx< 0)
+> (a) Score gradient at midpoint
+> *= 4
+> 012345678
+> Diffusion time
+> 1
+> 2
+> 3
+> 4
+> 5
+> Shock width  = 2/a
+> (b) Viscous shock width
+> *
+> 0=20/a= 0.33
+
+Figure 2: Two simple diagnostics for the symmetric binary mixture. Panel (a) tracks the midpoint derivative sx(0 , τ ) = ∂2 
+
+> x
+
+log pτ (0) , whose zero marks the exact speciation time τ ∗ = 4 .0. Panel (b) records the interfacial width δ(τ ) = σ2 
+
+> τ
+
+/a , linear in τ and smallest at τ = 0 .
+
+Proposition 5.4 (Background-subtracted interfacial profile) . Define the background-subtracted score 
+
+˜s(x, τ ) := s(x, τ ) + xσ2
+
+> τ
+
+= aσ2
+
+> τ
+
+tanh 
+
+ a x σ2
+
+> τ
+
+
+
+, (32) 
+
+and the corresponding Burgers variable ˜u = −2˜ s. Then ˜u has left and right asymptotic states 
+
+˜uL = 2aσ2
+
+> τ
+
+, ˜uR = − 2aσ2
+
+> τ
+
+, (33) 
+
+and the tanh transition between them has width 
+
+δ(τ ) = σ2
+
+> τ
+
+a . (34) 
+
+Thus the inter-mode layer is exactly the classical viscous Burgers shock after subtraction of the linear Gaussian background drift. Proof. Equation (32) follows immediately from the exact score formula (29). Therefore 
+
+˜u(x, τ ) = − 2aσ2
+
+> τ
+
+tanh 
+
+ a x σ2
+
+> τ
+
+
+
+.
+
+The classical steady viscous Burgers shock connecting states uL > u R with viscosity ν is [Whitham, 1974, Ch. 4]: 
+
+u(x) = uL + uR
+
+2 − uL − uR
+
+2 tanh 
+
+ (uL − uR) x
+
+4ν
+
+
+
+, (35) with shock width δ = 4 ν/ (uL − uR). Comparing with ˜u at viscosity ν = 1 gives ˜uL = 2 a/σ 2 
+
+> τ
+
+,
+
+˜uR = −2a/σ 2 
+
+> τ
+
+, and 
+
+δ = 44a/σ 2
+
+> τ
+
+= σ2
+
+> τ
+
+a .
+
+14 Remark 5.5 (Interfacial sharpening) . As the generative process proceeds ( τ decreases toward 0), the interfacial width δ shrinks to σ20 /a . The midpoint derivative of the score is 
+
+sx(0 , τ ) = a2 − σ2
+
+> τ
+
+σ4
+
+> τ
+
+,
+
+and approaches (a2 − σ20 )/σ 40 as τ → 0; it diverges only in the point-mass limit σ0 → 0. So for any finite variance the layer stays smooth, just increasingly narrow. The actual jump appears only in the inviscid point-mass limit. 
+
+5.4 The exact local binary-boundary theorem 
+
+The symmetric Gaussian formulas above reveal the mechanism transparently, but the underlying 
+
+tanh layer is not a Gaussian artifact. It is an exact algebraic consequence of binary competition between two positive heat contributions. A canonical choice is to partition the initial density into two attraction basins Ω1, Ω2 and define 
+
+p(k) 
+
+> τ
+
+(x) = 
+
+Z
+
+> Ωk
+
+p0(y) Gτ (x − y) dy, k = 1 , 2,
+
+so that each p(k) 
+
+> τ
+
+satisfies the heat equation by linearity. The theorem below, however, requires only positivity and separate heat evolution. 
+
+Theorem 5.6 (Exact binary decomposition) . Let pτ = p(1)  
+
+> τ
+
++ p(2)  
+
+> τ
+
+on Rd, where p(1)  
+
+> τ
+
+, p (2)  
+
+> τ
+
+> 0 are smooth and each satisfies ∂τ p(k) 
+
+> τ
+
+= ∆ p(k) 
+
+> τ
+
+. Define 
+
+ϕ(x, τ ) = log p(1)  
+
+> τ
+
+(x)
+
+p(2)  
+
+> τ
+
+(x) , ¯s(x, τ ) = 12
+
+ ∇ log p(1)  
+
+> τ
+
+(x) + ∇ log p(2)  
+
+> τ
+
+(x). (36) 
+
+Then the full score s = ∇ log pτ satisfies the exact identity 
+
+s(x, τ ) = ¯ s(x, τ ) + 12 tanh 
+
+ ϕ(x, τ )2
+
+
+
+∇ϕ(x, τ ). (37) 
+
+Proof. Write sk = ∇ log p(k) 
+
+> τ
+
+and R = p(1)  
+
+> τ
+
+/p (2)  
+
+> τ
+
+= eϕ. Then 
+
+s = p(1)  
+
+> τ
+
+s1 + p(2)  
+
+> τ
+
+s2
+
+p(1)  
+
+> τ
+
++ p(2) 
+
+> τ
+
+= R
+
+1 + R s1 + 11 + R s2.
+
+Since s1 = ¯ s + 12 ∇ϕ and s2 = ¯ s − 12 ∇ϕ, we obtain 
+
+s = ¯ s + R − 12( R + 1) ∇ϕ = ¯ s + 12 tanh 
+
+ ϕ
+
+2
+
+
+
+∇ϕ, 
+
+using (eϕ − 1) /(eϕ + 1) = tanh( ϕ/ 2) .
+
+Proposition 5.7 (Log-ratio advection–diffusion) . Under the hypotheses of Theorem 5.6, the log-ratio 
+
+ϕ satisfies 
+
+∂τ ϕ = ∆ ϕ + 2 ¯ s · ∇ ϕ. (38) 15 Proof. For each k, positivity and the heat equation give 
+
+∂τ log p(k) 
+
+> τ
+
+= ∆p(k)
+
+> τ
+
+p(k)
+
+> τ
+
+= ∆ log p(k) 
+
+> τ
+
++ |∇ log p(k) 
+
+> τ
+
+|2.
+
+Subtracting the identities for k = 1 and k = 2 yields 
+
+∂τ ϕ = ∆ ϕ + |s1|2 − | s2|2 = ∆ ϕ + ( s1 + s2) · (s1 − s2) = ∆ ϕ + 2 ¯ s · ∇ ϕ. 
+
+Theorem 5.8 (Local boundary-normal reduction and exact speciation criterion) . Assume the binary boundary 
+
+Γτ = {x ∈ Rd : ϕ(x, τ ) = 0 } (39) 
+
+is regular, i.e., ∇ϕ̸ = 0 on Γτ . Fix xΓ ∈ Γτ , let 
+
+ˆn = ∇ϕ
+
+|∇ ϕ| xΓ
+
+, κ = |∇ ϕ(xΓ, τ )|, (40) 
+
+and use boundary-normal coordinates (n, y) with signed distance n in the ˆn direction. Then, as 
+
+n → 0,
+
+(s − ¯s) · ˆn = 12 κ tanh 
+
+ κn 
+
+2
+
+
+
++ O(n), (41) 
+
+and exactly on the boundary, 
+
+∂nsn Γτ = ∂n ¯sn Γτ + κ2
+
+4 , sn = s · ˆn, ¯sn = ¯ s · ˆn. (42) 
+
+Thus the boundary-normal slice is locally bimodal at xΓ if and only if 
+
+∂n ¯sn Γτ + κ2
+
+4 > 0. (43) 
+
+Proof. Because ϕ = 0 on Γτ and ∇ϕ̸ = 0 there, boundary-normal coordinates give 
+
+ϕ(n, y, τ ) = κn + O(n2), ∂nϕ(n, y, τ ) = κ + O(n).
+
+Taking the normal component of (37) yields 
+
+sn − ¯sn = 12 tanh 
+
+ ϕ
+
+2
+
+
+
+∂nϕ = 12 tanh 
+
+ κn 
+
+2 + O(n2)
+
+  κ + O(n),
+
+which is (41). For the boundary derivative, differentiate the identity 
+
+sn = ¯ sn + 12 tanh 
+
+ ϕ
+
+2
+
+
+
+∂nϕ
+
+along the normal coordinate. At n = 0 one has ϕ = 0 , hence tanh(0) = 0 and sech 2(0) = 1 , so 
+
+∂nsn Γτ = ∂n ¯sn Γτ + 12
+
+ ∂nϕ
+
+2
+
+
+
+∂nϕ Γτ
+
+= ∂n ¯sn Γτ + κ2
+
+4 .
+
+On a one-dimensional normal slice, local bimodality is equivalent to the second derivative of log pτ
+
+being positive at the boundary point, i.e., to ∂nsn > 0. This gives (43). 16 Remark 5.9 (What is universal, and what is model-specific) . Theorems 5.6 and 5.8 separate what is universal from what depends on the model. The tanh layer and the positive term κ2/4 are universal for binary competition. By contrast, the actual objects ϕ, ¯s, and therefore κ depend on the model. It is also worth keeping in mind that Theorem 5.7 is linear in ϕ: the sharp score layer comes from the nonlinear map ϕ 7 → 12 tanh (ϕ/ 2) ∇ϕ, not from shock formation in ϕ itself. In the symmetric Gaussian case one has ϕ(x, τ ) = 2 ax/σ 2 
+
+> τ
+
+and ¯s(x, τ ) = −x/σ 2 
+
+> τ
+
+, so the general statement reduces to Theorems 5.4 and 5.11. 
+
+Proposition 5.10 (Error from non-binary competitors) . Suppose the true density admits the decomposition 
+
+pτ = p(1)  
+
+> τ
+
++ p(2)  
+
+> τ
+
++ p(rem)  
+
+> τ
+
+, r := p(rem) 
+
+> τ
+
+p(1)  
+
+> τ
+
++ p(2) 
+
+> τ
+
+. (44) 
+
+Let s(bin) denote the score built from p(1)  
+
+> τ
+
++ p(2)  
+
+> τ
+
+via Theorem 5.6. Then 
+
+s − s(bin) = ∇ log(1 + r), (45) 
+
+and on a boundary-normal slice, 
+
+∂nsn = ∂ns(bin)  
+
+> n
+
++ ∂2 
+
+> n
+
+log(1 + r). (46) 
+
+Thus the exact binary criterion (42) remains accurate whenever r, ∂nr, and ∂2
+
+> n
+
+r are small; for well-separated competing modes, these corrections are exponentially small in the distance to the nearest non-competing mode measured in units of √τ .Proof. Since pτ = ( p(1)  
+
+> τ
+
++ p(2)  
+
+> τ
+
+)(1 + r),
+
+log pτ = log  p(1)  
+
+> τ
+
++ p(2) 
+
+> τ
+
+ + log(1 + r),
+
+so differentiating once and twice along the normal direction gives (45) and (46) . The exponential smallness is the standard heat-kernel suppression of a farther mode relative to the two competing ones. 
+
+5.5 The Gaussian specialization and the spectral threshold 
+
+For the symmetric Gaussian model there is nothing subtle left: the exact local criterion reduces to the midpoint-derivative test, and that is the same condition picked out by the spectral criterion of Biroli et al. [2024]. 
+
+Theorem 5.11 (Gaussian specialization: speciation criterion = spectral threshold) . For the symmet-ric binary Gaussian mixture (27) , the exact local criterion of Theorem 5.8 reduces to the midpoint-derivative criterion, and the following two quantities coincide: 
+
+(i) The critical diffusion time τ ∗ at which sx(0 , τ ∗) = 0 (equivalently, the one-dimensional Hessian of log pτ ∗ vanishes at the mode boundary). 
+
+(ii) The speciation time of Biroli et al. [2024], defined as the time at which the largest non-trivial eigenvalue of the noised data covariance equals the noise variance. In Burgers terms, τ ∗ is the threshold at which the inter-mode layer changes from a single-attractor profile to a split, shock-like interface. 
+
+17 Proof. For the one-dimensional symmetric binary mixture, the between-class covariance (15) is 
+
+W = w1ν21 + w2ν22 = 12 a2 + 12 a2 = a2 (a scalar, since d = 1 , with ν1 = −a, ν2 = a). The spectral criterion of Biroli et al. [2024] states that speciation occurs when the signal-to-noise ratio—the ratio of the largest between-class eigenvalue to the noise variance—crosses unity: 
+
+λ(W )1
+
+σ2
+
+> τ
+
+= 1 ⇐⇒ σ2 
+
+> τ
+
+= λ(W )1 = a2 ⇐⇒ τ = a2 − σ20
+
+2 = τ ∗. (47) This is identical to (31). 
+
+Remark 5.12 (Interpretation) . In the symmetric Gaussian case, Theorem 5.11 agrees with two standard ways of locating the transition: the midpoint derivative changes sign, and the spectral signal-to-noise ratio crosses one. The Burgers language is not doing a separate characteristic calculation here. What it does give is a more concrete picture of the interface itself: its profile, its width, and the Rankine–Hugoniot motion law. 
+
+5.6 The Rankine–Hugoniot condition for asymmetric mixtures 
+
+For unequal-weight mixtures ( w1̸ = w2), the shock is located at a point xs(τ )̸ = 0 that drifts as τ
+
+changes. Its motion is governed by the Rankine–Hugoniot condition [Rankine, 1870, Hugoniot, 1889, Lax, 1957]: 
+
+Proposition 5.13 (Decision boundary dynamics) . In the inviscid limit, the location xs(τ ) of the score shock between two modes satisfies 
+
+dx s
+
+dτ = − sL(τ ) + sR(τ ), (48) 
+
+where sL and sR are the score values on the left and right sides of the shock. Proof. For the inviscid score equation in conservation form (23) , the standard Rankine–Hugoniot jump condition [Evans, 2010, Thm. 3.4.1] gives the shock speed as 
+
+˙xs = [sx + s2][s] = [s2][s] = sL + sR,
+
+where [·] denotes the jump across the shock and we used [sx] = 0 in the distributional sense for the shock solution. (For the flux f (s) = s2, the Rankine–Hugoniot speed is (f (sR) − f (sL)) /(sR − sL) = 
+
+sL + sR.) The minus sign in (48) arises from reversing the time orientation when tracing the generative (reverse) process. For w1 = w2, symmetry gives sL = −sR at x = 0 , hence ˙xs = 0 : the shock is stationary. For w1̸ = w2, the boundary drifts toward the minority component. 
+
+5.7 The Lax entropy condition and mode stability 
+
+In one spatial dimension, the physical relevance of Burgers shocks is determined by the Lax entropy condition [Lax, 1957]: a shock with left state uL and right state uR is admissible (entropy-satisfying) if and only if uL > u R. Translating to the score ( u = −2s), this becomes sL < s R: the score must jump from a lower value (pointing toward the left mode) to a higher value (pointing toward the right mode) as one crosses the boundary from left to right. 
+
+Proposition 5.14 (Scalar entropy admissibility on boundary slices) . For any Gaussian mixture with well-separated modes, the scalar score profile along a one-dimensional normal slice through an inter-mode boundary satisfies the Lax entropy condition. 
+
+18 6 4 2 0 2 4 6                    
+
+> x
+> 10 12
+> 10 11
+> 10 10
+> 10 9
+> 10 8
+> 10 7
+> 10 6
+> |s sxx  2s s x|
+> (a) Score PDE residual
+> = 0.3
+> = 1.0
+> = 4.0
+> = 6.0
+> = 10.0
+> 6420246
+> x
+> 10 12
+> 10 11
+> 10 10
+> 10 9
+> 10 8
+> 10 7
+> 10 6
+> |u + u u x uxx |
+> (b) Burgers equation residual
+> = 0.3
+> = 1.0
+> = 4.0
+> = 6.0
+> = 10.0
+
+Figure 3: Residual checks for the PDE identities. Panel (a) reports |sτ − sxx − 2ss x| at several diffusion times. Panel (b) reports the Burgers residual |uτ + uu x − uxx | after the change of variables 
+
+u = −2s. Both remain below 10 −8 on the tested grid. 
+
+Proof. Between two adjacent modes with means μj < μ k, the score far to the left of the boundary is dominated by component j: s ≈ − (x − μj )/σ 2 
+
+> τ
+
+< 0 for x between the modes (since x > μ j ). Far to the right, s ≈ − (x − μk)/σ 2 
+
+> τ
+
+> 0 (since x < μ k). Hence sL < 0 < s R, and the Lax condition sL < s R
+
+is satisfied. A learned score network that violates the scalar entropy condition on such a slice would correspond to an “entropy-violating weak solution” of the Burgers equation [Lax, 1957]—a non-physical shock that can cause spurious mode creation or mode collapse in the generated distribution. This provides a useful diagnostic: one can check the Lax condition along estimated boundary-normal slices to detect pathological score network behavior. For completeness, Figure 3 verifies the score PDE and Burgers equation directly by finite-difference residuals; the errors remain at machine precision throughout the tested diffusion times. 
+
+# 6 Error Amplification at Score Shocks 
+
+With the interfacial structure now established—exactly in the symmetric Gaussian model and locally in general through the binary-boundary theorem—we turn to its main dynamical consequence for generation. Errors in the score are amplified when trajectories traverse the boundary layer, and in the symmetric Gaussian case this amplification can be computed in closed form as a function of the signal-to-noise ratio. The resulting growth factor and the associated trajectory bifurcation are displayed in Figure 4. 
+
+6.1 Trajectory divergence near the interfacial layer 
+
+The probability flow ODE (11) for the VE-SDE (in τ -time, running backward from τT to 0) reduces to dx dτ = −s(x, τ ), τ decreasing from τT to 0. (49) 19 Linearizing around a trajectory x(τ ), a small perturbation ξ(τ ) = δx (τ ) satisfies 
+
+dξ dτ = −sx(x(τ ), τ ) ξ. (50) For a trajectory passing through the shock center at x ≈ 0, the local growth rate is −sx(0 , τ ).
+
+Proposition 6.1 (Lyapunov exponent at the shock) . For the symmetric binary mixture (27) with 
+
+τ < τ ∗, the reverse-time Lyapunov exponent at the mode boundary is 
+
+λ(τ ) = sx(0 , τ ) = a2 − σ2
+
+> τ
+
+σ4
+
+> τ
+
+> 0. (51) 
+
+Nearby generative trajectories diverge locally at rate λ(τ ) during the reverse process. Proof. In the reverse direction ( τ decreasing), the perturbation equation (50) becomes dξ/dσ =
+
+sx(0 , τ ) ξ with σ = τT − τ increasing. Since sx(0 , τ ) > 0 for τ < τ ∗ by Theorem 5.2, perturbations grow. This local trajectory divergence is the hallmark of the speciation bifurcation: infinitesimally close initial conditions lead to macroscopically different modes [Raya and Ambrogioni, 2023, Biroli et al., 2024]. 
+
+6.2 The Grönwall bound with score error 
+
+We next examine how score-estimation errors are amplified near the interfacial layer. The first result is a general trajectory-stability bound for the probability flow ODE; the second specializes it to the symmetric binary mixture and gives a closed-form exponent. Let ˆs(x, τ ) be a learned score approximation with pointwise error bounded by ε(τ ).
+
+Theorem 6.2 (Trajectory error amplification) . Let x(τ ) and ˆx(τ ) be trajectories of the probability flow ODE (49) driven by the true score s and approximate score ˆs respectively, starting from the same initial point x(τT ) = ˆx(τT ). Define the trajectory error e(τ ) = |x(τ ) − ˆx(τ )| and the uniform score error ε0 = sup τ ∥ˆs(·, τ ) − s(·, τ )∥L∞ . Then for all τ ∈ [0 , τ T ]:
+
+|e(τ )| ≤ ε0
+
+Z τT
+
+> τ
+
+exp 
+
+Z τ ′
+
+> τ
+
+|sx(ξ(τ ′′ ), τ ′′ )| dτ ′′ 
+
+!
+
+dτ ′, (52) 
+
+where ξ(τ ′′ ) lies between x(τ ′′ ) and ˆx(τ ′′ ).Proof. The trajectory error satisfies the differential equation (with τ decreasing): 
+
+de dτ = −s(x, τ ) + ˆ s(ˆ x, τ ) = −s(x, τ ) − s(ˆ x, τ ) − s(ˆ x, τ ) − ˆs(ˆ x, τ ). (53) By the mean value theorem, s(x, τ ) − s( ˆx, τ ) = sx(ξ, τ ) ( x − ˆx) for some ξ between x and ˆx. Thus 
+
+de/dτ = −sx(ξ, τ ) e + ϵ(ˆ x, τ ), where ϵ = ˆ s − s satisfies |ϵ| ≤ ε0.Switching to forward-in-reverse time σ = τT − τ :
+
+de dσ = sx(ξ, τ T − σ) e + ϵ(ˆ x, τ T − σ). (54) This is a linear inhomogeneous ODE. The variation of constants formula [Grönwall, 1919] gives 
+
+e(σ) = 
+
+Z σ
+
+> 0
+
+ϵ(σ′) exp 
+
+Z σσ′
+
+sx(ξ(σ′′ ), τ T − σ′′ ) dσ ′′ 
+
+
+
+dσ ′.
+
+Bounding |ϵ| ≤ ε0 and reverting to τ -time yields (52). 20 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0        
+
+> Diffusion time
+> 10 0
+> 10 1
+> Amplification factor  e
+> e(0) 16.8 ×
+> (a) Error amplification e()
+> e()
+> *
+> 0246810 12 14
+> Diffusion time
+> 10.0
+> 7.5
+> 5.0
+> 2.5
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> x( )
+> *
+> (b) Generative trajectories (reverse)
+
+Figure 4: Amplification near the transition. Panel (a) plots the factor eΛ( τ ) on a log scale; at τ = 0 
+
+it is about 18 . Panel (b) traces reverse-time probability-flow trajectories. Above τ ∗ they stay mixed, while below τ ∗ they split toward the two basins. 
+
+6.3 The amplification exponent in closed form 
+
+For the symmetric binary mixture, the integral R |sx| dτ in the bound (52) can then be evaluated exactly. 
+
+Theorem 6.3 (Amplification exponent) . For the symmetric binary GMM (27) , the amplification exponent for a trajectory through the shock center is 
+
+Λ( τ ) := 
+
+Z τ ∗
+
+> τ
+
+sx(0 , τ ′) dτ ′ = 12
+
+ a2
+
+σ2
+
+> τ
+
+− 1 − ln a2
+
+σ2
+
+> τ
+
+
+
+(55) 
+
+for τ < τ ∗, where σ2 
+
+> τ
+
+= σ20 + 2 τ . The amplification factor is exp(Λ) .Proof. From Theorem 5.2, sx(0 , τ ′) = ( a2 − σ2  
+
+> τ′
+
+)/σ 4  
+
+> τ′
+
+with σ2  
+
+> τ′
+
+= σ20 + 2 τ ′. Substituting w = σ20 + 2 τ ′
+
+(so dw = 2 dτ ′, and the limits transform as τ ′ = τ 7 → w = σ2 
+
+> τ
+
+and τ ′ = τ ∗ 7 → w = a2): 
+
+Λ( τ ) = 
+
+Z a2
+
+> σ2
+> τ
+
+a2 − ww2
+
+dw 
+
+2 = 12
+
+Z a2
+
+> σ2
+> τ
+
+ a2
+
+w2 − 1
+
+w
+
+
+
+dw 
+
+= 12
+
+
+
+− a2
+
+w − ln w
+
+a2
+
+> σ2
+> τ
+
+= 12
+
+ −1 − ln a2 −
+
+
+
+− a2
+
+σ2
+
+> τ
+
+− ln σ2
+
+> τ
+
+ 
+
+= 12
+
+ a2
+
+σ2
+
+> τ
+
+− 1 − ln a2
+
+σ2
+
+> τ
+
+
+
+.
+
+Corollary 6.4 (Asymptotic amplification) . Define the signal-to-noise ratio SNR = a2/σ 2 
+
+> τ
+
+. Then: 
+
+Λ ≈ SNR 2 for SNR ≫ 1. (56) 
+
+The amplification factor grows as exp( a2/(2 σ2 
+
+> τ
+
+)) , which is exponential in the SNR. Proof. For SNR ≫ 1: ln(SNR) ≪ SNR and the constant −1 is negligible, giving Λ ≈ SNR /2.21 Remark 6.5 (Numerical illustration) . For a = 3 , σ0 = 1 , at τ = 0 : SNR = 9 , Λ(0) = 12 (9 −1−ln 9) ≈
+
+2.90 , and exp (Λ) ≈ 18 .2. Score errors near the mode boundary are amplified by a factor of approximately 18 relative to errors in the smooth (single-mode) region. This amplification is captured by the Burgers interfacial analysis above and quantifies the well-known empirical observation [Song and Ermon, 2020, Karras et al., 2022] that diffusion models are sensitive to score accuracy at low noise levels. 
+
+6.4 KL and total variation bounds 
+
+We connect the trajectory-level amplification to distributional error bounds for the reverse-time SDE. 
+
+Proposition 6.6 (KL bound for the reverse-time SDE; cf. Chen et al., 2023) . Let ˆpSDE 0 denote the distribution generated by the reverse-time SDE (10) when the true score s is replaced by an approximate score ˆs. Then 
+
+KL(ˆ pSDE 0 ∥p0) ≤ 12
+
+Z τT
+
+> 0
+
+Epτ
+
+∥ˆs(x, τ ) − s(x, τ )∥2 dτ. (57) This follows from the Girsanov theorem [Girsanov, 1960] applied to the reverse-time SDE (10) ;see Chen et al. [2023, Theorem 1] for the rigorous statement. By Pinsker’s inequality [Tsybakov, 2009]: 
+
+TV(ˆ pSDE 0 , p 0) ≤
+
+q 12 KL(ˆ pSDE 0 ∥p0) ≤ 12
+
+Z τT
+
+> 0
+
+Epτ
+
+∥ˆs − s∥2 dτ 
+
+1/2
+
+. (58) 
+
+Definition 6.7 (Interfacial and regular regions) . For a K-component GMM, define the interfacial region at time τ as the set of points within one interfacial width of any inter-mode boundary: 
+
+Sδ(τ ) = x ∈ R : min  
+
+> j
+
+|x − x∗ 
+
+> j
+
+(τ )| < δ (τ ) , (59) 
+
+where x∗ 
+
+> j
+
+(τ ) are the boundary locations and δ(τ ) = σ2 
+
+> τ
+
+/a is the interfacial width (34) . The regular region is R(τ ) = R \ S δ(τ ).
+
+Proposition 6.8 (Score regularity by region) . In the regular region, the score is smooth with 
+
+∥sx∥L∞(R(τ )) = O(σ−2 
+
+> τ
+
+). In the interfacial region, ∥sx∥L∞(Sδ (τ )) = O(a2/σ 4 
+
+> τ
+
+).Proof. In R(τ ), the density is dominated by a single Gaussian component, so s(x, τ ) ≈ − (x − μk)/σ 2
+
+> τ
+
+and sx ≈ − 1/σ 2 
+
+> τ
+
+. In Sδ(τ ), by Theorem 5.2, |sx(0 , τ )| = |a2 − σ2 
+
+> τ
+
+|/σ 4 
+
+> τ
+
+∼ a2/σ 4 
+
+> τ
+
+for τ ≪ τ ∗.The practical implication is that the interfacial region is spatially narrow (width O(σ2 
+
+> τ
+
+/a )) yet contains the steepest score gradients (of order a2/σ 4 
+
+> τ
+
+rather than the σ−2 
+
+> τ
+
+of the regular region). In the present analysis, this a2/σ 2 
+
+> τ
+
+-fold ratio is the key quantity driving the Grönwall exponent (52) ,and hence one concrete mechanism by which mode-boundary score errors degrade sample quality. 
+
+# 7 Multi-Dimensional Extension 
+
+Having isolated the exact boundary-normal mechanism in Section 5, we now separate two comple-mentary higher-dimensional questions. The first is intrinsic and distribution-free: the full vector Burgers dynamics and its curl-free structure in Rd. The second is model-specific: how the local criterion specializes in Gaussian mixtures to explicit geometric objects such as Voronoi boundaries and leading-order spectral thresholds. 22 7.1 The vector Burgers system 
+
+Theorem 7.1 (Score PDE in Rd). Let p(x, τ ) be a positive smooth solution of the heat equation 
+
+∂τ p = ∆ p in Rd. Then each component si(x, τ ) = ∂i log p(x, τ ) of the score satisfies 
+
+∂s i
+
+∂τ = ∆ si + 2 sk ∂ksi (i = 1 , . . . , d ), (60) 
+
+where Einstein summation over k is implied. In vector notation: 
+
+∂τ s = ∆ s + 2 ( s · ∇ )s. (61) 
+
+Under u = −2s, this becomes the d-dimensional viscous Burgers system: 
+
+∂τ u + ( u · ∇ )u = ∆ u. (62) 
+
+Proof. The one-dimensional argument of Theorem 4.1 extends component-wise. We use the identities 
+
+∂ip = si p and ∂i∂j p = ( ∂j si + sisj ) p (by direct computation, as in (19) ). The Laplacian of p is 
+
+∆p = ( ∂ksk + |s|2) p. Applying ∂i to ∆p:
+
+∂i(∆ p) =  ∂i∂ksk + 2 sm ∂ism + si ∂ksk + si |s|2 p. (63) From ∂τ si = ( ∂i∆p)/p − si (∆ p)/p (the d-dimensional analogue of (21)): 
+
+∂τ si = ∂i∂ksk + 2 sm ∂ism + si ∂ksk + si|s|2 (64) 
+
+− si
+
+ ∂ksk + |s|2
+
+= ∂i∂ksk + 2 sm ∂ism. (65) Since si = ∂i log p, we have ∂ksi = ∂isk (symmetry of mixed partials), hence ∂i∂ksk = ∂k∂ksi = ∆ si.Therefore (65) reduces to (60). The Burgers form (62) follows from u = −2s by the same algebra as Theorem 4.3. 
+
+Remark 7.2. The system (62) is precisely the d-dimensional viscous Burgers equation studied in fluid dynamics as a model for irrotational compressible flow [Whitham, 1974]. The multi-dimensional Cole–Hopf transform u = −2∇ log φ with φτ = ∆ φ yields (62) , confirming the identification. 
+
+7.2 Curl preservation 
+
+The true score is curl-free by construction ( s = ∇ log p implies ∂isj = ∂j si). The next result shows that this property is preserved by the vector Burgers dynamics, even when the equation is viewed for a general vector field. 
+
+Definition 7.3 (Vorticity) . For a vector field v on Rd, the vorticity is the antisymmetric tensor 
+
+Ωij = ∂ivj − ∂j vi. (66) 
+
+The field v is irrotational (curl-free) if and only if Ωij = 0 for all i, j . In d = 3 , the dual vector 
+
+(∇ × v)i = ϵijk Ωjk /2 is the usual curl [Bhatia et al., 2013]. 
+
+Theorem 7.4 (Vorticity equation for vector Burgers) . If v satisfies the vector Burgers system 
+
+∂τ vi = ∆ vi + 2 vk ∂kvi, then the vorticity Ωij satisfies the linear parabolic system 
+
+∂τ Ωij = ∆Ω ij + 2 vk ∂kΩij + 2 ( ∂ivk) Ω kj − 2 ( ∂j vk) Ω ki . (67) 23 Proof. Apply ∂i to the Burgers equation for component j:
+
+∂τ (∂ivj ) = ∆( ∂ivj ) + 2 ( ∂ivk)( ∂kvj ) + 2 vk ∂k(∂ivj ). (68) Interchange i ↔ j and subtract: 
+
+∂τ Ωij = ∆Ω ij + 2 vk ∂kΩij + 2 (∂ivk)( ∂kvj ) − (∂j vk)( ∂kvi). (69) For the bracketed term, decompose ∂kvj = ∂j vk + Ω kj :
+
+(∂ivk)( ∂kvj ) = ( ∂ivk)( ∂j vk) + ( ∂ivk) Ω kj .
+
+Similarly, ∂kvi = ∂ivk + Ω ki gives 
+
+(∂j vk)( ∂kvi) = ( ∂j vk)( ∂ivk) + ( ∂j vk) Ω ki .
+
+The symmetric terms (∂ivk)( ∂j vk) cancel upon subtraction, leaving (67). 
+
+Theorem 7.5 (Curl preservation) . Let v be a smooth solution of the vector Burgers equation (61) 
+
+on Rd × [0 , T ] with ∇v bounded. If Ωij (x, 0) = 0 for all x ∈ Rd and all i, j , then Ωij (x, τ ) = 0 for all τ ∈ [0 , T ].Proof. Equation (67) is a linear parabolic system in the unknowns {Ωij }:
+
+∂τ Ωij = ∆Ω ij + Bk(x, τ ) ∂kΩij + Cij,mn (x, τ ) Ω mn , (70) where Bk = 2 vk and C collects the zero-order terms from (67) . Both B and C are bounded on [0 , T ]
+
+by assumption. Define the energy E(τ ) = 12
+
+R 
+
+> Rd
+
+|Ω|2 dx = 12
+
+R Ωij Ωij dx. Differentiating under the integral and substituting (67): 
+
+dE dτ =
+
+Z
+
+Ωij ∂τ Ωij dx
+
+=
+
+Z
+
+Ωij ∆Ω ij dx
+
+| {z }   
+
+> =−R|∇ Ω|2dx≤0
+
++2 
+
+Z
+
+Ωij vk ∂kΩij dx
+
+| {z }       
+
+> =−R(∂kvk)|Ω|2dx/2
+
++zero-order terms . (71) The first integral is non-positive (integration by parts with vanishing boundary terms). The second follows from integration by parts: R Ωij vk∂kΩij = − 12
+
+R (∂kvk)|Ω|2. The zero-order terms satisfy 
+
+| R Ωij (∂ivk)Ω kj | ≤ ∥∇ v∥∞
+
+R |Ω|2 = 2 ∥∇ v∥∞E, and similarly for the (∂j vk)Ω ki term. Combining: 
+
+dE dτ ≤ M (τ ) E(τ ), M (τ ) = ∥∇ · v∥∞ + 4 ∥∇ v∥∞. (72) By the Grönwall inequality [Grönwall, 1919]: 
+
+E(τ ) ≤ E(0) exp 
+
+Z τ
+
+> 0
+
+M (τ ′) dτ ′
+
+
+
+.
+
+Since E(0) = 0 , we conclude E(τ ) = 0 for all τ ∈ [0 , T ]. As |Ω|2 ≥ 0 with zero integral, Ωij (x, τ ) = 0 
+
+almost everywhere, and by continuity (smoothness of the solution for τ > 0, guaranteed by the heat kernel [Evans, 2010]), everywhere. 
+
+Corollary 7.6 (Non-conservative scores are approximation artifacts) . The true score s = ∇ log p
+
+of a diffusion model is curl-free for all τ > 0, and the vector Burgers dynamics (61) preserves this property. Any non-zero vorticity Ωij measured in a learned score network sθ [Vuong et al., 2025, Lai et al., 2023] is entirely attributable to the neural network approximation error. 
+
+This geometry is illustrated in Figure 5: the two-dimensional score field has a sharp directional transition across the inter-mode boundary, yet its measured curl remains numerically zero. 24 6 4 2 0 2 4 6             
+
+> x1
+> 4
+> 3
+> 2
+> 1
+> 0
+> 1
+> 2
+> 3
+> 4
+> x2 12
+> shock
+> (a) 2D score field ( = 1.0)
+> 0246810 12
+> Diffusion time
+> 10 10
+> 10 9
+> 10 8
+> max|  1s2 2s1|
+> (b) Curl of true score (should be 0)
+> max| 12 |
+> Machine precision
+
+Figure 5: Two-dimensional score geometry. Panel (a) depicts the score field for a two-component Gaussian mixture in R2 at τ = 1 ; the dashed line marks the inter-mode boundary. Panel (b) tracks the maximum curl magnitude |∂1s2 − ∂2s1| across random test points at several diffusion times. The values stay below 10 −9 throughout. 
+
+7.3 Shock surfaces in Rd
+
+In d > 1, the formal inviscid or low-noise Burgers description leads to shock surfaces —codimension-1
+
+manifolds across which the score becomes discontinuous in the limiting picture. 
+
+Proposition 7.7 (Shock surfaces as Voronoi boundaries) . For the equal-covariance GMM (13) with equal weights wk = 1 /K in the limit στ → 0, the limiting shock surfaces of the score are given by the faces of the Voronoi tessellation generated by the means {μk}:
+
+Γjk = x ∈ Rd : |x − μj | = |x − μk| = x : ( μj − μk) · x = |μj |2−| μk |2 
+
+> 2
+
+. (73) 
+
+For unequal weights, the boundaries are the weighted Voronoi (power diagram) faces. Proof. As στ → 0, the posterior responsibility rk(x, τ ) → 1[k = arg max m wm N (x; μm, σ 2 
+
+> τ
+
+I)] , which for equal weights reduces to k = arg min m |x − μm|. On each Voronoi cell, s(x, τ ) ≈ − (x − μk)/σ 2 
+
+> τ
+
+—a smooth field pointing toward the nearest mean. Across a Voronoi face Γjk , the score jumps discontinuously from the μj -directed field to the μk-directed field. In this low-noise inviscid description, these discontinuities are the relevant shock surfaces of the vector Burgers equation. 
+
+7.4 A Gaussian-mixture specialization of the local criterion in Rd
+
+Proposition 7.8 (Leading-order Gaussian-mixture specialization in Rd). For the equal-covariance GMM (13) , the exact local criterion of Theorem 5.8 can be expanded explicitly at the weighted mean 
+
+¯x = P 
+
+> k
+
+wkμk. In the high-noise limit σ2 
+
+> τ
+
+≫ λ1(W ), the score Jacobian J(x, τ ) = ∇s(x, τ ) satisfies: 
+
+J( ¯ x, τ ) ≈ − I
+
+σ2
+
+> τ
+
++ W
+
+σ4
+
+> τ
+
++ O(σ−6 
+
+> τ
+
+), (74) 
+
+where W is the between-class covariance (15) . The eigenvalues of J are 
+
+λ(J) 
+
+> i
+
+= λ(W ) 
+
+> i
+
+− σ2
+
+> τ
+
+σ4
+
+> τ
+
++ O(σ−6 
+
+> τ
+
+). (75) 25 The first speciation is predicted at leading order along the leading eigenvector e1 of W when λ(J)1 ≈ 0,at the critical time 
+
+τ ∗ 
+
+> LO
+
+= λ1(W ) − σ20
+
+2 . (76) 
+
+This leading-order threshold coincides with the spectral criterion of Biroli et al. [2024] and becomes exact when the posterior responsibilities remain equal at ¯x (see Section 9). For hierarchical data with 
+
+λ1 > λ 2 > · · · , the leading-order cascade is τ ∗ 
+
+> i, LO
+
+= ( λi(W ) − σ20 )/2, matching the hierarchical phase transitions of Sclocchi et al. [2024] at this order. Proof. The score of the GMM (14) at x can be written as s(x, τ ) = −x/σ 2 
+
+> τ
+
++ σ−2
+
+> τ
+
+P 
+
+> k
+
+rk(x, τ ) μk,where rk = wkN (x; μk, σ 2 
+
+> τ
+
+I)/ P 
+
+> m
+
+wmN (x; μm, σ 2 
+
+> τ
+
+I) are the posterior responsibilities. Differentiat-ing rk with respect to xj and evaluating at ¯x:
+
+∂j rk ¯x = rk
+
+σ2
+
+> τ
+
+μk,j − ˜μj
+
+,
+
+where ˜μ = P 
+
+> m
+
+rmμm is the posterior mean. The Jacobian is then Jij = −δij /σ 2 
+
+> τ
+
++ Cij /σ 4 
+
+> τ
+
+, where 
+
+Cij = P 
+
+> k
+
+rkμk,i μk,j − ˜μi ˜μj is the posterior covariance of the means. In the high-noise limit, rk → wk, ˜μ → ¯x, and Cij → Wij , giving (74) . The eigenvalues follow immediately. Setting the leading-order approximation λ(J)1 ≈ 0 gives σ2 
+
+> τ
+
+= λ1(W ), i.e., 
+
+τ ∗ 
+
+> LO
+
+= ( λ1(W ) − σ20 )/2.The connection to Biroli et al. [2024] follows because their speciation criterion is λ1(W )/σ 2 
+
+> τ
+
+=1 [Biroli et al., 2024, Eq. (7)], which is equivalent at this order. For hierarchical speciation, each eigenvalue λi crossing σ2 
+
+> τ
+
+triggers a new leading-order bifurcation along ei, matching the cascade described by Sclocchi et al. [2024]. 
+
+Remark 7.9 (Matrix Riccati structure) . Along the inviscid vector Burgers characteristics through ¯x
+
+(where s ≈ 0), the Jacobian J satisfies the matrix Riccati equation dJ/dσ = −2J2 (with σ = τT − τ ). For a symmetric matrix J with eigenvalues λi(0) < 0 (unimodal regime), each eigenvalue evolves as 
+
+λi(σ) = 1 /(2 σ + 1 /λ i(0)) , which diverges at σ∗ 
+
+> i
+
+= −1/(2 λi(0)) . The first divergence determines the corresponding leading-order threshold, yielding the same τ ∗ 
+
+> LO
+
+as above. 
+
+# 8 The VP-SDE via Coordinate Reduction 
+
+The VP-SDE (5) introduces a mean-reverting drift − 12 β(t)x in addition to diffusion, leading to a 
+
+forced Burgers equation for the score. An exact coordinate transformation reduces the VP analysis to the VE case studied in the preceding sections, yielding closed-form speciation times and interfacial widths. 
+
+8.1 The VP score PDE 
+
+For reference, we record the VP score PDE in one dimension. 
+
+Theorem 8.1 (VP score PDE) . Under the VP forward process (5) in d = 1 , the score s(x, t ) = 
+
+∂x log p(x, t ) satisfies 
+
+∂s ∂t = β(t)2
+
+ ∂2s∂x 2 + 2 s ∂s ∂x + x ∂s ∂x + s
+
+
+
+. (77) 26 Proof. From the VP Fokker–Planck equation (6) with ν = β(t)/2: ∂tp = ν[p + x ∂ xp + ∂2
+
+> x
+
+p] = 
+
+ν[1 + xs + sx + s2] p, where we used ∂xp = sp and ∂2
+
+> x
+
+p = ( sx + s2)p. Define A = 1 + xs + sx + s2.Then ∂t(∂xp) = ν ∂ x(Ap ) = ν(Ax + As ) p, where Ax = s + xs x + sxx + 2 ss x. Hence: 
+
+∂ts = ∂t(∂xp)
+
+p − s ∂tpp = νAx + As  − ν s A 
+
+= ν A x = νs + xs x + sxx + 2 ss x
+
+ = β(t)2
+
+sxx + 2 ss x + xs x + s.
+
+Remark 8.2 (Structure) . Equation (77) decomposes as 
+
+∂ts = β
+
+2
+
+ sxx + 2 s s x
+
+| {z }
+
+> Burgers (VE)
+
++ β
+
+2
+
+ x s x + s| {z }
+
+> OU forcing
+
+= β
+
+2
+
+∂∂x 
+
+sx + s2 + x s , (78) 
+
+where the OU forcing xs x + s = ∂x(xs ) acts as a source term. The Cole–Hopf variable u = −2s
+
+satisfies a forced Burgers equation with linear advection and growth [Whitham, 1974]. Rather than analyzing this forced equation directly, we reduce it to the pure VE case via a coordinate transformation. 
+
+8.2 The rescaling transformation 
+
+Definition 8.3 (Effective diffusion time) . For the VP-SDE, recall the signal attenuation α(t) from Section 3. Define the effective VE diffusion time :
+
+τeff (t) = 1 − α(t)2
+
+2 α(t)2 . (79) 
+
+Lemma 8.4 (Density under rescaling) . Define the rescaled variable Zt = Xt/α (t). Then the density 
+
+qt(z) of Zt satisfies qt = p0 ∗ Gτeff (t), i.e., qt solves the VE heat equation at effective time τeff (t).Proof. The VP conditional is Xt | X0 ∼ N (αtX0, (1 − α2 
+
+> t
+
+)I) [Song et al., 2021b]. Thus Zt | X0 ∼N (X0, (1 − α2 
+
+> t
+
+)/α 2 
+
+> t
+
+I). The marginal density of Zt is qt(z) = R p0(y) N (z; y, (1 − α2 
+
+> t
+
+)/α 2 
+
+> t
+
+I) dy =(p0 ∗ Gτeff )( z), where the Gaussian kernel has variance (1 − α2 
+
+> t
+
+)/α 2 
+
+> t
+
+= 2 τeff (t).
+
+Theorem 8.5 (VP–VE score equivalence) . The VP and VE scores are related by 
+
+sVP (x, t ) = 1
+
+α(t) sVE 
+
+ xα(t) , τ eff (t)
+
+
+
+, (80) 
+
+where sVE (z, τ ) = ∂z log( p0 ∗ Gτ )( z) is the VE score satisfying the pure Burgers equation (18) .Proof. By the change-of-variables formula, pt(x) = α−1 
+
+> t
+
+qt(x/α t) (in d = 1 ; in d dimensions, α−dt ). Therefore: 
+
+sVP (x, t ) = ∂x log pt(x) = ∂x log qt(x/α t) = 1
+
+αt
+
+(∂z log qt) z=x/α t = 1
+
+αt
+
+sVE (x/α t, τ eff (t)) ,
+
+where we used Theorem 8.4 to identify qt with the VE density at time τeff .27 8.3 VP speciation time 
+
+Corollary 8.6 (VP speciation time) . For the symmetric binary GMM (27) under the VP-SDE with constant β, the speciation time satisfies 
+
+τeff (t∗
+
+> VP
+
+) = τ ∗ 
+
+> VE
+
+= a2 − σ20
+
+2 . (81) 
+
+Solving for t∗
+
+> VP
+
+:
+
+t∗ 
+
+> VP
+
+= 1
+
+β ln  a2 − σ20 + 1 . (82) 
+
+Proof. From Theorem 8.5, the VP speciation occurs when the VE score (in z-coordinates) reaches the same speciation threshold, i.e., at VE diffusion time τ ∗
+
+> VE
+
+. Setting τeff (t) = τ ∗
+
+> VE
+
+:
+
+1 − α2
+
+2α2 = a2 − σ20
+
+2 =⇒ 1 − α2 = α2(a2 − σ20 ) =⇒ α2 = 1
+
+a2 − σ20 + 1 .
+
+For constant β: α(t) = e−βt/ 2, so e−βt = 1 /(a2 − σ20 + 1) , giving (82). 
+
+8.4 VP interfacial width 
+
+Corollary 8.7 (VP interfacial width) . The background-subtracted VP score layer at x = 0 for the symmetric binary mixture has width (in x-space): 
+
+δVP (t) = α(t) · σ2
+
+> τeff
+
+a = 1 − α(t)2(1 − σ20 )
+
+a α (t) . (83) 
+
+Proof. By Theorem 8.5, the VP score at x is the VE score at z = x/α rescaled by 1/α . The VE interfacial layer has width δVE = σ2 
+
+> τeff
+
+/a in z-space (Theorem 5.4). Mapping back to x-space: 
+
+δVP = α δ VE . Computing σ2 
+
+> τeff
+
+= σ20 + 2 τeff = σ20 + (1 − α2)/α 2 = (1 − α2(1 − σ20 )) /α 2 gives (83) .
+
+8.5 Summary: VP reduces to VE 
+
+The key message of this section is that, for the results studied here, no separate analysis of the forced Burgers equation (77) is needed. The rescaling Z = X/α (t) absorbs the OU drift entirely, reducing the VP score to a rescaled VE score. Under this transformation, the VE Burgers correspondence (Theorem 4.3), the background-subtracted interfacial profile (Theorem 5.4), the speciation criterion (Theorem 5.11), the error amplification (Theorem 6.3), and the curl preservation (Theorem 7.5) translate directly to the VP setting. Figure 6 makes this equivalence concrete: the transformed and direct VP scores overlap to machine precision, and the effective-time map sends the VP critical time exactly to the VE speciation time. This unification has a practical consequence: noise schedule optimization for VP models [Kingma et al., 2021, Karras et al., 2022] can be analyzed entirely in the VE Burgers framework by working in the effective time (79) , reducing the design problem to choosing τeff (t) to optimally traverse the interfacial layer. 
+
+# 9 Correction Terms for Asymmetric Mixtures 
+
+The leading-order speciation formula τ ∗ 
+
+> LO
+
+= ( λ1(W ) − σ20 )/2 of Theorem 7.8 becomes exact for symmetric arrangements (equal-weight binary mixtures, regular simplices) but admits corrections for general K-component mixtures. Here we derive these corrections by expanding the posterior responsibilities in powers of 1/σ 2 
+
+> τ
+
+and tracing their effect on the score Jacobian. 28 6 4 2 0 2 4 6              
+
+> x
+> 4
+> 2
+> 0
+> 2
+> 4
+> sVP (x, t)
+> (a) VP score: transform (solid) vs direct (dashed)
+> t= 0.50 (transform)
+> t= 2.20 ( t*VP ) (transform)
+> t= 3.00 (transform)
+> 012345
+> VP physical time t
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> 14
+> Effective VE time  eff
+> (b) VP VE time mapping
+> eff (t)
+> *VE = 4
+> t*VP = 2.20
+
+Figure 6: VP–VE equivalence under the rescaling transformation. Panel (a) overlays the VP score from the exact transformation sVP (x, t ) = α(t)−1sVE (x/α (t), τ eff (t)) with the score computed directly from the VP marginal; on the plotted times the two are visually indistinguishable. Panel (b) plots the effective-time map τeff (t) together with the VP speciation time t∗ 
+
+> VP
+
+= ln 9 ≈ 2.20 , which lands exactly at the VE critical time τ ∗ 
+
+> VE
+
+= 4 .0.
+
+9.1 Posterior responsibilities at the weighted mean 
+
+Definition 9.1 (Posterior responsibility) . For the GMM (14) , the posterior responsibility of compo-nent k at point x is 
+
+rk(x, τ ) = wk N (x; μk, σ 2 
+
+> τ
+
+I)
+
+PKm=1 wm N (x; μm, σ 2 
+
+> τ
+
+I) . (84) At the weighted mean ¯x = P 
+
+> k
+
+wkμk, define the squared distances d2 
+
+> k
+
+= | ¯x − μk|2 = |νk|2 and the dimensionless parameters ηk = d2
+
+> k
+
+/(2 σ2 
+
+> τ
+
+).
+
+Proposition 9.2 (Responsibility expansion) . For large σ2 
+
+> τ
+
+(i.e., ηk ≪ 1), the responsibilities at ¯x
+
+admit the expansion 
+
+rk( ¯ x, τ ) = wk
+
+
+
+1 + ( ⟨η⟩ − ηk) + (ηk − ⟨ η⟩)2 − Var w(η)2 + O(η3)
+
+
+
+, (85) 
+
+where ⟨η⟩ = P 
+
+> m
+
+wmηm and Var w(η) = ⟨η2⟩ − ⟨ η⟩2.Proof. Write rk = wke−ηk / P 
+
+> m
+
+wme−ηm . Expanding e−ηk = 1 − ηk + η2
+
+> k
+
+/2 + O(η3):
+
+X
+
+> m
+
+wme−ηm = 1 − ⟨ η⟩ + ⟨η2⟩/2 + O(η3).
+
+Dividing and expanding (1 − ϵ)−1 = 1 + ϵ + ϵ2 + · · · with ϵ = ⟨η⟩ − ⟨ η2⟩/2 + · · · :
+
+rk = wk(1 − ηk + η2
+
+> k
+
+/2)(1 + ⟨η⟩ − ⟨ η2⟩/2 + ⟨η⟩2 + · · · )= wk
+
+1 + ( ⟨η⟩ − ηk) + 12
+
+ (ηk − ⟨ η⟩)2 − Var w(η) + O(η3).
+
+One verifies P 
+
+> k
+
+rk = 1 at each order: order 0 gives P wk = 1 ; order 1 gives ⟨⟨ η⟩ − η⟩ = 0 ; order 2 gives ⟨(η − ⟨ η⟩)2 − Var( η)⟩/2 = 0 .
+
+Corollary 9.3 (Exactness condition) . The responsibilities satisfy rk = wk exactly if and only if all ηk are equal, i.e., all component means are equidistant from ¯x. This holds for: (a) K = 2 with 
+
+w1 = w2 = 1 /2; (b) any K with equal weights and means forming a regular simplex centered at ¯x.
+
+29 9.2 The corrected Jacobian 
+
+The exact score Jacobian at ¯x is Jij = −δij /σ 2 
+
+> τ
+
++ Cij /σ 4 
+
+> τ
+
+, where C = P 
+
+> k
+
+rkμkμ⊤ 
+
+> k
+
+− ˜μ ˜μ⊤ is the posterior covariance of the means (see the proof of Theorem 7.8). Substituting the expansion of Theorem 9.2 into C requires expanding the posterior mean ˜μ = P 
+
+> k
+
+rkμk and second moment 
+
+M = P 
+
+> k
+
+rkμkμ⊤ 
+
+> k
+
+.The next two results give asymptotic expansions in inverse noise variance. They refine the leading-order higher-dimensional criterion from Theorems 7.7 and 7.8; the exact non-perturbative characterization is given later in Theorem 9.10. 
+
+Definition 9.4 (Distance-weighted covariance) . Define the distance-weighted covariance :
+
+Q =
+
+> K
+
+X
+
+> k=1
+
+wk |νk|2 νkν⊤ 
+
+> k
+
+, (86) 
+
+and the mean squared distance ⟨d2⟩ = P 
+
+> k
+
+wk|νk|2.
+
+Theorem 9.5 (Corrected Jacobian) . To second order in 1/σ 2 
+
+> τ
+
+, the score Jacobian at ¯x admits the expansion 
+
+J( ¯ x, τ ) = − I
+
+σ2
+
+> τ
+
++ W
+
+σ4
+
+> τ
+
++ ⟨d2⟩W − Q
+
+2σ6
+
+> τ
+
++ O(σ−8 
+
+> τ
+
+). (87) 
+
+Proof. We expand the posterior covariance C = M − ˜μ ˜μ⊤ order by order. 
+
+Posterior mean. Using Theorem 9.2 at first order: 
+
+˜μi = X
+
+> k
+
+rkμk,i = ¯ xi + X
+
+> k
+
+wk(⟨η⟩ − ηk)μk,i + O(σ−4 
+
+> τ
+
+).
+
+Define ξ = P 
+
+> k
+
+wk|νk|2νk (the “third moment” of the centered means). A direct computation using 
+
+μk,i = ¯ xi + νk,i and ⟨η⟩ − ηk = ( ⟨d2⟩ − d2
+
+> k
+
+)/(2 σ2 
+
+> τ
+
+) gives 
+
+˜μ = ¯ x − ξ
+
+2σ2
+
+> τ
+
++ O(σ−4 
+
+> τ
+
+). (88) 
+
+Posterior second moment. At leading order: M (0)  
+
+> ij
+
+= P 
+
+> k
+
+wkμk,i μk,j = Wij + ¯xi ¯xj . The first-order correction, after expanding and using μk,i = ¯ xi + νk,i , is: 
+
+M (1)  
+
+> ij
+
+= 12σ2
+
+> τ
+
+⟨d2⟩Wij − Qij − ¯xiξj − ¯xj ξi
+
+. (89) 
+
+Product of posterior means. From (88): 
+
+˜μi ˜μj = ¯ xi ¯xj − ¯xiξj + ¯ xj ξi
+
+2σ2
+
+> τ
+
++ O(σ−4 
+
+> τ
+
+).
+
+Posterior covariance. Cij = M (0)  
+
+> ij
+
++ M (1)  
+
+> ij
+
+− ˜μi ˜μj . The ¯xi ¯xj terms cancel between M (0) and ˜μ˜μ⊤;the ¯xξ terms cancel between M (1) and ˜μ˜μ⊤:
+
+Cij = Wij + ⟨d2⟩Wij − Qij 
+
+2σ2
+
+> τ
+
++ O(σ−4 
+
+> τ
+
+). (90) Substituting into Jij = −δij /σ 2 
+
+> τ
+
++ Cij /σ 4 
+
+> τ
+
+yields (87). 30 9.3 The corrected speciation time 
+
+Definition 9.6 (Correction coefficient) . Define γ1 = ⟨d2⟩λ1 − e⊤ 
+
+> 1
+
+Q e 1, where e1 is the leading eigenvector of W .
+
+Theorem 9.7 (Corrected speciation time) . Including the first-order correction, the speciation time admits the expansion 
+
+τ ∗ = λ1 − σ20
+
+2 + γ1
+
+4λ1
+
++ O
+
+ γ21
+
+λ31
+
+
+
+. (91) 
+
+The corresponding quadratic approximation is: 
+
+σ2  
+
+> τ∗
+
+= λ1 + pλ21 + 2 γ1
+
+2 . (92) 
+
+Proof. The leading Jacobian eigenvalue along e1 is 
+
+λ(J)1 = − 1
+
+σ2
+
+> τ
+
++ λ1
+
+σ4
+
+> τ
+
++ γ1
+
+2σ6
+
+> τ
+
++ O(σ−8 
+
+> τ
+
+).
+
+Setting λ(J)1 = 0 and multiplying by σ6 
+
+> τ
+
+: σ4 
+
+> τ
+
+− λ1σ2 
+
+> τ
+
+− γ1/2 = 0 . The quadratic formula gives (92) .Expanding for small |γ1|/λ 21: σ2 
+
+> τ
+
+≈ λ1 + γ1/(2 λ1), hence τ ∗ = ( σ2  
+
+> τ∗
+
+− σ20 )/2 = ( λ1 − σ20 )/2 + 
+
+γ1/(4 λ1).
+
+Proposition 9.8 (When the correction is negative) . Let ak = νk · e1 and b2 
+
+> k
+
+= |νk − ake1|2, so that 
+
+d2 
+
+> k
+
+= a2 
+
+> k
+
++ b2
+
+> k
+
+. If Cov w(b2, a 2) ≥ 0, then γ1 ≤ 0. In particular, γ1 ≤ 0 for collinear configurations (bk ≡ 0) and whenever all bk are equal. In general, however, γ1 can have either sign. Proof. Using d2 
+
+> k
+
+= a2 
+
+> k
+
++ b2 
+
+> k
+
+and the covariance identity, 
+
+γ1 = ⟨d2⟩⟨ a2⟩ − ⟨ d2a2⟩ = −Cov w(d2, a 2) = −Var w(a2) − Cov w(b2, a 2).
+
+If Cov w(b2, a 2) ≥ 0, then the right-hand side is non-positive, proving γ1 ≤ 0. If the configuration is collinear, then bk ≡ 0, so Cov w(b2, a 2) = 0 . If all bk are equal, then b2 is constant and again 
+
+Cov w(b2, a 2) = 0 . No sign conclusion is possible without an additional geometric assumption on 
+
+Cov w(b2, a 2).
+
+Remark 9.9 (Physical interpretation) . When γ1 < 0, components closer to ¯x receive higher posterior responsibility than their prior weight wk. This biases the posterior covariance toward the closer components, reducing the effective between-class variance and causing speciation to occur at a lower noise level (earlier in the reverse process). If modes with smaller projection onto e1 have sufficiently large perpendicular spread, then Cov w(b2, a 2) can be negative and γ1 can instead be positive, delaying the transition. The correction vanishes for symmetric arrangements where all dk are equal. 
+
+The numerical effect of this correction is summarized in Figure 7: the first-order term dramatically improves the speciation-time estimate, and for the asymmetric family plotted there the coefficient γ1
+
+remains negative across the tested separations. 31 10 20 30 40 50              
+
+> Mode separation scale
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> 14
+> Relative error in  * (%)
+> (a) Speciation time accuracy ( K=3, d=10)
+> Leading: ( 120)/2
+> Corrected: + 1/(4 1)
+> 10 20 30 40 50
+> Mode separation scale
+> 400000
+> 300000
+> 200000
+> 100000
+> 0
+> 1
+> 1< 0 always
+> (b) Correction coefficient 10
+
+Figure 7: Correction terms for an asymmetric mixture. Panel (a) compares the relative error of the leading-order and corrected speciation formulas as the separation scale increases for a K = 3 , d = 10 
+
+example; the correction cuts the error from about 11% to about 2% . Panel (b) traces the coefficient 
+
+γ1 across the same family. In these examples it stays negative, so the first correction moves the threshold earlier. 
+
+9.4 The exact non-perturbative criterion 
+
+The exact criterion behind these asymptotic formulas is the following. 
+
+Theorem 9.10 (Exact speciation criterion) . The speciation time τ ∗ is characterized as the unique solution of 
+
+λmax 
+
+ C(τ )/σ 2
+
+> τ
+
+ = 1 , (93) 
+
+where C(τ ) = P 
+
+> k
+
+rk( ¯x, τ ) ˜νk ˜ν⊤ 
+
+> k
+
+is the exact posterior covariance of the means and ˜νk = μk − ˜μ(τ ).This equation can be solved by bisection at cost O(K2d) per step. Proof. The Jacobian eigenvalue is zero iff λmax (C)/σ 4 
+
+> τ
+
+= 1 /σ 2 
+
+> τ
+
+, i.e., λmax (C/σ 2 
+
+> τ
+
+) = 1 . Uniqueness follows from the monotonicity of λmax (C(τ )/σ 2 
+
+> τ
+
+) in τ : as τ increases, σ2 
+
+> τ
+
+grows, the responsibilities become more uniform, and C → W , while the division by σ2 
+
+> τ
+
+shrinks the eigenvalue, ensuring a unique crossing. 
+
+Remark 9.11 (Hierarchy of formulas) . There are really three levels here, depending on how much simplicity one wants and how much accuracy one needs: 1. Exact (Theorem 9.10): always valid, cost O(K2d) per bisection step. 2. Closed-form, exact for symmetric (Theorem 5.11): τ ∗ = ( λ1(W ) − σ20 )/2.3. Closed-form with correction (Theorem 9.7): includes γ1/(4 λ1); error ∼2% for equal-weight asymmetric mixtures with moderate separation. 
+
+# 10 Numerical Verification 
+
+The experiments are grouped in a fairly plain way: first the Burgers PDE and the closed-form Gaussian calculations, then the higher-dimensional, VP, and correction results, and finally the quartic-well test of the local theorem. 32 10.1 Verification of the score PDE (Theorems 4.1 and 4.3) 
+
+For the symmetric binary GMM (27) with a = 3 , σ0 = 1 , we evaluate the exact score (29) and its temporal and spatial derivatives on a grid of 2000 points x ∈ [−8, 8] , using finite differences (∆τ = 10 −7) for the time derivative. The residual curves are shown in Figure 3. 
+
+Score PDE. We compute the residual |sτ − (sxx + 2 s s x)| at five values of τ . The maximum pointwise error is below 5 × 10 −9 at all times tested, confirming Theorem 4.1 to machine precision. 
+
+Burgers equation. Transforming to u = −2s, the residual |uτ + u u x − uxx | is below 9 × 10 −9 at all times, confirming Theorem 4.3. 
+
+10.2 Verification of the speciation time (Theorem 5.11) 
+
+We compute sx(0 , τ ) from (30) for τ ∈ [0 .1, 10] and locate its zero crossing numerically. The zero crossing and the width trend are summarized in Figure 2. 
+
+Result. The predicted speciation time is τ ∗ = (9 − 1) /2 = 4 .0. The numerical zero crossing of sx(0 , τ ) occurs at τ = 4 .0000 (to four decimal places), with error < 5 × 10 −5. The analytical formula (30) gives sx(0 , τ ∗) = 0 .
+
+10.3 Verification of the interfacial profile (Proposition 5.4) 
+
+The predicted interfacial width is δ(τ ) = σ2 
+
+> τ
+
+/a . Representative profiles are displayed in Figure 1, and the width law is plotted in Figure 2. At τ = 0 .1: δ = 1 .2/3 = 0 .4. At τ = 0 .5: δ = 2 /3 ≈ 0.667 .At τ = 1 .0: δ = 3 /3 = 1 .0. In each case, the width of the background-subtracted tanh profile in (32) matches the prediction. 
+
+10.4 Verification of the beyond-Gaussian local theorem on a quartic well 
+
+To test Theorems 5.6 and 5.8 beyond Gaussian mixtures, we consider the quartic double-well density 
+
+p0(x) ∝ exp 
+
+
+
+− (x2 − a2)2
+
+4a2
+
+
+
+, (94) whose tails are quartic rather than Gaussian. We split the initial density into the left and right attraction basins, convolve each part with the heat kernel by numerical quadrature, and evaluate the exact decomposition (37) and boundary criterion (42) directly. 
+
+Exact local decomposition. The identity (37) is satisfied to within ∼10 −4 uniformly on the tested grid; the residual is limited by the quadrature used to evaluate the heat-kernel integrals rather than by the theorem itself. 
+
+Exact speciation criterion. Solving the boundary equation numerically gives a speciation time 
+
+τ ∗ ≈ 1.948 for this quartic well. At that time, the residual in the exact normal criterion 
+
+∂nsn = ∂n ¯sn + κ2/4
+
+is 5.6 × 10 −5. A naive matched-Gaussian estimate would instead predict τ ∗ = 3 .0, so the local theorem captures non-Gaussian boundary geometry that is missed by a Gaussian-mixture proxy. 33 10.5 Verification of the amplification exponent (Theorem 6.3) 
+
+We compare the closed-form exponent Λ( τ ) = 12 [a2/σ 2 
+
+> τ
+
+− 1 − ln (a2/σ 2 
+
+> τ
+
+)] against numerical integration of R τ ∗ 
+
+> τ
+
+sx(0 , τ ′) dτ ′ using the trapezoidal rule with N = 10 ,000 points. The amplification curve and representative reverse-time trajectories are shown in Figure 4. 
+
+τ Λexact Λnumerical Error Amplification eΛ
+
+0.0 2.9014 2.9014 4.5 × 10 −7 18 .2×
+
+0.5 0.9980 0.9980 4.1 × 10 −8 2.7×
+
+1.0 0.4507 0.4507 8.2 × 10 −9 1.6×
+
+2.0 0.1061 0.1061 6.1 × 10 −10 1.1×
+
+The closed form matches the numerical integral to at least seven significant figures. 
+
+10.6 Verification of curl preservation (Theorem 7.5) 
+
+For a two-component GMM in d = 2 with asymmetric means μ1 = (2 , 1) , μ2 = ( −1, 1.5) and weights 
+
+w1 = 0 .4, w2 = 0 .6, we compute the curl ω = ∂1s2 − ∂2s1 at 200 random points using centered finite differences ( ∆x = 10 −6). The associated quiver plot and curl summary appear in Figure 5. 
+
+Result. For every tested noise level τ ∈ { 0.1, 0.5, 1.0, 3.0, 10 .0}, the maximum curl magnitude is below 1.3 × 10 −9. This confirms Theorem 7.5 to machine precision. 
+
+10.7 Verification of the VP–VE equivalence (Theorem 8.5) 
+
+For the symmetric binary GMM with a = 3 , σ0 = 1 , β = 1 : The numerical comparison is displayed in Figure 6. 
+
+Speciation time. The predicted VP speciation time is t∗ = ln (a2 − σ20 + 1) = ln 9 ≈ 2.197 . The effective VE time at this point is τeff (t∗) = (1 − e− ln 9 )/(2 e− ln 9 ) = (1 − 1/9) /(2 /9) = (8 /9) /(2 /9) = 4.000 , matching τ ∗ 
+
+> VE
+
+= 4 .0.
+
+Score transformation. We compare sVP (x, t ) = α−1 sVE (x/α, τ eff ) against the direct VP score (computed from the VP marginal 12 N (x; −αa, σ 2VP ) + 12 N (x; αa, σ 2VP )). At five values of t, the maximum pointwise discrepancy over x ∈ [−5, 5] is below 2 × 10 −15 —consistent with double-precision arithmetic. 
+
+10.8 Verification of correction terms (Theorems 9.5 and 9.7) 
+
+We test the correction on three configurations. The aggregate error reduction and the sign of γ1 are shown in Figure 7. 
+
+Symmetric case: K = 2 , d = 5 , equal weights. With μ1 = (3 , 1, 0.5, 0, 0) and μ2 = −μ1: the predicted γ1 = 0 (by Theorem 9.3), and the leading-order speciation matches the exact value to 
+
+10 −6 relative error. 34 Asymmetric case: K = 3 , d = 10 , equal weights. We compare leading-order, first-correction, and quadratic (92) predictions against the exact criterion (93) solved by bisection. Separation scale τ ∗ 
+
+> leading
+
+τ ∗ 
+
+> corrected
+
+τ ∗ 
+
+> exact
+
+Leading / Corrected error 
+
+5 7.83 7.12 6.99 12 .0% / 1.9% 12 47 .5 43 .4 42 .6 11 .4% / 1.8% 50 833 762 749 11 .2% / 1.8% 
+
+The first-order correction reduces the error from ∼11% to ∼2% ; the quadratic formula further reduces it to ∼0.8% . For the asymmetric families tested here, the sign of γ1 is negative in all cases. 
+
+Equilateral case: K = 3 , d = 2 . With means at the vertices of an equilateral triangle of circumradius R = 4 : γ1 = 0 to machine precision, and the leading-order formula is exact. 
+
+# 11 Conclusion 
+
+11.1 Summary of contributions 
+
+The main point of the paper is simple: the score function of a diffusion generative model satisfies a viscous Burgers equation, with cumulative noise variance playing the role of viscosity. From there the paper moves through the PDE correspondence, the local boundary theorem, and the Gaussian formulas built on top of it. The identification itself is a direct consequence of the classical Cole–Hopf transform [Hopf, 1950, Cole, 1951] applied to the heat equation governing the forward diffusion [Sohl-Dickstein et al., 2015, Song et al., 2021b]. The main consequences are as follows: (i) Local binary-boundary theorem. For any decomposition of the noised density into two positive heat solutions, the score splits exactly as s = ¯s + 12 tanh (ϕ/ 2) ∇ϕ (Theorem 5.6), and at any regular binary boundary the normal Hessian obeys the exact criterion ∂nsn = ∂n ¯sn + κ2/4
+
+(Theorem 5.8). (ii) Gaussian specialization and spectral match. For symmetric binary mixtures, the local criterion reduces to the midpoint-derivative condition and coincides exactly with the spectral criterion of Raya and Ambrogioni [2023] and Biroli et al. [2024] (Theorem 5.11). In higher-dimensional asymmetric Gaussian settings, the leading-order threshold is τ ∗ 
+
+> LO
+
+= ( λ1(W ) − σ20 )/2,with explicit correction terms and an exact non-perturbative refinement given in Theorems 7.8, 9.7 and 9.10. (iii) Interfacial profile. After subtracting the smooth background drift, the inter-mode layer is locally a Burgers tanh profile (Theorem 5.8); in the symmetric Gaussian case this profile is globally exact (Theorem 5.4) with width δ = σ2 
+
+> τ
+
+/a .(iv) Error amplification. Score estimation errors are amplified near mode boundaries by exp (Λ) 
+
+where Λ = 12 [SNR −1−ln SNR ] ≈ SNR /2 (Theorem 6.3), providing a PDE-theoretic explanation for the empirical sensitivity of diffusion models to low-noise score accuracy [Song and Ermon, 2020, Karras et al., 2022]. (v) Curl preservation. The vector Burgers dynamics preserves irrotationality (Theorem 7.5), establishing that the non-conservative scores documented by Vuong et al. [2025] cannot arise from the exact score dynamics alone. (vi) VP–VE unification. The coordinate transformation Z = X/α (t) reduces the VP-SDE to the VE case (Theorem 8.5), yielding closed-form VP speciation times and interfacial widths (Theorems 8.6 and 8.7). 35 (vii) Decision boundary dynamics. The Rankine–Hugoniot condition governs the motion of mode boundaries for asymmetric mixtures (Theorem 5.13), and the scalar Lax entropy condition provides a diagnostic on one-dimensional boundary slices (Theorem 5.14). All results are proved in the text. The Gaussian-mixture formulas are verified to machine precision ( ∼10 −9), and the local beyond-Gaussian theorem is also checked on a quartic double-well. 
+
+11.2 Implications for practice 
+
+A few remarks about diffusion model design are worth keeping in view: 
+
+Adaptive step-size schedules. The error amplification exponent (Theorem 6.3) provides a principled signal for allocating ODE solver steps: the step size should scale inversely with |sx|,concentrating discretization effort near the interfacial layer (mode boundary) and below the speciation time τ ∗. This recovers—and gives a theoretical justification for—the empirical observation that low-noise regions require finer discretization [Karras et al., 2022, Song et al., 2021a]. 
+
+Score network diagnostics. The one-dimensional Lax entropy condition on normal slices (Theo-rem 5.14) and curl-freeness (Theorem 7.5) provide checkable constraints on learned scores. A score network that violates the scalar entropy condition on a boundary-normal slice, or that has large curl there, is likely to produce poor samples near that boundary. The “score Fokker–Planck” regularizer of Lai et al. [2023]—which, as we have shown, enforces the Burgers equation—can be understood as implicitly penalizing entropy-violating scalar slices. 
+
+Noise schedule design. The VP–VE reduction (Theorem 8.5) shows that noise schedule opti-mization for VP models can be conducted entirely in the effective VE time τeff (t), reducing the design problem to choosing how the schedule traverses the interfacial layer. 
+
+11.3 Limitations and open problems 
+
+Beyond Gaussian mixtures. The local binary-boundary theorem of Theorems 5.6 and 5.8 is already exact for arbitrary smooth densities once a two-component heat decomposition is specified, and Section 10.4 confirms this on a non-Gaussian quartic well. One open problem is to obtain comparably explicit formulas for the background field ¯s, the log-ratio gradient κ, and the resulting speciation time in non-Gaussian settings; outside the Gaussian case these quantities typically have to be computed numerically. A separate issue is the binary-reduction assumption itself when more than two modes compete. Theorem 5.10 shows that the error is exponentially small for well-separated binary boundaries, but triple junctions and strongly non-local mode interactions are still missing from the present analysis. 
+
+The role of architecture. Our analysis assumes access to the true score or a pointwise approxi-mation thereof. Understanding how specific neural network architectures (e.g., U-Nets) interact with the Burgers interfacial structure—whether they introduce systematic biases toward or away from entropy-satisfying solutions—remains open. The observation by Vuong et al. [2025] that trained networks produce non-conservative fields suggests that architecture imposes an implicit Helmholtz decomposition [Bhatia et al., 2013] on the learned score. That curl component deserves a more systematic treatment through the Burgers framework than we have given here. 36 Higher-order corrections. The correction series of Section 9 was carried to first order ( γ1). Computing the O(σ−8 
+
+> τ
+
+) term would tighten the approximation for strongly asymmetric mixtures; the algebraic structure of the expansion (powers of the responsibility deviation ηk − ⟨ η⟩) is systematic and could in principle be automated. 
+
+Multi-dimensional shocks. In d > 1, the formal inviscid vector Burgers description develops shock surfaces (Theorem 7.7). The detailed structure of these surfaces—their curvature, their interaction at triple junctions where three Voronoi cells meet, and the associated Rankine–Hugoniot dynamics in Rd—is largely unexplored in the generative modeling context and connects to the rich mathematical theory of multi-dimensional conservation laws [Evans, 2010]. 
+
+Stochastic corrections. The probability flow ODE is the deterministic counterpart of the reverse SDE (10) . The stochastic term in the reverse SDE introduces a viscous regularization that smooths the interfacial layers, analogous to adding viscosity. It would also be worthwhile to quantify the interplay between stochasticity, score error, and interfacial structure, perhaps through the stochastic localization framework [Montanari, 2023, Benton et al., 2024]. 
+
+11.4 Closing remark 
+
+The Burgers equation was introduced by Burgers [1948] in 1948 as a toy model for turbulence. Diffusion generative models were introduced by Sohl-Dickstein et al. [2015] in 2015 as a new approach to density estimation. The connection between the two is a direct consequence of the Cole–Hopf transform [Hopf, 1950, Cole, 1951] applied to the heat equation. Making this link explicit clarifies the role of interfacial structure, error amplification, and boundary dynamics in diffusion models. 
+
+# References 
+
+Beatrice Achilli, Luca Ambrogioni, Carlo Lucibello, Marc Mézard, and Emanuela Ventura. Mem-orization and generalization in generative diffusion under the manifold hypothesis. Journal of Statistical Mechanics: Theory and Experiment , 2025:073401, 2025. doi: 10.48550/arXiv.2502.09578. URL https://arxiv.org/abs/2502.09578 .Michael S Albergo, Nicholas M Boffi, and Eric Vanden-Eijnden. Stochastic interpolants: A unifying framework for flows and diffusions. arXiv preprint , 2023. doi: 10.48550/arXiv.2303.08797. URL 
+
+https://arxiv.org/abs/2303.08797 .Luca Ambrogioni. The information dynamics of generative diffusion. Entropy , 27, 2025a. doi: 10.3390/e28020195. URL https://doi.org/10.3390/e28020195 .Luca Ambrogioni. The statistical thermodynamics of generative diffusion models: Phase transitions, symmetry breaking and critical instability. Entropy , 27(3):291, 2025b. doi: 10.3390/e27030291. URL https://doi.org/10.3390/e27030291 .Luigi Ambrosio, Nicola Gigli, and Giuseppe Savaré. Gradient Flows in Metric Spaces and in the Space of Probability Measures . Birkhäuser, 2005. Brian DO Anderson. Reverse-time diffusion equation models. Stochastic Processes and their Applications , 12(3):313–326, 1982. 37 Joe Benton, Valentin De Bortoli, Arnaud Doucet, and Alain Durmus. Nearly d-linear convergence bounds for diffusion models via stochastic localization. International Conference on Learning Representations (ICLR) , 2024. doi: 10.48550/arXiv.2308.03686. URL https://arxiv.org/abs/ 2308.03686 .Harsh Bhatia, Gregory Norgard, Valerio Pascucci, and Peer-Timo Bremer. The Helmholtz-Hodge decomposition – a survey. IEEE Transactions on Visualization and Computer Graphics , 19(8): 1386–1404, 2013. Giulio Biroli and Marc Mézard. Generative diffusion in very large dimensions. Journal of Statistical Mechanics: Theory and Experiment , 2023:093402, 2023. doi: 10.1088/1742-5468/acf8ba. URL 
+
+https://doi.org/10.1088/1742-5468/acf8ba .Giulio Biroli, Tony Bonnaire, Valentin de Bortoli, and Marc Mézard. Dynamical regimes of diffusion models. Nature Communications , 15:9957, 2024. doi: 10.1038/s41467-024-54281-3. URL 
+
+https://doi.org/10.1038/s41467-024-54281-3 .Tony Bonnaire, Raphaël Urfin, Giulio Biroli, and Marc Mézard. Why diffusion models don’t memorize: The role of implicit dynamical regularization in training. arXiv preprint , 2025. doi: 10.48550/arXiv.2505.17638. URL https://arxiv.org/abs/2505.17638 .Johannes Martinus Burgers. A mathematical model illustrating the theory of turbulence. Advances in Applied Mechanics , 1:171–199, 1948. doi: 10.1016/S0065-2156(08)70100-8. URL https: //doi.org/10.1016/S0065-2156(08)70100-8 .Sitan Chen, Sinho Chewi, Jerry Li, Yuanzhi Li, Adil Salim, and Anru R Zhang. Sampling is as easy as learning the score: theory for diffusion models with minimal data assumptions. International Conference on Learning Representations (ICLR) , 2023. doi: 10.48550/arXiv.2209.11215. URL 
+
+https://arxiv.org/abs/2209.11215 .Julian D Cole. On a quasi-linear parabolic equation occurring in aerodynamics. Quarterly of Applied Mathematics , 9(3):225–236, 1951. doi: 10.1090/qam/42889. URL https://doi.org/10.1090/ qam/42889 .Valentin De Bortoli. Convergence of denoising diffusion models under the manifold hypothesis. 
+
+Transactions on Machine Learning Research , 2022. doi: 10.48550/arXiv.2208.05314. URL https: //arxiv.org/abs/2208.05314 .Prafulla Dhariwal and Alexander Nichol. Diffusion models beat GANs on image synthesis. Advances in Neural Information Processing Systems (NeurIPS) , 34:8780–8794, 2021. doi: 10.48550/arXiv. 2105.05233. URL https://arxiv.org/abs/2105.05233 .Ahmed El Alaoui, Andrea Montanari, and Mark Sellke. Sampling from the Sherrington-Kirkpatrick Gibbs measure via algorithmic stochastic localization. In Proceedings of IEEE FOCS , pages 323– 334, 2022. doi: 10.1109/FOCS54488.2022.00039. URL https://doi.org/10.1109/FOCS54488. 2022.00039 .Lawrence C Evans. Partial Differential Equations . American Mathematical Society, 2nd edition, 2010. doi: 10.1090/gsm/191. URL https://doi.org/10.1090/gsm/191 .Igor V Girsanov. On transforming a certain class of stochastic processes by absolutely continuous substitution of measures. Theory of Probability and its Applications , 5(3):285–301, 1960. 38 Thomas Hakon Grönwall. Note on the derivatives with respect to a parameter of the solutions of a system of differential equations. Annals of Mathematics , 20(4):292–296, 1919. Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in Neural Information Processing Systems (NeurIPS) , 33:6840–6851, 2020. doi: 10.48550/arXiv.2006. 11239. URL https://arxiv.org/abs/2006.11239 .Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J Fleet. Video diffusion models. Advances in Neural Information Processing Systems (NeurIPS) , 35, 2022. doi: 10.48550/arXiv.2204.03458. URL https://arxiv.org/abs/2204.03458 .Eberhard Hopf. The partial differential equation ut + uu x = μu xx . Communications on Pure and Applied Mathematics , 3(3):201–230, 1950. doi: 10.1002/cpa.3160030302. URL https://doi.org/ 10.1002/cpa.3160030302 .Pierre-Henri Hugoniot. Sur la propagation du mouvement dans les corps et spécialement dans les gaz parfaits. Journal de l”Ecole Polytechnique , 58:1–125, 1889. doi: 10.24033/bsmf.350. URL 
+
+https://doi.org/10.24033/bsmf.350 .Aapo Hyvärinen. Estimation of non-normalized statistical models by score matching. Journal of Machine Learning Research , 6:695–709, 2005. Richard Jordan, David Kinderlehrer, and Felix Otto. The variational formulation of the Fokker-Planck equation. SIAM Journal on Mathematical Analysis , 29(1):1–17, 1998. Mehran Kardar, Giorgio Parisi, and Yi-Cheng Zhang. Dynamic scaling of growing interfaces. Physical Review Letters , 56(9):889, 1986. Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine. Elucidating the design space of diffusion-based generative models. Advances in Neural Information Processing Systems (NeurIPS) , 35, 2022. doi: 10.48550/arXiv.2206.00364. URL https://arxiv.org/abs/2206.00364 .Diederik Kingma, Tim Salimans, Ben Poole, and Jonathan Ho. Variational diffusion models. Advances in Neural Information Processing Systems (NeurIPS) , 34, 2021. doi: 10.48550/arXiv.2107.00630. URL https://arxiv.org/abs/2107.00630 .Chieh-Hsin Lai, Yuhta Takida, Naoki Murata, Toshimitsu Uesaka, Yuki Mitsufuji, and Stefano Ermon. fp-diffusion: Improving score-based diffusion models by enforcing the underlying score Fokker-Planck equation. In International Conference on Machine Learning (ICML) , 2023. doi: 10.48550/arXiv.2210.04296. URL https://arxiv.org/abs/2210.04296 .Peter D Lax. Hyperbolic systems of conservation laws II. Communications on Pure and Applied Mathematics , 10(4):537–566, 1957. doi: 10.1002/cpa.3160100406. URL https://doi.org/10. 1002/cpa.3160100406 .Holden Lee, Jianfeng Lu, and Yixin Tan. Convergence of score-based generative modeling for general data distributions. International Conference on Algorithmic Learning Theory (ALT) , 2023. doi: 10.48550/arXiv.2209.12381. URL https://arxiv.org/abs/2209.12381 .Mingyang Li and Sitan Chen. Critical windows: Non-asymptotic theory for feature emergence in diffusion models. International Conference on Machine Learning (ICML) , 2024. doi: 10.48550/ arXiv.2403.01633. URL https://arxiv.org/abs/2403.01633 .39 Yaron Lipman, Ricky TQ Chen, Heli Ben-Hamu, Maximilian Nickel, and Matt Le. Flow matching for generative modeling. International Conference on Learning Representations (ICLR) , 2023. doi: 10.48550/arXiv.2210.02747. URL https://arxiv.org/abs/2210.02747 .Xingchao Liu, Chengyue Gong, and Qiang Liu. Flow straight and fast: Learning to generate and transfer data with rectified flow. International Conference on Learning Representations (ICLR) ,2023. doi: 10.48550/arXiv.2209.03003. URL https://arxiv.org/abs/2209.03003 .Andrea Montanari. Sampling, diffusions, and stochastic localization. arXiv preprint , 2023. doi: 10.48550/arXiv.2305.10690. URL https://arxiv.org/abs/2305.10690 .William John Macquorn Rankine. On the thermodynamic theory of waves of finite longitudinal disturbance. Philosophical Transactions of the Royal Society of London , 160:277–288, 1870. doi: 10.1098/rstl.1870.0017. URL https://doi.org/10.1098/rstl.1870.0017 .Gabriel Raya and Luca Ambrogioni. Spontaneous symmetry breaking in generative diffusion models. 
+
+Advances in Neural Information Processing Systems (NeurIPS) , 36, 2023. doi: 10.48550/arXiv. 2305.19693. URL https://arxiv.org/abs/2305.19693 .Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , pages 10684–10695, 2022. doi: 10.1109/CVPR52688.2022.01042. URL https://doi.org/10.1109/CVPR52688.2022.01042 .Antonio Sclocchi, Alessandro Favero, and Matthieu Wyart. A phase transition in diffusion models reveals the hierarchical nature of data. Proceedings of the National Academy of Sciences , 2024. doi: 10.48550/arXiv.2402.16991. URL https://arxiv.org/abs/2402.16991 .Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. Journal of Machine Learning Research (Proceedings of ICML 2015) , pages 2256–2265, 2015. doi: 10.5555/3045118.3045358. URL https://dl.acm. org/doi/10.5555/3045118.3045358 .Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diffusion implicit models. International Conference on Learning Representations (ICLR) , 2021a. doi: 10.48550/arXiv.2010.02502. URL 
+
+https://arxiv.org/abs/2010.02502 .Yang Song and Stefano Ermon. Generative modeling by estimating gradients of the data distribution. 
+
+Advances in Neural Information Processing Systems (NeurIPS) , 32:11895–11907, 2019. doi: 10.48550/arXiv.1907.05600. URL https://arxiv.org/abs/1907.05600 .Yang Song and Stefano Ermon. Improved techniques for training score-based generative models. 
+
+Advances in Neural Information Processing Systems (NeurIPS) , 33, 2020. doi: 10.48550/arXiv. 2006.09011. URL https://arxiv.org/abs/2006.09011 .Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. International Conference on Learning Representations (ICLR) , 2021b. doi: 10.48550/arXiv.2011.13456. URL 
+
+https://arxiv.org/abs/2011.13456 .Wenpin Tang and Hanyang Zhao. Score-based diffusion models via stochastic differential equations – a technical tutorial. arXiv preprint , 2024. doi: 10.48550/arXiv.2402.07487. URL https: //arxiv.org/abs/2402.07487 .40 Alexandre B Tsybakov. Introduction to Nonparametric Estimation . Springer, 2009. Pascal Vincent. A connection between score matching and denoising autoencoders. Neural Com-putation , 23:1661–1674, 2011. doi: 10.1162/NECO_a_00142. URL https://doi.org/10.1162/ NECO_a_00142 .An B Vuong, Yen Ting Lin, et al. Are we really learning the score function? Reinterpreting diffusion models through Wasserstein gradient flow matching. Transactions on Machine Learning Research ,2025. doi: 10.48550/arXiv.2509.00336. URL https://arxiv.org/abs/2509.00336 .Gerald Beresford Whitham. Linear and Nonlinear Waves . John Wiley & Sons, 1974. doi: 10.1002/ 9781118032954. URL https://doi.org/10.1002/9781118032954 .41

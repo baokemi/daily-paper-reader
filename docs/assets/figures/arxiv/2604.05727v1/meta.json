@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-001.webp",
+      "caption": "Figure 2. Framework of SADM. Under the multi-scale pyramid framework, the normally exposed image x0 is downsampled to generate xz 0, which is then contaminated with Gaussian noise to produce the noisy image xz t . The low-light image xlow, the image prior condition xdehaze (the detailed design is presented in Appendix B.5) and the position encoding xpositionEncode (following the setting in PyDiff(Zhou et al., 2023)) are taken as joint conditional information, which is fed into the SR3Unet alongside the noisy image xz t . Distinct loss functions are leveraged to constrain both the noise predicted by the SR3Unet and the derived target image. Ultimately, DDIM is employed to conduct sampling and inference based on random Gaussian noise.",
+      "page": 6,
+      "index": 1,
+      "width": 1017,
+      "height": 542
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-002.webp",
+      "caption": "Figure 1. Comparison of Architectural Workflows and Mechanisms for Three Diffusion Model-Based Low-Light Image Enhancement and Denoising Methods. Left: Workflow comparisons of three approaches: (a) two-stage LIME+LDPM, (b) DRP with a correction network, and (c) our single-stage SADM; (d) PSNR/SSIM performance on the LOLv1 dataset, where our SADM achieves the best results. Right: Comparison of forward noise addition timesteps between SADM and standard DDM, verifying the better adaptability of SADM’s signal attenuation mechanism to low-light scenarios.",
+      "page": 2,
+      "index": 2,
+      "width": 813,
+      "height": 475
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-003.webp",
+      "caption": "Table 1. Quantitative evaluation results in LOLv1, LOLv2 real, LOLv2 syn",
+      "page": 7,
+      "index": 3,
+      "width": 1004,
+      "height": 235
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-004.webp",
+      "caption": "Figure 3. Visual effect comparison of different algorithms on the LOLv1 test dataset:(a)low\\high; (b)Zero-Dce; (c)UR-Net; (d)LLF; (e)PyDiff; (f)RF; (g)GSAD; (h)WBDM; (i)FD; (j)LightenD; (k)AnlightenD; (l)CLODE; (m)DRP; (n)Ours. Local magnified views are presented in the red and green boxes.",
+      "page": 7,
+      "index": 4,
+      "width": 1017,
+      "height": 232
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-005.webp",
+      "caption": "Figure 11. Visual Comparison of Dehazing and Histogram Equalization Preprocessing With RGB Channel Distribution Analysis for Diffusion Based Low Light Image Enhancement.",
+      "page": 22,
+      "index": 5,
+      "width": 1017,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-006.webp",
+      "caption": "Figure 7. Variation of DDPM Noise Scheduling Coefficients with Iteration Steps(value range of images is set to [-1, 1]).",
+      "page": 18,
+      "index": 6,
+      "width": 1017,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-007.webp",
+      "caption": "Figure 12. Visual effect comparison of different algorithms on the LOLv1test dataset:(a)low; (b)high; (c)Zero-Dce; (d)UR-Net; (e)LLF; (f)PyDiff; (g)RF; (h)GSAD; (i)WBDM; (j)FD; (k)LightenD; (l)AnlightenD; (m)CLODE; (m)DRP; (n)Ours. Local magnified views are presented in the red and green boxes.",
+      "page": 23,
+      "index": 7,
+      "width": 1017,
+      "height": 481
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-008.webp",
+      "caption": "Figure 14. Visual effect comparison of different algorithms on the LOLv2 syn dataset:(a)low; (b)high; (c)Zero-Dce; (d)UR-Net; (e)LLF; (f)RF; (g)GSAD; (h)WBDM; (i)FD; (j)LightenD; (k)AnlightenD; (l)CLODE; (m)DRP; (n)Ours.",
+      "page": 23,
+      "index": 8,
+      "width": 1017,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-009.webp",
+      "caption": "Figure 13. Visual effect comparison of different algorithms on the LOLv2 real dataset:(a)low; (b)high; (c)Zero-Dce; (d)UR-Net; (e)LLF; (f)RF; (g)GSAD; (h)WBDM; (i)FD; (j)LightenD; (k)AnlightenD; (l)CLODE; (m)DRP; (n)Ours. Local magnified views are presented in the red and green boxes.",
+      "page": 23,
+      "index": 9,
+      "width": 1017,
+      "height": 240
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-010.webp",
+      "caption": "Figure 4. Visual effect comparison of different algorithms on the LOLv2 real dataset:(a)low; (b)high; (c)Zero-Dce; (d)UR-Net; (e)LLF; (f)RF; (g)GSAD; (h)WBDM; (i)FD; (j)LightenD; (k)AnlightenD; (l)CLODE; (m)DRP; (n)Ours. Local magnified views are presented in the red and green boxes.",
+      "page": 8,
+      "index": 10,
+      "width": 1017,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-011.webp",
+      "caption": "Figure 5. Performance of our SADM on unpaired (reference-free) low-light datasets (weights pre-trained on LOLv1). This figure presents visual enhancement results for input, WBDM, DRP and SADM to validate the model’s generalization ability, with a key strength in adaptive overexposure suppression.",
+      "page": 8,
+      "index": 11,
+      "width": 492,
+      "height": 354
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-012.webp",
+      "caption": "Figure 8. Variation of SADM Noise Scheduling Coefficients with Iteration Steps(value range of images is set to [0, 1]).",
+      "page": 19,
+      "index": 12,
+      "width": 1017,
+      "height": 361
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-013.webp",
+      "caption": "Figure 15. Visual effect comparison of different algorithms on the LOLv2 syn dataset.",
+      "page": 24,
+      "index": 13,
+      "width": 1017,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-014.webp",
+      "caption": "Figure 16. SADM’s visual results on the unpaired dataset.",
+      "page": 24,
+      "index": 14,
+      "width": 1017,
+      "height": 954
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-015.webp",
+      "caption": "Figure 9. Variation of SADM Noise Scheduling Coefficients with 0.99.",
+      "page": 20,
+      "index": 15,
+      "width": 1017,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05727v1/fig-016.webp",
+      "caption": "Figure 10. Variation of SADM Noise Scheduling Coefficients with 0.9999.",
+      "page": 20,
+      "index": 16,
+      "width": 1017,
+      "height": 383
+    }
+  ]
+}

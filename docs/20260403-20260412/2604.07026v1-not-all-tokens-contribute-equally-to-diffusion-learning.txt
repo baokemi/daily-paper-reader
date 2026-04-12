@@ -1,0 +1,651 @@
+Title: Not all tokens contribute equally to diffusion learning
+
+URL Source: https://arxiv.org/pdf/2604.07026v1
+
+Published Time: Thu, 09 Apr 2026 01:16:41 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Not all tokens contribute equally to diffusion learning 
+
+Guoqing Zhang † 1 2 3 Lu Shi 1 2 3 Wanru Xu 1 2 3 Linna Zhang 4 Sen Wang 5 Fangfang Wang * 6 
+
+Yigang Cen * 1 2 3 
+
+Abstract 
+
+With the rapid development of conditional diffu-sion models, significant progress has been made in text-to-video generation. However, we observe that these models often neglect semantically im-portant tokens during inference, leading to biased or incomplete generations under classifier-free guidance. We attribute this issue to two key fac-tors: distributional bias caused by the long-tailed token frequency in training data, and spatial mis-alignment in cross-attention where semantically important tokens are overshadowed by less in-formative ones. To address these issues, we pro-pose Distribution-Aware Rectification and Spa-tial Ensemble (DARE), a unified framework that improves semantic guidance in diffusion mod-els from the perspectives of distributional debias-ing and spatial consistency. First, we introduce Distribution-Rectified Classifier-Free Guidance (DR-CFG), which regularizes the training pro-cess by dynamically suppressing dominant to-kens with low semantic density, encouraging the model to better capture underrepresented seman-tic cues and learn a more balanced conditional distribution. This design mitigates the risk of the model distribution overfitting to tokens with low semantic density. Second, we propose Spatial Representation Alignment (SRA), which adap-tively reweights cross-attention maps according to token importance and enforces representation consistency, enabling semantically important to-kens to exert stronger spatial guidance during gen-eration. This mechanism effectively prevents low 
+
+> 1
+
+State Key Laboratory of Advanced Rail Autonomous Op-eration, Bejing Jiaotong University, Beijing, China 2School of Computer Science and Technology, Bejing Jiaotong University, Beijing, China 3Visual Intellgence +X International Cooperation Joint Laboratory of MOE, Bejing Jiaotong University, Beijing, China 4School of Mechanical Engineering, Guizhou University, Guizhou, China 5Seed, Bytedance, Beijing, China 6School of Information Science and Technology, Hangzhou Normal Univer-sity, Zhejiang, China. Correspondence to: Guoqing Zhang <guo-qing.zhang@bjtu.edu.cn >.
+
+Preprint. April 9, 2026. 
+
+semantic-density tokens from dominating the at-tention allocation, thereby avoiding the dilution of the spatial and distributional guidance provided by high semantic-density tokens. Extensive exper-iments on multiple benchmark datasets demon-strate that DARE consistently improves genera-tion fidelity and semantic alignment, achieving significant gains over existing approaches. 
+
+1. Introduction 
+
+With the continuous advancement of methods for text-to-image (T2I) generation (Esser et al., 2024; Labs, 2024; Xie et al., 2024), substantial progress has been made in text-to-video (T2V) generation, which has rapidly emerged as another core task in generative modeling. The primary ob-jective of T2V is to enable models to synthesize temporally coherent and semantically consistent videos conditioned on natural language prompts. Early works (Singer et al., 2022; Zeng et al., 2024) primarily focused on optimizing U-Net–based (Ronneberger et al., 2015) diffusion model architectures to enhance temporal consistency and visual coherence in generated videos. More recent approaches, represented by Wan (Wan et al., 2025), CogVideoX (Yang et al., 2024), and Hunyuan-Video (Kong et al., 2024), adopt Transformer-based (Vaswani et al., 2017) diffusion models as the backbone architecture and improve video genera-tion quality from perspectives such as spatiotemporal com-pression ratios, sparse representations, and semantic–visual alignment. Although these methods achieve significant im-provements in video quality by optimizing visual encoders and diffusion model architectures, they largely overlook the impact of semantic representations on the T2V task and on diffusion model design. First, both traditional approaches and recent studies typi-cally rely on text encoders such as T5 (Raffel et al., 2020; Liu et al., 2024b), CLIP (Radford et al., 2021), and Qwen (Bai et al., 2023) to extract semantic representations during semantic processing. However, we observe a consistent phe-nomenon across different architectures. Whether using T5, which is pre-trained with a conventional encoder–decoder architecture, or Qwen, which is pre-trained with an autore-gressive decoder architecture, the encoded semantic repre-1
+
+> arXiv:2604.07026v1 [cs.CV] 8 Apr 2026
+
+Not all tokens contribute equally to diffusion learning Wan -T5 CogVideoX -T5 CausalLM 
+
+(a) Visualization of Similarity between Conditional Semantic Rep-resentations in Diffusion Model Inputs. Prompt : The image is blurry, focusing on a close -up of a men's wrist watch worn on a left wrist . Only part of the watch                                                   
+
+> is visible on the screen .It features asilver metal strap and case, ablack dial, and silver hands .The camera pans to the
+> left, circling the watch and capturing the dial and strap .The camera then gradually zooms in for aclose -up of the
+> watch .White background .
+> Attention score for the token ‘Silver’
+> Seedance1.0_exp W. DARE
+> Inference by T2V model
+> 𝑡 ={𝑇 →0}
+> Attention Weight
+
+(b) Visualization of Attention Scores and Distributions for Under-fitted Tail Tokens During Inference 
+
+Figure 1. Visualization and Analysis of Conditional Semantic Information Distribution. (a) shows the similarity between condi-tional semantic representations. The off-diagonal regions indicate that the semantic similarity between different tokens is low, re-flecting a discrete distribution. (b) presents the attention scores and corresponding distribution maps of selected underfitted tail tokens generated by Seedance (Gao et al., 2025) before and after the introduction of DARE. 
+
+sentations of individual tokens remain highly discrete. As illustrated in Fig. 1a, the semantic similarity between dif-ferent tokens is relatively low, and the representations tend to be mutually independent. Second, during training, the increase in training data leads to the frequent occurrence of tokens carrying low-density semantic information, such as conjunctions and prepositions (e.g., the, to, and an), which further exacerbates the imbalance in token distribution. Con-sidering that the semantic information carried by different tokens is relatively independent, the model tends to fit the distribution of high-frequency tokens with low semantic density, thereby weakening its ability to accurately model the distribution of tokens that contain high-density semantic information. As illustrated in Fig. 1b, by extracting the attention scores and attention maps corresponding to tail tokens during inference, we can observe that these tokens generally receive relatively low attention scores and attend to spatially scattered regions, indicating insufficient learning. Consequently, when classifier-free guidance is additionally applied during inference for video generation, this bias is further amplified, reinforcing constraints associated with low-frequency semantic tokens and leading to the loss of certain semantic information in the generated content. To address the above issues, we propose Distribution-Aware Rectification and Spatial Ensemble (DARE), a unified frame-work that improves semantic guidance in conditional diffu-sion models from two complementary perspectives: dis-tributional rectification and spatial representation align-ment. First, from the perspective of distribution rectification, we propose Distribution-Rectified Classifier-Free Guidance (DR-CFG). Instead of modifying the guidance during in-ference, DR-CFG regularizes the learning process during training by randomly dropping or weakening a subset of frequently occurring and easily fitted dominant tokens, pre-venting the model from overemphasizing tokens with low semantic density. Specifically, we selectively identify tokens with low semantic density and compute their corresponding flow distributions. The resulting flow distribution is then contrasted with the flow distribution obtained under the guid-ance of the complete phrase. The differential information is further used to dynamically adjust the flow matching loss distribution in diffusion models. This strategy reduces the excessive influence of tokens carrying low-density semantic information on the training objective, while encouraging the model to better capture semantic cues that are other-wise underrepresented. As a result, the learned conditional distribution becomes more balanced and robust. Second, from the perspective of spatial representation alignment, we introduce a Spatial Representation Alignment (SRA) method. This method dynamically regulates the attention distribution during training, allocating more attention to tokens with high semantic density while suppressing the dominance of low-density tokens, thereby preventing seman-tically informative tokens from being overshadowed in the attention allocation. Concretely, we dynamically reweight attention scores based on token importance, suppressing the dominance of low-semantic-density tokens in the atten-tion distribution while enhancing the spatial contribution of high-density semantic tokens. A consistency loss is further employed to align the reweighted attention outputs with the original attention representations. This encourages the model to learn semantically aware spatial representations, enabling it to better capture the spatial guidance signals provided by high-density semantic tokens. Finally, we eval-uated the generation performance of our method on multiple benchmark datasets and performed comparative experiments against existing approaches. The results demonstrate that our method consistently and significantly improves both the generation capability and the generation quality of the base model. Our key contributions are as follows: • This paper introduces the Distribution-Rectification Classifier-Free Guidance (DR-CFG) method, which, for the first time, corrects the model’s preference distri-bution from the perspective of tokens. This effectively enhances the model’s ability to fit high-semantic infor-mation tokens. 2Not all tokens contribute equally to diffusion learning 
+
+• We propose the Spatial Representation Alignment (SRA) method, which uses a self-supervised learning framework to dynamically adjust the spatial distribu-tion of features based on the semantic density of tokens. This improves the consistency between spatial repre-sentations and high-semantic information tokens. • By integrating our methods with existing video gener-ation models, we significantly improve the video gen-eration quality of the base model and achieve optimal performance across multiple benchmark tests. 
+
+2. Related Works 
+
+2.1. Text-to-Video Generation 
+
+The Text-to-Video (T2V) task aims to generate control-lable videos from textual semantics. Early works primar-ily adopted GAN-based architectures (Li et al., 2018; Pan et al., 2017), incorporating text into the generator and en-forcing semantic consistency via discriminators, but often suffered from training instability. More recently, diffusion-based frameworks have emerged as a more stable and ef-fective alternative (Blattmann et al., 2023). For exam-ple, Make-A-Video (Singer et al., 2022) incorporates a spatiotemporal module into a UNet-based T2I model, re-ducing reliance on large text-video datasets, while Ani-matediff (Guo et al., 2023) leverages LoRA-based fine-tuning to generate short animations. Methods such as Mag-icVideo (Zhou et al., 2022), LAVIE (Wang et al., 2025b), and PixelDance (Zeng et al., 2024) further improve tem-poral and semantic consistency via 3D U-Nets, cascaded latent models, and conditional noise perturbation strate-gies. Transformer-based video diffusion models, including CogVideoX (Yang et al., 2024), HunyuanVideo (Kong et al., 2024), and WAN (Wan et al., 2025), extend these approaches to long, high-resolution videos using 3D VAEs, sparse at-tention, and large-scale Transformer backbones, enabling multi-resolution, high-quality video generation. 
+
+2.2. Classifier-Free Guidance 
+
+The classifier-free guidance (CFG) mechanism was first introduced in (Ho & Salimans, 2022), enabling effective conditional generation without requiring an auxiliary classi-fier. Since then, many works have extended CFG to improve generative performance. S-CFG (Shen et al., 2024) com-bines the attention distribution of the base model with object mask information during inference to adjust the feature dis-tribution under the CFG strategy, mitigating the issue of distribution imbalance across different regions. NPO (Wang et al., 2025a) constructs positive and negative text guides to calculate the model’s predicted distributions and strength-ens the conditional guidance of the positive text samples through distributional differences. ICG (Sadat et al., 2024) builds perturbation weights based on time-step values to dynamically adjust the CFG guidance weight. SEG (Hong, 2024) modifies the CFG guidance scale by controlling the energy curvature of attention, thereby improving the sta-bility and quality of image generation. NAG (Chen et al., 2025) introduces the CFG calculation method directly into the attention mechanism. By applying weighted modulation to the attention features guided by both positive and negative samples, it enhances the feature representation under pos-itive conditional guidance, thereby improving the model’s generation quality. Unlike existing approaches that modify guidance signals during inference, we identify the root cause of semantic degradation as the distribution imbalance among tokens during training, which leads to partial loss of semantic in-formation in the generated content. Based on the above analysis, we propose an explicit modeling strategy during training to address two key issues: (1) the fitting bias in-troduced by the long-tailed token distribution, and (2) the suppression of high-semantic-density tokens in terms of attention intensity and gradient contribution. Specifically, we dynamically adjust both gradient contributions and at-tention scores according to the fitting status of different to-kens, thereby enhancing the learning and distribution fitting of high-semantic-density tokens. With this approach, the model is encouraged to learn more comprehensive semantic representations across all tokens. As a result, it effectively alleviates the degradation in generation quality caused by insufficient learning of high-semantic-density tokens, which otherwise leads to inadequate guidance from relevant tokens during inference. 
+
+3. Method 
+
+3.1. Preliminaries 
+
+Diffusion models typically construct a stochastic differential equation (SDE) or a Markov chain to gradually transform the data distribution toward an easy-to-sample prior distri-bution (e.g., a standard Gaussian). 
+
+dx = f (x, t )dt + g(t)dw (1) Here, dx represents the Brownian motion corresponding to an infinitesimal Gaussian distribution, (f, g (t)) denotes the functions that determine the noise injection method based on the noise addition strategy (Karras et al., 2022; Song et al., 2020), and dw indicates the standard Wiener process. Their training objective is usually to estimate the noise or the score (gradient field), and samples are generated by simulating the corresponding reverse-time process. In contrast, Flow Matching (Lipman et al., 2022) is for-mulated as a deterministic ordinary differential equation (ODE) without inherent stochasticity. As a result, it is usu-3Not all tokens contribute equally to diffusion learning 
+
+ally more efficient at sampling and can achieve high-quality generation with significantly fewer steps. Flow Matching directly learns a vector field vt(x) that matches the true gen-erative direction along the target probability path, without the need to simulate explicit noise processes or to compute Jacobian-induced terms of the log probability density. Its forward process uses simple linear interpolation to compute 
+
+xt = (1 −t)x+tϵ , where x is the pure data, t is the time step, and ϵ is the noise. The derivative of x with respect to t at time t is given by dx dt = ϵ − x, where vt(x) = dx dt represents the target flow vector or velocity field that the neural net-work f aims to learn. Therefore, the core objective of Flow Matching training is to have the model-parameterized vector field u(x, t ) approximate the target velocity field vt(x) at time t. Accordingly, the loss is formulated as: 
+
+Lf m = Et∼U (0 ,1) [|| u(x, t ) − vt(x)|| 2] (2) To enhance training efficiency and convergence in condi-tional video generation tasks, we follow a unified training paradigm (Gao et al., 2025; Kong et al., 2024; Yang et al., 2024). The original video is first encoded using a 3D-VAE, producing a compressed latent visual representation x. In the conditional generation setting, the input prompt is en-coded via T5 (Raffel et al., 2020), CLIP (Radford et al., 2021), or a vision-language model (VLM) (Bai et al., 2023) to obtain its semantic representation c. A noisy version xt
+
+is then generated at a random timestep t and, together with the prompt representation c, fed into the diffusion model to produce u(x, t, c ), which represents the predicted velocity field under the current condition. Within the model, condi-tional guidance is achieved by computing attention between the visual representation xt and the prompt c. Specifically, three separate projection matrices Wq , Wk, and Wv are constructed to compute Q = Wq (xt), K = Wk([ xt, c ]) ,
+
+V = Wv ([ xt, c ]) . These are used to calculate the attention weights Aw and the corresponding correlation representa-tion Aout .
+
+Aw = sof tmax ( QK T
+
+√D ), A out = Aw × V (3) 
+
+3.2. Distribution-Aware Rectification and Spatial Ensemble 
+
+3.2.1. O VERVIEW 
+
+To address the issue that text-guided conditional diffusion models tend to overfit low-semantic tokens during train-ing, which in turn leads to low-quality video generation at inference time, we propose Distribution-Rectification Classifier-Free Guidance (DR-CFG) and Spatial Represen-tation Alignment (SRA) methods. These two methods tackle the problem from the perspectives of distribution correction and spatial representation alignment, respectively. Specifically, we follow the standard training paradigm of conditional diffusion models and compute the flow loss Lf m 
+
+under the current text condition using the Flow Matching loss defined in Eq. 2. In addition, we feed the original noise-free data x into the conditional diffusion model and extract the text–visual attention weights Aw|t=0 . After ap-plying morphological operations to Aw|t=0 , we obtain a mask Am|t=0 that represents the high-attention spatial re-gions corresponding to each token. Based on Aw|t=0 and 
+
+Am|t=0 for each token, we compute the token-specific loss as Lci =    
+
+> PAwi |t=0 ·Ami |t=0 ·Lf m
+> F·H·W·D
+
+. Here, F denotes the num-ber of frames, H and W represent the image height and width, and D is the channel dimension of the hidden fea-tures. Additionally, based on the overall textual condition description c, we store the value Lci of each token together with its occurrence count Nci .Second, in the Distribution-Rectification Classifier-Free Guidance (DR-CFG) method, we leverage the aforemen-tioned information to dynamically adjust the flow-matching strength according to the importance weights of tokens, thereby rectifying the model’s predicted distribution and preventing the model from overfitting to tokens with low semantic-importance density. Implementation details are provided in Section 3.2.2. Finally, in the Spatial Representation Alignment (SRA) method, we dynamically regulate the distribution of atten-tion weights based on token importance weights. This de-sign prevents tokens with low-density semantic information from receiving excessive attention, which could otherwise obscure tokens containing high-density semantic informa-tion. As a result, the model’s attention allocation and repre-sentation learning for high-density semantic tokens are en-hanced. Detailed implementation procedures are described in Section 3.2.3. 3.2.2. D ISTRIBUTION -R ECTIFICATION 
+
+CLASSIFIER -F REE GUIDANCE 
+
+To address the issue of biased distribution predictions in conditional diffusion models—caused by the model’s ten-dency to overfit the semantic information of simple tokens during training—we propose a Distribution Rectification approach based on Classifier-Free Guidance (CFG) (Ho & Salimans, 2022). Unlike related approaches (Chen et al., 2025), we abandon the conventional practice of computing velocity field differences under full-token guidance. Instead, we selectively use a subset of tokens as semantic guidance based on their semantic importance to compute the velocity field. We then perform a spatially fine-grained, weighted difference with the velocity field obtained under full-token guidance, which is used to rectify the model’s distribution prediction under full-token conditions. Specifically, we first calculate the importance weight ( Wci ) for each semantic 4Not all tokens contribute equally to diffusion learning …                            
+
+> Time lapse :the beautiful
+> blue sky cloudy is moving
+> over national park,
+> Thailand .
+> EMA model
+> (𝑡 =0)
+> T2V model
+> (𝑡 ∈{0,…,𝑇 })Flow Matching Loss
+> (𝐿 𝑓𝑚 )
+> Cross Attn. Weight 𝐴 !|#$%
+> &
+> Token  Importance  Weight  𝑊 !
+> 0
+> 2
+> 4
+> 6
+> Time :beautiful sky is over park th
+> Token Occurrence Statistics
+
+(a) Computation of Importance Weights for Each Token in the Prompt. T2V model                                                
+
+> (𝑡 ∈{0,…,𝑇 })
+> Time lapse :the beautiful
+> blue sky cloudy is
+> moving over national
+> park, Thailand .
+> Importance -Aware Token Masking
+> Time lapse: <null> … cloudy …
+> <null > park <null >ailand .
+> Cross
+> Attn.
+> Weight
+> 𝐴 !|#$%
+> Token
+> Import.
+> Weight
+> 𝑊 &
+> Attn.
+> Value 𝑉
+> Attn. Output 𝐴 '(#
+> 𝐿 )*+ =𝐸 (𝐴 '(# −𝐴 '(#
+> ,)
+> *
+> Resampling Attention Weight
+> 𝐴 '(#
+> ,
+> 𝑢 𝑥 ,𝑡 ,𝑐 ‘𝑢 𝑥 ,𝑡 ,𝑐
+> 𝑐
+> 𝑐′
+> GT Flow 𝑃 !
+> 𝐿 -* =𝐸 #~/(%,2)[𝑃 !⋅𝑢 𝑥 ,𝑡 ,𝑐 −𝑣 #4
+> 5
+> ]
+> 𝑣 #4
+> …
+> Distribution -Rectification C FG Spatial Representation Alignment
+> 𝑥
+> Token Import.
+> Weight 𝑊 "
+
+(b) Computation of Distribution-Rectification Classifier-Free Guid-ance (DR-CFG) and Spatial Representation Alignment (SRA). 
+
+Figure 2. Overall Computational Architecture of the Distribution-Aware Rectification and Spatial Ensemble (DARE) Method. By computing token importance weights online and incorporating them into the subsequent DR-CFG and SRA modules, DARE corrects the distributional bias in the model’s fitting to prompt tokens. 
+
+token based on its cumulative loss ( Lci ) and frequency of occurrence ( Nci ) recorded during training, as defined in Eq. 4. 
+
+Wci = Lci
+
+Nci · ln (1 + Nci ) (4) Finally, we sort all conditional text tokens c according to 
+
+Wci and construct a subset c′
+
+. This subset consists of to-kens with low importance weights that correspond to low-density semantic information, while the remaining tokens are replaced with null embeddings( < ϕ > ) and used as the new conditional input. The model performs a forward pass to obtain the velocity field u(x, t, c ′
+
+), which represents the model’s fit to this low-semantic conditional informa-tion. We then calculate Pw as the pixel-wise difference between the low-semantic-guided velocity field u(x, t, c ′
+
+)
+
+and the ground-truth velocity field vt(x). This Pw is used to reweight the loss Lf m between the fully conditioned veloc-ity field u(x, t, c ) and the ground truth vt(x). Specifically, 
+
+Pw reflects the model’s convergence state regarding the low-importance tokens c′; a smaller Pw indicates a higher degree of fitting to c′. By adjusting the weight of Lf m via Pw, we amplify the contribution of high-importance tokens to the fitting process, thereby biasing the model’s predicted distri-bution toward the influence of high-semantic information. 
+
+
+
+Pw = ג(vt(x) − u(x, t, c ′
+
+)) 2,Pw = 11+ e(−Pw ) ∗ 2 − 1,Ldr = Et∼U (0 ,1) [Pw · || u(x, t, c ) − vt(x)|| 2]
+
+(5) In the above expression, 11+ e(−Pw ) designed to map the weights of Pw onto the interval [0 .5, 1] . ג denotes the trun-cated gradient, where backpropagation is not performed. 3.2.3. S PATIAL REPRESENTATION ALIGNMENT 
+
+To address the dominance of low-semantic-density tokens in attention, which often leads the model to overlook the spatial and distributional guidance of semantically impor-tant tokens, we introduce Spatial Representation Align-ment (SRA). Unlike methods that focus on alignment in the feature-level representation space (Yu et al., 2024), we adopt a self-supervised training paradigm. By analyzing text-conditioned spatial attention weights and attention rep-resentations, we increase the influence of tokens carrying complex semantic information, thereby strengthening the weight distribution and guidance intensity of relevant to-kens. This approach enables targeted enhancement of the spatial representations of complex semantic tokens. Specifi-cally, we employ a self-supervised attention representation constraint with the timestep set to t = 0 . The noise-free vi-sual representations, together with the complete conditional text, are fed into the diffusion model for a single forward pass, from which the resulting attention weights Aw|t=0 
+
+are extracted. Since Aw|t=0 directly reflects the visual re-gions focused on by different text tokens, we apply token importance weights Wc to Aw|t=0 to adjust the attention intensity. This allows for the precise correction of focus strength across various tokens. 
+
+A′ 
+
+> w|t=0
+
+= Aw|t=0 · ( Wc
+
+σ(Wc) ) (6) In the equation above, the tensor Aw|t=0 has dimensions of 
+
+(B, head, F × H × W, K ), where K denotes the number of tokens in the current conditional text (i.e., the length of set c), B represents the number of samples, and head repre-sents the number of attention heads. The weight vector Wc
+
+initially has a dimension of (K, ). We amplify the variance between high and low token importance weights by scaling the weights by Wc 
+
+> σ(Wc)
+
+, where σ(Wc) represents the standard 5Not all tokens contribute equally to diffusion learning                                                                                                                                                                                     
+
+> Method Appearance Style(%) Overall Consistency(%) Temporal Style(%) Dynamic Degree(%) Aesthetic Quality(%) Background Consistency(%) Scene(%) LaVie §(Wang et al., 2025b) 23.56 26.41 25.93 49.72 54.94 97.47 52.69 ModelScope §(Wang et al., 2023) 23.39 25.67 25.37 66.39 52.06 95.29 39.26 VideoCrafter §(He et al.) 21.57 25.21 25.42 89.72 44.41 92.88 43.36 CogVideo §(Hong et al., 2022) 22.01 7.70 7.80 42.22 38.18 95.42 28.24 Wan 2.1 (Wan et al., 2025) 20.80 20.79 19.93 88.89 46.67 (✚2.55 )96.69 18.02 (✚9.08 )
+> w. DARE (Ours) 21.09 (✚0.29 )22.76 (✚2.00 )22.29 (✚2.36 )95.84 (✚6.95 )44.12 97.54 (✚0.85 )8.94 Seedance1.0 exp (Gao et al., 2025) 22.37 27.37 25.27 80.55 58.45 96.37 47.53
+> w. DARE (Ours) 22.66 (✚0.29 )27.71 (✚0.34 )25.39 (✚0.12 )87.50 (✚6.95 )58.63 (✚0.18 )96.65 (✚0.28 )51.82 (✚4.29 )
+> Motion Smoothness(%) Imaging Quality(%) Object Class(%) Spatial Relationship(%) Color Subject Consistency(%) Multiple Objects(%) LaVie §(Wang et al., 2025b) 96.38 61.90 91.82 34.09 86.39 91.41 33.32 ModelScope §(Wang et al., 2023) 95.79 58.57 82.25 33.68 81.72 89.87 38.98 VideoCrafter §(He et al.) 91.79 57.22 87.34 36.74 78.84 86.24 25.93 CogVideo §(Hong et al., 2022) 96.47 41.03 73.40 18.24 79.57 92.19 18.11 Wan 2.1 (Wan et al., 2025) 98.46 49.22 54.43 49.16 84.79 (✚1.53 )91.69 25.60
+> w. DARE (Ours) 99.36 (✚0.9 )59.04 (✚9.82 )54.67 (✚0.24 )55.95 (✚6.79 )83.26 93.14 (✚1.45 )35.52 (✚9.92 )
+> Seedance1.0 exp (Gao et al., 2025) 98.39 67.07 87.26 49.26 84.69 95.76 76.45
+> w. DARE (Ours) 98.39 (✚0.0 )67.96 (✚0.89 )92.56 (✚5.3 )54.41 (✚5.15 )87.39 (✚2.7 )95.88 (✚0.12 )79.65 (✚3.2 )
+
+Table 1. Evaluation results of generated outputs under the VBench (Huang et al., 2024; 2025) frameworks using the prompts provided by VBench. § indicates that the results of the corresponding methods are taken from (Huang et al., 2024), while all other results are obtained through inference and evaluation conducted by us under the same experimental environment. 
+
+deviation of the weight distribution. During computation, 
+
+Wc is reshaped or broadcasted to (1 , 1, 1, K ) to re-weight the attention scores based on individual token importance. Consequently, this operation modifies the spatial weight coefficients for different tokens within Aw|t=0 .Finally, considering that the values of the attention weights are constrained within the range [0 , 1] , applying direct su-pervision to these weights often results in vanishingly small gradients, which fails to provide an effective spatial con-straint. To address this, we instead utilize the attention Value V at timestep t (as defined in Eq. 3) and compute the weighted product with the attention weight A′
+
+> w|t=0
+
+. This process yields A′
+
+> out
+
+, an attention feature that highlights re-gions represented by high-importance tokens. We then use 
+
+A′ 
+
+> out
+
+to enforce the supervisory constraints. 
+
+A′ 
+
+> out
+
+= ג(A′ 
+
+> w|t=0
+
+× V ), L sra = E[|| A′ 
+
+> out
+
+− Aout || 2] (7) 3.2.4. T RAINING PARADIGM 
+
+We observe that jointly introducing Lsra and Ldr often leads to training instability and model collapse. We attribute this issue primarily to the strong representation-level con-straints imposed by Lsra . In contrast, the Ldr module, built upon Flow Matching, is easily dominated by the gradients introduced by these strong constraints. As a result, its gra-dient contributions are overwhelmed, which can lead to instability and even training collapse in the middle and later stages. In the Appendix (Section Implementation and Train-ing Details), we provide a detailed analysis of this issue and propose a simple yet effective solution. Additional im-plementation and inference details are also included in the Appendix. 
+
+4. Experiments 
+
+4.1. Datasets and Evaluation Metrics 
+
+We train our model on the WebVid (Bain et al., 2021) dataset, which contains over 10 million video–text pairs covering a wide range of application scenarios and exhibiting sub-stantial semantic diversity. For evaluation, we additionally employ two sets of textual prompts to guide video genera-tion: one constructed with the assistance of ChatGPT and the other provided by VBench (Huang et al., 2024; 2025). To assess model performance, we generate videos condi-tioned on these two prompt sets and evaluate the results us-ing the EvalCrafter (Liu et al., 2024a) and VBench (Huang et al., 2024; 2025) evaluation frameworks. EvalCrafter pri-marily focuses on metrics such as temporal consistency and visual quality, while VBench further extends the evaluation dimensions to include aesthetic quality, object consistency, and semantic alignment. A more detailed description of the experimental setup and evaluation protocol is provided in the Appendix. 
+
+4.2. Comparison and Analysis with state-of-the-art Methods 
+
+To comprehensively validate the effectiveness of our method, we conduct experiments on both the open-source model Wan 2.1 1 (Wan et al., 2025) and the closed-source model Seedance1.0 exp (Gao et al., 2025) 2. To ensure a fair 
+
+> 1
+
+Wan 2.1 is a 14B-parameter model, with its pretrained weights available at: https://huggingface.co/Wan-AI/Wan2. 1-T2V-14B .
+
+> 2
+
+Seedance1.0 exp is a base model built upon Seedance 1.0, primarily used for internal experiments, with a total parameter 
+
+6Not all tokens contribute equally to diffusion learning 
+
+comparison, we fine-tune the base models under the same environment and dataset settings. First, we perform infer-ence evaluation using the prompts provided by the VBench benchmark (Huang et al., 2024) 3. As shown in Table 1, the models are quantitatively evaluated from 14 different di-mensions. The results clearly demonstrate that introducing DARE during training effectively improves the inference performance of the base models. For example, on semantic consistency metrics—Object Class, Multiple Objects, and Spatial Relationship—our method improves performance over Seedance1.0 exp by 5.3%, 3.2%, and 5.15%, respec-tively, and over Wan 2.1 by 0.24%, 9.92%, and 6.79%. Moreover, notable improvements are also observed on met-rics related to aesthetic quality and motion dynamics. We attribute these improvements primarily to two factors. First, during training, dynamically adjusting the contribution of different tokens according to the model’s learning status helps the model better capture the distributional guidance of high semantic-density tokens, thereby improving the se-mantic consistency between the generated content and the textual description. Second, spatial representation alignment effectively mitigates spatiotemporal collapse and enhances dynamic motion quality. In addition, we conduct a comprehensive evaluation of the generated results using the EvalCrafter benchmark (Liu et al., 2024a); detailed results are provided in the Experi-ments section of the supplementary. Since the prompts in VBench are relatively simple, we further construct an addi-tional set of 100 prompts using GPT, considering aspects such as semantic complexity, animation, and visual effects. These prompts are used to evaluate model performance un-der more complex conditions. The generated results are assessed using both VBench and EvalCrafter, and the de-tailed evaluation results are reported in the supplementary. 
+
+4.3. Ablation Studies 
+
+We conduct ablation studies under the VBench evaluation framework. For each ablated component, inference is per-formed using the corresponding evaluation subsets provided by VBench, and all metrics are computed accordingly. The evaluation results are reported in Table 2. 4.3.1. A BLATION STUDY OF DR-CFG AND SRA We separately analyze Distribution-Rectification Classifier-Free Guidance (DR-CFG) and Spatial Representation Align-ment (SRA), as shown in the first four rows of Table 2. As 
+
+count of 7B. To ensure a fair comparison, we fine-tune both models based on their respective pretrained weights. 
+
+> 3
+
+Prompt Link: https://github.com/Vchitect/ VBench/blob/master/vbench/VBench_full_info. json , Evaluation code Link: https://github.com/ Vchitect/VBench/tree/master/vbench 
+
+discussed in Section 3.2.4, using SRA alone tends to cause the model to overfit semantic information at the token level while neglecting spatial–temporal consistency. This results in severe inter-frame discontinuities and visual artifacts. Consequently, as shown in the second row of Table 2, em-ploying only SRA leads to varying degrees of performance degradation across evaluation perspectives. In contrast, com-pared with the third and fourth rows, using DR-CFG alone yields noticeable improvements in overall generation quality and exhibits more stable behavior. Notably, when DR-CFG and SRA are jointly applied, we observe a significant per-formance gain. This is primarily because SRA effectively accelerates model learning and convergence, while DR-CFG regulates the model’s fitting behavior across different tokens, enabling superior generation quality and evaluation perfor-mance under the same training conditions. 4.3.2. ABLATION STUDY ON THE SELECTION RATIO OF 
+
+LOW -S EMANTIC TOKENS 
+
+During training, we dynamically update the importance weights of different tokens and perform targeted selection accordingly. Considering real-world scenarios where text prompts are often short, setting an excessively high selection ratio may discard semantically informative tokens, leading to underfitting. To address this issue, we conduct an ablation study on the proportion of low-semantic tokens and evaluate ratios of 15%, 20%, and 25%, as reported in Rows 4–6 of Table 2. Under a unified evaluation protocol, we observe that when the proportion of low-semantic tokens is 15%, the average score reaches 67.61%. In comparison, the average scores drop to 66.22% and 66.01% for ratios of 20% and 25%, respectively. These results indicate that selecting 15% low-semantic tokens yields relatively better performance gains across evaluation metrics. Prompt : On the tree -lined path, the bride and groom stood sideways to the camera, the groom's right arm around the bride's                                 
+
+> waist, and the bride's right arm around the groom's neck .They gazed lovingly at each other, then the bride leaned forward
+> and kissed the groom .Agentle breeze lifted the bride's veil and skirt .
+> Token ratio: 15%
+> Token ratio: 20%
+> Token ratio: 25%
+
+Figure 3. Visual evaluation of the effects of varying proportions of low-semantic tokens on model performance. 
+
+Furthermore, to provide an intuitive comparison of how 7Not all tokens contribute equally to diffusion learning                                                                                          
+
+> Method Appearance Style(%) Overall Consistency(%) Temporal Style(%) Dynamic Degree(%) Aesthetic Quality(%) Background Consistency(%) Scene(%) w. -22.37 27.37 25.27 80.55 58.45 96.37 47.53 w. SRA 22.30 22.88 20.92 23.61 47.07 81.44 14.46 w. DR-CFG 22.38 27.62 24.91 81.95 58.57 96.87 46.80 w. DARE w. 15% 22.66 27.71 25.39 87.50 58.63 96.65 51.82
+> w. 20% 22.65 27.83 25.48 77.78 58.81 96.72 49.86 w. 25% 22.24 27.78 25.31 79.17 58.45 96.63 49.64 Motion Smoothness(%) Imaging Quality(%) Object Class(%) Spatial Relationship(%) Color(%) Subject Consistency(%) Multiple Objects(%) w. -98.39 67.07 87.26 49.26 84.69 95.76 76.45 w. SRA 97.91 60.78 53.09 42.04 87.74 73.42 19.89 w. DR-CFG 98.28 66.86 91.46 49.11 90.30 95.30 76.83
+> w. DARE w. 15% 98.39 67.96 92.56 54.41 87.39 95.88 79.65 w. 20% 98.26 67.53 87.18 51.51 88.65 95.49 79.27 w. 25% 98.37 67.37 92.33 52.74 84.64 95.26 74.16
+> Table 2. Ablation results analyzing the effects of Distribution-Rectification Classifier-Free Guidance (DR-CFG), Spatial Representation Alignment (SRA), and varying proportions of low-semantic tokens on model performance.
+
+different ratios affect the model’s distribution and genera-tion capability, we visualize the generation results under the three settings in Fig. 3. As shown in Fig. 3, when the low-semantic token ratio is set to 15%, applying differ-ential reweighting constraints to the model-predicted flow matching loss leads to clear advantages in terms of semantic consistency with the conditioning input and spatial structure alignment in the generated content. 
+
+4.4. Visualization Analysis of Distribution and Attention Rectification Effects 
+
+To provide a more comprehensive analysis of the practi-cal gains introduced by our method, we examine the guid-ance and contribution of different types of tokens during inference. Specifically, we extract token-level signals and evaluate the model’s behavioral changes before and after introducing DARE from the perspective of attention scores. As illustrated in Fig. 4a, for the low semantic-density (high-frequency) token “fly”, the attention score decreases after integrating DARE into Seedance1.0 exp. In the baseline model, this token produces attention that broadly covers the image content, causing the model to be excessively influ-enced by “fly” during inference and consequently overlook tokens related to “gradually landing”. Similarly, in Fig. 4b, for the high semantic-density token group “right arm around waist”, the average attention score increases after introducing DARE. The attention map further shows that, in the baseline model, the attention associated with this token group does not converge and exhibits a clear uncertainty distribution. This unstable attention allocation leads to semantic confusion during inference and results in incorrect spatial constraints in the generated outputs. From both the quantitative attention scores and the qual-itative attention maps, it is evident that a severely imbal-anced token distribution causes the model to overfit low semantic-density tokens, while high semantic-density to-kens are insufficiently learned. As a result, during inference, low semantic-density tokens exert disproportionately strong guidance, leading to incorrect content generation. By incor-porating DARE during training, we dynamically correct the model’s distributional bias and recalibrate token-level atten-tion intensity. This effectively mitigates the imbalance issue and significantly improves generation quality. Additionally, we include in the appendix an evaluation of the attention scores for tail tokens containing high-density semantic in-formation. The results provide an intuitive illustration that the introduction of DARE effectively enhances the model’s ability to understand and learn from high-density semantic information. 
+
+4.5. Qualitative Analysis 
+
+We conduct video generation and quality evaluation by guiding the model with textual prompts from both our self-constructed evaluation dataset and the VBench benchmark. As shown in Fig. 5, we compare our results with those produced by the current state-of-the-art video generation model, Seedance (Gao et al., 2025). On the self-constructed evaluation dataset, our textual prompts are relatively more complex, which leads to more noticeable differences in the generated results. For example, in the first row, the prompt specifies “ The camera pans to the left ,” whereas Seedance, following a default tendency, moves the camera to the right. In contrast, our method accurately interprets the instruction and rotates the camera to the left. Similarly, in the second row, Seedance ignores the semantic information related to 8Not all tokens contribute equally to diffusion learning Prompt : 机场上 ，全景镜头拍摄一架客机向画面左侧飞 ，逐渐降落 。画面左侧是落日下的机场塔台 。随后镜头轻微下摇 ，画
+
+> 面里出现一个小绿点闪动 。
+> Attention score for the token ‘ ⻜(fly) ’
+> Seedance1.0_exp W. DARE
+> Seedance1.0_exp W. DARE
+> Attention
+> Map
+> Generate
+> Result
+
+(a) Impact of Low-Semantic-Density (High-Frequency) Tokens on Attention Scores and Distributions During Inference. Prompt : On the tree -lined path, the bride and groom stood sideways to the camera, the groom's right arm around the bride's waist, and the                                   
+
+> bride's right arm around the groom's neck .They gazed lovingly at each other, then the bride leaned forward and kissed the groom .Agentle
+> breeze lifted the bride's veil and skirt .
+> Average attention score for the token ‘right arm around waist ’
+> Seedance1.0_exp W. DARE
+> Seedance1.0_exp W. DARE
+> Attention Map
+> Generate Result
+
+(b) Impact of High-Semantic-Density (Low-Frequency) Tokens on Attention Scores and Distributions During Inference. 
+
+Figure 4. Visualization of Token-Level Guidance Dynamics Before and After DARE from the Perspective of Attention Scores and Distributions. Seedance1.0_exp W. DARE 
+
+Prompt: The camera pans to the left , capturing a villa residential area surrounded by lush greenery, with a large parking lot in the distance filled with cars. 
+
+Seedance1.0_exp W. DARE 
+
+Prompt: 机场上，全景镜头拍摄一架客机向画面左侧飞， 
+
+逐渐降落 。画面左侧是落日下的机场塔台。随后镜头轻微下摇，画面里出现一个小绿点闪动。 
+
+Self -built 
+
+prompt 
+
+Seedance1.0_exp W. DARE 
+
+Prompt : In a still frame, gas station. 
+
+Seedance1.0_exp W. DARE 
+
+Prompt: a toilet, frozen in time. 
+
+VBench 
+
+prompt 
+
+Figure 5. Visual quality evaluation of generation results based on a self-constructed evaluation dataset and the VBench benchmark. 
+
+the airplane landing , resulting in deviations in the generated video. In the VBench evaluation set, the prompts are gener-ally simpler and shorter, so the overall video content does not exhibit significant differences. However, substantial dis-parities can be observed in the quality of generated entities, such as “fuel tanks” and “toilets.” Compared with Seedance, our method produces results that are more accurate and more consistent with real-world appearances. Additional qualita-tive comparisons of video generation results are provided in the appendix. 
+
+5. Conclusion 
+
+This paper investigates the overlooked issue of semantic to-ken imbalance in conditional diffusion models, where long-tailed token distributions and cross-attention inconsistencies cause semantically dense tokens to be underutilized. To address this problem, we propose Distribution-Aware Recti-fication and Spatial Ensemble (DARE), a unified framework that improves conditional diffusion from both distributional and spatial perspectives. Specifically, DR-CFG mitigates distributional bias during training by suppressing the gra-dients of high-frequency, low-density semantic tokens. In parallel, SRA enhances the spatial influence of semanti-cally important tokens through importance-aware attention reweighting and representation alignment. Extensive ex-periments demonstrate consistent improvements in seman-tic fidelity and generation quality across multiple bench-marks. We believe our findings highlight the importance of distribution-aware training and semantic-aware spatial alignment for advancing reliable and controllable diffusion models. Furthermore, the appendix also discusses the limi-tations of the current work and outlines potential directions for future research. 9Not all tokens contribute equally to diffusion learning 
+
+References 
+
+Bai, J., Bai, S., Chu, Y., Cui, Z., Dang, K., Deng, X., Fan, Y., Ge, W., Han, Y., Huang, F., Hui, B., Ji, L., Li, M., Lin, J., Lin, R., Liu, D., Liu, G., Lu, C., Lu, K., Ma, J., Men, R., Ren, X., Ren, X., Tan, C., Tan, S., Tu, J., Wang, P., Wang, S., Wang, W., Wu, S., Xu, B., Xu, J., Yang, A., Yang, H., Yang, J., Yang, S., Yao, Y., Yu, B., Yuan, H., Yuan, Z., Zhang, J., Zhang, X., Zhang, Y., Zhang, Z., Zhou, C., Zhou, J., Zhou, X., and Zhu, T. Qwen technical report. arXiv preprint arXiv:2309.16609 , 2023. Bain, M., Nagrani, A., Varol, G., and Zisserman, A. Frozen in time: A joint video and image encoder for end-to-end retrieval. In Proceedings of the IEEE/CVF international conference on computer vision , pp. 1728–1738, 2021. Blattmann, A., Dockhorn, T., Kulal, S., Mendelevitch, D., Kilian, M., Lorenz, D., Levi, Y., English, Z., Voleti, V., Letts, A., et al. Stable video diffusion: Scaling latent video diffusion models to large datasets. arXiv preprint arXiv:2311.15127 , 2023. Chen, D.-Y., Bandyopadhyay, H., Zou, K., and Song, Y.-Z. Normalized attention guidance: Universal neg-ative guidance for diffusion model. arXiv preprint arXiv:2505.21179 , 2025. Esser, P., Kulal, S., Blattmann, A., Entezari, R., M ¨uller, J., Saini, H., Levi, Y., Lorenz, D., Sauer, A., Boesel, F., et al. Scaling rectified flow transformers for high-resolution image synthesis. In Forty-first international conference on machine learning , 2024. Gao, Y., Guo, H., Hoang, T., Huang, W., Jiang, L., Kong, F., Li, H., Li, J., Li, L., Li, X., et al. Seedance 1.0: Exploring the boundaries of video generation models. arXiv preprint arXiv:2506.09113 , 2025. Guo, Y., Yang, C., Rao, A., Liang, Z., Wang, Y., Qiao, Y., Agrawala, M., Lin, D., and Dai, B. Animatediff: Animate your personalized text-to-image diffusion models without specific tuning. arXiv preprint arXiv:2307.04725 , 2023. He, Y., Yang, T., Zhang, Y., Shan, Y., and Chen, Q. Latent video diffusion models for high-fidelity video genera-tion with arbitrary lengths. arxiv 2022. arXiv preprint arXiv:2211.13221 .Ho, J. and Salimans, T. Classifier-free diffusion guidance. 
+
+arXiv preprint arXiv:2207.12598 , 2022. Hong, S. Smoothed energy guidance: Guiding diffusion models with reduced energy curvature of attention. Ad-vances in Neural Information Processing Systems , 37: 66743–66772, 2024. Hong, W., Ding, M., Zheng, W., Liu, X., and Tang, J. Cogvideo: Large-scale pretraining for text-to-video gener-ation via transformers. arXiv preprint arXiv:2205.15868 ,2022. Huang, Z., He, Y., Yu, J., Zhang, F., Si, C., Jiang, Y., Zhang, Y., Wu, T., Jin, Q., Chanpaisit, N., et al. Vbench: Compre-hensive benchmark suite for video generative models. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 21807–21818, 2024. Huang, Z., Zhang, F., Xu, X., He, Y., Yu, J., Dong, Z., Ma, Q., Chanpaisit, N., Si, C., Jiang, Y., et al. Vbench++: Comprehensive and versatile benchmark suite for video generative models. IEEE Transactions on Pattern Analy-sis and Machine Intelligence , 2025. Karras, T., Aittala, M., Aila, T., and Laine, S. Elucidating the design space of diffusion-based generative models. 
+
+Advances in neural information processing systems , 35: 26565–26577, 2022. Kong, W., Tian, Q., Zhang, Z., Min, R., Dai, Z., Zhou, J., Xiong, J., Li, X., Wu, B., Zhang, J., et al. Hunyuan-video: A systematic framework for large video generative models. arXiv preprint arXiv:2412.03603 , 2024. Labs, B. F. Flux. https://github.com/ black-forest-labs/flux , 2024. Li, Y., Min, M., Shen, D., Carlson, D., and Carin, L. Video generation from text. In Proceedings of the AAAI confer-ence on artificial intelligence , volume 32, 2018. Lipman, Y., Chen, R. T., Ben-Hamu, H., Nickel, M., and Le, M. Flow matching for generative modeling. arXiv preprint arXiv:2210.02747 , 2022. Liu, Y., Cun, X., Liu, X., Wang, X., Zhang, Y., Chen, H., Liu, Y., Zeng, T., Chan, R., and Shan, Y. Evalcrafter: Benchmarking and evaluating large video generation models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 22139– 22149, 2024a. Liu, Z., Liang, W., Liang, Z., Luo, C., Li, J., Huang, G., and Yuan, Y. Glyph-byt5: A customized text encoder for accurate visual text rendering. In European Conference on Computer Vision , pp. 361–377. Springer, 2024b. Pan, Y., Qiu, Z., Yao, T., Li, H., and Mei, T. To create what you tell: Generating videos from captions. In Proceedings of the 25th ACM international conference on Multimedia ,pp. 1789–1798, 2017. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., et al. Learning transferable visual models from natural 10 Not all tokens contribute equally to diffusion learning 
+
+language supervision. In International conference on machine learning , pp. 8748–8763. PmLR, 2021. Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M., Zhou, Y., Li, W., and Liu, P. J. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of machine learning research , 21 (140):1–67, 2020. Ronneberger, O., Fischer, P., and Brox, T. U-net: Convolu-tional networks for biomedical image segmentation. In In-ternational Conference on Medical image computing and computer-assisted intervention , pp. 234–241. Springer, 2015. Sadat, S., Kansy, M., Hilliges, O., and Weber, R. M. No training, no problem: Rethinking classifier-free guidance for diffusion models. arXiv preprint arXiv:2407.02687 ,2024. Shen, D., Song, G., Xue, Z., Wang, F.-Y., and Liu, Y. Re-thinking the spatial inconsistency in classifier-free diffu-sion guidance. In Proceedings of the IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition , pp. 9370–9379, 2024. Singer, U., Polyak, A., Hayes, T., Yin, X., An, J., Zhang, S., Hu, Q., Yang, H., Ashual, O., Gafni, O., et al. Make-a-video: Text-to-video generation without text-video data. 
+
+arXiv preprint arXiv:2209.14792 , 2022. Song, Y., Sohl-Dickstein, J., Kingma, D. P., Kumar, A., Er-mon, S., and Poole, B. Score-based generative modeling through stochastic differential equations. arXiv preprint arXiv:2011.13456 , 2020. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., and Polosukhin, I. At-tention is all you need. Advances in neural information processing systems , 30, 2017. Wan, T., Wang, A., Ai, B., Wen, B., Mao, C., Xie, C.-W., Chen, D., Yu, F., Zhao, H., Yang, J., et al. Wan: Open and advanced large-scale video generative models. arXiv preprint arXiv:2503.20314 , 2025. Wang, F.-Y., Shui, Y., Piao, J., Sun, K., and Li, H. Diffusion-npo: Negative preference optimization for better pref-erence aligned generation of diffusion models. arXiv preprint arXiv:2505.11245 , 2025a. Wang, J., Yuan, H., Chen, D., Zhang, Y., Wang, X., and Zhang, S. Modelscope text-to-video technical report. 
+
+arXiv preprint arXiv:2308.06571 , 2023. Wang, Y., Chen, X., Ma, X., Zhou, S., Huang, Z., Wang, Y., Yang, C., He, Y., Yu, J., Yang, P., et al. Lavie: High-quality video generation with cascaded latent diffusion models. International Journal of Computer Vision , 133 (5):3059–3078, 2025b. Xie, E., Chen, J., Chen, J., Cai, H., Tang, H., Lin, Y., Zhang, Z., Li, M., Zhu, L., Lu, Y., et al. Sana: Efficient high-resolution image synthesis with linear diffusion trans-formers. arXiv preprint arXiv:2410.10629 , 2024. Yang, Z., Teng, J., Zheng, W., Ding, M., Huang, S., Xu, J., Yang, Y., Hong, W., Zhang, X., Feng, G., et al. Cogvideox: Text-to-video diffusion models with an ex-pert transformer. arXiv preprint arXiv:2408.06072 , 2024. Yu, S., Kwak, S., Jang, H., Jeong, J., Huang, J., Shin, J., and Xie, S. Representation alignment for generation: Training diffusion transformers is easier than you think. 
+
+arXiv preprint arXiv:2410.06940 , 2024. Zeng, Y., Wei, G., Zheng, J., Zou, J., Wei, Y., Zhang, Y., and Li, H. Make pixels dance: High-dynamic video generation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 8850– 8860, 2024. Zhou, D., Wang, W., Yan, H., Lv, W., Zhu, Y., and Feng, J. Magicvideo: Efficient video generation with latent diffu-sion models. arXiv preprint arXiv:2211.11018 , 2022. 11 Not all tokens contribute equally to diffusion learning 
+
+A. Implementation and Training Details 
+
+A.1. Implementation Details 
+
+To ensure a fair and accurate evaluation, we strictly keep all training resources and configurations consistent across experiments, including computational budget and the total number of iterations. Specifically, all models are trained under the Fully Sharded Data Parallel (FSDP) framework using 16 H20 GPUs. During training, we adopt a linear warm-up schedule with a learning rate of 1.5e-4 and apply gradient clipping to prevent training instability. Each model is trained for 30,000 iterations with an identical amount of training data to ensure comparability. 
+
+A.2. Training Details                                                                          
+
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+>       
+> 
+> 
+>  
+> 
+> 
+> 
+>  
+> 
+> 
+> The image is
+> blurry, focusing on
+> aclose -up of a
+> men's wrist watch
+> worn on aleft
+> wrist .Only part of
+> the watch is visible
+> on the screen .It
+> features asilver
+> metal strap and
+> case, ablack dial,
+> and silver hands .
+> The camera pans
+> to the left, circling
+> the watch and
+> capturing the dial
+> and strap .The
+> camera then
+> gradually zooms in
+> for aclose -up of
+> the watch .White
+> background .
+> Baseline (Using only flow matching loss)
+> Baseline w/ Lsra (inference in 5k)
+> Baseline w/ Lsra (inference in 20k)
+> Training iteration
+> Loss
+
+Figure 6. The loss curve during training is shown. Introducing 
+
+Lsra accelerates the model’s fitting of the conditional semantic representation, enhancing the semantic consistency between the video and the conditional text. However, in the later stages of training, this leads to oscillations in the loss, causing model in-stability and a shift in focus towards the consistency between the conditional semantics and individual frame images. 
+
+During model training, we initially assigned equal weights to Ldr and Lsra . Observations indicated that in the early stages, Lsra gradually converged, effectively enhancing the model’s ability to fit prompts and accelerating the learning of specific token information. However, during the mid-to-late stages, Lsra began to oscillate, leading to model collapse as iterations increased. As shown in Fig. 6, introducing SRA for token-level spatial representation alignment effec-tively strengthens token-level guidance, enabling the model to achieve improved semantic adherence with a minimal number of training steps. However, as training progresses, the model becomes unstable and eventually collapses, lead-ing to the loss of temporal consistency across video frames. Instead, the model tends to overfit the relationship between individual frames and the conditional text prompts. We hy-pothesize that using Mean Squared Error (MSE) for spatial representation constraints in Lsra generates larger gradients. This causes the model to prioritize optimization gains from the Attention mechanism while neglecting the Flow Loss (Ldr ). To address this, we developed an adaptive weighting strategy based on training steps. This strategy prioritizes the spatial constraints of Lsra in the early stages to accelerate convergence, then transitions to Ldr dominance in the later stages to correct the distribution fitting, encouraging the model to learn distribution predictions guided by complex semantic tokens. 
+
+(α = max (0 .0, 11+ e(0.001 ∗(I−ℏ)) ),Ldare = α · Lsra + (1 − α) · Ldr 
+
+(8) In the above equation, I denotes the number of training iter-ations, and ℏ represents the position of the Lsra oscillation point. 
+
+A.3. Inference Details 
+
+During inference, we use 8 NVIDIA H20 GPUs and strictly follow the same inference configuration as Wan 2.1. The sampling process runs for 40 steps with a classifier-free guidance (CFG) scale of 5.0. The negative prompt is set to: ” Worst quality, Normal quality, Low quality, Low res, Blurry, Jpeg artifacts, Grainy, text, logo, watermark, ban-ner, extra digits, signature, subtitling, Bad anatomy, Bad proportions, Deformed, Disconnected limbs, Disfigured, Ex-tra arms, Extra limbs, Extra hands, Fused fingers, Gross proportions, Long neck, Malformed limbs, Mutated, Mu-tated hands, Mutated limbs, Missing arms, Missing fingers, Poorly drawn hands, Poorly drawn face, Nsfw, Uncensored, Cleavage, Nude, Nipples, Overexposed, Plain background, Grainy, Underexposed, Deformed structures. ”
+
+B. Experiments 
+
+B.1. Datasets 
+
+WebVid (Bain et al., 2021) is a large-scale web video–text alignment dataset containing over 10 million video–caption pairs. Compared with traditional manually annotated datasets, it offers much larger scale and richer semantic diversity, covering a wide range of scenarios. This makes it well suited for pretraining and fine-tuning models for video generation and cross-modal alignment. Since the captions are collected from the web, the dataset inevitably contains noise, which can help improve model robustness and generalization ability during training. During model performance evaluation, we generate videos using two sets of textual prompts. The first set consists of 100 prompts constructed with the assistance of GPT, while the second set contains 946 prompts provided by VBench (Huang et al., 2024; 2025). 12 Not all tokens contribute equally to diffusion learning                                     
+
+> Method VBench Imaging Quality(%) ↑Dynamic Degree(%) ↑Aesthetic Quality(%) ↑Subject Consistency(%) ↑Background Consistency(%) ↑Motion Smoothness(%) ↑
+> Wan 2.1 58.01 96.00 45.28 89.61 92.01 98.04 w. DARE (Ours) 63.12 84.00 44.50 95.19 95.64 99.19 Seedance1.0 exp 69.55 94.00 49.56 93.32 94.52 98.44 w. DARE (Ours) 69.29 89.00 49.79 93.39 94.65 98.46
+
+Method EvalCrafter CLIP Temp ↑ SD Score ↑ CLIP Score ↑ Face Consistency ↑ BLIP BLUE ↑ IS ↑ IS std ↓ Flow Score Warping Error ↓
+
+Wan 2.1 0.9970 0.667 0.222 0.987 0.032 6.63 1.12 5.81 243.1 w. DARE (Ours) 0.9992 0.675 0.231 0.993 0.035 6.08 0.75 3.18 102.9 Seedance1.0 exp 0.9975 0.661 0.218 0.985 0.028 6.54 0.73 2.43 212.4 w. DARE (Ours) 0.9975 0.665 0.219 0.985 0.028 6.61 0.83 2.35 218.7  
+
+> Table 3. Evaluation results of generated outputs under the VBench (Huang et al., 2024; 2025) and EvalCrafter (Liu et al., 2024a) frameworks using self-designed evaluation prompts.
+
+B.2. Evaluation Metrics 
+
+To comprehensively evaluate the video generation capability of our model, we conduct a thorough assessment of the gen-erated results using the EvalCrafter (Liu et al., 2024a) and VBench (Huang et al., 2024; 2025) evaluation frameworks. EvalCrafter provides a fine-grained and multi-dimensional evaluation by considering several key aspects, including temporal consistency, text–video alignment, image quality and diversity, and inter-frame continuity. This framework enables detailed analysis of different components that con-tribute to video generation quality. VBench offers a more comprehensive evaluation protocol. It incorporates addi-tional factors such as video aesthetic quality, motion dy-namics, subject consistency, semantic alignment between the video and the input description, and global video coher-ence, thereby further extending the evaluation scope and enabling a more holistic assessment of generation quality. Furthermore, this benchmark provides dimension-specific video prompts tailored to different evaluation aspects, al-lowing the model’s generation performance to be assessed more precisely and in a more targeted manner from multiple perspectives. 
+
+B.3. Performance evaluation on the self-constructed benchmark dataset 
+
+To further validate the effectiveness of our method, we ad-ditionally used GPT to construct 100 instructions. These instructions are semantically more complex, closer to real-world scenarios, and better reflect the performance of the base models. Based on this instruction set, we conducted model inference and evaluated the generated results using two benchmarks, VBench (Huang et al., 2024) and Eval-Crafter (Liu et al., 2024a). As shown in Table 3, after introducing DARE, the performance improves across multi-ple evaluation aspects compared with Seedance (Gao et al., 2025). However, the improvement is relatively modest. In contrast, our method achieves significant performance gains on Wan (Wan et al., 2025). This is mainly because existing evaluation metrics focus primarily on image quality and content consistency. Since Seedance already mitigates col-lapse issues to a certain extent, introducing DARE on top of it does not lead to substantial improvements under these metrics. For Wan, however, the base model may still suffer from various collapse or degradation issues. After integrat-ing DARE, these issues are effectively suppressed, leading to improved spatiotemporal continuity and reduced collapse across frames. These results indicate that our method, which performs distribution correction and spatial alignment from the perspective of tokens, not only enhances the model’s ability to learn semantic representations of different tokens but also effectively mitigates spatiotemporal collapse caused by abrupt inter-frame transitions. 
+
+B.4. Performance evaluation on the VBench benchmark dataset 
+
+Although the generated results have already been evalu-ated using the VBench benchmark, we further introduce an additional benchmark to provide a more comprehensive evaluation of our method. Specifically, we use EvalCrafter to assess the generation results produced with the same VBench prompts. As shown in Table 4, EvalCrafter pri-marily evaluates generated content from the perspectives of image quality and visual perception. We observe that, after introducing DARE, the model achieves consistent improve-ments in both visual perception alignment and semantic alignment. In addition, compared with the relatively weaker baseline Wan, incorporating our method not only yields advantages in semantic perception evaluation but also ef-fectively prevents the occurrence of generation collapse. 13 Not all tokens contribute equally to diffusion learning 
+
+Method EvalCrafter CLIP Temp ↑ SD Score ↑ CLIP Score ↑ Face Consistency ↑ BLIP BLUE ↑ IS ↑ IS std ↓ Flow Score Warping Error ↓
+
+Wan 2.1 0.9983 0.7135 0.2098 0.9923 0.2137 12.63 2.147 2.25 124.73 w. DARE (Ours) 0.9988 0.7235 0.2150 0.9929 0.2154 11.11 3.193 1.56 71.32 Seedance1.0 exp 0.9986 0.7167 0.214 0.9909 0.2552 15.02 3.94 1.15 141.798 w. DARE (Ours) 0.9986 0.7195 0.214 0.9907 0.2625 15.33 3.75 1.16 152.028 
+
+Table 4. Evaluation results of generated outputs under the EvalCrafter (Liu et al., 2024a) frameworks using the prompts provided by VBench. 0 20 40 60 80 100 
+
+> Token
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> Score
+> Seedance
+> W. DARE
+
+(a) Seedance  
+
+> 40.6%
+> W. DARE
+> 59.4%
+
+(b) Seedance1.0_exp 
+
+> 51.0295
+> W. DARE
+> +1.8776
+
+(c) Figure 7. Visual comparison and analysis of the attention scores produced by high-density semantic tokens during the inference stage. Using 101 high-density semantic tokens extracted through statistical analysis, (a) illustrates the changes in the attention scores of different tokens before and after introducing DARE; (b) shows the proportion of tokens that exhibit a significant increase in attention scores after incorporating DARE; and (c) presents the overall variation in attention scores before and after applying DARE. 
+
+B.5. Attention Score–Based Visualization of High-Density Semantic Token Learning 
+
+To further investigate the model’s learning dynamics on tokens of varying semantic densities before and after inte-grating DARE, we sampled 101 high-semantic-density (i.e., high-importance-weight) tokens based on data stored dur-ing training. We then conducted single-token inference to extract the attention score for each token. As illustrated in Fig. 7, we analyze the results from three perspectives. First, Fig. 7a presents a visual comparison of the attention scores across all selected tokens. To explicitly highlight the overall shift in attention scores caused by DARE, Fig. 7b illustrates the proportion of tokens exhibiting score improvements. Ev-idently, after incorporating DARE, approximately 59.4% of the tokens demonstrated deepened learning, indicating enhanced attention allocation and distribution-fitting capa-bilities. Furthermore, Fig. 7c compares the mean attention scores; the baseline average of 51.0295 increased by 1.8776 following the introduction of DARE. In summary, the integration of DARE effectively bolsters the model’s ability to learn high-semantic-density tokens and intensifies its focus on them, thereby mitigating the information loss typically caused by over-attending to low-density semantic tokens. This substantiates that DARE significantly elevates generation quality while ensuring the output aligns more faithfully with the conditional semantic information. 
+
+B.6. More qualitative comparison and analysis 
+
+To more clearly demonstrate the effect of DARE on gener-ation quality, we conduct qualitative comparisons on two evaluation sets using two base models. First, we present visual comparisons using Seedance (Gao et al., 2025) on both a self-constructed dataset and the VBench benchmark. As shown in Fig. 8, on the self-constructed dataset, Seedance tends to lose fine-grained semantic details. For example, in the second row, tokens such as “A” and “F” are ignored, while the model focuses primarily on the “rectangular pendant.” In contrast, by in-troducing token-level spatial consistency alignment, DARE preserves these fine-grained semantic details. Similarly, in the third row, Seedance fails to capture spatial positional relationships, leading to incorrect placement of the “groom” and “bride,” whereas DARE produces spatially consistent 14 Not all tokens contribute equally to diffusion learning Seedance1.0_exp W. DARE                                                                                                                                                                     
+
+> Prompt: 镜头左摇拍摄雪地和树林。雪地上有一条公路，公路左侧的 树林和树枝都被雪覆盖 ，画面 左侧有一条红色的围栏，栏杆上也挂着一些雪 。
+> Seedance1.0_exp W. DARE
+> Prompt :Aclose -up shot shows agold necklace adorned with letters and aheart .The necklace features arectangular pendant bearing the letters "A" and "F"
+> along with aheart .The pendant hangs from athin gold chain and is held by ahand .The background shows the skin of the hand, revealing fine lines and wrinkles .A
+> close -up shot from above shows aperson holding the pendant in their right hand .The pendant, decorated with letters and aheart, reflects light .The hand trembles
+> slightly, causing the pendant to sway .The hand then rotates its wrist, revealing the pendant face up .
+> Seedance1.0_exp W. DARE
+> Prompt :On the tree -lined path, the bride and groom stood sideways to the camera, the groom's right arm around the bride's waist ,and the bride's right arm around
+> the groom's neck .They gazed lovingly at each other, then the bride leaned forward and kissed the groom .Agentle breeze lifted the bride's veil and skirt .
+> Seedance1.0_exp W. DARE
+> Prompt: A tranquil tableau of at the edge of the Arabian Desert, the ancient city of Petra beckoned with its enigmatic rock -carved façad es .
+> Self -built
+> prompt
+> VBench
+> prompt
+> Seedance1.0_exp W. DARE
+> Prompt: an airplane and a train.
+> Seedance1.0_exp W. DARE
+> Prompt :A person is sailing
+> Seedance1.0_exp W. DARE
+> Prompt :a remote and a keyboard
+
+Figure 8. Qualitative comparison of generation results produced by Seedance before and after introducing DARE on the self-constructed dataset and the VBench benchmark. 
+
+results. On the VBench benchmark, although the prompts are relatively simple, the generated results often lack dy-namic motion. For example, in the second row, the airplane and train remain largely static when generated by Seedance. After applying DARE, noticeable dynamic interaction be-tween the objects emerges. In the third row, Seedance ex-hibits clear spatial misalignment, while DARE significantly improves spatial consistency and overall generation quality, producing results that better reflect realistic motion. Second, we perform qualitative comparisons using Wan 2.1 (Wan et al., 2025) on the self-constructed dataset. As shown in Fig. 9, the base model often suffers from instability or collapse under complex semantic conditions. In the first row, the result generated by Wan 2.1 collapses and fails to capture spatial relationships, focusing only on a subset of tokens (e.g., “boy” and “can”) while ignoring other se-mantic cues. After introducing DARE, the collapse issue is largely mitigated and the generated content becomes highly consistent with the provided semantic guidance. Similar collapse issues appear in rows 3, 4, 6, and 8, all of which are significantly improved with DARE. In rows 2, 5, and 7, the base model ignores certain semantic tokens, leading to clear inconsistencies between the generated content and the prompt. In contrast, DARE effectively improves semantic alignment while suppressing collapse. Finally, we present qualitative comparisons using Wan 2.1 on the VBench benchmark (Fig. 10). Even with short and simple prompts, the base model may exhibit semantic mis-15 Not all tokens contribute equally to diffusion learning 
+
+understanding or local collapse. For example, in rows 3 and 4, significant semantic misinterpretation leads to poor gener-ation quality. In rows 1, 2, and 5, although the instructions are simple, distribution mismatch still results in localized collapse. With DARE, both generation quality and semantic consistency are significantly improved. Overall, incorporating DARE into different base models consistently improves generation quality across multiple benchmarks. In particular, it enhances semantic fidelity while effectively mitigating generation collapse, demonstrat-ing that the proposed components provide complementary solutions for improving conditional guidance and generation stability. 16 Not all tokens contribute equally to diffusion learning Wan 2.1 W. DARE 
+
+Prompt : By the river, a close -up of the side face of a man wearing glasses . He holds a microphone in his right hand and speaks, and then raises the microphone to the 
+
+mouth of a woman wearing a white veil . The woman frowns and speaks with emotion .
+
+Wan 2.1 W. DARE 
+
+Prompt : The camera moves to the left, photographing the Ferris wheel and buildings on the seaside, with the water sparkling . The picture quality is abnormal and 
+
+there are black spots on the picture . The picture is abnormal and there are black spots on the picture .
+
+Wan 2.1 W. DARE 
+
+Prompt : In the studio, the camera looked down and shot a woman in blue squatting on the groun d, holding a painting in her hands, and then placing it on the ground 
+
+to piece together a large puzzle . Next to her, a woman wrapped in a black and white blanket squatted on the ground and looked at the puzzle seriously .
+
+Wan 2.1 W. DARE 
+
+Prompt : The man smiled happily, holding the can in both hands, twisting his body , swinging his arms, and shaking the can while talking . There were two boys sitting 
+
+on the couch in the back living room .
+
+Wan 2.1 W. DARE 
+
+Prompt : The camera takes a close -up shot of a koi swimming in a blue basin . The camera follows the movement of the koi . There is no water in the basin, and the 
+
+koi rubs its body against the walls of the basin .
+
+Wan 2.1 W. DARE 
+
+Prompt : The groom smiled and slowly approached the bride . The bride smiled and looked at the groom . The groom took the bride's hands and kissed . Then 
+
+they looked at each other and the bride smiled .
+
+Wan 2.1 W. DARE 
+
+Prompt : The camera pans to the right to capture a woman riding a horse and galloping . Horse hooves kicked up dust . The woman has a serious expression . There is 
+
+grass in the background . The picture shows the woman's whole body . There are trees in the background .
+
+Wan 2.1 W. DARE 
+
+Prompt : On the boulevard, the groom and the bride stood sideways facing the camera . The groom held the bride's waist with his right hand, and the bride held the 
+
+groom's neck with her right hand . They look at each other lovingly, and then the bride leans forward and kisses the groom . The breeze blew the bride's veil 
+
+and skirt .
+
+Figure 9. Qualitative comparison of generation results produced by Wan 2.1 before and after introducing DARE on the self-constructed dataset. 
+
+17 Not all tokens contribute equally to diffusion learning Wan 2.1 W. DARE 
+
+Prompt: A tranquil tableau of tower 
+
+Wan 2.1 W. DARE 
+
+Prompt: a cow and an elephant 
+
+Wan 2.1 W. DARE 
+
+Prompt : A panda drinking coffee in a cafe in Paris, oil painting 
+
+Wan 2.1 W. DARE 
+
+Prompt: a laptop, frozen in time 
+
+Wan 2.1 W. DARE 
+
+Prompt: A tranquil tableau of kitchen 
+
+Wan 2.1 W. DARE 
+
+Prompt : A tranquil tableau of palace 
+
+Wan 2.1 W. DARE 
+
+Prompt: A person is sharpening knives 
+
+Wan 2.1 W. DARE 
+
+Prompt: A person is knitting 
+
+Wan 2.1 W. DARE 
+
+Prompt: A person is baby waking up 
+
+Wan 2.1 W. DARE 
+
+Prompt: A person is massaging legs 
+
+Figure 10. Qualitative comparison of generation results produced by Wan 2.1 before and after introducing DARE on the VBench benchmark. 
+
+18

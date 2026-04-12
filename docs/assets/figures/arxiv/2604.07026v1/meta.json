@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-001.webp",
+      "caption": "Table 1. Evaluation results of generated outputs under the VBench (Huang et al., 2024; 2025) frameworks using the prompts provided by VBench. § indicates that the results of the corresponding methods are taken from (Huang et al., 2024), while all other results are obtained through inference and evaluation conducted by us under the same experimental environment.",
+      "page": 6,
+      "index": 1,
+      "width": 1013,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-002.webp",
+      "caption": "Figure 8. Qualitative comparison of generation results produced by Seedance before and after introducing DARE on the self-constructed dataset and the VBench benchmark.",
+      "page": 15,
+      "index": 2,
+      "width": 1015,
+      "height": 882
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-003.webp",
+      "caption": "Figure 3. Visual evaluation of the effects of varying proportions of low-semantic tokens on model performance.",
+      "page": 7,
+      "index": 3,
+      "width": 490,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-004.webp",
+      "caption": "Table 4. Evaluation results of generated outputs under the EvalCrafter (Liu et al., 2024a) frameworks using the prompts provided by VBench.",
+      "page": 14,
+      "index": 4,
+      "width": 1013,
+      "height": 181
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-005.webp",
+      "caption": "Figure 7. Visual comparison and analysis of the attention scores produced by high-density semantic tokens during the inference stage. Using 101 high-density semantic tokens extracted through statistical analysis, (a) illustrates the changes in the attention scores of different tokens before and after introducing DARE; (b) shows the proportion of tokens that exhibit a significant increase in attention scores after incorporating DARE; and (c) presents the overall variation in attention scores before and after applying DARE.",
+      "page": 14,
+      "index": 5,
+      "width": 973,
+      "height": 362
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-006.webp",
+      "caption": "Figure 10. Qualitative comparison of generation results produced by Wan 2.1 before and after introducing DARE on the VBench benchmark.",
+      "page": 18,
+      "index": 6,
+      "width": 1017,
+      "height": 1237
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-007.webp",
+      "caption": "Table 3. Evaluation results of generated outputs under the VBench (Huang et al., 2024; 2025) and EvalCrafter (Liu et al., 2024a) frameworks using self-designed evaluation prompts.",
+      "page": 13,
+      "index": 7,
+      "width": 1008,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-008.webp",
+      "caption": "Table 2. Ablation results analyzing the effects of Distribution-Rectification Classifier-Free Guidance (DR-CFG), Spatial Representation Alignment (SRA), and varying proportions of low-semantic tokens on model performance.",
+      "page": 8,
+      "index": 8,
+      "width": 1013,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-009.webp",
+      "caption": "Figure 9. Qualitative comparison of generation results produced by Wan 2.1 before and after introducing DARE on the self-constructed dataset.",
+      "page": 17,
+      "index": 9,
+      "width": 1011,
+      "height": 1106
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-010.webp",
+      "caption": "Figure 6. The loss curve during training is shown. Introducing Lsra accelerates the model’s fitting of the conditional semantic representation, enhancing the semantic consistency between the video and the conditional text. However, in the later stages of training, this leads to oscillations in the loss, causing model instability and a shift in focus towards the consistency between the conditional semantics and individual frame images.",
+      "page": 12,
+      "index": 10,
+      "width": 481,
+      "height": 321
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-011.webp",
+      "caption": "Figure 4. Visualization of Token-Level Guidance Dynamics Before and After DARE from the Perspective of Attention Scores and Distributions.",
+      "page": 9,
+      "index": 11,
+      "width": 1011,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07026v1/fig-012.webp",
+      "caption": "Figure 5. Visual quality evaluation of generation results based on a self-constructed evaluation dataset and the VBench benchmark.",
+      "page": 9,
+      "index": 12,
+      "width": 1017,
+      "height": 480
+    }
+  ]
+}

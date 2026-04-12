@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02956v1/fig-001.webp",
+      "caption": "Figure 1. Illustration of different pruning modes for VLMs, with accuracy on NLVR2. For (i) parameter and (ii) token pruning, distinct modalities are simultaneously pruned under a unified ratio adjustment. For (iii) simple joint pruning, parameter and token pruning are conducted either sequentially or simultaneously without mitigating their inherent inconsistency. For (iv) our proposed CoMP, distinct pruning modes collaborate and only the optimal one is conducted at each stage in the progressive pruning process.",
+      "page": 1,
+      "index": 1,
+      "width": 487,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02956v1/fig-002.webp",
+      "caption": "Table 1. Comparison of Dev./Test Acc. (%) and GFLOPs by various pruning methods for BLIP on NLVR2 with distinct pruning ratios for the visual reasoning task. ‘P’, ‘T’, ‘J’ and ‘C’ denote parameter pruning, token pruning, joint pruning and collaborative pruning, respectively. ‘SJP’ stands for the simple joint pruning baseline. The best results are highlighted in bold.",
+      "page": 6,
+      "index": 2,
+      "width": 483,
+      "height": 575
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02956v1/fig-003.webp",
+      "caption": "Table 3. Comparison of performance and TFLOPs by various pruning methods on LLaVA-v1.5-7B with distinct pruning ratios on 6 commonly-used benchmarks. The ‘Average’ column summarizes the average score across all tasks. ‘†’ indicates that supervised fine-tuning is involved. The best results are highlighted in bold and the second-best results are underlined.",
+      "page": 7,
+      "index": 3,
+      "width": 982,
+      "height": 510
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02956v1/fig-004.webp",
+      "caption": "Table 2. (Top) Comparison of R@1/5 (%) and GFLOPs for BLIP/CLIP on Flickr30K and COCO for the image-text retrieval task. (Bottom) Comparison of CIDEr and SPICE on COCO for the image captioning task and Test-dev/std accuracy (%) on VQAv2 for the visual question answering task as well as GFLOPs, based on BLIP. ‘*’ indicates GFLOPs during inference by our re-implementation, which were not reported in the original works. The best results are highlighted in bold.",
+      "page": 7,
+      "index": 4,
+      "width": 1006,
+      "height": 398
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02956v1/fig-005.webp",
+      "caption": "Table I. Comparison of R@1/5 (%) and GFLOPs for BLIP on MSRVTT dataset for the zero-shot video-text retrieval task. The best results are highlighted in bold.",
+      "page": 17,
+      "index": 5,
+      "width": 492,
+      "height": 413
+    }
+  ]
+}

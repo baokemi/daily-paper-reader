@@ -1,0 +1,256 @@
+Title: Guiding a Diffusion Model by Swapping Its Tokens
+
+URL Source: https://arxiv.org/pdf/2604.08048v1
+
+Published Time: Fri, 10 Apr 2026 01:06:08 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Guiding a Diffusion Model by Swapping Its Tokens 
+
+## Weijia Zhang 1 Yuehao Liu 1 Shanyan Guan 2 Wu Ran 1
+
+## Yanhao Ge 2 Wei Li 2 Chao Ma 1,* 
+
+> 1
+
+## MoE Key Lab of Artificial Intelligence, AI Institute, Shanghai Jiao Tong University  
+
+> 2
+
+## vivo Mobile Communication Co., Ltd. 
+
+{weijia.zhang, yuehao.liu, chaoma }@sjtu.edu.cn 
+
+{guanshanyan, halege, liwei.yxgh }@vivo.com 
+
+## Abstract 
+
+Classifier-Free Guidance (CFG) is a widely used inference-time technique to boost the image quality of diffusion mod-els. Yet, its reliance on text conditions prevents its use in unconditional generation. We propose a simple method to enable CFG-like guidance for both conditional and uncon-ditional generation. The key idea is to generate a perturbed prediction via simple token swap operations, and use the di-rection between it and the clean prediction to steer sampling towards higher-fidelity distributions. In practice, we swap pairs of most semantically dissimilar token latents in either spatial or channel dimensions. Unlike existing methods that apply perturbation in a global or less constrained manner, our approach selectively exchanges and recomposes token latents, allowing finer control over perturbation and its in-fluence on generated samples. Experiments on MS-COCO 2014, MS-COCO 2017, and ImageNet datasets demon-strate that the proposed Self-Swap Guidance (SSG), when applied to popular diffusion models, outperforms previous condition-free methods in image fidelity and prompt align-ment under different set-ups. Its fine-grained perturbation granularity also improves robustness, reducing side-effects across a wider range of perturbation strengths. Overall, SSG extends CFG to a broader scope of applications in-cluding both conditional and unconditional generation, and can be readily inserted into any diffusion model as a plug-in to gain immediate improvements. The code is available at 
+
+https://github.com/VISION-SJTU/SSG .
+
+## 1. Introduction 
+
+Diffusion models (DMs) [16, 32, 36, 45–48] have emerged as a dominant paradigm in generative modelling, achiev-ing remarkable success in image [3, 9, 10, 31, 32, 36, 41], video [2, 11, 17, 54], and 3D/4D content [26, 33, 44, 52, 55]      
+
+> *Corresponding author. SSG (Ours)  SEG  PAG  SAG
+> ω = 1.5 3.0 5.0 7.0 9.0
+
+Figure 1. Self-Swap Guidance (SSG) generates higher-fidelity images over a wider range of guidance scale. In contrast, exist-ing methods [1, 18, 19] suffer from poor details at lower guidance scale, or noise, oversaturation, and oversimplified details at higher guidance scale. 
+
+synthesis problems. A crucial factor behind their success is the use of sampling guidance [6, 8, 15]—an inference-time mechanism that steers the iterative denoising process towards higher-quality and more semantically meaningful outputs. Sampling guidance operates by providing a nega-tive reference signal that the sampling process should avoid, thereby nudging the model towards more desirable regions of the data distribution. Amongst these methods, Classifier-Free Guidance (CFG) [15] is perhaps the most well-known, and is widely adopted in state-of-the-art diffusion mod-els [32, 36]. By providing an empty text prompt to the model, CFG obtains an unconditional generation and uses it as a negative reference, guiding the model towards out-puts that are both visually appealing and more aligned with textual instructions.          
+
+> arXiv:2604.08048v1 [cs.CV] 9 Apr 2026 t = 901 801 701 601 401 201 1
+> SAG
+> SEG
+> SSG
+> (Ours)
+> Generated Image
+> SSG
+> (Ours) Figure 2. Visualisations of guidance patterns and the iteratively denoised images across different timesteps. The text prompt used is “A loft bed with a dresser underneath it ”.
+
+Despite their effectiveness, CFG and other early guid-ance approaches [8, 15, 30] require external conditioning information such as text [15, 30] or class labels [8]. This dependency prevents their use in unconditional generation settings, such as solving inverse problems [5, 37, 56]. Addi-tionally, CFG’s reliance on specialised training procedures (e.g ., random text dropout) and tendency to produce over-saturated or less diverse samples at high guidance scales fur-ther limit its general applicability [21, 39, 41]. To address these limitations of CFG, recent works [1, 18, 19, 21, 40] have explored condition-free guidance strategies to unlock the benefits of inference-time guidance for univer-sal unconditional and conditional generation. Without rely-ing on external conditions like text, these methods manu-ally perturb the model’s internal forward process during in-ference, effectively simulating a weaker model branch that serves as a self-contained negative reference. In these recent methods, perturbations are introduced in the form of noise added to the inputs [19, 40] or attention maps [1, 18]. For example, SAG [19] and TSG [40] corrupt pixels or timestep embeddings with Gaussian noise; SEG [18] and PAG [1] in-troduce manual noise to perturb the attention maps. Existing condition-free guidance methods [1, 18, 19, 40] introduce perturbations in a global and often indiscrimi-nate manner. By applying the same perturbation patterns across the entire input or feature space, all layers, or all iterations, they treat the network’s diverse internal repre-sentations uniformly, disregarding the distinct semantic and structural roles played by different regions, channels, lay-ers, and timesteps [12, 22, 28]. Consequently, these pertur-bations can either be too weak—failing to sufficiently dis-rupt key features—or overly strong, causing irrecoverable distortions and loss of details [4, 18, 39], illustrated in Fig-ure 2. As a result, existing methods work in a relative nar-row range of guidance scale values which requires careful parameter tuning. At lower guidance scale, they suffer from poor details and local structures, whereas at higher scale, they tend to generate noisy, oversaturated or oversimplified images [1, 18, 19, 21], as demonstrated in Figure 1. In this paper, we propose a simple yet effective alterna-tive: Self-Swap Guidance (SSG). Instead of injecting exter-nal noise, SSG introduces perturbation by swapping a por-tion of token latents within the model’s intermediate repre-sentation space. At token and channel granularity, this mod-ification encourages the model to focus on fine-grained de-tails such as textures and edges as well as global coherence. It yields a rich and localised degradation that disrupts both semantic and structural consistency without introducing de-structive noise. By selectively and dynamically swapping the most semantically dissimilar spatial-wise or channel-wise token latents across layers and timesteps, SSG gener-ates a weakened model branch that is more informative and controllable, which contributes to a more effective sampling guidance trajectory. We evaluate SSG on both conditional and uncon-ditional image generation tasks using SDXL [32] and SD1.5 [36]. In both tasks, SSG consistently produces more realistic and more faithful images compared to pre-vious condition-free guidance methods such as SAG [19], PAG [1], and SEG [18], when evaluated against MS-COCO 2014/2017 [27] and ImageNet [7] data (comparisons with the concurrent work of TPG [35] are presented in the sup-plementary material). It exhibits more stable behaviour and maintains better visual realism across a wider range of guid-ance scales, as shown in Figure 1. SSG naturally integrates into standard diffusion pipelines as a lightweight plug-in, SSG SEG PAG SAG w/o Guidance Figure 3. Qualitative comparison of unconditional image generation by SDXL. 
+
+without the need for any retraining or architectural modifi-cation. Under conditional generation set-ups, it is also com-patible with CFG [15], allowing joint or stand-alone usage depending on the desired trade-off amongst fidelity, diver-sity, and alignment with prompts. 
+
+## 2. Related Work 
+
+Diffusion models. Diffusion models (DMs) [45, 47, 48] have emerged as a powerful class of generative models that iteratively refine noise into coherent data samples through a denoising process. Amongst the earliest variants, Denoising Diffusion Probabilistic Models (DDPM) [16] established the foundation by formulating generation as a Markov chain of denoising steps. Subsequently, Denoising Diffusion Im-plicit Models (DDIM) [46] introduced a deterministic for-mulation that allows for faster sampling without sacrificing sample quality. Building upon these ideas, Latent Diffusion Models (LDMs) [36] perform diffusion within a learned latent space rather than directly in the raw pixel space, greatly reducing computational requirements while main-taining high perceptual fidelity. In this work, we adopt SD1.5 [32] and SDXL [32] as our backbone models for text-conditioned and unconditional image generation. They are instances of LDMs and allow efficient high-resolution and photorealistic image synthesis. 
+
+Sampling guidance for diffusion models. Sampling guidance methods [6, 8, 15, 30] are essential to further en-hancing the generation quality of diffusion models during inference. They steer the denoising trajectory of diffusion models away from manually degraded samples, obtained via input or model perturbations, and towards the high-quality data manifold. Behind the success of state-of-the-art diffusion models [32, 36], Classifier-Free Guidance (CFG) uses unconditional generation as the degraded branch to ob-tain higher quality and better prompt-aligned images. How-ever, CFG requires specialised training procedures, and tends to generate oversaturated or oversimplified samples in reduced diversity [21, 25, 38]. Worse, CFG and other early guidance methods [8, 30, 39] rely on external conditions such as text [15, 30, 39] or class [8, 39], making them un-usable in unconditional generation settings [5, 21, 37, 56]. 
+
+Condition-free sampling guidance. Recent attempts [1, 18, 19, 40] have been made to unlock the benefits of inference-time guidance for unconditional generation. Without requiring external conditions like text, these meth-ods degrade the generation by perturbing the diffusion model itself. For instance, SAG [19] and TSG [40] add noise to the input image and the timestep embedding, re-spectively, whereas PAG [1] and SEG [18] corrupt the in-Method #Steps FID ↓ IS ↑ Precision ↑ Recall ↑ AES ↑                                                                    
+
+> w/o guidance 50 119.04 9.082 0.277 0.085 5.646 SAG [19] 50 113.33 8.765 0.377 0.184 5.851 SEG [18] 50 89.29 12.53 0.276 0.257 5.939 PAG [1] 50 103.72 13.59 0.265 0.218 5.734
+> SSG (ours) 50 70.91 16.44 0.380 0.227 6.034
+> Table 1. Quantitative comparison of unconditional image gen-eration by SDXL on MS COCO-2014.
+> Method #Steps FID ↓IS ↑Precision ↑Recall ↑AES ↑
+> w/o guidance 50 74.11 14.73 0.707 0.236 5.005 SAG [19] 50 64.29 17.22 0.701 0.331 5.123 SEG [18] 50 63.41 17.49 0.696 0.307 5.074 PAG [1] 50 66.92 20.66 0.722 0.293 5.383 SSG (ours) 50 63.05 18.84 0.722 0.317 5.286
+> Table 2. Quantitative comparison of unconditional image gen-eration by SD1.5 on ImageNet.
+
+termediate attention maps. Nonetheless, these methods lack granularity in their perturbations. By applying corruption universally to the input [19, 40] or attention [1, 18] space, they either fail to sufficiently disrupt key structures and fea-tures, yielding poor fine details, or excessively distort the image, causing undesirable effects such as oversaturation or oversimplification [4, 18, 21]. In this paper, we introduce a simple condition-free guidance method that selectively per-turbs structures and semantics without broadly or exces-sively disturbing the forward pass. It yields high-quality images across a wider range of perturbation strengths and offers finer control over the quality–diversity trade-off. 
+
+## 3. Preliminaries 
+
+Diffusion models. Diffusion models [16, 32, 36, 45–48] are a class of generative models that learn to synthesise data by reversing a gradual noising process. Starting from clean samples, noise is incrementally added following a stochas-tic differential equation (SDE) that describes the forward diffusion process [48]: 
+
+dx = − β(t)2 x dt + pβ(t) dw,  (1) where β(t) represents a time-dependent noise schedule and 
+
+w denotes the standard Wiener process. The correspond-ing reverse-time dynamics, which transform noise back into structured data, can be written as: 
+
+dx =
+
+h
+
+− β(t)2 x − β(t)∇x log pt(x)
+
+i
+
+dt + pβ(t) d ¯w,  (2) where d ¯w denotes the Wiener process evolving backward in time. ∇x log pt(x) is the score function, representing the gradient of the log-density at time t. In practice, this score function is approximated by a neural network sθ (xt), which is trained with the following denoising score matching ob-jective [47, 50]: 
+
+θ∗ = arg min  
+
+> θ
+
+Et
+
+n
+
+λ(t) Ex0 Ext|x0
+
+∥sθ (xt)
+
+−∇ x log pt(xt|x0)∥22
+
+o
+
+.
+
+(3) During inference, the learned score network iteratively refines a random noise vector into a coherent image by nu-merically solving the reverse SDE. 
+
+Inference-time sampling guidance. Classifier-Free Guidance (CFG) [15] steers the generated sample towards higher-quality, more text-aligned outputs with a linear extrapolation of conditional and unconditional model predictions: 
+
+˜ϵCFG (xt, y ) = ϵcond (xt, y )+ ω ϵcond (xt, y )−ϵuncond (xt, ∅),
+
+(4) where ϵuncond (xt, ∅)) is the unconditional noise prediction at timestep t, obtained by supplying the model with an empty text ( i.e ., ∅), and serve a ‘negative reference to steer away from. ω is the guidance scale that controls the trade-off of sample quality versus text alignment and image qual-ity. In condition-free guidance methods, the negative exam-ple is constructed by perturbing the model’s forward mech-anism, such as corrupting the input [19, 40] or attention maps [1, 18]. Denoting this degraded prediction as ϵpert (xt),the guidance is defined by analogy: 
+
+˜ϵ(xt) = ϵori (xt) + ω ϵori (xt) − ϵpert (xt), (5) where ϵori (xt) is the clean prediction left unperturbed. No-tice that external condition y (e.g ., text) is optional in this formulation, which means condition-free guidance may support both unconditional and conditional generation. 
+
+## 4. SSG: Self-Swap Guidance 
+
+Degrading generation with token swap. The central idea of condition-free sampling guidance is to manually perturb the forward propagation process of the diffusion model to produce a weakened version of the model’s gen-eration [1, 18, 19, 21]. Existing approaches typically in-troduce such perturbations in a global and less-constrained manner—for example by adding noise uniformly to inputs or attention maps across layers and timesteps [1, 18, 19, 21]. While effective in certain contexts, these global perturba-tions often overlook the inherent representation diversity across network layers and the distinct temporal dynam-ics throughout the reverse sampling process. As a result, they often produce excessive or unrecoverable disruptions, particularly at earlier timesteps [1, 4]. More importantly, because these perturbations operate at coarse granularity, they provide limited control over the trade-off between per-turbing and preserving quality: increasing the perturbation SSG (Ours) SEG PAG SAG w/o Guidance  
+
+> “a burger and
+> salad are on
+> a plate for
+> dinner ”
+> “a sink is
+> shown with
+> a mirror and
+> lights ”
+> “a small bird
+> sitting on a
+> skateboard ”
+> “There is a
+> woman in a
+> wetsuit in
+> the water ”Figure 4. Qualitative comparison of conditional image generation by SDXL.
+
+strength may enhance structure or texture but often intro-duces degradation [4, 39]. 
+
+Spatial self-swap of tokens. To address this lack of gran-ularity, we aim to introduce perturbations that are strong enough to effectively guide the sampling process towards better-quality outputs, yet fine-grained enough to avoid ex-cessive or global disruption. Our key insight is that this trade-off can be better controlled at the token level. Accord-ingly, we propose a local and selective perturbation strategy that operates by swapping only a subset of tokens within each per-sample token feature, applied across layers and timesteps. Unlike global noise injection, this token-level swap disrupts semantic and structural relationships by mod-ifying selected subset of semantic units, while leaving the remainder untouched. This controlled degradation produces weaker predictions that still retain essential global coher-ence, making the generation more resilient to oversatura-tion, distortion or other side-effects across a wider range of perturbation strengths. 
+
+Channel self-swap of tokens. Building on spatial self-swap, we further extend our perturbation strategy to the channel dimension through channel swaps of token fea-tures. Whereas spatial swaps primarily influence structural and geometric coherence, channel swaps perturb tokens along their channel embeddings, encouraging the model to refine subtle feature correlations such as textures, materi-als, and global appearance attributes. By jointly leveraging spatial and channel swaps, the model receives a balanced, fine-grained perturbation that strengthens both local detail and overall photorealism. 
+
+Adversarial token swap. Another important insight of our approach is that swapping semantically dissimilar tokens—–rather than randomly selected ones–—leads to better generation. This strategy, inspired by adversar-ial analysis of vision transformers and generative mod-els [29, 57], produces a more effective weakening of the model without requiring widespread perturbation. The im-plementation of the proposed token self-swap operations is simple and straightforward. Specifically, for spatial self-swap, given a batch of token embeddings X ∈ RB×T ×D ,we first normalise all token vectors along the feature dimen-sion and compute the cosine similarity between pairs of to-kens across spatial positions. The N token pairs with the lowest similarity scores are selected, where N is determined by a predefined swap ratio r. The indices of these pairs are used to construct a permutation mapping that exchanges the corresponding tokens in a parallel manner. This design spa-Method #Steps FID ↓ CLIP ↑ IS ↑ AES ↑ PickScore ↑ IR ↑                                                                              
+
+> w/o guidance 50 45.09 0.281 21.31 5.671 20.20 -0.847 SAG [19] 50 34.14 0.295 22.95 5.745 20.64 -0.487 SEG [18] 50 28.55 0.302 27.16 5.894 21.38 -0.0160 PAG [1] 50 26.55 0.306 29.70 5.820 21.56 -0.00318
+> SSG (ours) 50 21.73 0.313 34.63 5.902 22.17 0.276
+> Table 3. Quantitative comparison of conditional image genera-tion by SDXL on MS-COCO 2014.
+> Method #Steps FID ↓CLIP ↑IS ↑AES ↑PickScore ↑IR ↑
+> w/o guidance 50 54.93 0.280 21.00 5.660 20.17 -0.870 SAG [19] 50 43.76 0.293 23.08 5.745 20.60 -0.515 SEG [18] 50 38.66 0.301 27.70 5.881 21.35 -0.0575 PAG [1] 50 36.94 0.306 29.03 5.817 21.54 -0.0145
+> SSG (ours) 50 31.92 0.312 34.15 5.890 22.14 0.253
+> Table 4. Quantitative comparison of conditional image genera-tion by SDXL on MS-COCO 2017.
+
+tially swaps the most semantically dissimilar token pairs for each instance. Channel self-swap is implemented likewise, in a reciprocal manner. 
+
+Integration into diffusion models. To integrate SSG into existing diffusion models, we maintain two parallel branches during forward propagation. The original branch is left unmodified, producing ϵori in Equation 5, while the degradation branch applies the proposed token swaps and produces ϵpert . Intermediate predictions from both branches are concatenated at each stage and each timestep, allowing efficient parallel processing with minimal computational overhead. We apply token self-swap operations at the be-ginning of each transformer blocks [49] and before residual shortcuts [13] for maximised disruptive effect. 
+
+## 5. Experiments 
+
+5.1. Experimental settings 
+
+Models. We evaluate the proposed method on two pop-ular open-sourced diffusion models for image synthesis, namely Stable Diffusion v1.5 (SD1.5) [36] and Stable Dif-fusion XL (SDXL) [32]. We use the publicly available pre-trained weights from their official repository, and adopt de-fault inference configurations unless otherwise specified. 
+
+Dataset and metrics. We use the MS-COCO 2014, MS-COCO 2017 [27], and ImageNet [7] validation sets as the reference data to evaluate the quality of generated images. For conditional generation, we sample 30k captions of MS-COCO 2014 validation and 5k of MS-COCO 2017 valida-tion images as the text conditions. For unconditional gen-eration, we evaluate 30k images on MS-COCO 2014 vali-dation and 50k images on ImageNet validation data. The primary evaluation metrics are Fr´ echet Inception Distance (FID) [14], Aesthetic Score (AES) [43], PickScore [23], and ImageReward (IR) [53] for evaluating image fidelity and aesthetics, and Inception Score (IS) [42] for diversity. We also use CLIP Score [34] to measure prompt alignment in conditional generation, and Improved Precision and Re-call [24] in unconditional generation. 
+
+Implementation. Our method is implemented in PyTorch using the diffuser [51] library. All guidance methods (i.e ., PAG [1], SEG [18], CFG [15], SSG) adopt the Euler discrete scheduler [20], with the exception of SAG [19], for which only DDIM [46] is supported. Experiments are con-ducted on NVIDIA Tesla V100 GPUs. Further details are provided in the supplementary material. 
+
+5.2. Main Results 
+
+We present the main qualitative and quantitative evaluation results for SSG and other existing methods. The best quan-titative result under each metric is marked in bold, and sec-ond best underlined. For conditional generation, we provide the prompt used to generate each set of images. For uncon-ditional generation, each set uses the same random seed. 
+
+Unconditional generation with SSG. Table 1 pro-vides a comprehensive quantitative comparison of various condition-free guidance methods on MS-COCO 2014 data. On SDXL, SSG consistently delivers the best performance across all metrics, leading previous methods by consider-able margins. Compared to the vanilla baseline without inference-time guidance, SSG dramatically improves FID from 119.04 to 70.91 and Inception Score from 9.08 to 16.44. Compared to recent guidance methods such as PAG and SEG, it achieves the best results overall, including the highest AES score of 6.034. Table 2 reports results of SD1.5 on ImageNet data, where SSG achieves the best FID and overall performance. We postulate that the smaller perfor-mance gaps amongst different methods is potentially due to the lower generation quality of SD1.5, and the limited qual-ity of the ImageNet validation set. Qualitatively, as illus-trated in Figure 3, existing methods tend to generate non-photorealistic content and even repetitive patterns or tex-tures under unconditional generation. In contrast, SSG is less prone to generating low-quality images and more likely to render realistic textures and coherent layouts. 
+
+Conditional generation with SSG. We present quantita-tive results on the SDXL model on MS-COCO 2014 evalua-tion in Table 3. SSG leads to drastic improvements over the vanilla baseline across all metrics. For example, it achieves more than 2× reduction in FID and 1.5× improvement in Inception Score. SSG consistently leads all previous guid-ance methods, with particularly large improvements on Im-ageReward. We also present quantitative results using MS-Figure 5. Effect of varying guidance scale and swap ratio on image quality and prompt alignment. r = 0 0.02 0.05 0.1 0.2 0.5 1.0         
+
+> “∅∅∅∅”
+> ω=01.0 2.0 2.5 3.0 3.5 4.0
+> “a close up
+> of a cat
+> on a desk
+> near a
+> sandwich ”
+> “a close up
+> of a cat
+> on a desk
+> near a
+> sandwich ”
+> “∅∅∅∅”
+
+Figure 6. Visualising the effect of using different swap ratio and guidance scale values on generated images. 
+
+COCO 2017 validation samples in Table 4. As shown, SSG maintains its advantage across all metrics, further validating its effectiveness. Qualitative comparisons in Figure 4 show that SSG is more likely to generate high-fidelity images that are both more photorealistic in terms of global coherence and local structures and textures, while also aligning more closely with the text prompts. Together, these quantitative and qualitative results corroborate the rationality and effec-tiveness of SSG in better guiding diffusion sampling. 
+
+5.3. Further Analysis 
+
+We perform a set of analytical studies to gain deeper in-sights into the properties and rationality of our method and design. Experiments in the section are conducted by gen-erating 3k images using SDXL and evaluating on the MS-COCO 2014 validation data, unless otherwise specified. 
+
+Guidance scale. Figure 5 (left) analyses the impact of larger or smaller guidance scale, ω. As SSG is applied, both image quality and prompt fidelity dramatically improves, measured by FID and CLIP Score, as the guidance scale in-creases from zero to smaller values. Towards higher guid-ance values, FID gradually grows whereas CLIP Score sat-urates. Overall, SSG produces images of satisfactory qual-ity over a wide range of guidance scale. Notably, previous methods, including SAG, PAG, and SEG, are more sensi-tive to the guidance scale value, as illustrated in Figure 1. At lower guidance scale, they suffer from unrealistic de-tails ( e.g ., SAG). Whereas at higher guidance scale, the generated images are prone to noise ( e.g ., SAG), oversat-                                          
+
+> Method FID ↓CLIP ↑IS ↑AES ↑PickScore ↑IR ↑
+> SAG [19] 43.97 0.295 22.12 5.756 20.65 -0.483 SEG [18] 38.15 0.303 26.15 5.888 21.38 -0.0239 PAG [1] 36.79 0.306 29.42 5.827 21.57 0.00171 Random 32.28 0.312 34.67 5.928 22.14 0.283 Similar 28.74 0.309 32.81 5.826 21.80 0.110 Dissimilar 31.41 0.313 34.44 5.901 22.18 0.297
+
+Table 5. Importance of adversarial token swap. Swapping dis-similar tokens achieves the best generation quality overall. Ran-dom swap yields slightly worse results and swapping similar to-kens perform worst, but they still substantially outperform. w/o Guidance Similar Random Dissimilar 
+
+Figure 7. Visualising the effect of different token swap poli-cies. Swapping dissimilar tokens further refines local details and global coherence compared to random swap. In contrast, swapping similar tokens leads to poor generation that resembles the vanilla diffusion model’s output. 
+
+uration (SAG, PAG, SEG), or oversimplified details (SAG, PAG, SEG). In contrast, SSG generates higher-quality im-ages more consistently across different guidance scales. 
+
+Swap ratio. The swap ratio r is the ratio of swapped to-kens/channels to the total number of tokens/channels. It provides a direct control over the perturbation strength in the proposed method. The right-hand plot in Figure 5 ex-amines how different swap ratio impacts the generated im-ages by SSG. Similar patterns are observed to those seen with the guidance scale. However, we notice that increasing the swap ratio from 0 to small values more drastically im-prove both FID and CLIP Score compared to setting guid-ance scale. This reveals the central role and the remarkable ability of the proposed token swap operations in guiding the samples towards higher quality. It is also noteworthy that as swap ratio further increases, the FID degradation satu-rates, different from the more severe degradation observed at high guidance scale, which corroborates the advantage of the proposed swap-based operation as a more fine-grained and constrained type of perturbation. 
+
+Adversarial token swap. We demonstrate the importance of swapping dissimilar token pairs to sufficiently disrupt lo-cal structures. In Table 5, we consider three different poli-cies for selecting which pairs of tokens to swap: randomly selecting N pairs, selecting the N most similar pairs, and our method of selecting the N most dissimilar pairs. It turns out that swapping the most dissimilar pairs leads to the best overall performance the highest scores in terms of CLIP Spatial Channel FID ↓ CLIP ↑ IS ↑ AES ↑ PickScore ↑ IR ↑                                                   
+
+> ✓✗31.96 0.313 33.33 5.931 22.11 0.272
+> ✗✓31.30 0.313 34.95 5.892 22.17 0.286
+> ✓✓31.41 0.313 34.44 5.901 22.18 0.297
+> Table 6. Ablation on two types of token swap.
+> SSG CFG FID ↓CLIP ↑IS ↑AES ↑PickScore ↑IR ↑
+> ✗✗54.96 0.281 21.20 5.676 20.22 -0.834
+> ✓✗31.41 0.313 34.44 5.901 22.18 0.297
+> ✓✓30.82 0.319 36.37 5.858 22.44 0.492
+> Table 7. Compatibility of SSG with CFG.
+
+Score, PickScore, and ImageReward, whereas swapping the most similar ones performs the worst. We also provide visual examples of images generated using different swap strategies in Figure 7. These ablation results highlight the significance of the proposed adversarial token swap. Addi-tionally, it is surprising that even random token shuffle sub-stantially outperforms the state-of-the-art methods of SAG and SEG – compelling evidence to the fact that that token swap itself is a very effective form of perturbation in guid-ing diffusion model sampling. 
+
+Effect of spatial and channel swaps. Table 6 ablates the effects of the two token swap operations. As shown by the quantitative measurements, both strategies effectively boost generation quality, while exhibiting different charac-teristics: spatial swap achieves a higher AES score, whereas channel swap yields better PickScore and ImageReward, Fi-nally, using the two jointly leads to further improved empir-ical results on average as well as more visually appealing images, highlighting their complementary nature. 
+
+Analysis of guidance patterns. Figure 2 visualises the guidance patterns of various guidance methods across timesteps. Here, for each denoising step t, we plot the guid-ance magnitude, obtained by taking the channel-averaged absolute value of ω ϵori (xt)−ϵpert (xt) in Equation 5. It can be noticed that SSG exhibits strong responses to prominent edges and shapes, such as the two bedposts and the ladder, at early steps, indicating that SSG already guides the model to form and refine these structures early in the iterative gen-eration process. In contrast, SAG and SEG show only weak or negligible responses to these shapes at the same stage. Note that early formation of such these structures is criti-cal, as it largely determine the final image layout (see Fig-ure 2 (right)). It turns out that only SSG correctly generates the content corresponding to the text. Additionally, SSG concentrates strong guidance on fewer spatial locations than SAG and SEG, evident in later denoising steps in Figure 2. CFG  + SSG  CFG   
+
+> Figure 8. Compatibility between SSG and CFG. SSG can be applied on top of CFG to further refine image quality.
+
+Compatibility with CFG. As SSG and CFG operate in orthogonal perturbation spaces ( i.e ., token space and con-dition space, respectively), they can be conveniently com-bined to gain further improvements. To illustrate this, we apply CFG on top of SSG. Quantitative results in Table 7 show that CFG can further improve the overall image qual-ity. In particular, it brings significant improvements in terms of aesthetics and prompt alignment metrics. Conversely, we can also expect that SSG is able to refine the intricate structural details and improve the overall fidelity of images guided by CFG. We verify this qualitatively in Figure 8, where SSG successfully enhances the fine-grained texture and shapes of substructures. These quantitative and visual evidence demonstrates that CFG and SSG complement each other and can be applied together for additional benefits. 
+
+Additional details, results, and analyses including pseudo-code, further analytical studies, and more visualised examples, are presented in the supplementary material. 
+
+## 6. Conclusion 
+
+In this paper, we introduced Self-Swap Guidance (SSG), a simple, training-free, and condition-free guidance method that substantially improves the fidelity of images gener-ated by diffusion models. Unlike previous approaches that perturb the entire input or attention space, SSG op-erates at token granularity and selectively swaps pairs of most semantically dissimilar token latents across layers and timesteps. This design provides fine-grained control over the guidance process, simultaneously disrupting local struc-tures and global semantics without introducing destructive noise, which effectively steers the sampling process towards the generation of higher-quality images. Extensive experi-ments across different diffusion models, datasets, and con-dition settings demonstrate that SSG consistently enhances generation quality, prompt alignment, and image diversity of diffusion models. More broadly, SSG can be readily in-tegrated into existing diffusion pipelines as a plug-in, and is compatible with the classic CFG to allow flexible trade-offs amongst fidelity, diversity, and prompt adherence. Acknowledgements. This work was supported in part by NSFC (62322113, 62376156), Shanghai Municipal Science and Technology Major Project (2025SHZDZX025G15, 2021SHZDZX0102), and the Fundamental Research Funds for the Central Universities. 
+
+## References 
+
+[1] Donghoon Ahn, Hyoungwon Cho, Jaewon Min, Wooseok Jang, Jungwoo Kim, SeonHwa Kim, Hyun Hee Park, Ky-ong Hwan Jin, and Seungryong Kim. Self-rectifying diffu-sion sampling with perturbed-attention guidance. In ECCV ,2024. 1, 2, 3, 4, 6, 7 [2] Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, Yam Levi, Zion English, Vikram Voleti, Adam Letts, et al. Stable video diffusion: Scaling latent video diffusion models to large datasets. arXiv preprint arXiv:2311.15127 , 2023. 1 [3] Junsong Chen, Chongjian Ge, Enze Xie, Yue Wu, Lewei Yao, Xiaozhe Ren, Zhongdao Wang, Ping Luo, Huchuan Lu, and Zhenguo Li. Pixart-σ: Weak-to-strong training of diffu-sion transformer for 4k text-to-image generation. In ECCV ,2024. 1 [4] Hyunmin Cho, Donghoon Ahn, Susung Hong, Jee Eun Kim, Seungryong Kim, and Kyong Hwan Jin. Tag: Tangential am-plifying guidance for hallucination-resistant diffusion sam-pling. arXiv preprint arXiv:2510.04533 , 2025. 2, 4, 5 [5] Hyungjin Chung, Jeongsol Kim, Michael T Mccann, Marc L Klasky, and Jong Chul Ye. Diffusion posterior sampling for general noisy inverse problems. In ICLR , 2023. 2, 3 [6] Hyungjin Chung, Jeongsol Kim, Geon Yeong Park, Hyelin Nam, and Jong Chul Ye. Cfg++: Manifold-constrained clas-sifier free guidance for diffusion models. In ICLR , 2025. 1, 3[7] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In CVPR , 2009. 2, 6 [8] Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on image synthesis. In NeurIPS , 2021. 1, 2, 3 [9] Dave Epstein, Allan Jabri, Ben Poole, Alexei Efros, and Aleksander Holynski. Diffusion self-guidance for control-lable image generation. In NeurIPS , 2023. 1 [10] Patrick Esser, Sumith Kulal, Andreas Blattmann, Rahim Entezari, Jonas M¨ uller, Harry Saini, Yam Levi, Dominik Lorenz, Axel Sauer, Frederic Boesel, et al. Scaling recti-fied flow transformers for high-resolution image synthesis. In ICML , 2024. 1 [11] Agrim Gupta, Lijun Yu, Kihyuk Sohn, Xiuye Gu, Meera Hahn, Fei-Fei Li, Irfan Essa, Lu Jiang, and Jos´ e Lezama. Photorealistic video generation with diffusion models. In 
+
+ECCV , 2024. 1 [12] Gunshi Gupta, Karmesh Yadav, Yarin Gal, Dhruv Batra, Zsolt Kira, Cong Lu, and Tim GJ Rudner. Pre-trained text-to-image diffusion models are versatile representation learners for control. In NeurIPS , 2024. 2 [13] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR ,2016. 6 [14] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter. Gans trained by a two time-scale update rule converge to a local nash equilib-rium. In NeurIPS , 2017. 6 [15] Jonathan Ho and Tim Salimans. Classifier-free diffusion guidance. In NeurIPS 2021 Workshop on Deep Generative Models and Downstream Applications , 2021. 1, 2, 3, 4, 6 [16] Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffu-sion probabilistic models. In NeurIPS , 2020. 1, 3, 4 [17] Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J Fleet. Video dif-fusion models. In NeurIPS , 2022. 1 [18] Susung Hong. Smoothed energy guidance: Guiding diffu-sion models with reduced energy curvature of attention. In 
+
+NeurIPS , 2024. 1, 2, 3, 4, 6, 7 [19] Susung Hong, Gyuseong Lee, Wooseok Jang, and Seungry-ong Kim. Improving sample quality of diffusion models us-ing self-attention guidance. In ICCV , 2023. 1, 2, 3, 4, 6, 7[20] Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine. Elucidating the design space of diffusion-based generative models. In NeurIPS , 2022. 6 [21] Tero Karras, Miika Aittala, Tuomas Kynk¨ a¨ anniemi, Jaakko Lehtinen, Timo Aila, and Samuli Laine. Guiding a diffusion model with a bad version of itself. In NeurIPS , 2024. 2, 3, 4 [22] Dahye Kim, Xavier Thomas, and Deepti Ghadiyaram. Reve-lio: Interpreting and leveraging semantic information in dif-fusion models. In ICCV , 2025. 2 [23] Yuval Kirstain, Adam Polyak, Uriel Singer, Shahbuland Ma-tiana, Joe Penna, and Omer Levy. Pick-a-pic: An open dataset of user preferences for text-to-image generation. In 
+
+NeurIPS , 2023. 6 [24] Tuomas Kynk¨ a¨ anniemi, Tero Karras, Samuli Laine, Jaakko Lehtinen, and Timo Aila. Improved precision and recall met-ric for assessing generative models. In NeurIPS , 2019. 6 [25] Tuomas Kynk¨ a¨ anniemi, Miika Aittala, Tero Karras, Samuli Laine, Timo Aila, and Jaakko Lehtinen. Applying guidance in a limited interval improves sample and distribution quality in diffusion models. In NeurIPS , 2024. 3 [26] Chen-Hsuan Lin, Jun Gao, Luming Tang, Towaki Takikawa, Xiaohui Zeng, Xun Huang, Karsten Kreis, Sanja Fidler, Ming-Yu Liu, and Tsung-Yi Lin. Magic3d: High-resolution text-to-3d content creation. In CVPR , 2023. 1 [27] Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Doll´ ar, and C Lawrence Zitnick. Microsoft coco: Common objects in context. In 
+
+ECCV , 2014. 2, 6 [28] Benyuan Meng, Qianqian Xu, Zitai Wang, Xiaochun Cao, and Qingming Huang. Not all diffusion model activations have been evaluated as discriminative features. In NeurIPS ,2024. 2 [29] Di Ming, Peng Ren, Yunlong Wang, and Xin Feng. Boosting the transferability of adversarial attack on vision transformer with adaptive token tuning. In NeurIPS , 2024. 5 [30] Alex Nichol, Prafulla Dhariwal, Aditya Ramesh, Pranav Shyam, Pamela Mishkin, Bob McGrew, Ilya Sutskever, and Mark Chen. Glide: Towards photorealistic image genera-tion and editing with text-guided diffusion models. In ICML ,2022. 2, 3 [31] William Peebles and Saining Xie. Scalable diffusion models with transformers. In ICCV , 2023. 1 [32] Dustin Podell, Zion English, Kyle Lacey, Andreas Blattmann, Tim Dockhorn, Jonas M¨ uller, Joe Penna, and Robin Rombach. Sdxl: Improving latent diffusion mod-els for high-resolution image synthesis. arXiv preprint arXiv:2307.01952 , 2023. 1, 2, 3, 4, 6 [33] Ben Poole, Ajay Jain, Jonathan T Barron, and Ben Milden-hall. Dreamfusion: Text-to-3d using 2d diffusion. arXiv preprint arXiv:2209.14988 , 2022. 1 [34] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learn-ing transferable visual models from natural language super-vision. In ICML , 2021. 6 [35] Javad Rajabi, Soroush Mehraban, Seyedmorteza Sadat, and Babak Taati. Token perturbation guidance for diffusion mod-els. In NeurIPS , 2025. 2 [36] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj¨ orn Ommer. High-resolution image syn-thesis with latent diffusion models. In CVPR , 2022. 1, 2, 3, 4, 6 [37] Litu Rout, Yujia Chen, Abhishek Kumar, Constantine Cara-manis, Sanjay Shakkottai, and Wen-Sheng Chu. Beyond first-order tweedie: Solving inverse problems using latent diffusion. In CVPR , 2024. 2, 3 [38] Seyedmorteza Sadat, Jakob Buhmann, Derek Bradley, Otmar Hilliges, and Romann M Weber. Cads: Unleashing the di-versity of diffusion models through condition-annealed sam-pling. In ICLR , 2024. 3 [39] Seyedmorteza Sadat, Otmar Hilliges, and Romann M We-ber. Eliminating oversaturation and artifacts of high guid-ance scales in diffusion models. In ICLR , 2024. 2, 3, 5 [40] Seyedmorteza Sadat, Manuel Kansy, Otmar Hilliges, and Romann M Weber. No training, no problem: Rethinking classifier-free guidance for diffusion models. In ICLR , 2025. 2, 3, 4 [41] Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Photorealistic text-to-image diffusion models with deep language understanding. In NeurIPS , 2022. 1, 2 [42] Tim Salimans, Ian Goodfellow, Wojciech Zaremba, Vicki Cheung, Alec Radford, and Xi Chen. Improved techniques for training gans. In NeurIPS , 2016. 6 [43] Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Worts-man, et al. Laion-5b: An open large-scale dataset for training next generation image-text models. In NeurIPS , 2022. 6 [44] Uriel Singer, Shelly Sheynin, Adam Polyak, Oron Ashual, Iurii Makarov, Filippos Kokkinos, Naman Goyal, Andrea Vedaldi, Devi Parikh, Justin Johnson, et al. Text-to-4d dy-namic scene generation. In ICML , 2023. 1 [45] Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In ICML , 2015. 1, 3, 4 [46] Jiaming Song, Chenlin Meng, and Stefano Ermon. Denois-ing diffusion implicit models. In ICLR , 2021. 3, 6 [47] Yang Song and Stefano Ermon. Generative modeling by es-timating gradients of the data distribution. In NeurIPS , 2019. 3, 4 [48] Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Ab-hishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equa-tions. In ICLR , 2020. 1, 3, 4 [49] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszko-reit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In NeurIPS , 2017. 6 [50] Pascal Vincent. A connection between score matching and denoising autoencoders. Neural computation , 23(7):1661– 1674, 2011. 4 [51] Patrick von Platen, Suraj Patil, Anton Lozhkov, Pedro Cuenca, Nathan Lambert, Kashif Rasul, Mishig Davaadorj, Dhruv Nair, Sayak Paul, William Berman, Yiyi Xu, Steven Liu, and Thomas Wolf. Diffusers: State-of-the-art diffu-sion models. https://github.com/huggingface/ diffusers , 2022. 6 [52] Zhengyi Wang, Cheng Lu, Yikai Wang, Fan Bao, Chongxuan Li, Hang Su, and Jun Zhu. Prolificdreamer: High-fidelity and diverse text-to-3d generation with variational score distilla-tion. In NeurIPS , 2023. 1 [53] Jiazheng Xu, Xiao Liu, Yuchen Wu, Yuxuan Tong, Qinkai Li, Ming Ding, Jie Tang, and Yuxiao Dong. Imagere-ward: Learning and evaluating human preferences for text-to-image generation. In NeurIPS , 2023. 6 [54] Zhuoyi Yang, Jiayan Teng, Wendi Zheng, Ming Ding, Shiyu Huang, Jiazheng Xu, Yuanming Yang, Wenyi Hong, Xiao-han Zhang, Guanyu Feng, et al. Cogvideox: Text-to-video diffusion models with an expert transformer. In ICLR , 2025. 1[55] Heng Yu, Chaoyang Wang, Peiye Zhuang, Willi Mena-pace, Aliaksandr Siarohin, Junli Cao, L´ aszl´ o Jeni, Sergey Tulyakov, and Hsin-Ying Lee. 4real: Towards photorealistic 4d scene generation via video diffusion models. In NeurIPS ,2024. 1 [56] Bingliang Zhang, Wenda Chu, Julius Berner, Chenlin Meng, Anima Anandkumar, and Yang Song. Improving diffusion inverse problem solving with decoupled noise annealing. In 
+
+CVPR , 2025. 2, 3 [57] Jiahao Zhao and Wenji Mao. Generative adversarial train-ing with perturbed token detection for model robustness. In 
+
+EMNLP , 2023. 5

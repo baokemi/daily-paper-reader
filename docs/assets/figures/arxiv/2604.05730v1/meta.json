@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05730v1/fig-001.webp",
+      "caption": "Figure 1. Scatter plots of compositional generation error vs FID on 3 datasets (3 input components). Our method lies on the Pareto front of all results (see Appendix for full scatter plots) while achieving the lowest or joint lowest error among the baselines.",
+      "page": 1,
+      "index": 1,
+      "width": 496,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05730v1/fig-002.webp",
+      "caption": "Table 1. Quantitative results (error rate and FID score) on the Positional CLEVR dataset",
+      "page": 7,
+      "index": 2,
+      "width": 658,
+      "height": 186
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05730v1/fig-003.webp",
+      "caption": "Figure 4. Conceptual product space: Example of composing two concept spaces using our framework: {\"a cat\",\"a dog\",\"an apple\",\"a cherry\"}×AND{\"a red object\",\"an orange object\",\"a yellow object\",\"a green object\",\"a blue object\",\"an indigo object\",\"a violet object\"}.",
+      "page": 3,
+      "index": 3,
+      "width": 727,
+      "height": 414
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05730v1/fig-004.webp",
+      "caption": "Table 3. Quantitative results (error rate and FID score) on the FFHQ dataset",
+      "page": 8,
+      "index": 4,
+      "width": 648,
+      "height": 186
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05730v1/fig-005.webp",
+      "caption": "Figure 5. Overview of our approach. Left: We start with a generic “empty” state s0 or the preceding state st and a set of input concepts c1, c2, .... These are used to compute the unconditional distribution over st+1 and the conditional distributions given each of c1, c2, .... These are composed, optionally incorporating concept weights, to produce an accurate estimate of the distribution conditioned on all inputs. The process is repeated until a “full” state sT is obtained, e.g. a grid of VQ-VAE latents. Right: Our general formulation encompasses any additive discrete generative process, i.e. where the representation of st is fully determined by st+1 (masked and autoregressive generation shown as examples).",
+      "page": 4,
+      "index": 5,
+      "width": 914,
+      "height": 216
+    }
+  ]
+}

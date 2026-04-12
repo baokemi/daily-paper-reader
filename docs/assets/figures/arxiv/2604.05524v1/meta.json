@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-001.webp",
+      "caption": "Figure 6. Visual comparison across three generation settings. Dense denotes the original unpruned model. Global CR-Diff applies a pruning ratio optimized for a specific model and resolution, shared across all prompts. Specific CR-Diff further refines this ratio for the given prompt, enabling prompt-specific optimization. Each group corresponds to a specific prompt, and the ImageReward (IR) scores are shown below each image. Global CR-Diff improves generative fidelity in a prompt-agnostic manner, while Specific CR-Diff further enhances semantic alignment and visual coherence for the specific prompt.",
+      "page": 6,
+      "index": 1,
+      "width": 970,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-002.webp",
+      "caption": "Figure 12. Additional cross-resolution comparison on a subset of 5K prompts from the MS-COCO 2014 validation set [27]. CRDiff shows consistent gains in both ImageReward and visual fidelity compared to the original SD1.5. Dense denotes the original unpruned model. Each group corresponds to a specific prompt, and the ImageReward (IR) scores are shown below each image.",
+      "page": 15,
+      "index": 2,
+      "width": 973,
+      "height": 847
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-003.webp",
+      "caption": "Figure 2. Effects of magnitude-based unstructured pruning on SDXL at unseen resolution 512×512. (a) Quantitative metrics improvement within moderate sparsity. (b) Qualitative illustration of improved semantic alignment as sparsity increases.",
+      "page": 2,
+      "index": 3,
+      "width": 465,
+      "height": 487
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-004.webp",
+      "caption": "Figure 8. Radar comparison across pruning strategies on SDXL at 512 × 512. Five metrics are normalized with direction alignment so that larger radial values denote better performance. CR-Diff achieves the strongest overall results, highlighting its superior perceptual and semantic quality.",
+      "page": 7,
+      "index": 4,
+      "width": 450,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-005.webp",
+      "caption": "Figure 7. Ablation results of block-wise pruning. (a) Performance comparison under uniform and block-wise pruning strategies across different models and resolutions. For block-wise pruning, the ratios are listed in the order down-sampling / middle / upsampling. ImageReward (IR) of the better-performing strategy is highlighted in bold, showing that differentiated ratios improve image quality. (b) Conceptual illustration of ImageReward trends during the updating process for the optimal pruning configuration, showing generally higher and more stable values under block-wise pruning compared to uniform pruning.",
+      "page": 7,
+      "index": 5,
+      "width": 963,
+      "height": 186
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-006.webp",
+      "caption": "Figure 11. Additional cross-resolution comparison on a subset of 5K prompts from the MS-COCO 2014 validation set [27]. CRDiff shows consistent gains in both ImageReward and visual fidelity compared to the original SDXL. Dense denotes the original unpruned model. Each group corresponds to a specific prompt, and the ImageReward (IR) scores are shown below each image.",
+      "page": 14,
+      "index": 6,
+      "width": 972,
+      "height": 902
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-007.webp",
+      "caption": "Figure 14. Visual comparison across two generation settings. Dense denotes the original unpruned model. Specific CR-Diff adjusts the pruning ratio based on each input prompt, enabling prompt-tailored optimization. Each group corresponds to a specific prompt, and the ImageReward (IR) scores are shown below each image. Both quantitative and qualitative results show that Specific CR-Diff improves semantic alignment and visual coherence for the given prompt.",
+      "page": 17,
+      "index": 7,
+      "width": 973,
+      "height": 1200
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-008.webp",
+      "caption": "Table 7. Performance comparison of pruned models (the model pruned block-wisely without pruned output amplification) and CR-Diff (with pruned output amplification) across default and unseen resolutions. Resolutions are reported as height × width, where resolutions marked with * denote the native (default) setting of the model. Bold values indicate that CR-Diff outperforms the pruned baseline. These results verify that POA provides a stable refinement effect that generalizes across models and resolutions.",
+      "page": 12,
+      "index": 8,
+      "width": 980,
+      "height": 380
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-009.webp",
+      "caption": "Table 1. Performance comparison on unseen resolutions. Across the evaluated models and resolutions, CR-Diff improves most metrics relative to the dense model, with bold values indicating superior performance of our CR-Diff against the dense model.",
+      "page": 5,
+      "index": 9,
+      "width": 976,
+      "height": 303
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05524v1/fig-010.webp",
+      "caption": "Figure 13. Additional cross-resolution comparison on a subset of 5K prompts from the MS-COCO 2014 validation set [27]. CRDiff shows consistent gains in both ImageReward and visual fidelity compared to the original SD2.1. Dense denotes the original unpruned model. Each group corresponds to a specific prompt, and the ImageReward (IR) scores are shown below each image.",
+      "page": 16,
+      "index": 10,
+      "width": 969,
+      "height": 843
+    }
+  ]
+}

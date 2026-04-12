@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04997v1/fig-001.webp",
+      "caption": "Figure 1: Classification performance for both embedding and VLMs under various configurations. VLMs generally outperform embedding models, especially after fine-tuned with sufficient training samples. Dots are individual models’ results.",
+      "page": 4,
+      "index": 1,
+      "width": 786,
+      "height": 587
+    }
+  ]
+}

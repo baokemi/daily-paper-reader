@@ -1,0 +1,984 @@
+Title: $S^3$: Stratified Scaling Search for Test-Time in Diffusion Language Models
+
+URL Source: https://arxiv.org/pdf/2604.06260v1
+
+Published Time: Thu, 09 Apr 2026 00:03:30 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+Preprint. Under review. 
+
+# S3: Stratified Scaling Search for Test-Time in Diffusion Lan-guage Models 
+
+Ahsan Bilal †
+
+University of Oklahoma 
+
+ahsan.bilal-1@ou.edu 
+
+Muhammad Ahmed Mohsin †
+
+Stanford University 
+
+muahmed@stanford.edu 
+
+Muhammad Umer 
+
+Stanford University 
+
+mumer@stanford.edu 
+
+Asad Aali 
+
+Stanford University 
+
+asadaali@stanford.edu 
+
+Muhammad Usman Khanzada 
+
+University of G ¨ ottingen 
+
+muhammad.khanzada@stud.uni-goettingen.de 
+
+Muhammad Usman Rafique 
+
+Zoox 
+
+usman@urafique.com 
+
+Zihao He 
+
+Meta 
+
+zihaoh@usc.edu 
+
+Emily Fox 
+
+Stanford University 
+
+ebfox@stanford.edu 
+
+Dean F. Hougen 
+
+University of Oklahoma 
+
+hougen@ou.edu 
+
+> †
+
+Equal contribution 
+
+Abstract 
+
+Test-time scaling investigates whether a fixed diffusion language model (DLM) can generate better outputs when given more inference compute, without additional training. However, naive best-of-K sampling is funda-mentally limited because it repeatedly draws from the same base diffusion distribution, whose high-probability regions are often misaligned with high-quality outputs. We propose S3 (Stratified Scaling Search) , a classical verifier-guided search method that improves generation by reallocating compute during the denoising process rather than only at the final output stage. At each denoising step, S3 expands multiple candidate trajectories, evaluates them with a lightweight reference-free verifier, and selectively re-samples promising candidates while preserving diversity within the search frontier. This procedure effectively approximates a reward-tilted sampling distribution that favors higher-quality outputs while remaining anchored to the model prior. Experiments with LLaDA-8B-Instruct on MATH-500, GSM8K, ARC-Challenge, and TruthfulQA demonstrate that S3 consistently improves performance across benchmarks, achieving the largest gains on mathematical reasoning tasks while leaving the underlying model and decoding schedule unchanged. These results show that classical search over denoising trajectories provides a practical mechanism for test-time scaling in DLMs. 
+
+1 Introduction 
+
+Test-time scaling addresses a fundamental question: given a fixed model and additional compute at inference, how much can performance improve? For autoregressive language models, the answer depends strongly on how compute is spent: chain-of-thought reasoning, best-of-K sampling, and tree search have all been shown to significantly enhance perfor-mance (Brown et al., 2024; Snell et al., 2024). Diffusion language models (DLMs) offer a 1
+
+> arXiv:2604.06260v1 [cs.LG] 7 Apr 2026
+
+Preprint. Under review. structurally distinct opportunity. Recent diffusion LLMs already demonstrate competitive, and sometimes stronger, performance than similarly sized autoregressive models (Zhao et al., 2025). For autoregressive models, inference-time compute has been allocated across token-level search strategies such as beam search, MCTS, and best-of-K sampling (Brown et al., 2024; Snell et al., 2024), each exploiting the sequential left-to-right structure of generation. This opportunity extends naturally to DLMs: because generation proceeds through iterative de-noising over T steps, decoding forms a stochastic sequential process in which partial states are gradually refined into a final sequence, enabling multiple possible denoising trajectories at each step (Kim et al., 2025). Unlike autoregressive decoding, however, standard diffusion decoding samples only a single trajectory (Kim et al., 2025; Nie et al., 2024), leaving this structure unexploited. A common inference-time strategy adapted from autoregressive models is best-of-K sampling (BoK), which is fundamentally limited by the fact that increas-ing the number of samples does not change the underlying distribution from which they are drawn, a limitation that applies equally to both autoregressive and diffusion settings, as we formalize in Section 2.1. To address this limitation, we analyze the inference-time objective from a distributional perspective and show in Section 2.2 that the optimal distribution under a KL constraint relative to the model prior is a reward-tilted Gibbs distribution. Motivated by this objective, we introduce S3 (Stratified Scaling Search) , an inference-time procedure that maintains a population of partial denoising trajectories and allocates computation toward trajectories identified as promising according to verifier-based look-ahead estimates, as described in Section 3. 
+
+Contributions (1) We identify a density-quality mismatch in DLMs, where high-probability regions of p0(x) are misaligned with verifier rewards, limiting naive best-of-K
+
+sampling. (2) We show that the optimal inference-time target under a KL constraint is a 
+
+reward-tilted Gibbs distribution ˜p0(x) ∝ p0(x) exp (τ f (x)) , which shifts probability mass toward high-scoring outputs while remaining anchored to the model prior. (3) We propose 
+
+S3, a verifier-guided particle search over denoising trajectories that, without retraining, employs a lightweight verifier requiring no ground-truth labels and no LLM-as-a-judge, and improves accuracy from 25.60% to 30.20% on MATH-500, 68.16% to 70.21% on GSM8K, and 46.49% to 49.57% on TruthfulQA, while achieving competitive performance on ARC-Challenge (76.11% to 77.86%), where best-of-K can outperform under coarse block lengths (see Section 4). 
+
+2 Preliminaries 
+
+DLMs generate text through a reverse denoising process xT → xT−1 → · · · → x0, where 
+
+xT is an initial fully masked sequence sampled from a simple prior distribution, and x0 is the final decoded sequence. Under a fixed decoding schedule, this process induces a base output distribution p0 over complete sequences. 
+
+2.1 The Density-Quality Mismatch 
+
+Let p0(x) denote the base output distribution and let f (x) denote the verifier score. The expected quality under direct sampling is Q(p0) = Ex∼p0 [ f (x)] . As shown in Figure 1a, the base model distribution p0 often places probability mass on regions that are not aligned with verifier rewards. Meanwhile, the verifier landscape in Figure 1b highlights that high-quality outputs may lie in sparse regions of the space. The reward-tilted target distribution illustrated in Figure 1c, therefore, concentrates probability mass in areas with higher verifier scores. While such misalignment has been noted in autoregressive settings (Snell et al., 2024; Brown et al., 2024), we formalize it for DLMs as the density-quality mismatch and show in Section 2.2 that the Gibbs tilt (Donsker & Varadhan, 1975) provides the principled correction. A natural remedy is best-of-K sampling, which, however, remains fundamentally limited as we show next. 2Preprint. Under review. -40 -30 -20 -10 0 10 20 30 
+
+> Projection Dim 1
+> -40 -30 -20 -10 010 20 30
+> Projection Dim 2
+> 0.5 11.5 22.5 33.5 44.5 55.5 Density
+> #10 !4
+
+(a) Base distribution p0.-40 -30 -20 -10 0 10 20 30  
+
+> Projection Dim 1
+> -40 -30 -20 -10 010 20 30
+> Projection Dim 2
+> 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 Veri -er score  f (x)
+
+(b) Verifier landscape f (x).0  
+
+> 50
+> 0.2
+> 0.4
+> 50
+> 0.6
+> e= f (Gibbs weight, normalised)
+> 0.8
+> Projection Dim 2
+> 1
+> 0
+> Projection Dim 1
+> 0
+> -50 -50
+> 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 Veri -er score  f (x)
+
+(c) Reward-tilted target ˜ p0.0      
+
+> 7f= 0 :716
+> 50
+> 0.2
+> 0.4
+> 0.6
+> Veri -er Score  f (x)
+> 50
+> 0.8
+> 1
+> Projection Dim 2
+> 0
+> Projection Dim 1
+> 0
+> -50 -50
+> 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 Veri -er score  f (x)
+> Mean 7f= 0 :716 Max f= 0 :903
+
+(d) Direct sampling from p0.7fbase = 0 :716       
+
+> 7fS3= 0 :805
+> 050 0.2 0.4 0.6
+> Veri -er Score  f (x)
+> 50 0.8 1
+> Projection Dim 2
+> 0
+> Projection Dim 1
+> 0-50 -50
+> Base 7f= 0 :716, Max = 0 :903
+> S37f= 0 :805, Max = 0 :911 ( "= + 0 :089)
+> 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 Veri -er score  f (x)
+
+(e) S3 trajectory search. " = 0 :089          
+
+> 012345
+> KDE Density
+> 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9
+> Veri -er Score  f (x)
+> Base ( 7= 0 :716)
+> S3(7= 0 :805) data1 data2 data3 data4
+
+(f) Score distribution shift. 
+
+Figure 1: Density–quality mismatch and trajectory search under S3 for MATH-500 . Panels (a)-(c) illustrate the distributional mismatch between p0, the verifier landscape f (x), and the reward-tilted target ˜p0. Panels (d)-(f) show the corresponding inference behavior of direct sampling versus S3
+
+trajectory search and the resulting shift in verifier score distribution. 
+
+Remark 1. Suppose we draw K i.i.d. samples x1, . . . , xK ∼ p0 and return the highest-scoring one. Under mild regularity assumptions on f and p0, E[max k≤K f (xk)] ≤ Q (p0) + σ√2 ln K ,where σ2 = Var p0 [ f ]. This bound follows from standard concentration inequalities for maxima of sub-Gaussian random variables (Boucheron et al., 2013). The improvement, therefore, grows only logarithmically with K , underscoring the need for more efficient inference-time compute allocation strategies. 
+
+2.2 The Optimal Inference-Time Target 
+
+A principled objective is to maximize the expected verifier reward while remaining close to the base model distribution: max ˜p E ˜p[ f (x)] subject to DKL ( ˜p ∥ p0) ≤ δ.
+
+Proposition 1 (Optimal reward-tilted distribution) . The unique maximizer of the above objective is the Gibbs distribution 
+
+˜p0(x0; τ) ∝ p0(x0) eτ f (x0) (1) This result follows from standard variational formulations of KL-constrained optimization and exponential tilting of probability measures (Donsker & Varadhan, 1975). As illustrated in Figures 1d–1f, direct sampling from p0 remains concentrated around the model prior. Remark 1 shows that filtering outputs from p0 yields only logarithmic gains in K, making output-level selection fundamentally insufficient. Approximating ˜p0 instead requires reshap-ing the sampling distribution by exploiting the sequential denoising structure, formalized as a tractable look-ahead approximation in Level 3 of Section 3. 
+
+3 Methodology 
+
+Section 2 established that direct sampling from the base diffusion distribution p0 is limited by a density–quality mismatch, while the ideal inference-time target is the Gibbs-tilted 3Preprint. Under review. High veri fi er score Medium score Low score Full decoded output One-step clean output     
+
+> [P2] Veri fi er [P3] Srinivasan sampling process [P1] Trajectory generation
+> ...\boxed{34}
+> Majority voting on fi nal N particles N selected particles
+> [P2 →P3] For N Selected Particles
+> ...\boxed{34} ...\boxed{34} ...\boxed{7} ...\boxed{34} ...\boxed{34} ...\boxed{7}
+> t = T
+> t = T-1
+> t = 0
+
+Figure 2: S3: N particles are initialized at t=T [P1], then at each step expanded into Nb candidates, scored via one-step clean predictions ˆx(i,j,t) 
+
+> 0
+
+[P2], and resampled to N particles via SSP [P3]. Final output is selected by majority voting at t=0. 
+
+distribution in Eq. (1) . We approximate this target in practice using S3, an inference-time search procedure over denoising trajectories that requires no retraining and operates on a fixed diffusion decoding schedule, developed across three levels: (1) the exact terminal target, (2) its exact sequential realization, and (3) the tractable approximation that S3 implements as in Figure 2. 
+
+3.1 Diffusion decoding as a path-space problem 
+
+Let x denote the input prompt and L the output sequence length. Under a fixed decoding schedule e = ( K, π, T), the DLM defines a reverse denoising chain from the fully masked initial state xT ∈ X L to the final decoded sequence x0 ∈ X L, where K is the block length controlling how many positions are unmasked per step, π is the masking update policy, and T = ⌈L/K⌉ is the total number of denoising steps. This formulation is agnostic to the specific model instantiation, discrete (Do et al., 2025), continuous, or energy-based (Xu et al., 2024) as long as a stochastic reverse transition pθ (xt−1 | xt) is defined (Nie et al., 2025). At each step t, the schedule specifies a set of K updatable positions Ut ⊆ { 1, . . . , L}, where the model samples xt−1 ∼ pθ (· | xt, e) while holding all positions outside Ut fixed, i.e., 
+
+xt−1[i] = xt[i] for all i /∈ Ut, and xt[i] denotes the token at position i of the partial state 
+
+xt. The collection of these reverse transitions, chained over all T steps, defines a base path measure over complete denoising trajectories x0: T = ( x0, x1, . . . , xT ) (Nie et al., 2025), 
+
+p(x0: T ) = pT (xT )
+
+> T
+
+# ∏
+
+> t=1
+
+pθ (xt−1 | xt, e), (2) where pT is the prior over the fully masked initial state xT , each factor pθ (xt−1 | xt, e) is the reverse transition kernel at step t, and the terminal marginal p0(x0) = ∑x1: T p(x0: T ) recovers the base output distribution from Section 2; here, the sum is over all intermediate trajectories 
+
+x1: T consistent with the fixed endpoints x0 and xT .
+
+Level 1: The exact terminal target. As established in Section 2.2, the optimal inference-time distribution under a KL constraint is the Gibbs tilt distribution defined in Eq. (1) , where 
+
+f : X L → [0, 1 ] is the verifier and τ > 0 is the reward temperature. Extending this reward tilt from final outputs to the full denoising trajectory gives the target path measure 
+
+˜p(x0: T ) ∝ p(x0: T ) eτ f (x0), (3) whose terminal marginal is exactly the desired reward-tilted distribution ˜ p0 in Eq. (1). 4Preprint. Under review. 
+
+Level 2: The exact sequential realization. Sampling from ˜p exactly requires twisting the reverse transition kernels, i.e., the learned conditional distributions pθ (xt−1 | xt, e) that define the probability of transitioning from state xt to xt−1 at every denoising step. Define the backward information function at step t as 
+
+ht(xt) := Ep
+
+h
+
+eτ f (x0) | xt = xt
+
+i
+
+, (4) where x0 is the terminal output distributed according to p0. The function ht encodes all expected future reward reachable from the current partial state xt, satisfying boundary conditions hT (xT ) = ˜p0/p0 up to a normalizing constant, and h0(x0) = eτ f (x0). The marginal of ˜p at step t factorizes as ˜pt(xt) ∝ pt(xt) ht(xt), where pt is the t-step marginal of p, and the exact twisted reverse kernel that realizes ˜ p sequentially is ˜pθ (xt−1 | xt) = pθ (xt−1 | xt, e) · ht−1(xt−1)
+
+ht(xt) . (5) This is the Doob h-transform of the base kernel (Whiteley & Lee, 2014), where the base transition is weighted by the ratio of future reward expectations at the child state relative to the parent state. Formally, Gt(xt, xt−1) := ht−1(xt−1)/ht(xt) is the incremental potential at step t, and a Sequential Monte Carlo (SMC) sampler using these potentials as importance weights yields an exact, unbiased particle approximation of ˜p (Smith, 2013; Neal, 2001). The auxiliary particle filter of Pitt & Shephard (1999) can be understood as approximating this look-ahead weighting scheme precisely via a predictive approximation of the backward information function. 
+
+Level 3: The S3 approximation. The backward information functions ht defined in Eq. (4) are intractable: computing them exactly requires marginalizing over all denoising trajec-tories from step t to 0 under the base path measure, which is as expensive as running the full reverse process from every candidate state. S3 replaces these intractable quantities with a tractable surrogate derived from the diffusion model’s own one-step clean prediction, described next. 
+
+3.2 Trajectory search with look-ahead scoring 
+
+The reverse process in Eq. (2) naturally induces a search tree over partial states. We maintain a population of N partial trajectories {x(i) 
+
+> t
+
+}Ni=1 and expand each particle into b candidate successors by sampling x(i,j) 
+
+> t−1
+
+∼ pθ
+
+
+
+· | x(i) 
+
+> t
+
+, e
+
+
+
+for j = 1, . . . , b, producing an expanded frontier of Nb candidate partial trajectories {x(i,j) 
+
+> t−1
+
+}. Since x0 is unavailable at intermediate steps, evaluating ht−1(x(i,j) 
+
+> t−1
+
+) directly is intractable. We instead approximate it via the model’s one-step clean prediction, ˆx(i,j,t) 
+
+> 0
+
+= decode 
+
+
+
+pθ
+
+
+
+x0 | x(i,j)
+
+> t−1
+
+ 
+
+, (6) where decode (·) denotes argmax decoding, and apply the verifier to obtain a look-ahead score 
+
+si,j,t = f
+
+
+
+ˆx(i,j,t)
+
+> 0
+
+
+
+∈ [0, 1 ], (7) which estimates how rewarding the trajectory through x(i,j) 
+
+> t−1
+
+is likely to be at termination. This defines the approximate backward information function ˆht−1
+
+
+
+x(i,j)
+
+> t−1
+
+
+
+:= exp λ si,j,t ≈ ht−1
+
+
+
+x(i,j)
+
+> t−1
+
+
+
+, (8) where λ > 0 is an inverse-temperature hyperparameter, making si,j,t a tractable surrogate for 1 
+
+> τ
+
+log ht−1(x(i,j) 
+
+> t−1
+
+). This instantiates for DLM decoding the same look-ahead principle underlying the auxiliary particle filter (Pitt & Shephard, 1999) and twisted particle filters (Whiteley & Lee, 2014): the model’s one-step denoising prediction plays the role of the look-ahead, and the verifier provides the reward signal. 5Preprint. Under review. 
+
+Algorithm 1 Single-Schedule Verifier-Guided Particle Search ( S3)
+
+Input: Diffusion model pθ , verifier f , prompt x, fixed schedule e = ( K, π, T), particle count 
+
+N, branching factor b, temperature λ > 0
+
+Output: Best decoded output y⋆ 
+
+> 1:
+
+Initialize: x(i) 
+
+> T
+
+← FULL MASK (x) for i = 1, . . . , N ▷ all output positions masked  
+
+> 2:
+
+for t = T, T − 1, . . . , 1 do  
+
+> 3:
+
+Determine updatable positions Ut ⊆ { 1, . . . , L} from schedule policy π ▷ | Ut | = K 
+
+> 4:
+
+for each particle i ∈ { 1, . . . , N} do  
+
+> 5:
+
+for each child j ∈ { 1, . . . , b} do  
+
+> 6:
+
+x(i,j) 
+
+> t−1
+
+∼ pθ (· | x(i) 
+
+> t
+
+, e) ▷ update only K positions in Ut 
+
+> 7:
+
+ˆx(i,j,t) 
+
+> 0
+
+← decode 
+
+
+
+pθ (x0 | x(i,j) 
+
+> t−1
+
+)
+
+
+
+▷ clean prediction, Eq. (6)  
+
+> 8:
+
+si,j,t ← f
+
+
+
+ˆx(i,j,t)
+
+> 0
+
+
+
+▷ look-ahead verifier score, Eq. (7)  
+
+> 9:
+
+end for  
+
+> 10:
+
+end for  
+
+> 11:
+
+˜wi,j,t ← exp (λsi,j,t) for all i, j ▷ approximate twist weight, Eq. (8)  
+
+> 12:
+
+wi,j,t ← ˜wi,j,t
+
+ ∑i′,j′ ˜wi′,j′,t ▷ normalize over all N · b children  
+
+> 13:
+
+ξi,j,t ← N w i,j,t for all i, j ▷ expected offspring counts  
+
+> 14:
+
+{x(i)
+
+> t−1
+
+}Ni=1 ← SSPR ESAMPLE 
+
+
+
+{x(i,j) 
+
+> t−1
+
+}, {ξi,j,t}, N
+
+
+
+▷ low-variance dependent-rounding resampling  
+
+> 15:
+
+end for  
+
+> 16:
+
+return y⋆ ← MajorityVote 
+
+
+
+{x(i) 
+
+> 0
+
+}Ni=1
+
+
+
+▷ break ties by lowest NLL under the base model 
+
+3.3 Verifier-weighted resampling with Srinivasan Sampling Process (SSP) 
+
+To bias the search toward higher-quality trajectories while preserving particle diversity, we convert look-ahead scores from Eq. (7) into normalized importance weights. For each expanded candidate x(i,j) 
+
+> t−1
+
+in the frontier of Nb children, the unnormalized weight ˜wi,j,t =
+
+exp  λ si,j,t
+
+ and normalized weight wi,j,t = ˜wi,j,t/ ∑i′,j′ ˜wi′,j′,t over all Nb candidates, where larger λ concentrates mass on high-scoring trajectories and smaller λ retains a more diffuse particle distribution. 
+
+Remark 2. The per-step weights ˜wi,j,t are inspired by the incremental potential Gt(xt, xt−1) = 
+
+ht−1(xt−1)/ht(xt) from Eq. (5) , but do not implement the exact sequential importance sampling correction for ˜p , as doing so would require computing the ratio of consecutive backward information functions at consecutive states, which is intractable. S3 instead uses the surrogate ˆht−1 from Eq. (8) 
+
+as a stand-alone potential without dividing by ˆht(x(i) 
+
+> t
+
+), and should therefore be interpreted as a verifier-guided approximate twisting scheme rather than an unbiased particle filter for ˜p. 
+
+The expected offspring allocation ξi,j,t = N w i,j,t with ∑i,j ξi,j,t = N is converted into exact integer counts using the Srinivasan Sampling Process (SSP) (Srinivasan, 1999), a low-variance dependent-rounding procedure with ni,j,t ∈ Z≥0 and ∑i,j ni,j,t = N. SSP retains stochasticity in the resampling step, which is critical because deterministic top-k pruning leads to mode collapse within the search tree, whereas stochastic resampling preserves multiple plausible denoising trajectories. Each denoising step thus applies an expand–score–resample update: expansion proposes 
+
+Nb continuations under pθ (· | xt, e); scoring evaluates clean-prediction quality ˆx0 through the verifier; and SSP resampling reallocates the particle budget toward more promising trajectory regions. Repeating over T steps progressively shifts the population toward the reward-tilted distribution in Eq. (3); see Appendix A for an empirical illustration. 6Preprint. Under review. 
+
+Table 1: Accuracy (%) of standard diffusion decoding, Best-of-K (K=8), and S3 (N=4, b=2, K=64) on LLaDA-8B-Instruct. 
+
+Dataset Baseline Diffusion Best-of-K S3
+
+GSM-8K 68.16 69.56 70.21 MATH-500 25.60 28.20 30.20 TruthfulQA 46.49 49.36 49.57 ARC-Challenge 76.11 79.30 77.86 10 1 10 2    
+
+> Number of Function Evaluations (NFE)
+> 24 25 26 27 28 29 30 31 32
+> Accuracy (%)
+> N=2, b=1 N=2, b=2
+> N=4, b=2
+> N=4, b=4 N=8, b=4 K=2 K=4 K=8 K=16 K=32 Base: 25.60%
+> S3(ours) BoK Baseline
+
+(a) MATH-500 10 1 10 2     
+
+> Number of Function Evaluations (NFE)
+> 67.5 68 68.5 69 69.5 70 70.5 71 71.5
+> Accuracy (%)
+> N=2, b=1 N=2, b=2
+> N=4, b=2 N=4, b=4 N=8, b=4 K=2 K=4 K=8 K=16 K=32 Base: 68.16%
+> S3(ours) BoK Baseline
+
+(b) GSM8K 10 1 10 2      
+
+> Number of Function Evaluations (NFE)
+> 76 78 80 82 84 86 88
+> Accuracy (%)
+> N=2, b=1 N=2, b=2 N=4, b=2
+> N=4, b=4 N=8, b=4 K=2 K=4 K=8 K=16 K=32 Base: 76.11%
+> S3(ours) BoK Baseline
+
+(c) ARC-C 10 1 10 2       
+
+> Number of Function Evaluations (NFE)
+> 46 47 48 49 50 51
+> Accuracy (%)  N=2, b=1 N=2, b=2
+> N=4, b=2 N=4, b=4 N=8, b=4 K=2 K=4 K=8 K=16 K=32 Base: 46.49%
+> S3(ours) BoK Baseline
+
+(d) TruthfulQA 0% 25% 50% 75% 100%  
+
+> Denoising Progress (fraction of steps)
+> 00.2 0.4 0.6 0.8 1
+> Top-1 Token Confidence
+> Baseline S3(ours) BoK
+
+(e) MATH-500 0% 25% 50% 75% 100%   
+
+> Denoising Progress (fraction of steps)
+> 00.2 0.4 0.6 0.8 1
+> Top-1 Token Confidence
+> Baseline S3(ours) BoK
+
+(f) GSM8K 0% 25% 50% 75% 100%   
+
+> Denoising Progress (fraction of steps)
+> 00.2 0.4 0.6 0.8 1
+> Top-1 Token Confidence
+> Baseline S3(ours) BoK
+
+(g) ARC-C 0% 25% 50% 75% 100%   
+
+> Denoising Progress (fraction of steps)
+> 00.2 0.4 0.6 0.8 1
+> Top-1 Token Confidence
+> Baseline S3(ours) BoK
+
+(h) TruthfulQA 
+
+Figure 3: Inference-time scaling with S3 across datasets. Top row: accuracy vs. compute ( NFE =
+
+steps × N × b) across multiple (N, b) settings. Bottom row: mean top-1 token confidence over denoising progress. Curves shown for Baseline, S3 (N=4, b=2, λ=1.0), and BoK ( K=8). 
+
+3.4 Verifier, compute budget, and final output selection 
+
+We use a lightweight ground-truth-free composite verifier scoring candidate outputs via intrinsic signals from the generated text, combining structural validity, arithmetic con-sistency, answer reachability, model confidence, and degeneracy penalties into a single scalar, f (x) = ∑5
+
+k=1 αk sk(x) + αc sconstraint (x) where sk(x) for k = 1, . . . , 5 measure structural completeness, arithmetic consistency, answer reachability, model confidence, and non-degeneracy respectively; sconstraint (x) captures task-specific constraint satisfaction; and 
+
+∑5
+
+k=1 αk + αc = 1. Full details and dataset-specific weight profiles are given in Appendix C. The computational cost is explicit and tunable: each denoising step evaluates Nb transition proposals and Nb clean-prediction verifier scores, yielding approximately TNb total evalua-tions over T steps, so N, b, and λ directly control the compute–quality trade-off. After the final step, let {x(i)
+
+0 }Ni=1 denote the surviving decoded particles. We extract the final answer from each particle, select the majority answer, and break ties using the lowest negative log-likelihood (NLL) under the base model. The returned output y⋆ is the representative decoded sequence corresponding to this selected answer; full latency and computational cost analysis are provided in Appendix D. 
+
+4 Evaluation and Results 
+
+Experimental Setup We evaluate S3 on four benchmarks encompassing mathematical reasoning, scientific reasoning, and factual accuracy: GSM8K (Cobbe et al., 2021), MATH-500 (Hendrycks et al., 2021), TruthfulQA (Lin et al., 2022), and ARC-Challenge (Clark et al., 2018), leveraging LLaDA-8B-Instruct under its default denoising schedule. We follow the evaluation protocol of Lee et al. (2025) for preprocessing and answer normalization. The 7Preprint. Under review. 2 4 8 16 32 64 65 70 75 80 85   
+
+> Accuracy (%)
+> K=8 K=8 K=8 K=8 K=8 K=8
+> Block Length
+> Baseline BoK S3(ours)
+
+(a) ARC-Challenge 2 4 8 16 32 64 67 68 69 70 71     
+
+> Accuracy (%)
+> K=8 K=8 K=8 K=8 K=8 K=8
+> Block Length
+> Baseline BoK S3(ours)
+
+(b) GSM8K 2 4 8 16 32 64 15 20 25 30   
+
+> Accuracy (%)
+> K=8 K=8 K=8 K=8 K=8 K=8
+> Block Length
+> Baseline BoK S3(ours)
+
+(c) MATH-500 2 4 8 16 32 64 40 45 50   
+
+> Accuracy (%)
+> K=8 K=8 K=8 K=8 K=8 K=8
+> Block Length
+> Baseline BoK S3(ours)
+
+(d) TruthfulQA 
+
+Figure 4: Accuracy (%) across block lengths K ∈ { 2, 4, 8, 16, 32, 64 } on four benchmarks. Results use LLaDA-8B-Instruct with N=4, b=2, and K=8. Orange bars denote S3, blue bars denote Baseline, and green bars denote BoK. An upward arrow ( ↑) indicates configurations where the leading method improves over the Baseline. 
+
+baseline is standard single-trajectory diffusion decoding from p0; full experimental details are provided in Appendix B. 
+
+Benchmark Performance Table 1 reports accuracy for the baseline, Best-of-K (K=8), and 
+
+S3 (N=4, b=2). S3 consistently outperforms both baselines across all benchmarks. We use 
+
+(N=4, b=2) as a representative compute point ( NFE ∝ T · N · b) without dataset-specific tuning; results remain consistent across all (N, b) configurations (Figure 3). The most pronounced improvement is observed on MATH-500 (+4.60 pp over baseline, +2.00 pp over BoK), suggesting that verifier-guided trajectory search is particularly effective on tasks requiring multi-step reasoning where intermediate denoising decisions compound. Gains on TruthfulQA (+3.08 pp over baseline) further demonstrate that the density-quality mismatch is not specific to mathematical reasoning. On ARC-Challenge, S3 improves over the baseline (+1.75 pp) but underperforms BoK at K=64; as shown in Figure 4, S3 recovers its advantage at finer block lengths ( K ∈ { 2, 4, 16 }), where the look-ahead signal is more informative. Crucially, S3 improves over BoK on MATH-500, GSM8K, and TruthfulQA, confirming that the gains arise from reallocating compute during denoising rather than merely increasing the final sample count. 
+
+4.1 Scaling with Inference-Time Compute and Block-Length Analysis 
+
+Figure 3 (top row) shows accuracy vs. NFE across multiple (N, b) configurations. S3 sur-passes the BoK Pareto frontier at matched NFE on MATH-500, GSM8K, and TruthfulQA; on ARC-Challenge, S3 remains competitive at low NFE but does not dominate at higher budgets, consistent with the weaker verifier signal on multiple-choice tasks. The confidence evolution plots (bottom row) show that S3 maintains higher mean token confidence through-out denoising compared to the baseline, indicating that verifier-guided resampling stabilizes intermediate generation dynamics rather than only affecting the final output selection. Fig-ure 4 shows that S3 consistently outperforms both baselines across all block lengths on MATH-500 and GSM8K, and matches or exceeds BoK on TruthfulQA. On ARC-Challenge, 
+
+S3 leads at block lengths K ∈ { 2, 4, 16 } but underperforms BoK at K ∈ { 8, 32, 64 }, suggest-ing that the look-ahead signal is less reliable at coarser granularities on multiple-choice tasks where the verifier provides weaker per-step discrimination. Full latency and output token statistics across all block sizes are reported in Appendix D. 
+
+4.2 Ablation: Tilted Reward vs. Look-ahead 
+
+To isolate the contribution of each component, we evaluate four conditions under a matched compute budget of K = N · b forward passes: (1) Baseline diffusion , single-trajectory decoding with no verifier; (2) Best-of-K, K independent sequences from p0 with majority voting and NLL tie-breaking; (3) Look-ahead only , tree expansion with uniform top-N
+
+pruning instead of exponential weighting, with majority voting and NLL tie-breaking over surviving particles; and (4) Tilting only , K independent sequences reweighted by 8Preprint. Under review.                                            
+
+> Table 2: Ablation study decomposing the contributions of look-ahead search and Gibbs tilting in S3
+> (LLaDA-8B-Instruct, N=4, b=2, K=N·b=8, block length 64, generation length 128). ✓/× indicate whether each mechanism is active. Scores represent task accuracy (%).
+> Method Look-ahead Tilting Accuracy (%) GSM8K MATH-500 ARC-C TruthfulQA
+> Baseline diffusion ××68.16 25.60 76.11 46.49 Best-of-K××69.56 28.20 79.30 49.36 Tilting only ×✓69.54 26.40 76.30 48.10 Look-ahead only ✓×69.69 26.20 76.71 46.49
+> S3(full, ours) ✓✓70.21 30.20 77.86 49.57
+
+wi ∝ exp (λ f (xi)) without tree structure, selected via weighted argmax. The full S3 method uses both look-ahead and tilting with majority voting and NLL tie-breaking. Table 2 shows that neither look-ahead nor tilting alone is sufficient in isolation: look-ahead without tilting yields marginal gains, and tilting without look-ahead can underperform BoK on MATH-500. Only their combination in S3 achieves consistent improvements, with the largest synergy on MATH-500 (+2.40 pp over BoK), empirically validating the two-component design motivated by the approximate twisted SMC framework in Section 3. 
+
+5 Related Work 
+
+Diffusion models for generation. Score-based diffusion models learn to reverse a noising process to generate samples (Song et al., 2020), and have been extended to discrete domains via masked denoising (Austin et al., 2021). In NLP, Diffusion-LM (Li et al., 2022) intro-duced diffusion-based text generation, with subsequent work scaling DLMs to competitive performance (Nie et al., 2025). 
+
+Inference-time control and test-time scaling. Recent studies show that allocating addi-tional inference-time compute can substantially improve model performance (Snell et al., 2024). This has motivated research on verifier design and compute allocation strategies (Chen et al., 2025). Exponential tilting of base distributions toward reward-weighted targets provides a principled foundation for inference-time objective formulations (Donsker & Varadhan, 1975). For diffusion models, several approaches steer generation at inference time without retraining, including training-free guidance (Ye et al., 2024), derivative-free or value-based decoding (Li et al., 2024), and controlled Langevin diffusion processes (Chen et al., 2024). Analogous verifier-guided scaling has also been explored for vision diffusion models (Ma et al., 2025; Baraldi et al., 2025). These methods modify the denoising dynamics to incorporate external reward signals during sampling; however, their reliance on con-tinuous state spaces and gradient-based updates renders them incompatible with discrete masked DLMs, and thus not directly comparable to S3.
+
+Population and search-based diffusion inference. Another line of work scales diffusion inference via population-based methods that maintain and resample multiple denoising trajectories (Dang et al., 2025), building on SMC (Smith, 2013) and annealed importance sampling (Neal, 2001) as general frameworks for importance-weighted resampling over sequences of target distributions. The auxiliary particle filter (Pitt & Shephard, 1999) and twisted particle filters (Whiteley & Lee, 2014) provide the theoretical foundation for S3
+
+via look-ahead weighting and backward information function approximation, respectively. Orthogonal directions include amortizing inference-time compute via auxiliary networks (Eyring et al., 2025) and scaling compute for vision diffusion models (Ma et al., 2025; Baraldi et al., 2025). Closely related work interprets diffusion decoding as search over denoising trajectories and applies classical search strategies such as BFS or DFS to guide exploration (Zhang et al., 2025), and hierarchical search with self-verification has been explored for discrete DLMs (Bai et al., 2026). Both are complementary to S3 rather than 9Preprint. Under review. directly comparable, as neither grounds search in a principled inference-time objective nor employs verifier-weighted SMC resampling. 
+
+6 Conclusion 
+
+This work demonstrates that test-time scaling for DLMs improves by reallocating compute across denoising trajectories rather than increasing the final sample count. S3 performs verifier-guided particle search that shifts generation toward higher-quality output regions without modifying the underlying model or decoding schedule, yielding consistent gains across four benchmarks. The primary limitation is the reliance on verifier quality and intermediate clean prediction accuracy: noisy or misaligned signals may fail to guide trajectories toward better solutions. The method also incurs additional compute due to particle expansion and repeated scoring, making the compute-performance trade-off an important consideration for practical deployment. 
+
+Ethics Statement 
+
+This work studies inference-time compute allocation for DLMs and does not introduce new datasets, human subjects, or deployment systems that raise additional ethical concerns beyond those associated with large language models. 
+
+Reproducibility Statement 
+
+All experiments use publicly available benchmarks and a fixed model configuration, and we provide the evaluation setup, algorithm description, and hyperparameters necessary to reproduce the results. 
+
+Usage of LLMs 
+
+We used LLMs to assist with the research, coding, and writing of this paper, in accordance with COLM policy. LLMs were used to refine and streamline text, support aspects of the literature review, and assist with reference formatting. All content has been carefully reviewed, and we take full responsibility for the accuracy and validity of the paper. We also used LLMs as coding assistants for implementation, validation, and plotting. The resulting code has been thoroughly tested, sanity-checked, and manually reviewed. We stand by the correctness of the software and the claims derived from it. 
+
+Acknowledgments 
+
+We thank the anonymous reviewers and the open-source community whose tools and datasets made this research possible. 
+
+References 
+
+Jacob Austin, Daniel D Johnson, Jonathan Ho, Daniel Tarlow, and Rianne Van Den Berg. Structured denoising diffusion models in discrete state-spaces. Advances in neural informa-tion processing systems , 34:17981–17993, 2021. Jinbin Bai, Yixuan Li, Yuchen Zhu, Yi Xin, Qingyu Shi, Aosong Feng, Xiaohong Liu, Molei Tao, Jianru Xue, Xiangtai Li, et al. Prism: Efficient test-time scaling via hierar-chical search and self-verification for discrete diffusion language models. arXiv preprint arXiv:2602.01842 , 2026. 10 Preprint. Under review. Lorenzo Baraldi, Davide Bucciarelli, Zifan Zeng, Chongzhe Zhang, Qunli Zhang, Marcella Cornia, Feng Liu, Hu Zheng, Rita Cucchiara, et al. Verifier matters: Enhancing inference-time scaling for video diffusion models. In Proceedings of the 36th British Machine Vision Conference , 2025. St ´ephane Boucheron, G ´abor Lugosi, and Pascal Massart. Concentration Inequalities: A Nonasymptotic Theory of Independence . Oxford University Press, 02 2013. ISBN 9780199535255. doi: 10.1093/acprof:oso/9780199535255.001.0001. URL https://doi. org/10.1093/acprof:oso/9780199535255.001.0001 .Bradley Brown, Jordan Juravsky, Ryan Ehrlich, Ronald Clark, Quoc V Le, Christopher R ´e, and Azalia Mirhoseini. Large language monkeys: Scaling inference compute with repeated sampling. arXiv preprint arXiv:2407.21787 , 2024. Hao Mark Chen, Guanxi Lu, Yasuyuki Okoshi, Zhiwen Mo, Masato Motomura, and Hongx-iang Fan. Rethinking optimal verification granularity for compute-efficient test-time scaling. arXiv preprint arXiv:2505.11730 , 2025. Junhua Chen, Lorenz Richter, Julius Berner, Denis Blessing, Gerhard Neumann, and Anima Anandkumar. Sequential controlled langevin diffusions. arXiv preprint arXiv:2412.07081 ,2024. Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. Think you have solved question answering? try arc, the ai2 reasoning challenge. arXiv preprint arXiv:1803.05457 , 2018. Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, et al. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 , 2021. Meihua Dang, Jiaqi Han, Minkai Xu, Kai Xu, Akash Srivastava, and Stefano Ermon. Inference-time scaling of diffusion language models with particle gibbs sampling. arXiv preprint arXiv:2507.08390 , 2025. Duc Anh Do, Luu Anh Tuan, Wray Buntine, et al. Discrete diffusion language model for efficient text summarization. In Findings of the Association for Computational Linguistics: NAACL 2025 , pp. 6278–6290, 2025. Monroe D Donsker and SR Srinivasa Varadhan. Asymptotic evaluation of certain markov process expectations for large time, i. Communications on pure and applied mathematics , 28 (1):1–47, 1975. Luca Eyring, Shyamgopal Karthik, Alexey Dosovitskiy, Nataniel Ruiz, and Zeynep Akata. Noise hypernetworks: Amortizing test-time compute in diffusion models. arXiv preprint arXiv:2508.09968 , 2025. Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset. arXiv preprint arXiv:2103.03874 , 2021. Jaeyeon Kim, Kulin Shah, Vasilis Kontonis, Sham Kakade, and Sitan Chen. Train for the worst, plan for the best: Understanding token ordering in masked diffusions. arXiv preprint arXiv:2502.06768 , 2025. Jihoon Lee, Hoyeon Moon, Kevin Zhai, Arun Kumar Chithanar, Anit Kumar Sahu, Soum-mya Kar, Chul Lee, Souradip Chakraborty, and Amrit Singh Bedi. Test-time scaling in diffusion llms via hidden semi-autoregressive experts. arXiv preprint arXiv:2510.05040 ,2025. Xiang Li, John Thickstun, Ishaan Gulrajani, Percy S Liang, and Tatsunori B Hashimoto. Diffusion-lm improves controllable text generation. Advances in neural information process-ing systems , 35:4328–4343, 2022. 11 Preprint. Under review. Xiner Li, Yulai Zhao, Chenyu Wang, Gabriele Scalia, Gokcen Eraslan, Surag Nair, Tommaso Biancalani, Shuiwang Ji, Aviv Regev, Sergey Levine, et al. Derivative-free guidance in continuous and discrete diffusion models with soft value-based decoding. arXiv preprint arXiv:2408.08252 , 2024. Stephanie Lin, Jacob Hilton, and Owain Evans. Truthfulqa: Measuring how models mimic human falsehoods. In Proceedings of the 60th annual meeting of the association for computa-tional linguistics (volume 1: long papers) , pp. 3214–3252, 2022. Nanye Ma, Shangyuan Tong, Haolin Jia, Hexiang Hu, Yu-Chuan Su, Mingda Zhang, Xuan Yang, Yandong Li, Tommi Jaakkola, Xuhui Jia, et al. Scaling inference time compute for diffusion models. In Proceedings of the Computer Vision and Pattern Recognition Conference ,pp. 2523–2534, 2025. Radford M Neal. Annealed importance sampling. Statistics and computing , 11(2):125–139, 2001. Shen Nie, Fengqi Zhu, Chao Du, Tianyu Pang, Qian Liu, Guangtao Zeng, Min Lin, and Chongxuan Li. Scaling up masked diffusion models on text. arXiv preprint arXiv:2410.18514 , 2024. Shen Nie, Fengqi Zhu, Zebin You, Xiaolu Zhang, Jingyang Ou, Jun Hu, Jun Zhou, Yankai Lin, Ji-Rong Wen, and Chongxuan Li. Large language diffusion models. arXiv preprint arXiv:2502.09992 , 2025. Michael K Pitt and Neil Shephard. Filtering via simulation: Auxiliary particle filters. Journal of the American statistical association , 94(446):590–599, 1999. Adrian Smith. Sequential Monte Carlo methods in practice . Springer Science & Business Media, 2013. Charlie Snell, Jaehoon Lee, Kelvin Xu, and Aviral Kumar. Scaling llm test-time compute opti-mally can be more effective than scaling model parameters. arXiv preprint arXiv:2408.03314 ,2024. Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. 
+
+arXiv preprint arXiv:2011.13456 , 2020. Aravind Srinivasan. Improved approximation guarantees for packing and covering integer programs. SIAM Journal on Computing , 29(2):648–670, 1999. Nick Whiteley and Anthony Lee. Twisted particle filters. 2014. Minkai Xu, Tomas Geffner, Karsten Kreis, Weili Nie, Yilun Xu, Jure Leskovec, Stefano Ermon, and Arash Vahdat. Energy-based diffusion language models for text generation. arXiv preprint arXiv:2410.21357 , 2024. Haotian Ye, Haowei Lin, Jiaqi Han, Minkai Xu, Sheng Liu, Yitao Liang, Jianzhu Ma, James Y Zou, and Stefano Ermon. Tfg: Unified training-free guidance for diffusion models. 
+
+Advances in Neural Information Processing Systems , 37:22370–22417, 2024. Xiangcheng Zhang, Haowei Lin, Haotian Ye, James Zou, Jianzhu Ma, Yitao Liang, and Yilun Du. Inference-time scaling of diffusion models through classical search. arXiv preprint arXiv:2505.23614 , 2025. Siyan Zhao, Devaansh Gupta, Qinqing Zheng, and Aditya Grover. d1: Scaling rea-soning in diffusion large language models via reinforcement learning. arXiv preprint arXiv:2504.12216 , 2025. 12 Preprint. Under review. 
+
+A Distributional Shift of Verifier Scores 
+
+Figure 5 illustrates the distributional shift of verifier scores across denoising steps under 
+
+S3 search on MATH-500. Sequential resampling progressively concentrates particles in higher-reward regions compared to direct sampling from p0. The KDE plot (Figure 5a) shows the score distribution shifting rightward across steps, while the heatmap (Figure 5b) shows the particle score density concentrating toward higher-reward regions as denoising proceeds, confirming that the expand–score–resample updates progressively move the particle population away from the unguided base path measure p and toward the reward-tilted distribution in Eq. (3). 0.5 0.6 0.7 0.8 0.9 1                           
+
+> Veri -er Score f(x)
+> 012345
+> KDE Density
+> " 7f= +0 :089
+> high-reward region
+> data1
+> t=T!1(base, 7f= 0 :716) data2
+> t=T!2(1 st SSP, 7f= 0 :760) data3
+> t=T = 2(mid, 7f= 0 :790) data4
+> t= 0 (-nal, 7f= 0 :805)
+
+(a) KDE of verifier scores across denoising steps. 0.4 0.5 0.6 0.7 0.8 0.9 1                                    
+
+> Veri -er Score f(x)
+> t=T!9
+> t=T!8
+> t=T!7
+> t=T!6
+> t=T!5
+> t=T!4
+> t=T!3
+> t=T!2
+> t=T!1
+> t= 0
+> Denoising Step
+> 7f= 0 :716 (base p0)
+> 7f= 0 :805 (S3)base 7fS37f
+> high-reward
+> 0123456Particle density
+
+(b) Particle score density over denoising steps. 
+
+Figure 5: Distributional shift of verifier scores under S3 search on MATH-500. Sequential resampling during denoising concentrates particles in higher-reward regions compared to direct sampling from 
+
+p0.
+
+B Experimental Details 
+
+All experiments use LLaDA-8B-Instruct with gen length =128 and diffusion steps =64. We follow the evaluation protocol of Lee et al. (2025) for dataset preprocessing and answer normalization: numerical and symbolic answers are extracted via L ATEX canonicalization for GSM8K and MATH-500, and multiple-choice predictions are mapped to option sets for ARC-Challenge and TruthfulQA. GSM8K comprises 1,319 test problems, MATH-500 comprises 500 competition-level problems, TruthfulQA comprises 817 questions, and ARC-Challenge comprises 1,172 questions. The S3 default configuration uses N=4, b=2, λ=1.0, and K=64 unless otherwise stated. 
+
+Benchmark Performance. On MATH-500, S3 improves accuracy from 25.60% to 30.20% (+4.60 pp over baseline, +2.00 pp over BoK). On GSM8K, accuracy improves from 68.16% to 70.21% (+2.05 pp over baseline, +0.65 pp over BoK). On TruthfulQA, accuracy improves from 46.49% to 49.57% (+3.08 pp over baseline, +0.21 pp over BoK). On ARC-Challenge, accuracy improves from 76.11% to 77.86% (+1.75 pp over baseline, −1.44 pp vs. best-of-
+
+K), with S3 recovering its advantage over best-of-K at finer block lengths as discussed in Section 4. 
+
+C Composite Verifier Design 
+
+The verifier f : X L → [0, 1 ] must satisfy two operational requirements: it must produce a meaningful quality signal without access to ground-truth answers , and it must be inexpensive enough to evaluate Nb times per denoising step throughout the S3 search procedure. To satisfy both constraints simultaneously, we design a lightweight composite intrinsic verifier that decomposes solution quality into five orthogonal dimensions derivable from the generated text alone, plus an optional task-specific constraint term. 13 Preprint. Under review. 
+
+C.1 Composite Score Formulation 
+
+The verifier score is defined as 
+
+f (x) = 
+
+> 5
+
+# ∑
+
+> k=1
+
+αk sk(x) + αc sconstraint (x), (9) where s1, . . . , s5 measure structural completeness, internal arithmetic consistency, answer reachability, model confidence, and non-degeneracy respectively; sconstraint captures task-specific constraint satisfaction, and the coefficients satisfy 
+
+> 5
+
+# ∑
+
+> k=1
+
+αk + αc = 1, αk ≥ 0. Each component is described in detail below. The five dimensions are intentionally or-thogonal: structural completeness captures surface form, arithmetic consistency captures local numerical correctness, answer reachability captures global reasoning coherence, model confidence captures fluency, and non-degeneracy penalizes degenerate failure modes. No single component is sufficient alone; the composite aggregation makes the signal robust to the weaknesses of any individual dimension. 
+
+C.2 Dataset-Specific Weight Profiles 
+
+The coefficients (α1, . . . , α5, αc) are heuristically set based on the expected answer format: numerical answer extraction for mathematical reasoning tasks (GSM8K, MATH-500) and let-ter option selection for multiple-choice tasks (ARC-Challenge, TruthfulQA). Consequently, arithmetic consistency α2 and answer reachability α3 carry the largest weight for mathemati-cal tasks, while they are zeroed out for multiple-choice tasks where the constraint term αc
+
+dominates, as summarized in Table 3.   
+
+> Table 3: Weight profiles
+
+(α1, . . . , α5, αc) per dataset, corresponding to structural completeness, arith-metic consistency, and answer reachability, model confidence, non-degeneracy, and constraint satisfac-tion respectively. All rows sum to 1.0.                                           
+
+> Dataset α1α2α3α4α5αc
+> GSM8K 0.20 0.25 0.25 0.10 0.20 0.00 MATH-500 0.25 0.20 0.25 0.10 0.20 0.00 ARC-Challenge 0.20 0.00 0.00 0.15 0.20 0.45 TruthfulQA 0.20 0.00 0.00 0.15 0.20 0.45 Countdown 0.15 0.10 0.10 0.10 0.15 0.40 Sudoku 0.05 0.00 0.00 0.05 0.10 0.80
+
+For mathematical reasoning (GSM8K, MATH-500), arithmetic consistency α2 and answer reachability α3 together carry the largest combined weight (0.50 for GSM8K; 0.45 for MATH-500). MATH-500 upweights structural completeness ( α1 = 0.25) relative to GSM8K ( α1 =
+
+0.20) to account for the more elaborate solution formats typical of competition mathematics, while GSM8K slightly upweights arithmetic consistency ( α2 = 0.25) to capture the denser arithmetic chains present in grade-school word problems. The constraint term is set to zero for both, since no domain constraints are verifiable without ground truth. For multiple-choice tasks (ARC-Challenge, TruthfulQA), the arithmetic components α2
+
+and α3 are zeroed out, as these benchmarks require answer selection rather than numerical derivation. The constraint term carries αc = 0.45 via an MC reasoning quality score that rewards the answer extraction, reasoning keyword presence, answer dominance across options, and minimum response length. For structured constraint tasks , the constraint term dominates: αc = 0.40 for Countdown (target match and number validity) and αc = 0.80 for Sudoku (grid validity and clue preservation), since these tasks are self-verifying, and domain constraint satisfaction is a far stronger quality signal than any text-surface heuristic. 14 Preprint. Under review. 
+
+C.3 Component Scores S1: Structural Completeness. sstruct (x) rewards outputs that exhibit the surface form of well-structured solutions. For mathematical reasoning tasks, the score aggregates three sub-signals: (i) a soft-thresholded keyword match min (h/ 3, 1.0 ) over a vocabulary of 14 reasoning keywords (e.g., step , therefore , thus , compute ), where h is the number of distinct keyword hits; (ii) a binary answer-delimiter check using the priority cascade \boxed{...} ≻
+
+<answer>...</answer> ≻ #### ≻ “answer is/=/” ; and (iii) an alphanumeric density score min (r/ 0.5, 1.0 ) where r is the fraction of alphanumeric or whitespace characters. For multiple-choice tasks, the score reduces to a binary extraction check for a letter option in 
+
+{A, . . . , H } plus a keyword match and density term.     
+
+> Example. For the problem “If 3x
+
++ 5 = 14 , find x ”, the output “Step 1: subtract 5: 3x = 9. Therefore x = 3. \boxed {3}” receives sstruct = 1.0 (keywords present, boxed answer, high alphanumeric density). The degenerate output “3” receives sstruct = 0.25 (answer present but no reasoning structure). 
+
+Limitation. Keyword matching is purely lexical. A response of the form “step step therefore 
+
+\boxed {42 }” scores highly on structure despite being semantically vacuous. 
+
+S2: Internal Arithmetic Consistency. sconsist (x) verifies explicit arithmetic equalities of the form a op b = c for op ∈ { +, −, ×, ÷} appearing in the generated reasoning trace, in both ASCII and L ATEX notation. A tolerance of max (| ˆc| × 10 −6, 10 −4) is applied to the stated result ˆc to handle floating-point rounding. An additional chain-consistency check verifies that consecutive equality values {v1, v2, . . . } extracted via the pattern = ⟨number ⟩ have consecutive ratios within (10 −3, 10 3), penalizing outputs whose intermediate values diverge implausibly. The score is 
+
+sconsist (x) = 
+
+
+
+|{ verified equalities }| |{ total equalities }| if any equalities detected, 0.5 if no equalities detected (neutral default).    
+
+> Example. The trace “12
+
+× 4 = 48 , then 48 + 7 = 55 ” yields sconsist = 1.0 (both equalities verified). The trace “12 × 4 = 50 , then 50 + 7 = 55 ” yields sconsist = 0.5 (one of two equalities incorrect). A response containing no arithmetic expressions yields sconsist = 0.5 (neutral default, not penalized). 
+
+Limitation. The parser does not handle compound parenthesized expressions (e.g., (a + b) ×
+
+c = d), multi-line equations, or symbolic variables. Logical errors not expressed as explicit equalities (e.g., incorrect substitutions) are invisible to this component. 
+
+S3: Answer Reachability. sreach (x) checks whether the final answer can be traced back to the preceding reasoning. The final answer is extracted via the same priority cascade as sstruct .The reasoning prefix is defined as all text before the detected answer delimiter. For numeric answers, the check verifies the presence of the same floating-point value (to tolerance 10 −6)among all numbers in the reasoning prefix; for symbolic answers, case-insensitive substring matching is used. The score is 
+
+sreach (x) = 
+
+
+
+1.0 answer found and traceable to reasoning, 0.3 answer found but not traceable, 0.2 no answer found.     
+
+> Example. The output “We compute 6
+
+× 7 = 42 . The answer is \boxed {42 }” scores sreach = 1.0. The output “\boxed {42 }” with no preceding reasoning scores sreach = 0.3 (answer present but unreachable from the empty prefix). 
+
+Limitation. Reachability is checked by value occurrence, not logical derivation. A response that mentions the correct value incidentally (e.g., “this is not 42”) would still receive full reachability credit. 15 Preprint. Under review. 
+
+S4: Model Confidence. When token-level log-probabilities are available, we compute 
+
+sconf (x) = 1
+
+|G| ∑
+
+> i∈G
+
+pθ (xi | x<i),where G denotes the generated token positions (excluding the prompt). Logits are clamped to [−100, 100 ] before softmax to prevent numerical overflow, and the result is clipped to 
+
+[0, 1 ]. This serves as a proxy for local fluency and coherence. When logits are unavailable (e.g., black-box APIs), the score defaults to 0.5 to avoid biasing the composite. 
+
+Limitation. Model confidence reflects the model’s own distribution and not solution correct-ness. High-confidence outputs can still be factually wrong, particularly when the model is confidently biased toward plausible but incorrect completions. This component is therefore most informative in combination with the other four signals rather than in isolation. 
+
+S5: Non-degeneracy. sndegen (x) penalizes collapsed or low-information outputs via a cascade of hard and soft thresholds: 1. Special token flood : if <|endoftext|> or <|eot id|> tokens exceed 20% of word positions, return 0.0. 2. Unresolved mask tokens : if <|mdm mask|> tokens exceed 15% of positions return 0.05. 3. Insufficient length : fewer than 8 words returns 0.2. 4. Bigram diversity (outputs > 12 words): unique bigram ratio ρ2 =
+
+|unique bigrams |/|total bigrams |; return 0.05 if ρ2 < 0.15, return 0.3 if ρ2 < 0.30. 5. Trigram diversity (outputs > 30 words): unique trigram ratio ρ3 < 0.25 returns 0.2. 6. Otherwise : return 1.0.               
+
+> Example. The output “the answer is 42 the answer is 42 the answer is 42” (11 bigrams, 2 unique) yields
+> ρ2≈0.18 <0.30, returning sndegen =0.3. A fully collapsed output of repeated <|endoftext|>
+> tokens returns sndegen =0.0 immediately.
+
+Limitation. Very short outputs (fewer than 8 words) bypass the repetition checks and are penalized only by the length threshold. Outputs consisting of diverse but semantically vacuous tokens score sndegen = 1.0 despite being uninformative. 
+
+C.4 Task-Specific Constraint Term Countdown. The constraint score sconstraint combines a target-match sub-score (weight 0.6) and a number-validity sub-score (weight 0.4). Both the target value and the allowed number pool are parsed solely from input text via pattern matching (e.g., “Target: 952 Numbers: 100, 75, 50, 25, 6, 3”), with no ground-truth metadata passed in. The target-match sub-score is 0.6 if the extracted arithmetic expression evaluates to within 10 −6 of the target, 0.3 if within 
+
+±1, and 0.1 otherwise. The number-validity sub-score is 0.4 if all operands are drawn from the allowed pool with correct multiplicity, and 0.1 otherwise. If neither target nor allowed numbers can be parsed from input text , the score falls back to 0.7 when any evaluable arithmetic expression is present, and 0.0 otherwise. 
+
+Sudoku. Sudoku is self-verifying: a solution is valid if and only if all 27 row/column/box uniqueness constraints are satisfied. The constraint score is 
+
+sconstraint (x) = 0.75 · |satisfied constraints |
+
+27 + 0.25 · sclue (x),where sclue ∈ [0, 1 ] measures the fraction of given puzzle clues (parsed from input text as an 81-character digit string) that are correctly preserved in the output. This score is fully ground-truth-free: correctness of a completed Sudoku grid is entirely determined by the structural constraints of the puzzle itself. 16 Preprint. Under review. 
+
+Multiple-choice (ARC-Challenge, TruthfulQA). The constraint term is replaced by an MC reasoning quality score with four additive components: (i) extraction of a clear letter choice from {A, . . . , H } (base +0.3); (ii) presence of reasoning keywords such as because ,
+
+therefore , eliminat (up to +0.3, soft-thresholded at 3 hits); (iii) answer dominance, i.e., the chosen letter appears at least as frequently as any other letter in the response ( +0.2); and (iv) minimum response length of 30 characters ( +0.2). The score is capped at 1.0. 
+
+C.5 Computational Complexity 
+
+All five base components and the constraint verifiers run in O(|x|) time with respect to the output length |x|: regex pattern matching, bigram and trigram computation, arithmetic expression parsing, and mean logit aggregation all require a single linear pass over the token sequence. The Sudoku constraint check adds a constant-time grid validation step (O(81 ) = O(1)) independent of output length. Consequently, the total cost of evaluating 
+
+f (x) for a single candidate is negligible relative to a single diffusion model forward pass, which requires an O(L2) attention computation over the full sequence length L. This asymptotic gap ensures that the Nb verifier evaluations required per denoising step under 
+
+S3 do not meaningfully increase the total inference budget, making repeated evaluation practical even at large particle counts. 
+
+D Ablation Study: Computational Cost and Output Conciseness 
+
+We report three supplementary metrics alongside accuracy to characterize the computational cost and output behavior of each method. Average effective output tokens is the mean number of tokens in the generated output text, tokenized via OpenAI’s cl100k base BPE tokenizer after stripping <|endoftext|> tokens, serving as a proxy for response conciseness — shorter outputs generally indicate more confident and direct generations. Total latency 
+
+is the total wall-clock time from script initialization to completion, encompassing model loading, dataset construction, and all forward passes across all batches, recorded as a single scalar at the end of each run. Wall time is the average of cumulative elapsed timestamps recorded after each batch completes, both measured from script start using time.time() ,meaning it reflects the average point in the run at which batches finish rather than per-batch duration, as a result, wall time ≈ total latency / 2 for uniform batch sizes. All experiments use LLaDA-8B-Instruct with gen length =128 and diffusion steps =64. 
+
+D.1 Component Ablation ( N = 4, b = 2)
+
+Table 4 reports metrics for the five ablation conditions under a matched compute budget of K = N · b = 8 forward passes per denoising step. Baseline diffusion incurs the lowest latency by design, performing a single trajectory with no search overhead. Best-of-K and Tilting only share nearly identical latency since both draw K independent sequences without inter-step communication. Look-ahead only and S3 incur slightly higher wall time than Best-of-K due to per-step verifier scoring and SSP resampling, yet S3 achieves the best accuracy on ARC-C and TruthfulQA within a comparable wall-time budget to Look-ahead only, confirming that the tilting step adds negligible overhead. 
+
+D.2 Effect of Block Size 
+
+Table 5 reports the same metrics across all block sizes for LLaDA-8B-Instruct, comparing the single-trajectory Baseline against S3 multi-block decoding. Larger block sizes reduce wall time substantially, as fewer autoregressive blocks are decoded sequentially, but may sacrifice fine-grained denoising structure. S3 consistently matches or improves over the Baseline on accuracy across most configurations, with modest additional latency from the multi-seed expert construction. 17 Preprint. Under review. 
+
+Table 4: Average effective output tokens ( ↓), total latency ( ↓, seconds), and wall time ( ↓, seconds) for each ablation variant and dataset ( N = 4, b = 2, K = 8, LLaDA-8B-Instruct, block length =64). 
+
+Dataset Method Avg Eff. Tokens (↓) Total Latency (s) (↓) Wall Time (s) (↓)
+
+ARC-C Baseline 5.67 3648.21 1829.87 Best-of-K 5.43 28803.25 14431.86 Look-ahead only 6.08 29450.49 14756.30 Tilting only 5.43 28804.53 14431.20 
+
+S3 4.34 29100.42 14580.21 GSM8K Baseline 3.03 3919.06 1964.63 Best-of-K 3.06 30938.32 15497.02 Look-ahead only 3.08 31655.13 15855.10 Tilting only 3.06 30942.79 15500.48 
+
+S3 3.07 31660.45 15858.32 MATH Baseline 3.85 1530.82 770.71 Best-of-K 3.40 12131.98 6091.68 Look-ahead only 4.40 12413.41 6231.07 Tilting only 3.40 12128.29 6088.90 
+
+S3 3.43 12412.98 6230.43 TruthfulQA Baseline 5.87 2120.41 1064.81 Best-of-K 3.06 16743.28 8394.48 Look-ahead only 5.62 17119.66 8583.10 Tilting only 3.06 16743.15 8394.40 
+
+S3 4.05 17110.60 8578.05 
+
+Table 5: Average effective tokens ( ↓), total latency ( ↓, s), and wall time ( ↓, s) across all block sizes for LLaDA-8B-Instruct. Base : single-trajectory decoding; S3: multi-block decoding with BFS search and SSP resampling. DATASET BLOCK MODE AVG TOK .↓ LATENCY (S)↓ WALL (S)↓
+
+ARC-C 2 BASE 16.92 7.42 6.10 
+
+S3 17.10 71262.09 35680.83 4 BASE 8.92 7.43 6.12 
+
+S3 8.46 71038.65 35550.89 8 BASE 8.04 7.51 6.18 
+
+S3 7.45 37840.20 18952.40 16 BASE 7.13 7.49 6.15 
+
+S3 8.44 37927.16 20814.40 32 BASE 6.14 7.43 6.11 
+
+S3 5.89 26140.50 13092.30 64 BASE 5.96 1111.75 566.58 
+
+S3 5.79 25058.80 12573.95 GSM8K 2 BASE 15.84 7.62 6.24 
+
+S3 16.10 68420.30 34218.50 4 BASE 8.12 7.58 6.21 
+
+S3 7.95 68215.40 34115.80 8 BASE 6.34 7.64 6.26 
+
+S3 5.82 36940.20 18478.60 16 BASE 5.18 7.71 6.31 
+
+S3 4.96 36820.50 18418.40 32 BASE 4.42 7.53 6.16 
+
+S3 4.18 25640.80 12828.20 64 BASE 3.06 3068.37 1530.94 
+
+S3 3.06 24870.64 12393.65 MATH 2 BASE 16.34 5.80 4.75 
+
+S3 12.66 22140.30 11082.50 4 BASE 8.33 5.47 4.48 
+
+continued on next page 
+
+18 Preprint. Under review. 
+
+TABLE 5 – continued from previous page 
+
+DATASET BLOCK MODE AVG TOK .↓ LATENCY (S)↓ WALL (S)↓
+
+S3 5.68 5.93 4.85 8 BASE 8.79 5.34 4.37 
+
+S3 4.93 5.85 4.79 16 BASE 7.77 5.51 4.51 
+
+S3 7.20 11820.40 5923.80 32 BASE 6.89 5.43 4.44 
+
+S3 4.40 11750.20 5888.60 64 BASE 3.33 1024.58 526.81 
+
+S3 3.55 4.11 3.36 TRUTHFUL QA 2 BASE 15.30 4.85 3.97 
+
+S3 18.09 5.29 4.33 4 BASE 8.71 5.24 4.29 
+
+S3 7.65 5.27 4.31 8 BASE 7.61 5.10 4.17 
+
+S3 5.40 19764.35 9929.58 16 BASE 6.52 5.16 4.22 
+
+S3 8.13 5.38 4.40 32 BASE 5.04 5.13 4.20 
+
+S3 6.61 17200.40 8623.50 64 BASE 5.24 1862.12 935.11 
+
+S3 5.57 4048.35 2065.72 AIME 2 BASE 14.20 22.40 16.80 
+
+S3 13.85 680.20 358.40 4 BASE 6.80 21.60 16.20 
+
+S3 1.06 760.40 402.30 8 BASE 4.20 21.80 16.40 
+
+S3 1.00 762.80 403.50 16 BASE 3.90 22.10 16.60 
+
+S3 3.65 775.20 409.10 32 BASE 3.75 23.80 17.40 
+
+S3 3.58 774.50 408.60 64 BASE 3.70 25.07 18.97 
+
+S3 3.50 774.89 408.75 
+
+19

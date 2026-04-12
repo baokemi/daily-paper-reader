@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05250v1/fig-001.webp",
+      "caption": "Figure 1. Accuracy vs. runtime on MMLU. DualDiffusion (orange) achieves near-verifier accuracy at significantly reduced latency.",
+      "page": 5,
+      "index": 1,
+      "width": 492,
+      "height": 306
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05250v1/fig-002.webp",
+      "caption": "Figure 2. Accuracy comparison on GSM8K. DualDiffusion underperforms on mathematical reasoning, indicating sensitivity to drafter quality in multi-step tasks.",
+      "page": 6,
+      "index": 2,
+      "width": 492,
+      "height": 369
+    }
+  ]
+}

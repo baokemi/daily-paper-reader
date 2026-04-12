@@ -1,0 +1,166 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-001.webp",
+      "caption": "Figure 4. (a) Defense workflow using VLMShield: multimodal inputs first undergo MAFE feature extraction, then VLMShield performs safety detection to either block malicious prompts or forward benign ones to VLMs, and (b) detailed architecture and training pipeline of VLMShield.",
+      "page": 6,
+      "index": 1,
+      "width": 911,
+      "height": 219
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-002.webp",
+      "caption": "Figure 14. Attention evolution of the EOS token across CLIP text encoder layers. The EOS token progressively concentrates attention from uniform distribution (early layers) to semantically salient tokens like “bigger,” “garage,” and “living room” (deep layers), while the SOS token maintains self-attention throughout. This demonstrates EOS token’s semantic aggregation property.",
+      "page": 25,
+      "index": 2,
+      "width": 845,
+      "height": 416
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-003.webp",
+      "caption": "Figure 15. Attention evolution of the CLS token across CLIP vision encoder layers. The CLS token shifts from uniform spatial attention (early layers) to focused attention on discriminative regions corresponding to the garage and living room (deep layers). Image patches are grouped into 4×4 spatial regions for visualization clarity, with one representative patch per region shown.",
+      "page": 25,
+      "index": 3,
+      "width": 1015,
+      "height": 187
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-004.webp",
+      "caption": "Figure 10. Within-category analysis for image-based jailbreak datasets. MAFE (right) demonstrates semantic convergence where three datasets employing different visual attack techniques cluster together. Traditional features (left) scatter randomly while VLM representations (middle) show fragmented grouping, highlighting MAFE’s superior ability to capture attack semantics beyond dataset artifacts.",
+      "page": 15,
+      "index": 4,
+      "width": 1013,
+      "height": 276
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-005.webp",
+      "caption": "Table 4. [RQ3] Computational efficiency comparison showing detection time and total processing time. Total time includes VLM generation time, averaging 8.02s for LLaVA and 3.86s for Qwen.",
+      "page": 7,
+      "index": 5,
+      "width": 498,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-006.webp",
+      "caption": "Table 3. [RQ2] ACC on benign multimodal benchmarks. Higher values indicate better preservation of legitimate functionality. Best results are shown in bold.",
+      "page": 7,
+      "index": 6,
+      "width": 994,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-007.webp",
+      "caption": "Table 2. [RQ1] ASR on in-domain (JailbreakV 28K) and out-of-domain test datasets using the LLaVA-1.5-13B model. Lower values indicate better defense performance. Best results are shown in bold.",
+      "page": 7,
+      "index": 7,
+      "width": 1013,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-008.webp",
+      "caption": "Figure 8. Distributional analysis with image-only processing showing inadequate separation due to missing textual information, particularly affecting detection of text-based jailbreak attacks.",
+      "page": 14,
+      "index": 8,
+      "width": 858,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-009.webp",
+      "caption": "Figure 9. Cross-category distributional analysis comparing three feature extraction approaches. Only MAFE (right) achieves clear separation between benign (green) and malicious categories (red, blue, orange) while maintaining distinct attack-type clustering. Traditional features (left) show complete category intermixing, while VLM representations (middle) achieve only partial separation.",
+      "page": 14,
+      "index": 9,
+      "width": 1010,
+      "height": 276
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-010.webp",
+      "caption": "Table 9. FNR on out-of-domain datasets using the LLaVA-1.5-13B model.",
+      "page": 18,
+      "index": 10,
+      "width": 923,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-011.webp",
+      "caption": "Table 10. FNR on out-of-domain datasets using the Qwen2.5-VL-7B-Instruct model.",
+      "page": 18,
+      "index": 11,
+      "width": 923,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-012.webp",
+      "caption": "Figure 6. Distributional analysis without long text processing showing poor separation between prompt categories due to information loss from text truncation.",
+      "page": 13,
+      "index": 12,
+      "width": 863,
+      "height": 352
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-013.webp",
+      "caption": "Figure 7. Distributional analysis with text-only processing showing incomplete separation patterns due to missing visual information, particularly affecting detection of image-based attacks.",
+      "page": 13,
+      "index": 13,
+      "width": 861,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-014.webp",
+      "caption": "Figure 2. Overview of the CLIP-based MAFE framework for processing multimodal prompts through progressive text aggregation and",
+      "page": 4,
+      "index": 14,
+      "width": 912,
+      "height": 219
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-015.webp",
+      "caption": "Table 11. FPR on benign multimodal benchmarks. Higher values indicate better preservation of legitimate functionality. Best results are shown in bold.",
+      "page": 19,
+      "index": 15,
+      "width": 921,
+      "height": 294
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-016.webp",
+      "caption": "Table 7. ASR on in-domain (JailbreakV 28K) and out-of-domain test datasets using the Qwen2.5-VL-7B-Instruct model. Lower values indicate better defense performance. Best results are shown in bold.",
+      "page": 17,
+      "index": 16,
+      "width": 1013,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-017.webp",
+      "caption": "Table 8. FNR on the JailbreakV 28K test dataset. Lower values indicate better defense performance. Best results are shown in bold.",
+      "page": 17,
+      "index": 17,
+      "width": 960,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-018.webp",
+      "caption": "Figure 5. Comprehensive distributional analysis of MAFE-extracted features showing clear separation between benign prompts (green) and malicious attacks (red, blue, orange) across PCA with density estimation (left) and t-SNE visualization (right).",
+      "page": 12,
+      "index": 18,
+      "width": 865,
+      "height": 352
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-019.webp",
+      "caption": "Figure 12. Within-category analysis for direct malicious datasets. MAFE (right) demonstrates convergence across evaluation benchmarks with clear benign-malicious separation, while alternative approaches show inconsistent patterns.",
+      "page": 16,
+      "index": 19,
+      "width": 1015,
+      "height": 278
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06502v1/fig-020.webp",
+      "caption": "Figure 11. Within-category analysis for text-based jailbreak datasets. MAFE (right) achieves unified clustering despite different manipulation strategies, demonstrating semantic understanding. Traditional and VLM-based features fail to recognize shared malicious intent across datasets.",
+      "page": 16,
+      "index": 20,
+      "width": 1004,
+      "height": 274
+    }
+  ]
+}

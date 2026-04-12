@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-001.webp",
+      "caption": "Figure 5: Two-dimensional score geometry. Panel (a) depicts the score field for a two-component Gaussian mixture in R2 at τ = 1; the dashed line marks the inter-mode boundary. Panel (b) tracks the maximum curl magnitude |∂1s2 − ∂2s1| across random test points at several diffusion times. The values stay below 10−9 throughout.",
+      "page": 25,
+      "index": 1,
+      "width": 957,
+      "height": 375
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-002.webp",
+      "caption": "Figure 4: Amplification near the transition. Panel (a) plots the factor eΛ(τ) on a log scale; at τ = 0 it is about 18. Panel (b) traces reverse-time probability-flow trajectories. Above τ∗ they stay mixed, while below τ∗ they split toward the two basins.",
+      "page": 21,
+      "index": 2,
+      "width": 960,
+      "height": 345
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-003.webp",
+      "caption": "Figure 6: VP–VE equivalence under the rescaling transformation. Panel (a) overlays the VP score from the exact transformation sVP(x, t) = α(t)−1sVE(x/α(t), τeff(t)) with the score computed directly from the VP marginal; on the plotted times the two are visually indistinguishable. Panel (b) plots the effective-time map τeff(t) together with the VP speciation time t∗VP = ln 9 ≈ 2.20, which lands exactly at the VE critical time τ∗VE = 4.0.",
+      "page": 29,
+      "index": 3,
+      "width": 960,
+      "height": 347
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-004.webp",
+      "caption": "Figure 2: Two simple diagnostics for the symmetric binary mixture. Panel (a) tracks the midpoint derivative sx(0, τ) = ∂2 x log pτ (0), whose zero marks the exact speciation time τ∗ = 4.0. Panel (b) records the interfacial width δ(τ) = σ2 τ/a, linear in τ and smallest at τ = 0.",
+      "page": 14,
+      "index": 4,
+      "width": 960,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-005.webp",
+      "caption": "Figure 1: Symmetric binary Gaussian mixture at several diffusion times. Panel (a) traces the exact score s(x, τ); the central transition sharpens as τ ↓ 0, and the critical time τ∗ = 4.0 is marked. Panel (b) displays the Burgers variable u = −2s for the same slices. Its linear background remains visible; subtracting 2x/σ2 τ isolates the tanh layer described in Proposition 5.4.",
+      "page": 13,
+      "index": 5,
+      "width": 960,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-006.webp",
+      "caption": "Figure 3: Residual checks for the PDE identities. Panel (a) reports |sτ − sxx − 2ssx| at several diffusion times. Panel (b) reports the Burgers residual |uτ + uux − uxx| after the change of variables u = −2s. Both remain below 10−8 on the tested grid.",
+      "page": 19,
+      "index": 6,
+      "width": 960,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07404v1/fig-007.webp",
+      "caption": "Figure 7: Correction terms for an asymmetric mixture. Panel (a) compares the relative error of the leading-order and corrected speciation formulas as the separation scale increases for a K = 3, d = 10 example; the correction cuts the error from about 11% to about 2%. Panel (b) traces the coefficient γ1 across the same family. In these examples it stays negative, so the first correction moves the threshold earlier.",
+      "page": 32,
+      "index": 7,
+      "width": 960,
+      "height": 349
+    }
+  ]
+}

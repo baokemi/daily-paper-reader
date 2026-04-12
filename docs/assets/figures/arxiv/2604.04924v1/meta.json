@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-001.webp",
+      "caption": "Table 3: Quantitative comparisons of our prompt learning approach on the WAN model with state-of-the-art image and video restoration approaches for the task of all-in-one video restoration on OOD datasets. H-Haze, R-Rain, S-Snow, B-Blur, and L-Low-light",
+      "page": 11,
+      "index": 1,
+      "width": 725,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-002.webp",
+      "caption": "Table 2: Quantitative comparisons of our prompt learning approach on the FLUX model with state-of-the-art AiOR approaches for images from OOD, mixed and unseen degradations. H-Haze, R-Rain, S-Snow, B-Blur, L-Low-light, and U-Unseen.",
+      "page": 10,
+      "index": 2,
+      "width": 725,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-003.webp",
+      "caption": "Fig. 2: Text token-space prompting is ineffective for restoration: Even with optimized token prompts (textual inversion/prompt tuning), the model tends to denoise without removing degradations, whereas embedding-space optimization enables restoration from the same noisy degraded input.",
+      "page": 3,
+      "index": 3,
+      "width": 727,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-004.webp",
+      "caption": "Fig. 5: Qualitative comparisons of the pre-trained WAN model using our learned prompts with state-of-the-art AiOR approaches. ViWS-Net and AverNet are video restoration approaches while others are proposed for image restoration. Our prompts elicit the strong restoration potential of the pre-trained WAN model. AAU: AAURainSnow [2], NTU: real test set of NTU-Rain [7].",
+      "page": 13,
+      "index": 4,
+      "width": 714,
+      "height": 464
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-005.webp",
+      "caption": "Fig. 4: Qualitative comparisons of the pre-trained FLUX model using our learned prompts with state-of-the-art AiOR approaches. Our approach enables the pre-trained FLUX to achieve remarkable restoration performance. WBSnow denotes the snow subset of the WeatherBench [15] dataset.",
+      "page": 12,
+      "index": 5,
+      "width": 717,
+      "height": 456
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-006.webp",
+      "caption": "Table 1: Comparisons of mean within-distribution performance of our approach on the WAN and FLUX models with state-of-the-art image and video AiOR approaches.",
+      "page": 9,
+      "index": 6,
+      "width": 725,
+      "height": 221
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04924v1/fig-007.webp",
+      "caption": "Fig. 3: (a) We freeze the diffusion backbone and optimize only the conditioning: tokenspace prompt optimization fails, while embedding-space (text-encoder output) optimization elicits restoration. (b) Naive tuning yields states anchored at zdeg; DDBM [61] is pinned at both endpoints; our desired/EBR-style [21] bridge starts from noisy degraded inputs and denoises monotonically as the content transitions toward zclean. (c) Naive training sees a different state family than inference, causing trajectory misalignment. (d) Bridge-based training aligns train/test states; DDBM may under-correct early (low noise near zdeg), while the desired/EBR bridge enables stronger correction on an aligned path.",
+      "page": 5,
+      "index": 7,
+      "width": 652,
+      "height": 490
+    }
+  ]
+}

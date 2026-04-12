@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02816v1/fig-001.webp",
+      "caption": "Table 2. Ablation study about methods to calculate quantization sensitivity",
+      "page": 10,
+      "index": 1,
+      "width": 562,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02816v1/fig-002.webp",
+      "caption": "Fig. 3. Normalized accuracy retention versus retained visual-token ratio for LLaVA7B and LLaVA-13B under W4A4 PTQ. Each curve is normalized by the dense W4A4 baseline of its model. As the token budget shrinks, semantic-only pruning degrades more noticeably, while our method remains consistently closer to, and often above, the dense PTQ baseline.",
+      "page": 10,
+      "index": 2,
+      "width": 691,
+      "height": 259
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02816v1/fig-003.webp",
+      "caption": "Table 1. Comparisons with quantization methods and vision tokens pruning methods for LLaVA-v1.3 and LLaVA-v1.5 7B models on the ScienceQA dataset. Question classes: NAT = natural science, SOC = social science, LAN = language science, TXT = text context, IMG = image context, NO = no context.",
+      "page": 9,
+      "index": 3,
+      "width": 725,
+      "height": 465
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02816v1/fig-004.webp",
+      "caption": "Fig. 1. Motivation teaser of quantization-aware vision token pruning on a real ScienceQA sample. Panel (a) shows the input image. Panel (b) shows the token-level outlier scores, with darker red cells indicating greater quantization sensitivity. Panel (c) shows the tokens kept by semantic-only pruning, which misses the highest-scoring outlier token and leads the quantized model to predict Rhode Island. Panel (d) shows our selection, which preserves that token and recovers the correct answer South Carolina.",
+      "page": 3,
+      "index": 4,
+      "width": 698,
+      "height": 367
+    }
+  ]
+}

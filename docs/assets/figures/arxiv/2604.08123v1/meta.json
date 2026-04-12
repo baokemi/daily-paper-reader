@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08123v1/fig-001.webp",
+      "caption": "Figure 1. Top: a basic diffusion workflow using FluxDev [34].Middle: add ControlNets [90] alongside the base diffusion model, which process an additional input reference image and pass the intermediaries to diffusion model to control the composition in image generation. Bottom: Further add LoRA [27] to change image styles by patching LoRA weights onto diffusion model weights.",
+      "page": 1,
+      "index": 1,
+      "width": 496,
+      "height": 248
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08123v1/fig-002.webp",
+      "caption": "Figure 6. A simplified case of integrating Flux with LegoDiffusion.",
+      "page": 6,
+      "index": 2,
+      "width": 520,
+      "height": 872
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08123v1/fig-003.webp",
+      "caption": "Table 1. Primitives in LegoDiffusion’s Python library for defining models and composing diffusion workflows.",
+      "page": 6,
+      "index": 3,
+      "width": 508,
+      "height": 262
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08123v1/fig-004.webp",
+      "caption": "Figure 9. End-to-end performance across six settings (S1–S6 in Table 2), evaluated under varying request traffic rates (a–f, j), SLO requirements (g), traffic burstiness (h), and testbed sizes (i).",
+      "page": 11,
+      "index": 4,
+      "width": 1051,
+      "height": 274
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08123v1/fig-005.webp",
+      "caption": "Figure 7. A simplified diffusion workflow using Flux [34].",
+      "page": 7,
+      "index": 5,
+      "width": 520,
+      "height": 592
+    }
+  ]
+}

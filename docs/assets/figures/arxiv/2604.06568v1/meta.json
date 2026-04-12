@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06568v1/fig-001.webp",
+      "caption": "Fig. 14. Visual comparison between the method without the Lhigh loss term and the method with the Lhigh loss term (β is set to 0.3) on the reconstructed image kodim23 from the Kodak dataset.",
+      "page": 11,
+      "index": 1,
+      "width": 1004,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06568v1/fig-002.webp",
+      "caption": "Fig. 12. The visual comparison between our method and the baseline on the reconstructed image kodim07 from Kodak dataset.",
+      "page": 10,
+      "index": 2,
+      "width": 1013,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06568v1/fig-003.webp",
+      "caption": "Fig. 13. Quantitative comparison of the results obtained with different inference steps on the Kodak dataset.",
+      "page": 10,
+      "index": 3,
+      "width": 445,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06568v1/fig-004.webp",
+      "caption": "Fig. 15. Visual comparison of the results obtained without (left) and with (right) sample-guided perceptual enhancement. It can be observed that the left image exhibits blurring artifacts in the shoe’s ventilation holes area, while the right image demonstrates better perceptual quality.",
+      "page": 12,
+      "index": 4,
+      "width": 494,
+      "height": 335
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06568v1/fig-005.webp",
+      "caption": "Fig. 11. Comparison results of the ablation experiments on the Kodak dataset.",
+      "page": 9,
+      "index": 5,
+      "width": 393,
+      "height": 342
+    }
+  ]
+}
