@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05296v1/fig-001.webp",
+      "caption": "Table 1. Ridge Open-Set TAR@FAR=10−4 (%) Across k TAR@FAR=10−4 for each model over varied k, dataset, and projection method. ISP-W refers to the ISP projection being calculated on the same dataset, and ISP-X refers to the ISP projection being calculated from the other dataset. Results are averaged over 5 different seeds. FR models are bolded; ISP is not applied to FR encoders (— indicates not applicable).",
+      "page": 6,
+      "index": 1,
+      "width": 706,
+      "height": 278
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05296v1/fig-002.webp",
+      "caption": "Figure 2. Template Inversion Verification Rate (%). Heatmap of verification rates across four attack families (DiffMI, Bob, Vec2Face, ALSUV) and five encoders. The FR encoder (ArcFace, top row) achieves consistently high rates (67–100%), while nonFR encoders (CLIP, DINOv2, DINOv3, SSCD) remain near zero across all methods. All rates averaged over ArcFace (τ=0.1051) and AdaFace (τ=0.1111) verifiers.",
+      "page": 6,
+      "index": 2,
+      "width": 473,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05296v1/fig-003.webp",
+      "caption": "Figure 3. FCR Attribution: RAW vs ISP Overlay. (A) FII comparison: ISP reduces face-driven similarity. (B) Censoring comparison: context dominance maintained. (C) CPI delta: dramatic shift from context-only (1.0) to balanced (0.35-0.41). All images were cropped to a FCR of 0.33, with ±2% equal-area tolerance.",
+      "page": 7,
+      "index": 3,
+      "width": 1008,
+      "height": 449
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05296v1/fig-004.webp",
+      "caption": "Figure 4. Template Inversion Gallery. Target vs. DiffMI reconstruction across five encoders. ArcFace reconstructions verify at high rates; non-FR encoders do not. Protocol: DiffMI white-box, 1,000-latent pool, APGD 100 iterations, N=200 CelebA-20 targets.",
+      "page": 8,
+      "index": 4,
+      "width": 486,
+      "height": 459
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05296v1/fig-005.webp",
+      "caption": "Table 11. Attribute-swap identity inference at k = 128. Joint = fraction of victims where identity is preserved (sim ≥ τFAR=10−3 ) and gender is flipped. FR models allow highly reliable joint manipulation; non-FR encoders do not. 500 victims per direction on CelebA-20.",
+      "page": 20,
+      "index": 5,
+      "width": 502,
+      "height": 579
+    }
+  ]
+}

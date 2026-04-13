@@ -1,0 +1,3052 @@
+Title: Learning vs. Optimizing Bidders in Budgeted Auctions
+
+URL Source: https://arxiv.org/pdf/2604.08517v1
+
+Published Time: Fri, 10 Apr 2026 01:27:02 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+# Learning vs. Optimizing Bidders in Budgeted Auctions 
+
+Giannis Fikioris ∗
+
+Cornell University 
+
+gfikioris@cs.cornell.edu 
+
+Balasubramanian Sivan Google Research 
+
+balusivan@google.com 
+
+Éva Tardos †
+
+Cornell University 
+
+eva.tardos@cornell.edu 
+
+April 10, 2026 
+
+Abstract 
+
+The study of repeated interactions between a learner and a utility-maximizing optimizer has yielded deep insights into the manipulability of learning algorithms. However, existing literature primarily focuses on independent, unlinked rounds, largely ignoring the ubiquitous practical reality of budget constraints. In this paper, we study this interaction in repeated second-price auctions in a Bayesian set-ting between a learning agent and a strategic agent, both subject to strict budget constraints, showing that such cross-round constraints fundamentally alter the strategic landscape. First, we generalize the classic Stackelberg equilibrium to the Budgeted Stackelberg Equilibrium .We prove that an optimizer’s optimal strategy in a budgeted setting requires time-multiplexing; for a 𝑘 -dimensional budget constraint, the optimal strategy strictly decomposes into up to 𝑘 + 1 distinct phases, with each phase employing a possibly unique mixed strategy (the case of 𝑘 = 0 recovers the classic Stackelberg equilibrium where the optimizer repeatedly uses a single mixed strategy). Second, we address the intriguing question of non-manipulability. We prove that when the learner employs a standard Proportional controller (the “P” of the PID-controller) to pace their bids, the optimizer’s utility is upper bounded by their objective value in the Budgeted Stackelberg Equilibrium baseline. By bounding the dynamics of the PID controller via a novel analysis, our results establish that this widely used control-theoretic heuristic is actually strategically robust. 
+
+> ∗
+
+Supported by the Google PhD Fellowship and the ONR MURI grant N000142412742. 
+
+> †
+
+Supported in part by AFOSR grant FA9550-23-1-0410, AFOSR grant FA9550-231-0068, ONR MURI grant N000142412742, and through a SPROUT Award from Cornell Engineering. 
+
+> arXiv:2604.08517v1 [cs.GT] 9 Apr 2026
+
+# 1 Introduction 
+
+The study of online learning in strategic environments has blossomed over the past decade into a fertile and dynamic area of theoretical computer science. A recent central theme of this literature is understand-ing the long-run outcomes when a standard, no-regret learning algorithm interacts with a fully rational, utility-maximizing optimizer. In these asymmetric interactions, prior work has consistently asked: What extra utility can an optimizer extract when playing against a predictable learner, rather than a strategic opponent? Which learning algorithms are fundamentally robust against such manipulation? This inquiry has yielded a rich understanding of optimizer-learner dynamics. We know that against stan-dard no-regret learners, optimizers can always earn an average objective of their Stackelberg value in the single-shot game [DSS19b] (by simply playing their Stackelberg strategy in each round), and often much more than this. Preventing this manipulation requires learners to minimize stronger notions of regret—swap regret in normal form games [DSS19b; Man+22] and profile swap regret in broader poly-tope games [Aru+25]. However, all of this foundational work operates under a simplifying assumption: decisions are made round-by-round, independent of the past. In this paper, we add to this line of work a new, practically ubiquitous, dimension: budget constraints .In real-world repeated interactions—most notably in digital advertising and online auctions [Goo; Twi]— agents rarely operate with infinite liquidity. Bidding under budget constraints is a thriving area of research in its own right, precisely because budgets fundamentally alter strategic behavior, even in traditionally truthful mechanisms like second-price auctions. In a further departure from prior work, which has over-whelmingly modeled the optimizer as an unconstrained seller (e.g., dynamically setting reserve prices to extract revenue: see [Bra+18; KSS24]) and the learner as a buyer , we shift this paradigm to study a setting where both the optimizer and the learner are competing buyers , with budget constraints. We study the interaction between two budget-constrained agents participating in repeated auctions (we primarily focus on second-price auctions, and also show, under some assumptions, that our results extend to first-price auctions), where item values are drawn repeatedly from a joint distribution. One agent employs a learning algorithm to compute their bids, while the opponent is a strategic optimizer. Both share the same objective: maximizing their total accumulated value subject to a budget constraint. Budgets introduce a significant theoretical wrinkle—by linking decisions across rounds, budgets shatter the isolation of the repeated game framework. First, from the optimizer’s perspective, it is unclear what the generalization of the Stackelberg strategy is when they are budget constrained. Second, from the learner’s perspective, it is unclear whether they can achieve standard properties like no-regret, and best respond to the optimizer’s strategy. The learner being able to do as good as their best distribution in hindsight becomes complicated because of the “spend or save” dilemma introduced by the budget constraints (see [Imm+22]), that forces the learner to weigh the value of spending today against the opportunity cost of having depleted funds tomorrow. The budget constraint’s introduction of coupling across rounds raises a sequence of challenging, fundamental questions: What is the baseline objective value an optimizer is guaranteed to obtain against any learner in a budgeted setting? What strategy achieves this? Are there strategically robust learning algorithms guaranteeing that the optimizer cannot extract anything beyond this baseline? 
+
+Our Contributions. In this paper, we resolve these questions by characterizing the limits of manipu-lation in budgeted settings and identifying a simple and practical learning algorithm that achieves non-manipulability in second-price auctions, which, under certain assumptions, extend to first-price auctions. 
+
+The Budgeted Stackelberg Equilibrium. Our first contribution generalizes the classic notion of a Stackelberg equilibrium to accommodate cross-round constraints, introducing what we call the Budgeted Stackelberg Equilibrium (BSE), Definition 2.1. In a standard repeated game, an optimizer achieves their Stackelberg value by repeatedly sampling actions from a single, optimal mixed strategy, and the learner learning to best respond to this. When the optimizer has a budget constraint, we show that this approach is insufficient. 1Because the optimizer’s value as a leader is not necessarily concave as a function of their spending (see Fig. 1a), they can achieve strictly higher utility by modulating their spend rate over time—for instance, aggressively overspending in an initial phase of length 𝑞𝑇 , and underspending for the remaining (1 − 𝑞 )𝑇 
+
+rounds. We show that an optimizer with a 𝑘 -dimensional budget constraint might need to use up to 𝑘 + 1
+
+different strategies in 𝑘 +1 distinct temporal phases (Lemmas 2.2 and B.2). For 𝑘 = 0, i.e., for an unbudgeted optimizer, this recovers the classic definition of Stackelberg equilibrium. For the optimizer to achieve this increased utility by time-multiplexing, the learner needs to react to the change in the optimizer’s strategy. Even in the absence of budget constraints, employing a no-regret algo-rithm is insufficient for the learner to react to a time-multiplexed optimizer strategy, and we would need no-adaptive regret algorithms. But from a budget-constrained learner’s perspective, a time-multiplexing optimizer would make it impossible for them to best respond, even against the single best distribution in hindsight. [Imm+22] shows this is indeed the case, as the learner cannot avoid linear regret in an adversar-ial bandits with knapsacks setting 1. Without knowledge of when and what the optimizer would do in the future, a budget-constrained learner’s reasonable strategy is to optimize their value while spending their budget evenly over time. This boils down to making the learner “best respond” to each of the optimizer’s phases. Existing learning algorithms for budgeted auctions, such as [BG19], do learn to optimize value in each phase and switch fast enough, even when the occurrence of that change of phase is unclear. We discuss this further in Remarks 2.4 and 3.2, and show that the PID controller learning algorithm we analyze can achieve this in repeated auction settings. Before proceeding to whether the optimizer can do better than their BSE, we remark that in a BSE, the optimizer’s budget constraint forces them to 𝑘 +1 phases (with a unique mixed strategy in each phase), even if the learner had no budget constraint, and were able to instantly best respond to each phase immediately. This is unlike an optimizer with no budget constraint, where, if the learner can instantly best-respond to each phase, the optimizer would find no additional utility in employing more than 1 phase .
+
+Strategic Robustness of simple PID Controller Algorithm. While so far we have discussed the challenges in generalizing the Stackelberg equilibrium to set the lower bound for how much utility an optimizer should hope to get, the intriguing next step is whether the optimizer can Ω(𝑇 ) more than what they can in the BSE. For instance, can the optimizer exploit the learner’s slow responses by using a super-constant ( 𝜔 (1))number of phases or slowly drifting their strategy, rather than sticking to just 2 phases as in their BSE? Our main contribution is addressing this intriguing question of non-manipulability in budgeted auction settings. We consider the simple and well-studied bidding algorithm referred to as pacing [BG19; Con+22a; Con+22b], where a player bids 𝜆 times their value, for some value 𝜆 and iteratively updates 𝜆 . With the right choice of 𝜆 , this strategy is optimal in second-price auctions, and more generally in any truthful auction [BG19]. Our learning algorithm, much like a PID controller, adjusts this pacing multiplier 𝜆 pro-portionally to the over/under spending of each round, which converges to the optimal such 𝜆 against sta-tionary environments. While this use of pacing multipliers is optimal only in truthful auctions, they are the go-to choice for bidding under budget constraints in very large-scale ad platforms in industry [Con+22a; Goo; Twi], even when the auction is non-truthful. Due to this, even though our main focus is second-price, we also study the above algorithm when the underlying auction is first-price. We show that our results extend to first-price auctions too, under the assumption that the learner’s action space is restricted to exclusively using pacing strategies (this restriction is w.l.o.g. for second-price auctions). Our main result (Theorem 3.4) is that this PID controller learning algorithm is robust to strategic manip-ulation when the optimizer and learner values are repeatedly drawn from a bounded joint distribution (but independent across rounds). Specifically, we show that an optimizer cannot gain value more than their BSE value + O( 𝑇 2/3) (Theorem 3.4). We show this under a mild distributional assumption 2, which is            
+
+> 1In fact, the adversary in the counterexample from [Imm+22] looks similar to the optimizer’s two-phase strategy that we use.
+> 2We require that P[0<𝑣 learner <𝜖 ·𝑣 optimizer ]=0for some small 𝜖 . On the other hand, when this is not true, the optimizer
+
+2satisfied when the smallest non-zero point in the distribution’s support is bounded away from zero (e.g., values being in pennies). Our result establishes that the PID controller is not merely a practical heuristic for pacing in auctions, but, despite its predictability due to the deterministic updates, a strategically robust and non-manipulable learning algorithm. It formally bridges the gap between the widespread use of the PID controller for bidding in large corporations [Con+22a; Goo; Twi], and the rigorous non-manipulability guarantees called for in the strategic environments they get deployed in. 
+
+Technical Overview. Our results require bridging techniques from online learning, control theory, and the geometry of repeated games. The technical core of the paper is divided into two parts: establishing the structural properties of the BSE (in Section 2 for general games and in Section 3 for auctions), and proving the non-manipulability of the PID controller learning algorithm (Sections 4 and 5). 
+
+The Geometry of Budgeted Stackelberg Equilibria. To maximize their total return, a budgeted optimizer must operate on the concave closure of their utility-spending curve. Geometrically, the feasible region of the optimizer’s utility and payments is constrained by the learner’s best responses, making it non-convex. By allowing the optimizer to time-multiplex, this feasible region expands to the convex hull of these points (see Fig. 1b). We show that by taking the convex combination of two points on the original utility curve, the optimizer can achieve strictly more utility than with any single fixed distribution. We generalize this structural insight to establish that under 𝑘 different budget constraints, the optimal strategy requires at most 𝑘 + 1 distributions, leveraging Carathéodory’s theorem (Lemmas 2.2 and B.2). 
+
+Bounding Manipulability in Auctions via Lagrangian Relaxation. The primary technical challenge lies in proving that an optimizer cannot exploit the predictable, deterministic nature of this PID update rule. Since the learner might play a different pacing multiplier in every round (since there are uncountably many), we cannot use classic notions of swap-regret that are the standard way to prove non-manipulability (see [DSS19b; Man+22]). Since budgeted learning algorithms fail to satisfy classical learning properties (given our earlier discussion about no-regret being impossible), we propose a novel approach and show that, while the pacing multiplier varies across rounds, the optimizer cannot take advantage of such transi-tions. To this end, we analyze the recursive maximum Lagrangian reward 𝑅 𝜏 (𝜆 ) the optimizer can achieve when there are 𝜏 rounds remaining and the learner is currently at pacing multiplier 𝜆 . We prove by in-duction that this reward is bounded by an affine form 𝑅 𝜏 (𝜆 ) ≤ 𝐴𝜏 + 1 
+
+> 𝜂
+
+𝐺 (𝜆 ), where 𝐴 acts as the average per-round reward and 𝐺 (𝜆 ) bounds the optimizer’s benefit from the learner occupying state 𝜆 . The crux of the proof relies on carefully constructing 𝐺 (𝜆 ) so that its derivative aligns with a Lagrangian dual variable 
+
+𝑔 ∗ (𝜆 ) corresponding to the learner’s budget constraint for a fixed 𝜆 . However, a direct application fails because the optimal Lagrange dual variable might be infinite for certain 𝜆 . Relaxing our goal of using the optimal dual variable to simply coming up with a dual variable that is “good enough” still leads to prob-lems: 𝑔 ★(𝜆 ) can be highly discontinuous, invalidating standard Taylor approximations. To remedy this, we introduce a novel smoothing technique, averaging 𝑔 ★(𝜆 ) over a small interval 𝜎 to produce a strictly Lipschitz continuous surrogate 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ). By integrating this smoothed dual variable, we calculate an appro-priate 𝐺 (𝜆 ) and successfully bound the optimizer’s benefit from the drift of the PID controller, proving that the learner adapts fast enough to cap the optimizer’s total extracted value to the BSE baseline plus an additive error of O( 𝑇 2/3). To build intuition, we first present a simplified proof in Section 4 assuming uniform value distributions among bidders, followed by the formal arguments in Section 5. 
+
+Related Work 
+
+In this section, we summarize some key past work that is related to our paper, focusing on the recent line of work on strategizing against learners. We include a more extended presentation in Section A, where we focus on online learning with constraints and the usage of pacing multipliers.     
+
+> can obtain Ω(𝑇 1−𝜀 )more than their BSE value by exploiting the transition periods of the learner (Section E).
+
+3Strategizing Against Learners. A recent line of work has pursued the study of utility-maximizing responses to learning algorithms, and has asked what such a utility maximizer, referred to as the optimizer, earns in the long run, and what learning algorithms are not strategically manipulable. Initiated by the work of Braverman et al. [Bra+18] in the setting of auctions, this has blossomed into a thriving area with such questions being asked in various settings including auctions [Bra+18; DSS19a; RZ24], normal-form games [BSV23; CHJ20; DSS19b; HPY24], Bayesian games [Man+22; RZ24], polytope games [Aru+25], principal-agent problems [Gur+24]. Some important insights that come out of this line of work include the fact that learners using a no-swap regret algorithm will cap the optimizer’s utility (up to 𝑜 (𝑇 ) terms) at the Stackelberg value of the single-shot game [DSS19b], and that the optimizer can always earn the Stack-elberg value. [Man+22] made this connection tight by showing that no-swap regret is also necessary: i.e., there exists games where the optimizer can exceed Stackelberg value by exactly a constant multiple of the learner’s swap regret. In the more general class of polytope games, introduced in [Man+22], that includes Bayesian games and extensive form games as special cases, [Aru+25] showed the right generalization of swap regret to ensure non-manipulability is the notion of profile swap regret. 
+
+Learning and Bidding in Budget-Constrained Auctions. A rich line of previous work has focused on no-regret guarantees for learning in budgeted auctions. [AFZ25; BG19; FPW23; Wan+23] learn optimal bidding strategies in first- and second-price auctions with budget and ROI constraints. [FT25; Gai+23; Luc+24] focus on learning optimal pacing multipliers and the implied welfare guarantees. We refer the reader to our extended related work in Section A and the survey by [Agg+24]. 
+
+Learner vs Optimizer with Budgets. To the best of our knowledge, the overlap between the two lines of work, namely, strategizing against learners and bidding under budget constraints, is empty except for one prior work. [Fik+26] study the same learning algorithm as us, but in a very restricted setting where all the players’ values are 1. Their main result is that, when all players use this algorithm, each player’s number of wins is approximately proportional to their budget share, even in short intervals. They also show that in the simple setting they consider, all players running this algorithm is an equilibrium: no player can gain significantly more wins by a different strategy. Due to the simplicity of their value distribution of all 1s, the BSE in their setting is devoid of all the complexities we have to deal with in our paper: there is no need for multiple action distributions, and the BSE is the same as the Second Price Pacing Equilibrium (which can be thought of as the Nash equilibrium). 
+
+# 2 Budgeted Stackelberg Equilibrium 
+
+In this section, we formally define the Budgeted Stackelberg Equilibrium (BSE), along with what it means for a learning algorithm to be manipulable in general games (see Section 3 for the auctions setting). Before doing so, we present a simple example to illustrate the benefit of the optimizer using multiple action distributions rather than using just one like in the classical Stackelberg Equilibrium. 
+
+Illustrative Example. Here, we present a simple example of how using multiple action distributions can be strictly stronger than using only one distribution, even when the learner best responds immedi-ately. Switching strategies is beneficial in unbudgeted games only if the learning algorithm is slow at best responding. We define the following game between two players, the optimizer (leader) and the learner (fol-lower), each having two actions. For simplicity, we assume that only the optimizer has a budget constraint, unlike our main results in Section 5. To define the game, consider the following matrices: 
+
+𝑈 O =
+
+3 00 1
+
+
+
+𝑈 L =
+
+3 00 1
+
+
+
+𝑃 O =
+
+3 00 0
+
+
+
+40.0 0.5 1.0 1.5 2.0 2.5 3.0    
+
+> Optimizer's Budget
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> Expected  Optimizer  Utility  BSE( )
+> SE( )
+
+(a) Optimal optimizer value by a single strategy obeying the budget (SE) and two strategies (BSE). 0.0 0.5 1.0 1.5 2.0 2.5 3.0    
+
+> Payment
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> Utility
+> SE
+> BSE
+> Pay . 5
+> BSE Opt
+> SE Opt
+
+(b) Possible optimizer utility and payment pairs when the learner best responds (feasible set of SE) and their convex hull (feasible set of BSE), along with example op-timizer’s budget restriction. 
+
+where 3, if 𝑥 ∈ Δ([ 2]) and 𝑦 ∈ Δ([ 2]) are the action distributions of the optimizer and the learner, respec-tively, then 𝑥 ⊤𝑈 O𝑦 is the optimizer’s expected utility, 𝑥 ⊤𝑈 L𝑦 is the learner’s expected utility, and 𝑥 ⊤𝑃 O𝑦 is the optimizer’s expected payment, which she wants to keep less than 𝜌 , for some 𝜌 ∈ [ 0, 3]. In the classic Stackelberg Equilibrium (where the optimizer has no budget constraint), we pick 𝑥 and 𝑦 so that 𝑦 is a best response to 𝑥 , while maximizing the optimizer’s utility. Extending this idea, we simply add a constraint for the optimizer’s budget; formally, the optimizer’s value when her budget share is 𝜌 is SE (𝜌 ):SE (𝜌 ) = max  
+
+> 𝑥,𝑦
+
+𝑥 ⊤𝑈 O𝑦 such that 𝑥 ⊤𝑃 O𝑦 ≤ 𝜌 and 𝑦 ∈ arg max 
+
+> 𝑦 ′
+
+𝑥 ⊤𝑈 L𝑦 ′ (1) The blue dashed line in Fig. 1a shows the optimal value 𝑆𝐸 (𝜌 ).Now consider the repeated setting, where the optimizer and the learner are playing the above game 𝑇 
+
+times, and the optimizer has a total budget of 𝑇 𝜌 with 𝜌 = 1/2. According to 𝑆𝐸 (1/2), the best strategy is to always play her second action, which, assuming that the learner is approximately best responding, would result in her picking her second action in 𝑇 − 𝑜 (𝑇 ) rounds, resulting in 𝑇 − 𝑜 (𝑇 ) total utility for the optimizer. However, the optimizer can do better by switching her action distribution once, assuming the learner will best respond appropriately. Playing her first action 𝑞𝑇 times, and then the second (1 − 𝑞 )𝑇 
+
+times, the optimizer pays at most 3𝑞𝑇 , so with an average budget of 𝜌 = 1/2, she can afford 𝑞 = 𝜌 /3 = 1/6.If the Learner best responds in 𝑇 − 𝑜 (𝑇 ) rounds, this leads to 4/3𝑇 − 𝑜 (𝑇 ) utility. We can think of this as the optimizer mixing the two strategies corresponding to 𝑆𝐸 (0) and 𝑆𝐸 (3). In fact, the optimal value of the BSE for any 𝜌 is achieved by mixing these two (for the right 𝑞 ), and its value is the concave closure of the values achieved by SE (𝜌 ), see Fig. 1a. This increase in utility comes from the BSE allowing the concave hull of optimizer utility/payment pairs allowed by SE, which can be a strictly larger set, see Fig. 1b. 
+
+Formal Definition. Next, we give our formal definition for the Budgeted Stackelberg Equilibrium (BSE) notion that we illustrated in the previous example. For simplicity in this section, we give the definition when the optimizer (leader) has only one budget constraint, since this will be the focus of the rest of the paper. We define it for an optimizer with multiple constraints in Section B. Our definition abstracts away the learner’s behavior by a best response function: for an action distribution       
+
+> 3We denote with Δ(A) the distribution over some set A. For simple cases we abuse this notation: e.g., Δ([ 𝑘 ]) is the set of
+> 𝑘 -dimensional nonnegative vectors whose elements sum up to 1.
+
+5𝐴 of the optimizer, BR (𝐴 ) are the learner action distributions that are best responses. This BR function is simple to define for a learner who does not have any constraints (like in our previous example), but it is hard to universally define for a learner with a budget constraint like the one we consider later. The standard approach for learning algorithms with budget constraints is to maximize the expected reward while trying to spend the budget evenly across time, which is what we also propose in Section 3. This is optimal in Bayesian environments and the standard approach for adversarial environments [Ber+24; FT23]. 
+
+Definition 2.1 (Budgeted Stackelberg Equilibrium) . Consider strategy spaces of two players, A for the optimizer (leader) and B for the learner (follower). For actions 𝑎 ∈ A and 𝑏 ∈ B let 𝑈 (𝑎, 𝑏 ) ∈ R be the utility of the optimizer and 𝑃 (𝑎, 𝑏 ) ∈ R be the payment of the optimizer for a resource with average budget 𝜌 ∈ R. For an optimizer’s action distribution 𝐴 ∈ Δ(A) , let 𝐵𝑅 (𝐴 ) ⊆ Δ(B) be the learner action distributions that are best responses to 𝐴 . Then, a Budgeted Stackelberg Equilibrium (BSE) is a distribution 
+
+𝜈 over Δ(A) × Δ(B) (i.e., a distribution over independent distributions), that maximize the expected utility of the optimizer while satisfying the budget constraint in expectation and the learner is best responding in every pair in the support of 𝜈 . Formally, the value of the BSE is 
+
+sup  
+
+> 𝜈 ∈Δ
+
+ Δ( A ) × Δ( B) 
+
+ E
+
+> (𝐴,𝐵 )∼ 𝜈
+
+
+
+E
+
+> 𝑎 ∼𝐴,𝑏 ∼𝐵
+
+𝑈 (𝑎, 𝑏 ) 
+
+such that E
+
+> (𝐴,𝐵 )∼ 𝜈
+
+
+
+E
+
+> 𝑎 ∼𝐴,𝑏 ∼𝐵
+
+𝑃 (𝑎, 𝑏 ) 
+
+≤ 𝜌 and 𝐵 ∈ BR (𝐴 ) ∀( 𝐴, 𝐵 ) ∈ supp (𝜈 )
+
+(2) We now simplify the above definition. Specifically, we show that the optimal distribution 𝜈 can be sup-ported on at most 2 points. More generally, in Section B, we show that when the optimizer has 𝑘 constraints, the optimal 𝜈 can be supported on at most 𝑘 + 1 points. 
+
+Lemma 2.2. The optimum of Optimization Program (2) is obtained using a 𝜈 supported on two points only. 
+
+Let 𝑈 (𝐴, 𝐵 ) = E𝑎 ∼𝐴,𝑏 ∼𝐵 [𝑈 (𝑎, 𝑏 )] and similarly for 𝑃 (𝐴, 𝐵 ). We prove the lemma by considering all the points  𝑈 (𝐴, 𝐵 ), 𝑃 (𝐴, 𝐵 ) we can generate, under the condition 𝐵 ∈ BR (𝐴 ). The optimal distribution 𝜈 
+
+of Optimization Program (2) is a convex combination of these points (see the orange region in Fig. 1b). Since these points are on a 2-dimensional space, by Carathéodory’s theorem, any such distribution 𝜈 can be supported on 3 points. However, the optimal solution 𝜈 is on the boundary of the feasible region, since the objective is linear w.r.t. 𝜈 , which is actually a convex combination of at most 2 points. We now formally state our observation from our previous example, that allowing randomization over action distributions can lead to strictly more utility for the optimizer. 
+
+Theorem 2.3. The value of a BSE can be strictly more than the value of a Stackelberg equilibrium (the latter restricts Optimization Program (2) to a single (𝐴, 𝐵 ) ∈ Δ(A) × Δ(B) pair). 
+
+Remark 2.4. A reasonable question is whether the optimizer can always achieve utility close to OPT · 𝑇 ,where OPT is her the BSE value. For unbudgeted players [DSS19b] prove that, if the learning algorithm guarantees 𝑜 (𝑇 ) regret, under mild conditions on the game, the optimizer can get OPT · 𝑇 − 𝑜 (𝑇 ) utility, guiding the learner to the desired best response. If the optimizer alone has budget constraints, we can still think of a learner who uses classical algorithms. Since the optimizer might need to change her action distribution, she needs the learner to adapt to this change. This means that classic no-regret algorithms may fail to switch their actions fast enough. However, slightly stronger properties guarantee fast enough responses, e.g., if the learning algorithm has 𝑜 (𝑇 ) adaptive regret [Haz16, Section 10.2]. In budgeted auction settings, we identify the corresponding property that our learning algorithm satisfies in Remark 3.2. 6Manipulability of a learning algorithm. Here, we formalize our definition of what it means for a learning algorithm to be manipulable. [Aru+25; ACS24; DSS19b; Man+22] define manipulability in games without budgets, and consider that any Ω(𝑇 ) utility increase due to time-varying strategies to be manipu-lation. In the absence of budgets, this is equivalent to the optimizer getting Ω(𝑇 ) more than her Stackelberg utility. However, a budgeted optimizer may want to switch strategies due to budget constraints and not to gain utility while the learner is adapting. Due to this, we directly define the manipulability of a learning algorithm, based on the comparison between the maximum utility the optimizer can get and her BSE. 
+
+Definition 2.5 (Manipulability) . Consider a game as defined in Definition 2.1 and let OPT be the value of its Budgeted Stackelberg Equilibrium. A learning algorithm is called non-manipulable if every strategy for the optimizer that satisfies her budget constraints achieves expected utility at most OPT · 𝑇 + 𝑜 (𝑇 ).
+
+# 3 Repeated Budgeted Auctions 
+
+We consider two budget-limited players, the learner and the optimizer , participating in 𝑇 repeated auctions. In every round 𝑡 , the learner observes a value 𝑣 (𝑡 ) 
+
+> L
+
+∈ [ 0, 1] and the optimizer observes a value 𝑣 (𝑡 ) 
+
+> O
+
+∈ [ 0, 1],drawn from a joint distribution  𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+ ∼ D . Each then submits a bid; the highest bid wins and makes a payment; we consider either first-price auctions (where the winner pays her bid) or second-price auctions (where the winner pays the loser’s bid). The learner’s total budget is 𝑇 𝜌 L, and the optimizer’s is 𝑇 𝜌 O, for some 𝜌 L, 𝜌 O > 0. Each player’s goal is to maximize the total value they get over the 𝑇 rounds, subject to their total payment being less than their budget with probability 1.
+
+Learning Algorithm for Auctions. We consider a simple learning algorithm for the learner’s bids. Specifically, in round 𝑡 she uses a pacing multiplier 𝜆 (𝑡 ) ≥ 0 and bids 𝜆 (𝑡 ) 𝑣 (𝑡 ) 
+
+> L
+
+. She then observes some payment 𝑝 (𝑡 ) 
+
+> L
+
+and updates her pacing multiplier using the following PID controller 
+
+𝜆 (𝑡 +1) = 𝜆 (𝑡 ) + 𝜂  𝜌 L − 𝑝 (𝑡 )
+
+> L
+
+. (3) In other words, the learner increases/decreases her pacing multiplier proportional to her under/over pay-ment compared to her per-round budget 𝜌 L. This algorithm is similar to the one proposed by [Fik+26], who used it in a setting similar to ours but where 𝑣 L = 𝑣 O = 1 in every round. While simple, we will show that this algorithm is resistant to strategic manipulation. Pacing multipliers have been widely studied in equilibria for budgeted auctions or as simple bidding strate-gies to learn in online environments. More importantly for us, if the optimizer were to use any fixed bidding distribution that does not respond to the learner’s bidding, pacing multipliers are optimal for second-price auctions, and our learning algorithm will find such a pacing multiplier. However, Eq. (3) aims to find a good pacing multiplier regardless of the auction format. While using a pacing multiplier is not optimal for first-price auctions, many works try to find the optimal such multiplier and show their benefits for welfare guarantees [Con+22a; FT25; Gai+23; Luc+24]. [BKK23] also examine equilibria in budgeted first-price auctions and show that first pacing one’s values and then composing it with a symmetric unbudgeted Bayesian Nash Equilibrium (BNE) strategy results in an equilibrium. Eq. (3) never produces negative pacing multipliers or runs out of budget if initialized with 𝜆 (1) ≤ 𝜌 L:
+
+Lemma 3.1 (Similar to [Fik+26, Lemma 2.1]) . Assume the learner is bidding using a pacing multiplier, updated by Eq. (3) , with 𝜂 ∈ ( 0, 1) and 𝜆 (1) ≥ 0. Assume the auction format is either first- or second-price. Then, for arbitrary behavior by the optimizer, with probability 1 it holds that 𝜆 (𝑡 ) ≥ 0 and the learner’s total payment by round 𝑇 is 𝜌 L𝑇 + 𝜆 (1) −𝜆 (𝑇 +1) 
+
+> 𝜂
+
+. In addition, if 𝜆 (1) ≤ 𝜌 L, then the learner never runs out of budget. 
+
+The total payment rule follows by simple manipulation of Eq. (3). We prove that if 𝜆 (𝑡 ) ≤ 𝜌 L, then the pacing multiplier cannot decrease in the next round, proving that 𝜆 (1) ≤ 𝜌 L leads to no budget violation. 7Auction definitions and optimizer strategies. Since the learning algorithm is deterministic, the pac-ing multiplier used by the learner is always predictable. Therefore, instead of using bids as the optimizer’s action space, we interpret her bids as using the learner’s pacing multiplier, scaled by a “fake” value. Specifi-cally, her action space each round is a function ˆ𝑣 O : [0, 1] → R≥0 that maps her value 𝑣 O to some “fake” value 
+
+ˆ𝑣 O (𝑣 O). Then, when the learner is using pacing multiplier 𝜆 (and therefore bids 𝜆 𝑣 L), the optimizer is bidding 
+
+𝜆 ˆ𝑣 O (𝑣 O). This simplifies who wins (we break ties in favor of the learner): if ˆ𝑣 O (𝑣 O) > 𝑣 L the optimizer wins, otherwise the learner wins. Then, when the optimizer uses ˆ𝑣 O and the learner 𝜆 , with values (𝑣 L, 𝑣 O), we de-note with 𝑈 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) and 𝜆𝑃 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) the optimizer’s utility and payment; we denote with 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 O, 𝑣 L)
+
+the learner’s payment. For example, for second-price auctions, we have 𝑈 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) = 𝑣 O1ˆ𝑣 O (𝑣 O )>𝑣 L ,
+
+𝜆𝑃 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) = 𝜆𝑣 L1ˆ𝑣 O (𝑣 O )>𝑣 L , and 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 O, 𝑣 L) = 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O ) ≤ 𝑣 L . For first-price the payments become 
+
+𝜆𝑃 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) = 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O )>𝑣 L and 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 O, 𝑣 L) = 𝜆𝑣 L1ˆ𝑣 O (𝑣 O ) ≤ 𝑣 L . This makes the learner’s update in round 𝑡 when the optimizer uses ˆ𝑣 (𝑡 ) 
+
+> O
+
+to be 𝜆 (𝑡 +1) = 𝜆 (𝑡 ) + 𝜂  𝜌 L − 𝜆 (𝑡 ) 𝑃 L ( ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+). We also overload these functions; for a fake value function ˆ𝑣 O ∈ R[0,1]≥0 and a randomized fake value function ˆ𝑉 O ∈ Δ R[0,1]≥0
+
+,we define (and similarly define 𝑃 O ( ˆ𝑣 O), 𝑃 O ( ˆ𝑉 O), 𝑃 L ( ˆ𝑣 O), 𝑃 L ( ˆ𝑉 O))
+
+𝑈 O ( ˆ𝑣 O) = E 
+
+> (𝑣 O,𝑣 L)∼D
+
+𝑈 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) and 𝑈 O ( ˆ𝑉 O) = E 
+
+> ˆ𝑣 O∼ˆ𝑉 O
+
+𝑈 O ( ˆ𝑣 O) = E 
+
+> ˆ𝑣 O∼ˆ𝑉 O
+
+
+
+E 
+
+> (𝑣 O,𝑣 L)∼D
+
+𝑈 O ( ˆ𝑣 O, 𝑣 O, 𝑣 L) 
+
+.
+
+Budgeted Stackelberg Equilibrium in Budgeted Auctions. We now specialize the BSE (Definition 2.1), simplifying it using Lemma 2.2, in the context of repeated budgeted auctions, using the functions defined in the previous part. Here, given a bidding function ˆ𝑣 O ∈ R[0,1]≥0 and the learner’s multiplier 𝜆 , the optimizer’s expected utility is 𝑈 O ( ˆ𝑣 O), her expected payment is 𝜆𝑃 O ( ˆ𝑣 O), and her per-round budget is 𝜌 O. In a second-price auction, a fixed pacing multiplier is the optimal bidding with respect to any static bidding by the optimizer. In general, the higher the pacing multiplier, the more the learner’s value and payment, making the optimal pacing multiplier to be 𝜌 L/𝑃 L ( ˆ𝑣 O). To simplify our future results, we relax this constraint and define as BR ( ˆ𝑣 O) any 𝜆 such that 𝜆𝑃 L ( ˆ𝑣 O) ≥ 𝜌 L; we explain next why this does not change the value of the BSE, OPT , in this setting. Formally, 
+
+OPT = sup      
+
+> ˆ𝑉 (1)
+> O,ˆ𝑉 (2)
+> O∈Δ
+
+ R[0,1]≥0
+
+,𝜆 1,𝜆 2 ∈R≥0, 0≤𝑞 ≤1
+
+𝑞 𝑈 O
+
+  ˆ𝑉 (1)
+
+> O
+
+ + ( 1 − 𝑞 )𝑈 O
+
+  ˆ𝑉 (2)
+
+> O
+
+
+
+such that 𝑞 𝜆 1𝑃 O
+
+  ˆ𝑉 (1)
+
+> O
+
+ + ( 1 − 𝑞 )𝜆 2𝑃 O
+
+  ˆ𝑉 (2)
+
+> O
+
+ ≤ 𝜌 O and 𝜆 𝑖 𝑃 L
+
+  ˆ𝑉 (𝑖 )
+
+> O
+
+ ≥ 𝜌 L ∀𝑖 ∈ [ 2].
+
+(4) The reason we use an inequality rather than an equality for the learner’s payment is that, for any feasible solution, we can decrease a 𝜆 𝑖 until the learner’s inequality is an equality without affecting feasibility or increasing the objective value. This simplifies some of our future results. 
+
+Remark 3.2 (Optimizer’s ability to get OPT · 𝑇 ). We now comment on whether the optimizer can achieve always value OPT · 𝑇 in repeated budgeted auctions. Consider any (near) optimal solution to Optimization Program (4) with pacing multipliers 𝜆 1 ≤ 𝜆 2. In rounds 𝑡 ≤ 𝑇𝑞 , the optimizer can bid 𝜆 (𝑡 ) ˆ𝑣 O (𝑣 (𝑡 ) 
+
+> O
+
+) where 
+
+ˆ𝑣 O ∼ ˆ𝑉 (1) 
+
+> O
+
+; this leads to expected utility of 𝑈 O ( ˆ𝑉 (1) 
+
+> O
+
+) for those rounds, as suggested by the equilibrium. In expectation, this leads to the learner’s update to be 𝜆 (𝑡 +1) −𝜆 (𝑡 ) = 𝜂  𝜌 L − 𝜆 (𝑡 ) 𝑃 L ( ˆ𝑉 (1) 
+
+> O
+
+) ≤ 𝜂𝜌 L
+
+ 1 − 𝜆 (𝑡 )
+
+> 𝜆 1
+
+, i.e., the learner’s pacing multiplier performs a random walk biased towards something less than 𝜆 1. Therefore, it will converge within O( 1/𝜂 ) = 𝑜 (𝑇 ) steps to 𝜆 1. We can similarly examine the second phase, the last 
+
+𝑇 (1 − 𝑞 ) rounds. This implies that the learner converges to the desired multipliers within 𝑜 (𝑇 ) rounds, leading to at most 𝑜 (𝑇 ) overspending by the optimizer, implying a OPT · 𝑇 − 𝑜 (𝑇 ) utility for the optimizer. 
+
+Lagrangian Relaxation. It will be more convenient to relax the optimizer’s budget constraint using a Lagrange multiplier 𝜇 ≥ 0. Specifically, we show that strong duality holds with respect to this constraint. 8Lemma 3.3. Assume that both the optimizer and the learner have positive expected values. Then, strong duality holds: there exists 4 a 𝜇 ≥ 0 such that OPT = 𝑅 ★ + 𝜇𝜌 O, where 𝑅 ★ is the maximum Lagrangian reward the optimizer can achieve for this optimal 𝜇 :
+
+𝑅 ★ = sup   
+
+> ˆ𝑉 O∈Δ(R[0,1]≥0), 𝜆 ∈R≥0
+
+𝑈 O
+
+  ˆ𝑉 O
+
+ − 𝜇𝜆𝑃 O
+
+  ˆ𝑉 O
+
+ such that 𝜆𝑃 L
+
+  ˆ𝑉 O
+
+ ≥ 𝜌 L. (5) We prove this lemma via standard convex optimization arguments: we analyze the 2-dimensional region defined by all the possible expected utility and payments of the optimizer, constrained by the learner’s best response. Given that our final solution is a point from the convex hull of that region, this makes Optimization Program (4) a convex program, and we establish strong duality via Slater’s condition by finding a point in the interior of the feasible region. We present the full proof in Section C. Lemma 3.3 shows that, instead of focusing on the total value accumulated by the budgeted optimizer, we can consider the total Lagrangian reward they receive. Specifically, we show that the total Lagrangian reward is in expectation at most 𝑅 ★𝑇 + O( 𝑇 2/3), which immediately proves our main theorem: 
+
+Theorem 3.4. Fix any joint distribution of values such that P [0 < 𝑣 L < 𝑣 O𝜀 ] = 0 for some 𝜀 > 0. Assume that the optimizer and learner have budgets 𝜌 O𝑇 and 𝜌 L𝑇 , and they participate in 𝑇 repeated first- or second-price auctions. Let OPT be the value of the BSE (Optimization Program (4)), when the learner’s best response function is the optimal pacing multiplier for the auction format being used. If the Learner bids using pacing multipliers 𝜆 (𝑡 ) , updated using Eq. (3) with step size 𝜂 ∈ ( 0, 1) and initial value 𝜆 (1) ≤ 𝜌 L, then the Optimizer’s expected total value is at most 5 OPT · 𝑇 + O  𝑇 √𝜂 + 1
+
+> 𝜂
+
+. If 𝜂 = Θ(𝑇 −2/3), this becomes OPT · 𝑇 + O( 𝑇 2/3).
+
+We note that the above distributional assumption is necessary. There are value distributions where the optimizer can extract OPT · 𝑇 + Θ(𝑇 1−𝜀 ) for any constant 𝜀 > 0 if the learner has significant probability mass near 0. We include the details of this example in Section E. To provide some intuition, before presenting the proof for arbitrary budget shares and distributions, we consider in the next section the example where both players have uniform distributions (even though this is not covered by our distributional assumption). 
+
+# 4 Non-manipulability Warm-up Example – Uniform Distributions 
+
+In this section, we consider a simple example where the optimizer cannot get substantially more value than her BSE value. We examine budgeted second-price auctions where both players’ values 𝑣 O and 𝑣 L are independently drawn from the uniform [0, 1] distribution and their total budgets are 𝑇 , i.e., 𝜌 O = 𝜌 L = 1.We start by showing the optimizer’s value at the Nash and Budgeted Stackelberg equilibria, and how the second one is larger. Then we outline the proof that the PID controller learning algorithm of Eq. (3) is not manipulable in this case. In Section 5, we extend the argument to prove the general case of Theorem 3.4. 
+
+Equilibria of the two bidder auction game. To contrast with the proposed solutions of past works, we first consider the static solution of the Second Price Pacing Equilibrium (SPPE) [Con+22b] 6, where both players use pacing multipliers to bid. By symmetry, they use the same pacing multiplier 𝜆 , which gets them expected value E 𝑣 O1𝜆𝑣 O ≥𝜆𝑣 L
+
+ = 1/3 and they are paying E 𝜆𝑣 L1𝜆𝑣 O ≥𝜆𝑣 L
+
+ = 𝜆 /6, so need to set 𝜆 = 6.If the learner uses 𝜆 = 6 to bid, doing the same is the best response for the optimizer.        
+
+> 4Formally, this optimal 𝜇 is the one that minimizes 𝑅 ★(𝜇 ) + 𝜇𝜌 O.
+> 5Our O(·) terms hide terms relating to the players’ average budgets or their value distributions.
+> 6In the SPPE definition of [Con+22b], players are not allowed to bid more than their value. We do not place this restriction, i.e., there is no ROI constraint. For this example, we can recover the original definition of SPPE by scaling the values up.
+
+90.0 0.2 0.4 0.6 0.8 1.0   
+
+> Optimizer's value vO
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Fake  value  vO(vO)
+> BSE
+> SPPE
+
+(a) Optimal “fake” value ˆ𝑣 O (·) (i.e., bidding 𝜆 ˆ𝑣 O (𝑣 O) when the learner uses 𝜆 ) for the SPPE (leading to 0.33 op-timizer value) and the BSE (leading to 0.36 optimizer value). 0 2 4 6 8 10   
+
+> -.4
+> -.3
+> -.2
+> -.1
+> .0
+> g
+> g*( )
+> gbad ( )
+> . 0
+> . 2
+> . 4
+> . 6
+> . 8
+> 1.0
+> 1.2 of  R*
+
+(b) 𝑓 (𝜆, 𝑔 ) relative to 𝑅 ★, along with bad solution of the 
+
+𝑓 (𝜆, 𝑔 ) = 𝑅 ★ equation ( 𝑔 bad ) and our final solution 𝑔 ★(𝜆 ),see Eq. (9). 
+
+Now consider the BSE, where the optimizer does not have to best respond. We can show in this simplified setting that the optimizer does not have to randomize over two action distributions (note that this is not generally true; in Section D we show an example where the optimizer randomizes over two distributions of actions). In fact, her optimal bid (see Fig. 2a) is deterministic given her value, specifically, ˆ𝑣 ★ 
+
+> O
+
+(𝑣 O) = 𝑣 O/√3+1/3
+
+and 𝜆 ★ = 18 /2+√3 ≈ 4.82 , with expected optimizer value OPT = 3+2√3/18 ≈ 0.36 , which is more than 1/3 as in the SPPE. Note that the optimizer’s bid when her value is small seems abnormally high, e.g., ˆ𝑣 ★ 
+
+> O
+
+(0) = 13 , winning with probability 1/3. This is due to the optimizer having a secondary objective to keep the learner’s payment high (second inequality in (4)), incentivizing high bidding even with low values. We also note that this is not a Bayes-Nash equilibrium: if the learner commits to bidding 𝜆 ★𝑣 L, there is a pacing multiplier by the optimizer that yields more than 0.36 utility. 
+
+Non-manipulability of the PID controller. We now consider the manipulability of our learning al-gorithm of Eq. (3). Can the optimizer achieve expected value OPT · 𝑇 + Ω(𝑇 )? We answer this negatively for this example, giving intuition on how we prove this for general distributions in Section 5 (under mild distributional assumptions). We consider the Lagrangian relaxation of the optimizer’s budget constraint using a Lagrange multiplier 𝜇 
+
+as we did in Lemma 3.3. We can show that the optimal value for 𝜇 is 3+2√3/54 , making 𝑅 ★ = 3+2√3/27 . We now upper-bound the total Lagrangian reward the optimizer can get by 𝑅 ★𝑇 + 𝑜 (𝑇 ), implying the desired bound for the budget-constrained value. The benefit of working with the Lagrangian reward is that there is a simple recursive formula that calculates its optimal expected reward. Let 𝑅 𝜏 (𝜆 ) be the maximum expected Lagrangian reward the optimizer can get if there are 𝜏 rounds left, and the learner is currently using pacing multiplier 𝜆 . 𝑅 0 (𝜆 ) = 0 and for 𝜏 ≥ 1,
+
+𝑅 𝜏 (𝜆 ) = max  
+
+> ˆ𝑣 O:[0,1]→[ 0,1]
+
+E
+
+> 𝑣 L,𝑣 O
+
+
+
+(𝑣 O − 𝜇𝜆𝑣 L)1ˆ𝑣 O (𝑣 O ) ≥ 𝑣 L + 𝑅 𝜏 −1
+
+
+
+𝜆 + 𝜂  1 − 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O )<𝑣 L
+
+
+
+(6) i.e., the optimizer maximizes her current Lagrangian reward plus whatever reward she gets in the subse-quent 𝜏 − 1 rounds, given the learner’s update for 𝜆 . We want to upper bound the total Lagrangian reward the optimizer gets when there are 𝑇 rounds left, and the learner starts at 0, i.e., 𝑅 𝑇 (0). We do this by the 10 following bound for every 𝜏, 𝜆 :
+
+𝑅 𝜏 (𝜆 ) ≤ 𝐴 𝜏 + 1
+
+𝜂 𝐺 (𝜆 ) (7) for some 𝐴 ≥ 0 and function 𝐺 : R≥0 → R. The value 𝐴 represents the average reward per round, and 
+
+𝐺 (𝜆 ) is proportional to the benefit of the learner being at a certain pacing multiplier 𝜆 . We notice that if 
+
+𝐺 (𝜆 ) ≥ 0, then Eq. (7) holds for 𝜏 = 0. We will show Eq. (7) for 𝜏 ≥ 1 inductively; assume that Eq. (7) holds for 𝜏 − 1. Then, by Eq. (6), we have that 
+
+𝑅 𝜏 (𝜆 ) ≤ 𝐴 (𝜏 − 1) + max  
+
+> ˆ𝑣 O:[0,1]→[ 0,1]
+
+E
+
+> 𝑣 L,𝑣 O
+
+
+
+(𝑣 O − 𝜇𝜆𝑣 L)1ˆ𝑣 O (𝑣 O ) ≥ 𝑣 L + 1
+
+𝜂 𝐺 
+
+
+
+𝜆 + 𝜂  1 − 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O )<𝑣 L
+
+
+
+To show (7) for this 𝜏 and all 𝜆 , we can prove that the above r.h.s. is at most 𝐴𝜏 + 1 
+
+> 𝜂
+
+𝐺 (𝜆 ), i.e., show 
+
+∀𝜆 ≥ 0 : 𝐴 ≥ max  
+
+> ˆ𝑣 O:[0,1]→[ 0,1]
+
+E
+
+> 𝑣 L,𝑣 O
+
+
+
+(𝑣 O − 𝜇𝜆𝑣 L)1ˆ𝑣 O (𝑣 O ) ≥ 𝑣 L + 1
+
+𝜂 𝐺 
+
+
+
+𝜆 + 𝜂  1 − 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O )<𝑣 L
+
+
+
+− 1
+
+𝜂 𝐺 (𝜆 )
+
+
+
+≈ max  
+
+> ˆ𝑣 O:[0,1]→[ 0,1]
+
+E
+
+> 𝑣 L,𝑣 O
+
+
+
+(𝑣 O − 𝜇𝜆𝑣 L)1ˆ𝑣 O (𝑣 O ) ≥ 𝑣 L + 𝐺 ′ (𝜆 )  1 − 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O )<𝑣 L
+
+
+
++ O  𝜆 2𝜂  (8) where 𝐺 ′ (·) is the derivative of 𝐺 (·) and in the last approximation we take the second order Taylor expan-sion 𝐺 (𝜆 + 𝜀 ) − 𝐺 (𝜆 ) ≈ 𝜀𝐺 ′ (𝜆 ) + O( 𝜀 2), assuming it is accurate. If we show that the maximum in the r.h.s. of the above inequality is at most 𝑅 ★, we would get the desired claim. To that end, we define for every 𝜆, 𝑔 𝑓 (𝜆, 𝑔 ) = max  
+
+> ˆ𝑣 O:[0,1]→[ 0,1]
+
+E
+
+> 𝑣 L,𝑣 O
+
+
+
+(𝑣 O − 𝜇𝜆𝑣 L)1ˆ𝑣 O (𝑣 O ) ≥ 𝑣 L + 𝑔  1 − 𝜆 ˆ𝑣 O (𝑣 O)1ˆ𝑣 O (𝑣 O )<𝑣 L
+
+
+
+= max 
+
+> ˆ𝑣 O:[0,1]→[ 0,1]
+
+∫ 10
+
+
+
+𝑣 O ˆ𝑣 O (𝑣 O) − 𝜇 𝜆 ˆ𝑣 O (𝑣 O)2
+
+2 + 𝑔 ·
+
+
+
+1 − 𝜆 ˆ𝑣 O (𝑣 O)  1 − ˆ𝑣 O (𝑣 O)
+
+𝑑𝑣 O
+
+where in the last equality we used that 𝑣 L, 𝑣 O are sampled from the uniform distribution. We note that the above maximum is easy to compute for 𝑔 ≤ 0, since in that case the function inside the integral is concave w.r.t. ˆ𝑣 O (𝑣 O), making the unconstrained optimum ˆ𝑣 O (𝑣 O) = 𝑣 O −𝜆 𝑔 𝜆 (𝜇 −2𝑔 ) (explaining the affine form of the optimal solution for this special case). Then, for every 𝜆 , we want to pick 𝑔 to get 𝐴 ≈ 𝑅 ★. There are multiple ways to approach this. A natural first idea is to pick 𝑔 to minimize 𝑓 (𝜆, 𝑔 ), since it serves as a lower bound for 𝐴 (Eq. (8)). However, while this serves as a good bound for 𝐴 , it invalidates our previous assumptions and goals. Specifically, for 𝜆 < 4 where 𝜆 ˆ𝑣 O (𝑣 O)  1 − ˆ𝑣 O (𝑣 O) < 1 for all ˆ𝑣 O, we have that 
+
+arg min 𝑔 𝑓 (𝜆, 𝑔 ) = −∞ , making it unclear how to define 𝐺 (·) for that range. Since for some 𝜆 it holds that 𝑓 (𝜆, −∞) = −∞ , a different idea, instead of minimizing 𝑓 , is to pick 𝑔 so that for every 𝜆 , 𝑓 (𝜆, 𝑔 ) = 𝑅 ★; that still gets 𝐴 ≈ 𝑅 ★ for all 𝜆 . However, this equation might have multiple solutions, which is impossible to handle for general distributions. In addition, even in this example, some solutions invalidate our previous assumptions. Specifically, one such solution satisfies 𝑔 = −Ω(𝜆 −1/2) for large 𝜆 (see 𝑔 bad in Fig. 2b), implying that its integral would be 𝐺 (𝜆 ) = Ω(√𝜆 ), making it too large and unnatural: as 𝜆 grows larger, the optimizer’s payment increases, implying 𝐺 (𝜆 ) should decrease. We pick 𝑔 according to 𝑔 ★(𝜆 ), which we defined inspired by the following three points. First, to get 𝐴 ≈ 𝑅 ★
+
+from Eq. (8), all we need is 𝑓 (𝜆, 𝑔 ★(𝜆 )) ≤ 𝑅 ★ for all 𝜆 ≥ 0. Second, to get 𝐺 (𝜆 ) = ∫ 
+
+> 𝜆
+
+𝑔 ★(𝑥 )𝑑𝑥 to be as small as possible for all 𝜆 , we should try to make 𝑔 ★(𝜆 ) as close to 0 as possible. Third, given that we expect 
+
+𝐺 (𝜆 ) to be decreasing, it should be 𝑔 ★(𝜆 ) ≤ 0 for all 𝜆 . These lead to the following definition: 
+
+𝑔 ★(𝜆 ) = sup 𝑔 ≤ 0 : 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★ (9) Specifically, Fig. 2b shows how 𝑓 (𝜆, 𝑔 ) behaves relative to 𝑅 ★. The same figure also shows pairs (𝜆, 𝑔 ) that satisfy 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★, along with the resulting 𝑔 ★(𝜆 ). We also observe some other key properties of 𝑔 ★(𝜆 ),that we prove in Section 5.2.1 for general value distributions: 11 • 𝑔 ★(𝜆 ) is bounded for all 𝜆 , i.e., there exists 𝑔 ≤ 0 with 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★.
+
+• 𝑔 ★(𝜆 ) is weakly increasing, making it integrable. 
+
+• 𝑔 ★(𝜆 ) eventually becomes 0, implying its integral is always bounded. Another property that holds for uniform distributions but not in general is Lipschitzness of 𝑔 ★, which implies that the Taylor approximation that we made in Eq. (8) is accurate. All these properties imply that using 𝐺 (𝜆 ) = − ∫ ∞ 
+
+> 𝜆
+
+𝑔 ★(𝑥 )𝑑𝑥 gives us the desired bound of 𝐴 = 𝑅 ★ + O   ¯𝜆 2𝜂 , where ¯𝜆 is such that 𝑔 ★( ¯𝜆 ) = 0.This yields that the optimizer’s expected Lagrangian reward is 𝑅 𝑇 (0) ≤ 𝑅 ★𝑇 + O( 𝑇𝜂 + 1 
+
+> 𝜂
+
+).To extend these ideas to general value distributions in Section 5, we need to handle one more issue, that 
+
+𝑔 ★(𝜆 ) might not be Lipschitz continuous; in fact, it can be discontinuous. We solve this by considering a smoothed version of 𝑔 ★, 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) = 1
+
+> 𝜎
+
+∫ 𝜆 +𝜎 𝜆 𝑔 ★(𝑥 )𝑑𝑥 , which (by boundedness) is O( 1/𝜎 )-Lipschitz and satisfies 𝑓 (𝜆, 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 )) ≤ 𝑅 ★ + O( 𝜎 ). Then, using 𝐺 (𝜆 ) = − ∫ ∞ 
+
+> 𝜆
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝑥 )𝑑𝑥 gives the following bound 𝑅 𝑇 (0) ≤ 
+
+𝑅 ★𝑇 + O( 𝑇 𝜎 + 𝜂 𝜎 𝑇 + 1 
+
+> 𝜂
+
+), which, if optimized over 𝜎, 𝜂 , implies 𝑅 𝑇 (0) ≤ 𝑅 ★𝑇 + O( 𝑇 2/3).
+
+# 5 Non-manipulability of the Budgeted Learner 
+
+In this section, we prove our main theorem, Theorem 3.4, that our proposed learning algorithm is non-manipulable, i.e., that the optimizer cannot gain substantially more than her BSE value (Optimization Program (4)) when the learner is responding with her optimal pacing multiplier (which is optimal among all bidding strategies for second-price auctions). Specifically, if the learner is bidding 𝜆 (𝑡 ) 𝑣 (𝑡 ) 
+
+> L
+
+to bid in round 
+
+𝑡 , and uses Eq. (3) to update 𝜆 (𝑡 ) , the optimizer cannot gain more than OPT · 𝑇 + 𝑜 (𝑇 ) expected value. Our theorem holds for both first- and second-price auctions with the following distributional assumption: there exists some 𝜀 > 0 such that P [0 < 𝑣 L < 𝑣 O𝜀 ] = 0, which is satisfied if, e.g., possible values are multiples of a small constant 𝛿 . We note that this distributional assumption is necessary: in Section E we show an example where P [0 < 𝑣 L < 𝑣 O𝜀 ] = Ω(𝜀 𝛿 ) for small 𝛿 > 0 and the optimizer can get OPT · 𝑇 + Ω  𝑇 1− O ( 𝛿 ) 
+
+value in expectation. To prove Theorem 3.4, we follow the following steps, similar to our warm-up example in Section 4. First, we relax the optimizer’s budget constraint and upper bound her total Lagrangian reward, similar to Op-timization Program 5. Then, we upper bound this Lagrangian reward by 𝐴 𝜏 + 1/𝜂 𝐺 (𝜆 ), when there are 
+
+𝜏 rounds remaining and the learner is currently using pacing multiplier 𝜆 . By achieving 𝐴 = 𝑅 ★ + 𝑜 (1)
+
+and 𝐺 (0) = O( 1) (where 𝑅 ★ is the maximum Lagrangian reward of the Optimizer’s problem, Optimization Program 5), we get the theorem. To pick the right 𝐺 (𝜆 ) function that bounds the learner’s benefit for a particular 𝜆 , we examine the dual function 𝑓 (𝜆, 𝑔 ) after also Lagrangifying the learner’s constraint. Unlike Section 4, here we cannot calculate in closed form the above quantities; in fact, the definition of the dual function 𝑓 (𝜆, 𝑔 ) is a complicated maximization program over all the bidding functions that the optimizer can use. In Section 4 we showed by examining Fig. 2b that the 𝑔 ★(𝜆 ) (that subsequently defines 𝐺 (𝜆 ))satisfies key properties: monotonicity, boundedness, eventually becoming 0, and Lipschitz continuity. We also show that the 𝑔 ★(𝜆 ) for general value distributions satisfies monotonicity (Lemma 5.3) and bounded-ness (Lemma 5.4). Unfortunately, there are distributions (like the one in Section E) where 𝑔 ★(𝜆 ) ≠ 0 for all 
+
+𝜆 ≥ 0; we show that this is not the case when the value distribution satisfies the aforementioned property (or that 𝑅 ★ is above a certain threshold, see Lemma 5.5). Finally, we have to deal with the issue that the function 𝑔 ★(·) can be discontinuous. We resolve this final issue by taking an averaged version of 𝑔 ★(·) 
+
+on an interval of small length 𝜎 that we show is Lipschitz continuous and approximately satisfies all the properties of 𝑔 ★(·) .12 5.1 Relaxing the Upper Bound for the Optimizer’s Problem 
+
+By leveraging strong duality (Lemma 3.3), and in particular Optimization Program 5, instead of upper bounding the total value the optimizer can get, we upper bound her maximum Lagrangian reward. For-mally, the maximum value the optimizer can get when the learner starts at some 𝜆 (1) , given she wants to observe her budget constraint with probability 1, is 
+
+sup    
+
+> ˆ𝑣 (𝑡 )
+> O∈R[0,1]≥0
+
+E
+
+" 𝑇 ∑︁ 
+
+> 𝑡 =1
+
+𝑈 O
+
+
+
+ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+#
+
+such that 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =1
+
+𝜆 (𝑡 ) 𝑃 O
+
+
+
+ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+
+
+≤ 𝜌 O𝑇 𝜆 (𝑡 +1) = 𝜆 (𝑡 ) + 𝜂 
+
+
+
+𝜌 L − 𝜆 (𝑡 ) 𝑃 L
+
+
+
+ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+
+
+∀𝑡 ∈ [ 𝑇 ]
+
+where the inequality must hold for every realization of (𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 ) 
+
+> O
+
+) ∼ D and each ˆ𝑣 (𝑡 ) 
+
+> O
+
+depends only on the values of the previous rounds (and not future ones). We will assume that the initial value value 𝜆 (1)
+
+is small enough so that the learner does not run out of budget (Lemma 3.1). By relaxing the optimizer’s budget constraint to hold only in expectation, lagrangifying that constraint with the multiplier 𝜇 ≥ 0 of Lemma 3.3, we get an upper bound for the above problem: 
+
+sup    
+
+> ˆ𝑣 (𝑡 )
+> O:R[0,1]≥0
+
+E
+
+" 𝑇 ∑︁ 
+
+> 𝑡 =1
+
+
+
+𝑈 O
+
+
+
+ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+
+
+− 𝜇 𝜆 (𝑡 ) 𝑃 O
+
+
+
+ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+
+
++ 𝜇𝜌 O
+
+#
+
+where 𝜆 (𝑡 +1) = 𝜆 (𝑡 ) + 𝜂 
+
+
+
+𝜌 L − 𝜆 (𝑡 ) 𝑃 L
+
+
+
+ˆ𝑣 (𝑡 ) 
+
+> O
+
+, 𝑣 (𝑡 ) 
+
+> L
+
+, 𝑣 (𝑡 )
+
+> O
+
+
+
+∀𝑡 ∈ [ 𝑇 ].
+
+Ignoring the constant 𝜇𝜌 O term in the objective, we can write the above recursively. In particular, it is equal to 𝑅 𝑇 
+
+ 𝜆 (1) , where 
+
+𝑅 𝜏 (𝜆 ) =
+
+
+
+sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+E
+
+> 𝑣 L,𝑣 O
+
+
+
+𝑈 O ( ˆ𝑣 O, 𝑣 L, 𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O, 𝑣 L, 𝑣 O) + 𝑅 𝜏 −1
+
+
+
+𝜆 + 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)
+
+if 𝜏 ≥ 10 o/w 
+
+,
+
+i.e., 𝑅 𝜏 (𝜆 ) denotes the total Lagrangian reward the optimizer can get if there are 𝜏 rounds remaining and the learner is currently using pacing multiplier 𝜆 . If we were to show that 𝑅 𝑇 (𝜆 ) ≤ 𝑅 ★ · 𝑇 + 𝑜 (𝑇 ), then by strong duality we would get Theorem 3.4. However, proving such a bound directly is complicated. In fact, the ˆ𝑣 O that is the maximizer of the above expression depends on both 𝜏 and 𝜆 , making it impossible to compute. Instead, we relax 𝑅 𝜏 (𝜆 ) even further by separating the two variables, via a function of the form 
+
+𝐴𝜏 + 1 
+
+> 𝜂
+
+𝐺 (𝜆 ). Specifically, we prove the following lemma that gives such a bound. 
+
+Lemma 5.1. For every 𝜏 ≥ 0 and 𝜆 ≥ 0, the Lagrangian reward of the optimizer is upper-bounded by 
+
+𝑅 𝜏 (𝜆 ) ≤ 𝐴𝜏 + 1
+
+𝜂 𝐺 (𝜆 ) (10) 
+
+as long as the following two conditions hold 1. 𝐺 (𝜆 ) ≥ 0 for all 𝜆 ≥ 0.
+
+13 2. For all 𝜆 ≥ 0
+
+𝐴 ≥ sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 1
+
+𝜂 E
+
+> 𝑣 L,𝑣 O
+
+
+
+𝐺 
+
+
+
+𝜆 + 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)
+
+− 𝐺 (𝜆 )
+
+  
+
+(11) 
+
+Proof. We prove Eq. (10) inductively in 𝜏 . First, for 𝜏 = 0, the claim holds since 𝐺 (𝜆 ) ≥ 0 = 𝑅 0 (𝜆 ) for all 
+
+𝜆 ≥ 0. Fix a 𝜏 ≥ 1, and assume Eq. (10) holds for 𝜏 − 1. We have that 
+
+𝑅 𝜏 (𝜆 ) = sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + E
+
+> 𝑣 L,𝑣 O
+
+
+
+𝑅 𝜏 −1
+
+
+
+𝜆 + 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)  
+
+≤ sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝐴 (𝜏 − 1) + 1
+
+𝜂 E
+
+> 𝑣 L,𝑣 O
+
+
+
+𝐺 
+
+
+
+𝜆 + 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)  
+
+≤ 𝐴 (𝜏 − 1) + 𝐴 + 1
+
+𝜂 𝐺 (𝜆 ) = 𝐴𝜏 + 1
+
+𝜂 𝐺 (𝜆 )
+
+where the first inequality follows from the induction hypothesis (Eq. (10) holds for 𝜏 −1); the second follows from Eq. (11) and careful rearranging. ■
+
+5.2 Finding an appropriate 𝐺 for Lemma 5.1 
+
+In this section, we find a function 𝐺 (and a value 𝐴 ) that satisfies Lemma 5.1 and, in particular, Eq. (10). To draw intuition for how we set this 𝐺 , we consider the following calculation. Consider that 𝐺 is “nice” and that 𝐺 (𝜆 + 𝜀 ) ≈ 𝐺 (𝜆 ) + 𝜀𝐺 ′ (𝜆 ), where 𝐺 ′ (·) is the derivative of 𝐺 (·) . In this case, the r.h.s. of Eq. (11) approximately becomes 
+
+sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝐺 ′ (𝜆 )  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O)
+
+and given that we want to pick the smallest possible 𝐴 , it makes sense to set: 
+
+𝐴 = inf  
+
+> 𝐺 ′:R≥0→R
+
+sup 
+
+> 𝜆 ≥0
+
+sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝐺 ′ (𝜆 )  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O)
+
+(12) which, since 𝐺 ′ (𝜆 ) is minimizing the expression for every 𝜆 , can also be rewritten as 
+
+𝐴 = sup 
+
+> 𝜆 ≥0
+
+inf  
+
+> 𝑔 ∈R
+
+sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝑔 ·  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O)
+
+.
+
+We notice that the above problem is very similar to the dual of Optimization Program 5. In fact, the objective is equal to the Lagrangian of the following problem for a fixed 𝜆 ≥ 0:
+
+max  
+
+> ˆ𝑉 O:Δ(R[0,1]≥0)
+
+𝑈 O
+
+ ˆ𝑉 O
+
+
+
+− 𝜇𝜆𝑃 O
+
+ ˆ𝑉 O
+
+
+
+such that 𝜌 L = 𝜆𝑃 L
+
+ ˆ𝑉 O
+
+ (13) Therefore, assuming some form of strong duality, we might be able to set 𝐺 ′ (𝜆 ) to the optimal Lagrange multiplier 𝑔 for every 𝜆 of the above problem to get a good 𝐴 . However, this poses major difficulties, as also outlined in Section 4. For example, for certain values of 𝜆 , the optimal value of 𝑔 might be −∞ , e.g., if 14 𝜆 < 𝜌 L Optimization Program (13) is infeasible, since 𝑃 L
+
+  ˆ𝑉 O
+
+ ≤ 1. While this makes sense from the setting of 𝐴 we have above, having 𝐺 ′ (𝜆 ) = −∞ does not correspond to anything useful for Lemma 5.1. Despite these problems, the above solution is a good starting point. First, we define the dual function of the above problem, 𝑓 : R2 → R,
+
+𝑓 (𝜆, 𝑔 ) = sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝑔 ·  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O)
+
+.
+
+We then pick 𝑔 so that 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★, with the goal to achieve 𝐴 ≈ 𝑅 ★ in Lemma 5.1. While this does not minimize the dual function for every 𝜆 (like in Eq. (12)), it achieves the goal of Lemma 5.1. Specifically, we define 
+
+𝑔 ★(𝜆 ) = sup 𝑔 ≤ 0 : 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★ . (14) Note that if for some 𝜆 , there is no 𝑔 ≤ 0 such that 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★, then 𝑔 ★(𝜆 ) = −∞ (we prove this is not the case later). However, if for some finite 𝑔 ≤ 0 it holds that 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★, then we can replace the above sup 
+
+with a max , i.e., 𝑓  𝜆, 𝑔 ★(𝜆 ) ≤ 𝑅 ★. This is because the set {𝑔 ≤ 0 : 𝑓 (𝜆, 𝑔 ) ≤ 𝑅 ★} is an interval of the form 
+
+[𝑎, 𝑏 ] or (−∞ , 𝑏 ] for 𝑎 ≤ 𝑏 ≤ 0, due to 𝑓 (𝜆, ·) being convex. 
+
+Claim 5.2. As a supremum of functions linear in 𝑔 or 𝜆 , 𝑓 (𝜆, 𝑔 ) is convex in each argument (but not necessarily jointly convex). 
+
+Then, to guarantee that 𝐺 (·) is not negative, we set 
+
+𝐺 (𝜆 ) ≈ − 
+
+∫ ∞
+
+> 𝜆
+
+𝑔 ★(𝑥 )𝑑𝑥 
+
+Note that even if 𝑔 ★ is finite, 𝑔 ★ might not be integrable or the above might be +∞ , e.g., if 𝑔 ★(𝜆 ) = −Ω(1/𝜆 )
+
+for large 𝜆 ; we prove these are non-issues later, under the distributional assumption of Theorem 3.4. We now make some observations about the definition of 𝑔 ★ in Eq. (14) and the subsequent definition of 𝐺 .First, the definition of 𝐺 matches our original goal to set its derivative to something relating to a Lagrange multiplier of Optimization Program (13). Second, we define 𝑔 ★(𝜆 ) to be non-positive so that 𝐺 (𝜆 ) is weakly decreasing in 𝜆 , i.e., our bound 𝐴𝜏 + 1 
+
+> 𝜂
+
+𝐺 (𝜆 ) is weakly decreasing in 𝜆 . Third, because 𝑔 ★(𝜆 ) ≤ 0, we are guaranteed to have that 𝐺 (𝜆 ) ≥ 0, as needed in Lemma 5.1. Finally, to make sure that the value of 𝐺 (𝜆 ) is as small as possible, in Eq. (14) we define 𝑔 ★ to be as close to 0 as possible under the required assumption on the value of 𝑓 .
+
+5.2.1 Proving that 𝑔 ★ is well behaved 
+
+The key property of 𝑔 ★ of Eq. (14) is that it is weakly increasing . This subsequently guarantees multiple desirable properties: it is integrable, bounded if and only if 𝑔 ★(0) is bounded, and its integral is non-infinite if it becomes 0 for any 𝜆 . We now prove that 𝑔 ★ is weakly increasing. 
+
+Lemma 5.3 (Monotonicity) . The function 𝑔 ★(𝜆 ), as defined in Eq. (14) , is weakly increasing. 
+
+We prove the lemma by noticing that, if the above condition were violated, then there would be a feasible bidding that achieves a Lagrangian reward higher than 𝑅 ★.
+
+Proof. Towards a contradiction, assume that for some 0 ≤ 𝜆 1 < 𝜆 2 it holds that 𝑔 ★(𝜆 1) > 𝑔 ★(𝜆 2). Note that this implies that 𝑔 ★(𝜆 1) > −∞ .First consider 𝑓  𝜆 2, 𝑔 ★(𝜆 1). It must be the case that 𝑓  𝜆 2, 𝑔 ★(𝜆 1) > 𝑅 ★ since, either (a) 𝑔 ★(𝜆 2) = −∞ ,implying 𝑓  𝜆 2, 𝑔  > 𝑅 ★ for all 𝑔 ≤ 0, or (b) 𝑔 ★(𝜆 2) ≠ −∞ , implying 𝑓  𝜆 2, 𝑔  > 𝑅 ★ for all 𝑔 > 𝑔 ★(𝜆 2). Let ˆ𝑣 O
+
+15 be the maximizer of 𝑓  𝜆 2, 𝑔 ★(𝜆 1) (recall that 𝑓 is defined as a supremum over a Lagrangian). If no such maximizer exists, we define ˆ𝑣 O to be such that its value is close enough to 𝑓  𝜆 2, 𝑔 ★(𝜆 1), so that it holds 
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 2𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)  𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O) > 𝑅 ★ (15) By definition of 𝑔 ★(𝜆 1) > −∞ , we have that 
+
+𝑅 ★ ≥ 𝑓  𝜆 1, 𝑔 ★(𝜆 1) ≥ 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 1𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)  𝜌 L − 𝜆 1𝑃 L ( ˆ𝑣 O)
+
+Combining the above with Eq. (15) we get 
+
+(𝜆 2 − 𝜆 1)  𝜇𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)𝑃 L ( ˆ𝑣 O) < 0 ⇐⇒ 𝜇𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)𝑃 L ( ˆ𝑣 O) < 0
+
+where we used that 𝜆 2 > 𝜆 1.We now assume that 𝜌 L > 𝜆 2𝑃 L ( ˆ𝑣 O) and prove the lemma; we postpone the proof of 𝜌 L > 𝜆 2𝑃 L ( ˆ𝑣 O) for the end of the proof. We define 𝜆 3 = 𝜌 L/𝑃 L ( ˆ𝑣 O); this is well defined since 𝑃 L ( ˆ𝑣 O) > 0 by our claim above. We note that 𝜆 3 > 𝜆 2, since 𝜌 L > 𝜆 2𝑃 L ( ˆ𝑣 O). We now revisit Eq. (15): 
+
+𝑅 ★ < 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 2𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)  𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O)
+
+< 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 3𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)  𝜌 L − 𝜆 3𝑃 L ( ˆ𝑣 O) 𝜇𝑃 O ( ˆ𝑣 O )+ 𝑔 ★ (𝜆 1 )𝑃 L ( ˆ𝑣 O )<0  
+
+> and 𝜆 3>𝜆 2
+
+
+
+= 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 3𝑃 O ( ˆ𝑣 O)  𝜆 3=𝜌 L/𝑃 L ( ˆ𝑣 O ) 
+
+However, the above inequality is a contradiction by the definition of 𝑅 ★: this ( ˆ𝑣 O, 𝜆 3) combination is feasible for Optimization Program 5 but achieves a strictly higher value than the maximum. To complete the proof of the lemma, we conclude with the proof that 𝜌 L > 𝜆 2𝑃 L ( ˆ𝑣 O). Assume towards a contradiction that 𝜌 L ≤ 𝜆 2𝑃 L ( ˆ𝑣 O). This makes the pair ( ˆ𝑣 O, 𝜆 2) feasible for Optimization Program 5, which implies that 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 2𝑃 O ( ˆ𝑣 O) ≤ 𝑅 ★. Combining this with Eq. (15), we get 
+
+𝑔 ★(𝜆 1)  𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O) > 0
+
+which implies that 𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O) < 0. Also, for every 𝑔 ≤ 𝑔 ★(𝜆 1):
+
+𝑓 (𝜆 2, 𝑔 ) ≥ 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 2𝑃 O ( ˆ𝑣 O) + 𝑔 ·  𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O) ≥ 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 2𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)  𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O)
+
+where in the inequality we use 𝜌 L < 𝜆 2𝑃 L ( ˆ𝑣 O). The above implies that 
+
+inf    
+
+> 𝑔 ≤𝑔 ★(𝜆 1)
+
+𝑓 (𝜆 2, 𝑔 ) ≥ 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆 2𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 1)  𝜌 L − 𝜆 2𝑃 L ( ˆ𝑣 O) > 𝑅 ★
+
+where the last inequality is Eq. (15). On the other hand, we know that 𝑔 ★(𝜆 1) > 𝑔 ★(𝜆 2), implying 𝑓 (𝜆 2, 𝑔 ) >
+
+𝑅 ★ for 𝑔 ≥ 𝑔 ★(𝜆 2). This implies that 
+
+inf  
+
+> 𝑔 ≤0
+
+𝑓 (𝜆 2, 𝑔 ) > 𝑅 ★
+
+We proceed to show that the above is a contradiction, along with our previous observation, 𝜌 L < 𝜆 2𝑃 L ( ˆ𝑣 O).Consider the following optimization program 
+
+sup  
+
+> ˆ𝑉 O:Δ(R[0,1]≥0)
+
+𝑈 O
+
+ ˆ𝑉 O
+
+
+
+− 𝜇𝜆 2𝑃 O
+
+ ˆ𝑉 O
+
+
+
+such that 𝜆 2𝑃 L
+
+ ˆ𝑉 O
+
+
+
+≥ 𝜌 L
+
+(16) 16 The above problem is a convex optimization problem, by considering the subset of R2,
+
+𝐹 =
+
+
+
+𝑈 O
+
+  ˆ𝑣 ′
+
+> O
+
+ − 𝜇𝜆 2𝑃 O
+
+  ˆ𝑣 ′
+
+> O
+
+, 𝜆 2𝑃 L
+
+  ˆ𝑣 ′
+
+> O
+
+
+
+: ˆ 𝑣 ′ 
+
+> O
+
+∈ R[0,1]≥0
+
+
+
+,
+
+its closure ¯𝐹 and its convex hull cnvx ( ¯𝐹 ). Specifically, the convex problem is 
+
+max    
+
+> 𝑥 ∈cnvx (¯𝐹 )
+
+𝑥 [1]
+
+such that 𝑥 [2] ≥ 𝜌 L
+
+We now observe that strong duality holds. By our previous observations that 𝜌 L < 𝜆 2𝑃 L ( ˆ𝑣 O), i.e., ∃𝑥 ∈ 𝐹 
+
+such that 𝜌 L < 𝑥 [2], we get that there exists a neighborhood around this point that strictly satisfies the constraint. The intersection of this neighborhood and cnvx ( ¯𝐹 ) is in the relative interior of cnvx ( ¯𝐹 ) and strictly satisfies the constraint, which makes Slater’s condition hold, and therefore strong duality. We notice now that 𝑓 (𝜆 2, 𝑔 ) is the dual function of Optimization Program (16). Given that inf 𝑔 ≤0 𝑓 (𝜆 2, 𝑔 ) > 𝑅 ★
+
+and strong duality, we get that the objective of Optimization Program (16) is also strictly bigger than 𝑅 ★.However, 𝑅 ★ was defined as the Optimization Program (16) where we are also allowed to optimize over our choice of 𝜆 , implying it cannot have a higher objective. This completes the contradiction. ■
+
+We now proceed to prove that 𝑔 ★ is bounded. Since it is weakly increasing, we only have to prove that 
+
+𝑔 ★(0) is bounded, which we do by explicitly calculating its value. 
+
+Lemma 5.4 (Boundedness) . The function 𝑔 ★(𝜆 ), as defined in Eq. (14) , satisfies 𝑔 ★(0) = − E [𝑣 O ]− 𝑅 ★ 
+
+> 𝜌 L
+
+≤ 0.Proof. We notice that 
+
+𝑓 (0, 𝑔 ) = sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) + 𝑔𝜌 L
+
+
+
+= E 𝑣 O
+
+ + 𝑔𝜌 L
+
+Given the constraint E [𝑣 O] + 𝑔𝜌 L ≤ 𝑅 ★, the highest 𝑔 that satisfies this is − E [𝑣 O ]− 𝑅 ★ 
+
+> 𝜌 L
+
+. We notice that this is non-positive due to Optimization Program 5, since the optimization objective is 
+
+𝑈 O ( ˆ𝑉 O) − 𝜆𝜇𝑃 O ( ˆ𝑉 O) ≤ 𝑈 O ( ˆ𝑉 O) ≤ E 𝑣 O
+
+ .
+
+This completes the proof. ■
+
+We now prove that 𝑔 ★(𝜆 ) = 0 for large enough 𝜆 , under our distribution assumption in Theorem 3.4. In addition, we prove the claim when 𝑅 ★ is larger than the optimizer’s value when the learner has a value of 
+
+0. Combined with the above lemma, this proves that ∫ ∞ 
+
+> 0
+
+𝑔 ★(𝜆 )𝑑𝜆 is bounded. We note that the following lemma might not be true without the assumptions, e.g., in our example in Section E, see Fig. 4. 
+
+Lemma 5.5. Let 𝑔 ★(𝜆 ) be as defined in Eq. (14) . Assume that E [𝑣 L] > 0. Assume that P [0 < 𝑣 L < 𝑣 O𝜀 ] = 0
+
+for some 𝜀 > 0 or that 𝑅 ★ > E 𝑣 O1𝑣 L=0
+
+. Then, there exists a finite ¯𝜆 such that 𝑔 ★( ¯𝜆 ) = 0.Proof. We first prove that 𝑅 ★ ≥ E 𝑣 O1𝑣 L=0
+
+, relying just on the assumption that E [𝑣 L] > 0. Consider the optimizer bidding a small constant 𝛿 > 0, such that P [𝑣 L ≥ 𝛿 ] > 0 (if no such 𝛿 exists then E [𝑣 L] = 0). Let 𝜆 = 𝜌 L/𝑃 L (𝛿 ), which is well defined since 𝑃 L (𝛿 ) ≥ 𝛿 P [𝑣 L ≥ 𝛿 ] > 0. This means that this 𝜆 , along with bidding 𝛿 , is feasible for Optimization Program 5. We now examine its objective value. For second-price, 
+
+𝑈 O (𝛿 ) − 𝜇𝜆𝑃 O (𝛿 ) = 𝑈 O (𝛿 ) − 𝜇𝜌 L
+
+𝑃 O (𝛿 )
+
+𝑃 L (𝛿 ) = E 𝑣 O1𝑣 L <𝛿 
+
+ − 𝜇𝜌 L
+
+E 𝑣 L1𝑣 L <𝛿 
+
+
+
+𝛿 P [𝑣 L ≥ 𝛿 ] ≥ E 𝑣 O1𝑣 L <𝛿 
+
+ − 𝜇𝜌 L
+
+𝛿 P [0 < 𝑣 L < 𝛿 ]
+
+𝛿 P [𝑣 L ≥ 𝛿 ]
+
+17 and for first-price 
+
+𝑈 O (𝛿 ) − 𝜇𝜆𝑃 O (𝛿 ) = 𝑈 O (𝛿 ) − 𝜇𝜌 L
+
+𝑃 O (𝛿 )
+
+𝑃 L (𝛿 ) = E 𝑣 O1𝑣 L <𝛿 
+
+ − 𝜇𝜌 L
+
+𝛿 P [𝑣 L < 𝛿 ]
+
+E 𝑣 L1𝑣 L ≥𝛿 
+
+
+
+We notice that in both cases, the final r.h.s. converges to E 𝑣 O1𝑣 L=0
+
+ by taking 𝛿 → 0. This proves that 
+
+𝑅 ★ ≥ E 𝑣 O1𝑣 L=0
+
+.We now proceed to prove that 𝑔 ★(𝜆 ) becomes 0 eventually. We get that 𝑔 ★(𝜆 ) = 0 if 𝑓 (𝜆, 0) ≤ 𝑅 ★. This is easy to do in the case when 𝜇 = 0: we can extend the above analysis to show that 𝑅 ★ = E [𝑣 O] and also show that 𝑓 (𝜆, 0) = E [𝑣 O], making the desired ¯𝜆 = 0. For 𝜇 > 0, we have that 
+
+𝑓 (𝜆, 0) = sup 
+
+> ˆ𝑣 O
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O)
+
+
+
+≤ sup 
+
+> ˆ𝑣 O
+
+E (𝑣 O − 𝜇𝜆𝑣 L)1ˆ𝑣 O (𝑣 O )>𝑣 L
+
+ = E (𝑣 O − 𝜇𝜆𝑣 L)+
+
+where in the inequality we used the payment rule of second-price that lower bounds the first-price one and in the final equality we used the “truthful” bidding rule that maximizes the expression, ˆ𝑣 O (𝑣 O) = 𝑣 O 
+
+> 𝜇𝜆
+
+.We further upper bound the above quantity: 
+
+E (𝑣 O − 𝜇𝜆𝑣 L)+ = E 𝑣 O1𝑣 L=0
+
+ + E (𝑣 O − 𝜇𝜆𝑣 L)10<𝜇𝜆𝑣 L <𝑣 O
+
+ ≤ E 𝑣 O1𝑣 L=0
+
+ + P 0 < 𝜇𝜆𝑣 L < 𝑣 O
+
+
+
+where in the inequality we used 𝑣 O − 𝜇𝜆𝑣 L ≤ 1. We now analyze the above for the two assumptions we made in the lemma. If P [0 < 𝑣 L < 𝑣 O𝜀 ] = 0 for some 𝜀 > 0 then setting 𝜆 = ¯𝜆 = 1/( 𝜇𝜀 ) makes the above equal to E 𝑣 O1𝑣 L=0
+
+ ≤ 𝑅 ★. If, instead, 𝑅 ★ > E 𝑣 O1𝑣 L=0
+
+ then since the probability converges to 0 as 𝜆 → ∞ ,there must be some finite ¯𝜆 such that the expression becomes at most than 𝑅 ★. In either case, this proves that 𝑓 ( ¯𝜆, 0) ≤ 𝑅 ★ for some finite ¯𝜆 , implying 𝑔 ★( ¯𝜆 ) = 0. ■
+
+We now examine the last property of 𝑔 ★ we are interested in. At the beginning of Section 5.2, we analyzed the requirements of Lemma 5.1 under the assumption that 𝐺 (𝜆 + 𝜀 ) ≈ 𝐺 (𝜆 ) + 𝜀𝐺 ′ (𝜆 ), which is similar to assuming that 𝐺 ′ (𝜆 ) is Lipschitz. However, we can show that there are examples where 𝑔 ★(𝜆 ) is not only not Lipschitz, but also discontinuous, implying that the previous approximation fails. We remedy this in a two-step process. First, we define 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ), an averaged version of 𝑔 ★(𝜆 ) over an interval of length 𝜎 around 𝜆 , for a small 𝜎 > 0. Because 𝑔 ★(𝜆 ) is bounded by 𝑔 ★(0) , this will make the new function 
+
+𝑔 ★(0) /𝜎 -Lipschitz. Then, to prove that this 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) is useful, we prove that using a slightly incorrect 𝑔 ★
+
+leads to small error in the dual function 𝑓 : 𝑓  𝜆, 𝑔 ★(𝜆 + 𝜀 ) ≤ 𝑅 ★ + O(| 𝜀 |) . This means that even if we use 
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) instead of 𝑔 ★(𝜆 ), we still get a good bound. However, we emphasize that the previous inequality of using 𝑔 ★(𝜆 + 𝜀 ) instead of 𝑔 ★(𝜆 ) is not good enough to get our desired bounds: the perturbation of 
+
+𝜆 in Eq. (11) is not fixed and depends on the realizations of 𝑣 L, 𝑣 O; the above inequality requires a fixed perturbation. We now present this inequality formally property formally. 
+
+Lemma 5.6. Let 𝑔 ★(𝜆 ) be as defined in Eq. (14) and fix 𝜆 ≥ 0 and 𝜆 + 𝜀 ≥ 0. Then, 
+
+𝑓  𝜆, 𝑔 ★(𝜆 + 𝜀 ) ≤ 𝑅 ★ + 𝜇𝜀 + − 𝑔 ★(0)𝜀 −
+
+where 𝜀 + = max {𝜀, 0} and 𝜀 − = max {− 𝜀, 0}.Proof. Let ˆ𝑣 O be a bidding function that is 𝛿 -close to the supremum in the definition of 𝑓  𝜆, 𝑔 ★(𝜆 + 𝜀 ), i.e., 
+
+𝑓  𝜆, 𝑔 ★(𝜆 + 𝜀 ) − 𝛿 ≤ 𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 + 𝜀 )  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O)
+
+By the definition of 𝑔 ★(𝜆 + 𝜀 ), we have that 
+
+𝑅 ★ ≥ 𝑓  𝜆 + 𝜀, 𝑔 ★(𝜆 + 𝜀 ) ≥ 𝑈 O ( ˆ𝑣 O) − 𝜇 (𝜆 + 𝜀 )𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 + 𝜀 )  𝜌 L − ( 𝜆 + 𝜀 )𝑃 L ( ˆ𝑣 O)
+
+18 Adding the two inequalities, we get that 
+
+𝑓  𝜆, 𝑔 ★(𝜆 + 𝜀 ) − 𝛿 − 𝑅 ★ ≤ 𝜇𝜀𝑃 O ( ˆ𝑣 O) + 𝑔 ★(𝜆 + 𝜀 )𝜀𝑃 L ( ˆ𝑣 O) ≤ 𝜇𝜀 + − 𝑔 ★(0)𝜀 −
+
+where in the inequality we used that 𝑃 O, 𝑃 L ≤ 1 and that 𝑔 ★(0) ≤ 𝑔 ★(𝜆 + 𝜀 ) ≤ 0. Taking 𝛿 arbitrarily close to 0 proves the lemma. ■
+
+We now define the averaged version of 𝑔 ★ that is Lipschitz. Specifically, for a parameter 𝜎 > 0, we define 
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) = 1
+
+𝜎 
+
+∫ 𝜆 +𝜎 𝜆 
+
+𝑔 ★(𝑥 )𝑑𝑥 (17) and proceed to prove that 𝑔 ★ 
+
+> 𝜎
+
+satisfies all the properties that 𝑔 ★ satisfied, with the addition of being O( 1/𝜎 )-Lipschitz. 
+
+Lemma 5.7 (𝑔 ★ 
+
+> 𝜎
+
+Properties) . For any 𝜎 > 0, the following properties hold for 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ), as defined in Eq. (17) .(i) It is weakly increasing. (ii) It satisfies: −∞ < 𝑔 ★(0) ≤ 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ≤ 0.(iii) It eventually becomes 0 if 𝑔 ★ becomes 0: if 𝑔 ★(𝜆 ) = 0 for some 𝜆 then 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) = 0.(iv) For every 𝜆 ≥ 0, it holds 
+
+𝑓  𝜆, 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ≤ 𝑅 ★ + 𝜇𝜎 
+
+(v) It is Lipschitz. Specifically, for every 𝜆, 𝜀 ≥ 0, 0 ≤ 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) − 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ≤ − 𝜀 𝜎 𝑔 ★(𝜆 ).Proof. We prove that 𝑔 ★ 
+
+> 𝜎
+
+(·) is weakly increasing by examining its derivative, 𝑔 ★ (𝜆 +𝜎 ) − 𝑔 ★ (𝜆 ) 
+
+> 𝜎
+
+≥ 0, since 𝑔 ★(·) 
+
+is weakly increasing. For the lower and upper bounds, we have that 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ∈ [ 𝑔 ★(𝜆 ), 𝑔 ★(𝜆 + 𝜎 )] ⊆ [ 𝑔 ★(0), 0]. We recall that 
+
+𝑔 ★(0) > −∞ by Lemma 5.4. Since 𝑔 ★(·) is weakly increasing and non-negative, if 𝑔 ★(𝜆 ) = 0 then 𝑔 ★(𝑥 ) = 0 for 𝑥 ∈ [ 𝜆, 𝜆 + 𝜎 ], implying 
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) = 0.To prove property (iv), we first recall that the function 𝑓 (𝜆, ·) is convex (Claim 5.2). Convexity means that when evaluating 𝑓 (𝜆, 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 )) , since 𝑔 ★(𝜆 ) ≤ 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ≤ 𝑔 ★(𝜆 + 𝜎 ), its maximum is at one of the boundaries: 
+
+𝑓  𝜆, 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ≤ max 
+
+n
+
+𝑓  𝜆, 𝑔 ★(𝜆 ), 𝑓  𝜆, 𝑔 ★(𝜆 + 𝜎 )o
+
+≤ 𝑅 ★ + 𝜇𝜎  by Lemma 5.6 
+
+Finally, to prove Lipschitzness, by the mean value theorem, we have that 
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) − 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) ≤ 𝜀 sup   
+
+> 𝑥 ∈ [ 𝜆,𝜆 +𝜀 ]
+
+𝑔 ★(𝑥 + 𝜎 ) − 𝑔 ★(𝑥 )
+
+𝜎 ≤ − 𝜀 𝜎 𝑔 ★(𝜆 ) ≤ − 𝜀 𝜎 𝑔 ★(0)
+
+which concludes the proof of the lemma. ■
+
+5.2.2 Using 𝑔 ★ 
+
+> 𝜎
+
+(·) in Lemma 5.1 
+
+With Lemma 5.7, we have all the properties that we had highlighted, and we are ready to define the 𝐺 (·) 
+
+that we will use in Lemma 5.1. Specifically, for any 𝜎 > 0, we define 
+
+𝐺 𝜎 (𝜆 ) = −
+
+∫ ∞
+
+> 𝜆
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝑥 )𝑑𝑥 . (18) We note that the above is well-defined: since 𝑔 ★ 
+
+> 𝜎
+
+(·) is monotone, it is integrable. In addition, if 𝑔 ★ 
+
+> 𝜎
+
+(·) be-comes 0 eventually, then 𝐺 𝜎 (·) is always bounded. We now prove that the above 𝐺 𝜎 (·) satisfies Lemma 5.1 for an appropriate 𝐴 .19 Lemma 5.8. Let 𝐺 𝜎 (·) be as defined in Eq. (18) and assume that 𝑔 ★( ¯𝜆 ) = 0 for some ¯𝜆 ≥ 𝜌 L. Then, 𝐺 𝜎 (·) 
+
+satisfies Lemma 5.1 with 
+
+𝐴 = 𝑅 ★ + 𝜇 𝜎 − 𝜂 𝜌 2 
+
+> L
+
++
+
+ ¯𝜆 −𝜂𝜌 L
+
+> 1−𝜂
+
+2
+
+𝜎 𝑔 ★(0).
+
+Before proving the lemma, we apply it to prove Theorem 3.4. 
+
+Proof of Theorem 3.4. By the assumptions of Theorem 3.4 and Lemma 5.5, we have that 𝑔 ★( ¯𝜆 ) = 0 for some 
+
+¯𝜆 ≥ 𝜌 L. Because of Lemma 5.8, the total expected Lagrangian value of the optimizer when the learner starts at 𝜆 (1) = 0 is 
+
+𝑅 𝑇 (0) ≤ 𝑇 𝑅 ★ + 𝜇 𝜎 𝑇 − 𝜂 𝜌 2 
+
+> L
+
++
+
+ ¯𝜆 −𝜂𝜌 L
+
+> 1−𝜂
+
+2
+
+𝜎 𝑔 ★(0)𝑇 + 𝐺 𝜎 (0)
+
+𝜂 
+
+≤ 𝑇 𝑅 ★ + 𝜇 𝜎 𝑇 + 𝜂 𝜌 2 
+
+> L
+
++
+
+ ¯𝜆 −𝜂𝜌 L
+
+> 1−𝜂
+
+2
+
+𝜎 
+
+E [𝑣 O] − 𝑅 ★
+
+𝜌 L
+
+𝑇 + ¯𝜆 𝜂 
+
+E [𝑣 O] − 𝑅 ★
+
+𝜌 L
+
+= 𝑇 𝑅 ★ + Θ
+
+
+
+𝜎 𝑇 + 𝜂 𝜎 𝑇 + 1
+
+𝜂 
+
+
+
+where the second inequality follows by 𝐺 𝜎 (0) ≤ ¯𝜆𝑔 ★(0) and Lemma 5.4; in the last equality we notice that 
+
+¯𝜆 , 𝜇 , 𝜌 L, 𝑅 ★, and E [𝑣 O] are constants with respect to 𝑇 , 𝜂 , 𝜎 , since their definitions are independent of them. Using that the total expected reward the budgeted optimizer gets is at most 𝑅 𝑇 (0) + 𝑇 𝜇𝜌 O and that 
+
+𝑅 ★ + 𝜌 O = OPT , we get that the total expected reward of the budgeted optimizer is at most 
+
+𝑇 OPT + Θ
+
+
+
+𝜎 𝑇 + 𝜂 𝜎 𝑇 + 1
+
+𝜂 
+
+
+
+By taking 𝜎 = Θ(√𝜂 ) and then 𝜂 = Θ(𝑇 −2/3) we get the final bounds of Theorem 3.4. ■
+
+We now proceed to prove the lemma. 
+
+Proof of Lemma 5.8. We notice that 𝐺 𝜎 (𝜆 ) ≥ 0 since 𝑔 ★ 
+
+> 𝜎
+
+(𝑥 ) ≤ 0 for all 𝑥 ≥ 0. This takes care of the first condition of Lemma 5.1. We now prove the second condition. Let 𝜀 = 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O). If 𝜀 ≥ 0, we have that 
+
+𝐺 𝜎 (𝜆 + 𝜀 ) − 𝐺 𝜎 (𝜆 ) =
+
+∫ 𝜆 +𝜀 𝜆 
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝑥 )𝑑𝑥 ≤ 𝜀 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) ≤ 𝜀 
+
+
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) − 𝜀 𝜎 𝑔 ★(𝜆 )
+
+
+
+where we use 𝑔 ★ 
+
+> 𝜎
+
+(𝑥 ) ≤ 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) in the first inequality and Lemma 5.7-(v) in the second inequality. If 𝜀 ≤ 0
+
+and 𝜆 + 𝜀 ≥ 0, we have 
+
+𝐺 𝜎 (𝜆 + 𝜀 ) − 𝐺 𝜎 (𝜆 ) = −
+
+∫ 𝜆 𝜆 +𝜀 
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝑥 )𝑑𝑥 ≤ 𝜀 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) ≤ 𝜀 
+
+
+
+𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) − 𝜀 𝜎 𝑔 ★(𝜆 + 𝜀 )
+
+
+
+where we use 𝑔 ★ 
+
+> 𝜎
+
+(𝑥 ) ≥ 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) in the first inequality and 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) − 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 + 𝜀 ) ≤ 𝜀 𝜎 𝑔 ★(𝜆 + 𝜀 ) (which again comes from Lemma 5.7-(v)) in the second inequality. We summarize the bound for any 𝜀 as 
+
+𝐺 𝜎 (𝜆 + 𝜀 ) − 𝐺 𝜎 (𝜆 ) ≤ 𝜀 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) − 𝜀 2
+
+𝜎 𝑔 ★  𝜆 − 𝜀 − 
+
+20 We now use the above inequality in the r.h.s. of Eq. (11): 
+
+sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 1
+
+𝜂 E
+
+> 𝑣 L,𝑣 O
+
+
+
+𝐺 𝜎 
+
+
+
+𝜆 + 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)
+
+− 𝐺 𝜎 (𝜆 )
+
+  
+
+≤ sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 1
+
+𝜂 E
+
+> 𝑣 L,𝑣 O
+
+
+
+𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)𝑔 ★ 
+
+> 𝜎
+
+(𝜆 )− 𝜂 2  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)2
+
+𝜎 𝑔 ★ 
+
+𝜆 − 𝜂  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O) −  !
+
+≤ sup 
+
+> ˆ𝑣 O:R[0,1]≥0
+
+
+
+𝑈 O ( ˆ𝑣 O) − 𝜇𝜆𝑃 O ( ˆ𝑣 O) + 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 )  𝜌 L − 𝜆𝑃 L ( ˆ𝑣 O) − 𝜂  𝜌 2 
+
+> L
+
++ 𝜆 2
+
+𝜎 𝑔 ★
+
+> 𝜎
+
+
+
+𝜆 − 𝜂  𝜌 L − 𝜆  − 
+
+= 𝑓  𝜆, 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 ) − 𝜂  𝜌 2 
+
+> L
+
++ 𝜆 2
+
+𝜎 𝑔 ★
+
+> 𝜎
+
+
+
+𝜆 − 𝜂  𝜌 L − 𝜆  − 
+
+≤ 𝑅 ★ + 𝜇 𝜎 − 𝜂  𝜌 2 
+
+> L
+
++ 𝜆 2
+
+𝜎 𝑔 ★
+
+> 𝜎
+
+
+
+𝜆 − 𝜂  𝜌 L − 𝜆  − 
+
+where in the second inequality we used the definition E [𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O)] = 𝑃 L ( ˆ𝑣 O) and that 𝑃 L ( ˆ𝑣 O, 𝑣 L, 𝑣 O) ≤ 1;in the last inequality we used Lemma 5.7-(iv). When 𝜆 ≥ ¯𝜆 −𝜂𝜌 L 
+
+> 1−𝜂
+
+and ¯𝜆 ≥ 𝜌 L, we have that 𝜆 −𝜂  𝜌 L − 𝜆  − ≥ ¯𝜆 ,implying that 𝑔 ★ 
+
+> 𝜎
+
+(𝜆 − 𝜂  𝜌 L − 𝜆  − ) = 0 by 𝑔 ★( ¯𝜆 ) = 0 and Lemma 5.7-(iii). When 𝜆 ≤ ¯𝜆 −𝜂𝜌 L 
+
+> 1−𝜂
+
+, by taking 
+
+𝑔 ★ 
+
+> 𝜎
+
+(·) ≥ 𝑔 ★(0) by Lemma 5.7-(ii) and bounding 𝜆 2 we get the lemma. This completes the proof. ■
+
+# References 
+
+[AFZ25] Gagan Aggarwal, Giannis Fikioris, and Mingfei Zhao. “No-Regret Algorithms in non-Truthful Auctions with Budget and ROI Constraints”. In: Proceedings of the ACM on Web Conference 2025, WWW 2025, Sydney, NSW, Australia, 28 April 2025- 2 May 2025 . ACM, 2025, pp. 1398– 1415. [Agg+24] Gagan Aggarwal et al. “Auto-Bidding and Auctions in Online Advertising: A Survey”. In: 
+
+SIGecom Exch. 22.1 (2024), pp. 159–183. [AD16] Shipra Agrawal and Nikhil R. Devanur. “Linear Contextual Bandits with Knapsacks”. In: Ad-vances in Neural Information Processing Systems 29: Annual Conference on Neural Information Processing Systems 2016, December 5-10, 2016, Barcelona, Spain . 2016, pp. 3450–3458. [Aru+25] Eshwar Ram Arunachaleswaran, Natalie Collina, Yishay Mansour, Mehryar Mohri, Jon Schnei-der, and Balasubramanian Sivan. “Swap Regret and Correlated Equilibria Beyond Normal-Form Games”. In: Proceedings of the 26th ACM Conference on Economics and Computation, EC 2025, Stanford University, Stanford, CA, USA, July 7-10, 2025 . ACM, 2025, pp. 130–157. [ACS24] Eshwar Ram Arunachaleswaran, Natalie Collina, and Jon Schneider. “Pareto-Optimal Algo-rithms for Learning in Games”. In: Proceedings of the 25th ACM Conference on Economics and Computation, EC 2024, New Haven, CT, USA, July 8-11, 2024 . ACM, 2024, pp. 490–510. [BKS18] Ashwinkumar Badanidiyuru, Robert Kleinberg, and Aleksandrs Slivkins. “Bandits with Knap-sacks”. In: J. ACM 65.3 (2018), 13:1–13:55. [BBW15] Santiago R. Balseiro, Omar Besbes, and Gabriel Y. Weintraub. “Repeated Auctions with Bud-gets in Ad Exchanges: Approximations and Design”. In: Manag. Sci. 61.4 (2015), pp. 864–884. 21 [Bal+24] Santiago R. Balseiro, Kshipra Bhawalkar, Zhe Feng, Haihao Lu, Vahab Mirrokni, Balasubra-manian Sivan, and Di Wang. “A Field Guide for Pacing Budget and ROS Constraints”. In: 
+
+Forty-first International Conference on Machine Learning, ICML 2024, Vienna, Austria, July 21-27, 2024 . Ed. by Ruslan Salakhutdinov, Zico Kolter, Katherine A. Heller, Adrian Weller, Nuria Oliver, Jonathan Scarlett, and Felix Berkenkamp. Proceedings of Machine Learning Research. PMLR / OpenReview.net, 2024, pp. 2607–2638. url : https : / / proceedings . mlr . press / v235/balseiro24a.html .[BG19] Santiago R. Balseiro and Yonatan Gur. “Learning in Repeated Auctions with Budgets: Regret Minimization and Equilibrium”. In: Management Science 65.9 (2019), pp. 3952–3968. [BKK23] Santiago R. Balseiro, Christian Kroer, and Rachitesh Kumar. “Contextual Standard Auctions with Budgets: Revenue Equivalence and Efficiency Guarantees”. In: Manag. Sci. 69.11 (2023), pp. 6837–6854. [Bal+23] Santiago R. Balseiro, Rachitesh Kumar, Vahab Mirrokni, Balasubramanian Sivan, and Di Wang. “Robust Budget Pacing with a Single Sample”. In: International Conference on Machine Learn-ing, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA . Ed. by Andreas Krause, Emma Brun-skill, Kyunghyun Cho, Barbara Engelhardt, Sivan Sabato, and Jonathan Scarlett. Proceedings of Machine Learning Research. PMLR, 2023, pp. 1636–1659. url : https://proceedings. mlr.press/v202/balseiro23a.html .[BLM23] Santiago R. Balseiro, Haihao Lu, and Vahab Mirrokni. “The Best of Many Worlds: Dual Mirror Descent for Online Allocation Problems”. In: Oper. Res. 71.1 (2023), pp. 101–119. doi : 10.1287/ OPRE.2021.2242 . url : https://doi.org/10.1287/opre.2021.2242 .[Bal+22] Santiago R. Balseiro, Haihao Lu, Vahab S. Mirrokni, and Balasubramanian Sivan. “From On-line Optimization to PID Controllers: Mirror Descent with Momentum”. In: CoRR abs/2202.06152 (2022). arXiv: 2202.06152 . url : https://arxiv.org/abs/2202.06152 .[Ber+24] Martino Bernasconi, Matteo Castiglioni, Andrea Celli, and Federico Fusco. “Bandits with Re-plenishable Knapsacks: the Best of both Worlds”. In: The Twelfth International Conference on Learning Representations, ICLR 2024, Vienna, Austria, May 7-11, 2024 . OpenReview.net, 2024. [Ber09] Dimitri Bertsekas. Convex optimization theory . Vol. 1. Athena Scientific, 2009. [Bra+25] Mark Braverman, Jingyi Liu, Jieming Mao, Jon Schneider, and Eric Xue. “A New Benchmark for Online Learning with Budget-Balancing Constraints”. In: CoRR abs/2503.14796 (2025). doi :
+
+10.48550/ARXIV.2503.14796 . arXiv: 2503.14796 . url : https://doi.org/10.48550/ arXiv.2503.14796 .[Bra+18] Mark Braverman, Jieming Mao, Jon Schneider, and S. Matthew Weinberg. “Selling to a No-Regret Buyer”. In: Proceedings of the 2018 ACM Conference on Economics and Computation, Ithaca, NY, USA, June 18-22, 2018 . ACM, 2018, pp. 523–538. [BSV23] William Brown, Jon Schneider, and Kiran Vodrahalli. “Is Learning in Games Good for the Learners?” In: Advances in Neural Information Processing Systems 36: Annual Conference on Neural Information Processing Systems 2023, NeurIPS 2023, New Orleans, LA, USA, December 10 - 16, 2023 . Ed. by Alice Oh, Tristan Naumann, Amir Globerson, Kate Saenko, Moritz Hardt, and Sergey Levine. 2023. url : http://papers.nips.cc/paper%5C_files/paper/2023/ hash/a9ea92ef18aae17627d133534209e640-Abstract-Conference.html .[CHJ20] Modibo K. Camara, Jason D. Hartline, and Aleck Johnsen. “Mechanisms for a no-regret agent: Beyond the common prior”. In: 2020 IEEE 61st annual symposium on foundations of computer science (FOCS) . IEEE, 2020, pp. 259–270. 22 [CCK22] Matteo Castiglioni, Andrea Celli, and Christian Kroer. “Online Learning with Knapsacks: the Best of Both Worlds”. In: International Conference on Machine Learning, ICML 2022, 17-23 July 2022, Baltimore, Maryland, USA . Proceedings of Machine Learning Research. PMLR, 2022, pp. 2767–2783. [CCK24] Matteo Castiglioni, Andrea Celli, and Christian Kroer. “Online Learning under Budget and ROI Constraints via Weak Adaptivity”. In: Forty-first International Conference on Machine Learning, ICML 2024, Vienna, Austria, July 21-27, 2024 . Proceedings of Machine Learning Re-search. PMLR / OpenReview.net, 2024, pp. 5792–5816. [CKK24] Xi Chen, Christian Kroer, and Rachitesh Kumar. “The Complexity of Pacing for Second-Price Auctions”. In: Math. Oper. Res. 49.4 (2024), pp. 2109–2135. [Con+22a] Vincent Conitzer, Christian Kroer, Debmalya Panigrahi, Okke Schrijvers, Nicolás E. Stier Moses, Eric Sodomka, and Christopher A. Wilkens. “Pacing Equilibrium in First Price Auction Markets”. In: Management Science 68.12 (2022), pp. 8515–8535. [Con+22b] Vincent Conitzer, Christian Kroer, Eric Sodomka, and Nicolás E. Stier Moses. “Multiplicative Pacing Equilibria in Auction Markets”. In: Operations Research 70.2 (2022), pp. 963–989. [DSS19a] Yuan Deng, Jon Schneider, and Balasubramanian Sivan. “Prior-Free Dynamic Auctions with Low Regret Buyers”. In: Advances in Neural Information Processing Systems 32: Annual Con-ference on Neural Information Processing Systems 2019, NeurIPS 2019, December 8-14, 2019, Vancouver, BC, Canada . Ed. by Hanna M. Wallach, Hugo Larochelle, Alina Beygelzimer, Flo-rence d’Alché-Buc, Emily B. Fox, and Roman Garnett. 2019, pp. 4804–4814. url : https:// proceedings . neurips . cc / paper / 2019 / hash / f15eda31a2da646eea513b0f81a5414d -Abstract.html .[DSS19b] Yuan Deng, Jon Schneider, and Balasubramanian Sivan. “Strategizing against No-regret Learn-ers”. In: Advances in Neural Information Processing Systems 32: Annual Conference on Neural Information Processing Systems 2019 . 2019, pp. 1577–1585. [FPW23] Zhe Feng, Swati Padmanabhan, and Di Wang. “Online Bidding Algorithms for Return-on-Spend Constrained Advertisers”. In: Proceedings of the ACM Web Conference 2023, WWW 2023, Austin, TX, USA, 30 April 2023 - 4 May 2023 . ACM, 2023, pp. 3550–3560. [Fik+26] Giannis Fikioris, Robert Kleinberg, Yoav Kolumbus, Yishay Mansour, and Eva Tardos. Robust Temporal Guarantees in Budgeted Sequential Auctions . 2026. arXiv: 2602.17916 . url : https: //arxiv.org/abs/2602.17916 .[FT23] Giannis Fikioris and Éva Tardos. “Approximately Stationary Bandits with Knapsacks”. In: The Thirty Sixth Annual Conference on Learning Theory, COLT 2023, 12-15 July 2023, Bangalore, India . Proceedings of Machine Learning Research. PMLR, 2023, pp. 3758–3782. [FT25] Giannis Fikioris and Éva Tardos. “Liquid Welfare Guarantees for No-Regret Learning in Se-quential Budgeted Auctions”. In: Mathematics of Operations Research 50.2 (2025), pp. 1233– 1249. [Gai+23] Jason Gaitonde, Yingkai Li, Bar Light, Brendan Lucier, and Aleksandrs Slivkins. “Budget Pac-ing in Repeated Auctions: Regret and Efficiency Without Convergence”. In: 14th Innovations in Theoretical Computer Science Conference, ITCS 2023, MIT, Cambridge, Massachusetts, USA, January 10-13, 2023 . LIPIcs. Schloss Dagstuhl - Leibniz-Zentrum für Informatik, 2023, 52:1– 52:1. [Goo] Google. Power your business by taking control of your budget and advertising cost . url : https: //business.google.com/en-all/google-ads/campaign-budget/ .23 [Gur+24] Guru Guruganesh, Yoav Kolumbus, Jon Schneider, Inbal Talgam-Cohen, Emmanouil-Vasileios Vlatakis-Gkaragkounis, Joshua R. Wang, and S. Matthew Weinberg. “Contracting with a Learn-ing Agent”. In: Advances in Neural Information Processing Systems 38: Annual Conference on Neural Information Processing Systems 2024, NeurIPS 2024, Vancouver, BC, Canada, December 10 - 15, 2024 . Ed. by Amir Globersons, Lester Mackey, Danielle Belgrave, Angela Fan, Ul-rich Paquet, Jakub M. Tomczak, and Cheng Zhang. 2024. url : http://papers.nips.cc/ paper%5C_files/paper/2024/hash/8d7c8a3a0ed04006d129b3cebcac7a3e- Abstract-Conference.html .[HPY24] Nika Haghtalab, Chara Podimata, and Kunhe Yang. “Calibrated stackelberg games: Learning optimal commitments against calibrated agents”. In: Advances in Neural Information Process-ing Systems 36 (2024). [Haz16] Elad Hazan. “Introduction to Online Convex Optimization”. In: Foundations and Trends in Optimization 2.3-4 (2016), pp. 157–325. [Imm+22] Nicole Immorlica, Karthik Abinav Sankararaman, Robert E. Schapire, and Aleksandrs Slivkins. “Adversarial Bandits with Knapsacks”. In: J. ACM 69.6 (2022), 40:1–40:47. [KS20] Thomas Kesselheim and Sahil Singla. “Online Learning with Vector Costs and Bandits with Knapsacks”. In: Conference on Learning Theory, COLT 2020, 9-12 July 2020, Virtual Event [Graz, Austria] . Proceedings of Machine Learning Research. PMLR, 2020, pp. 2286–2305. [KSS24] Rachitesh Kumar, Jon Schneider, and Balasubramanian Sivan. “Strategically-Robust Learning Algorithms for Bidding in First-Price Auctions”. In: Proceedings of the 25th ACM Conference on Economics and Computation, EC 2024, New Haven, CT, USA, July 8-11, 2024 . ACM, 2024, p. 893. [Luc+24] Brendan Lucier, Sarath Pattathil, Aleksandrs Slivkins, and Mengxiao Zhang. “Autobidders with Budget and ROI Constraints: Efficiency, Regret, and Pacing Dynamics”. In: The Thirty Seventh Annual Conference on Learning Theory, June 30 - July 3, 2023, Edmonton, Canada .Proceedings of Machine Learning Research. PMLR, 2024, pp. 3642–3643. [Man+22] Yishay Mansour, Mehryar Mohri, Jon Schneider, and Balasubramanian Sivan. “Strategizing against Learners in Bayesian Games”. In: Conference on Learning Theory, 2-5 July 2022, London, UK . Proceedings of Machine Learning Research. PMLR, 2022, pp. 5221–5252. [RZ24] Aviad Rubinstein and Junyao Zhao. “Strategizing against no-regret learners in first-price auctions”. In: Proceedings of the 25th ACM Conference on Economics and Computation . 2024, pp. 894–921. [Twi] Twitter. How we built Twitter’s highly reliable ads pacing service . url : https : / / blog . x . com/engineering/en_us/topics/infrastructure/2021/how-we-built- twitter- s-highly-reliable-ads-pacing-service .[Wan+23] Qian Wang, Zongjun Yang, Xiaotie Deng, and Yuqing Kong. “Learning to Bid in Repeated First-Price Auctions with Budgets”. In: International Conference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA . Proceedings of Machine Learning Research. PMLR, 2023, pp. 36494–36513. 24 A Extended Related Work 
+
+Here we include a more detailed version of our related work in Section 1, focusing on works in budgeted auctions. 
+
+Pacing Multipliers in Static Settings. Pacing multipliers have been studied extensively, since they sim-plify the action space of bidders in second-price auctions from an arbitrary mapping from values/context to bids. [BBW15] use pacing multipliers to prove the existence of a Fluid Mean-field Equilibrium in budgeted second price auctions. [Con+22b] extend this idea and introduce the Second Price Pacing Equilibrium (SPPE), an equilibrium with a finite number of players, all of which are best responding. Conitzer et al. [Con+22a] use pacing multipliers in first-price auctions, where they come up with a weaker equilibrium notion where the players are not necessarily best responding with respect to any bidding function, but are using the optimal pacing multiplier. [CKK24] prove that computing an SPPE is PPAD-hard. [BKK23] show that in budgeted first-price auctions, one can get an equilibrium by composing a pacing multiplier with a unbudgeted Bayes-Nash Equilibrium. 
+
+Learning in Budgeted Second-price Auctions. This area was started by the seminal work of Balseiro and Gur [BG19], who studied budget-constrained learners trying to maximize their total quasi-linear util-ity. Their proposed algorithm is to find the optimal pacing multiplier. From the perspective of a single learner, they prove O( √𝑇 ) regret in Bayesian environments and 𝐵 /𝑇 competitive ratio in adversarial en-vironments. They also show that all the bidders follow their algorithm, under rather strong assumptions on the value distributions, this process converges to an SPPE. Finally, they show that this behavior is an equilibrium (i.e., players do not want to use a different algorithm), as long as the probability that any two players simultaneously have positive values is small. [BLM23] show how dual mirror descent based algorithms can simultaneously achieve good guarantees in stochastic and adversarial settings (with adver-sarial guarantees degrading with how much the adversary is changing the environment). [Bal+22] uncover a deep connection between dual mirror descent and PID controller algorithms, and provide the first re-gret guarantees for PID controllers for online resource allocation problems. [Bal+23] study budget pacing in settings where the bidder’s value distribution changes across rounds, and show how having just one sample per distribution is good enough to achieve 𝑂 (√𝑇 ) regret. [FPW23], examine the setting where the learning player also has an ROI constraint, and show how to achieve ˜O( √𝑇 ) regret in Bayesian environ-ments. [Bal+24] extend this further by showing how to achieve the same with strategies that are fully decoupled across the budget and ROS constraints. 
+
+Learning in Budgeted First-price Auctions. Learning in untruthful auctions poses major challenges compared to truthful ones, since the optimal strategy is no longer a simple pacing multiplier. Instead, the optimal strategy might involve an arbitrarily complicated mapping from values to bids. [Wan+23] study budgeted settings when the value and the highest competing bid are independent, and achieve ˜O( √𝑇 ) in Bayesian environments. [CCK24] study first-price auctions with budget and ROI constraints, and show no-regret guarantees in Bayesian and adversarial environments when there is a finite number of possible values and bids. [AFZ25] extend these results in Bayesian settings for uncountable value and bidding spaces, when the goal is to learn the optimal Lipschitz mapping from values to bids. 
+
+Learning in Budgeted First-price Auctions with Pacing Multipliers. While not optimal, lots of past work has focused on learning pacing multipliers in repeated budgeted auctions and the implications of doing so. [Gai+23] show that if all the players are learning pacing multipliers with a generalized version of the algorithm of [BG19], the resulting welfare is at least half of the optimal one in either first- or second-price auctions. [FT25] generalize this result for first-price auctions and show that, as long as every player has low regret with respect to the optimal pacing multiplier, then the resulting welfare is high. [Luc+24] extend the results of [Gai+23] to the case when players also have ROI constraints. They also show a simple 25 algorithm similar to ours has 𝑜 (𝑇 ) regret against the following benchmark: the value achieved by the optimal sequence of multipliers that observes the average budget constraint in each round in expectation, as long as this sequence does not change too much between rounds. 
+
+Learning in Budgeted Environments. The study of learning in budgeted environments pre-dates the study of learning in budgeted auctions. [BKS18] introduce Bandits with Knapsacks a generalization of Multi-armed Bandits with 𝑚 budget constraints, and propose algorithms with ˜O( √𝑇 ) regret in Bayesian environments. [AD16] offer similar guarantees in the contextual setting. [Imm+22] extend this study to adversarial environments and show how sublinear regret is not achievable here; instead, they offer 
+
+O( log 𝑇 ) competitive ratio guarantees that are tight when the budget is sublinear in 𝑇 . [KS20] improve the competitive ratio of [Imm+22] by improving the dependence on the number of budget constraints. [CCK22] offer O( 𝐵 /𝑇 )-competitive ratio that is optimal when 𝐵 = Ω(𝑇 ) and also extend these results when the budgets are replenishable (which models an ROI constraint that can both increase or decrease) in [CCK24]. Finally, [Bra+25] develop a weaker benchmark against which they achieve sublinear regret. 
+
+# B Budgeted Stackelberg Equilibrium for multiple optimizer constraints 
+
+In this section, we offer the generalized definition of Definition 2.1, where the Leader has multiple con-straints. 
+
+Definition B.1 (Budgeted Stackelberg Equilibrium) . Consider strategy spaces of two players, A for the optimizer and B for the learner. For actions 𝑎 ∈ A and 𝑏 ∈ B let 
+
+• 𝑈 (𝑎, 𝑏 ) ∈ R be the utility of the optimizer, 
+
+• 𝑃 𝑖 (𝑎, 𝑏 ) ∈ R be the payment of the optimizer for a resource 𝑖 ∈ [ 𝑚 ] with average budget 𝜌 𝑖 ∈ R, and Also, for a distribution of the Optimizer’s actions 𝐴 ∈ Δ(A) , let 𝐵𝑅 (𝐴 ) ⊆ Δ(B) be the distributions of actions of the learner that are best responses to 𝐴 . Then, a Budgeted Stackelberg Equilibrium is a distribution 
+
+𝜈 over Δ(A) × Δ(B) , such that the expected utility of the Optimizer is maximized while satisfying all the constraints on expectation, while the learner is best responding for every random action of the Optimizer. Formally, the value of the Budgeted Stackelberg Equilibrium is 
+
+sup  
+
+> 𝜈 ∈Δ
+
+ Δ( A ) × Δ( B) 
+
+ E
+
+> (𝐴,𝐵 )∼ 𝜈
+
+
+
+E
+
+> 𝑎 ∼𝐴,𝑏 ∼𝐵
+
+𝑈 (𝑎, 𝑏 ) 
+
+such that E
+
+> (𝐴,𝐵 )∼ 𝜈
+
+
+
+E
+
+> 𝑎 ∼𝐴,𝑏 ∼𝐵
+
+𝑃 𝑖 (𝑎, 𝑏 ) 
+
+≤ 𝜌 𝑖 ∀𝑖 ∈ [ 𝑚 ]
+
+𝐵 ∈ 𝐵𝑅 (𝐴 ) ∀( 𝐴, 𝐵 ) ∈ supp (𝜈 )
+
+(19) And we now offer the generalization of Lemma 2.2, that we can limit the support of distribution 𝜈 to at most 𝑚 + 1 points. 26 Lemma B.2. The value of Optimization Program (19) is equal to 
+
+sup    
+
+> 𝐴 𝑗 ∈Δ( A ) , 𝑧 𝑗 ≥0,𝐵 𝑗 ∈Δ( B)
+> 𝑚 +1
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑧 𝑗 E 
+
+> 𝑎 ∼𝐴 𝑗 ,𝑏 ∼𝐵 𝑗
+
+𝑈 (𝑎, 𝑏 )
+
+such that 
+
+> 𝑚 +1
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑧 𝑗 E 
+
+> 𝑎 ∼𝐴 𝑗 ,𝑏 ∼𝐵 𝑗
+
+𝑃 𝑖 (𝑎, 𝑏 ) ≤ 𝜌 𝑖 ∀𝑖 ∈ [ 𝑚 ]
+
+> 𝑚 +1
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑧 𝑗 = 1
+
+𝐵 𝑗 ∈ 𝐵𝑅 (𝐴 𝑗 ) ∀𝑗 ∈ [ 𝑚 + 1]
+
+(20) 
+
+Proof. Define 𝑈 (𝐴, 𝐵 ) = E𝑎 ∼𝐴,𝑏 ∼𝐵 [𝑈 (𝑎, 𝑏 )] and 𝑃 𝑖 (𝐴, 𝐵 ) = E𝑎 ∼𝐴,𝑏 ∼𝐵 [𝑃 𝑖 (𝑎, 𝑏 )] for 𝑖 ∈ [ 𝑚 ]. Consider the following subset of R𝑚 +1:
+
+𝐹 =   𝑈 (𝐴, 𝐵 ), 𝑃 1 (𝐴, 𝐵 ), 𝑃 2 (𝐴, 𝐵 ), . . . , 𝑃 𝑚 (𝐴, 𝐵 ) : 𝐵 ∈ BR (𝐴 ), 𝐴 ∈ Δ(A) 
+
+its closure ¯𝐹 , and the convex hull of the closure, cnvx ( ¯𝐹 ). Then, Optimization Program (19) can be re-written as sup    
+
+> 𝑥 ∈cnvx (¯𝐹 )
+
+𝑥 [1]
+
+such that 𝑥 [𝑖 + 1] ≤ 𝜌 𝑖 ∀𝑖 ∈ [ 𝑚 ]
+
+Via Carathéodory’s theorem, any point in cnvx ( ¯𝐹 ) can be written as a convex combination of at most 𝑚 +2
+
+points of ¯𝐹 , since 𝐹 has 𝑚 + 1 dimensions. We now proceed that we actually need 𝑚 + 1 points for the optimal distribution. Consider a collection of 𝑚 + 2 point 𝑥 1, 𝑥 2, . . . , 𝑥 𝑚 +2 and consider we are trying to find the optimal way to mix them. This leads to the following linear program over 𝑚 + 2 variables: 
+
+max  
+
+> 𝑧 1,...,𝑧 𝑚 +2≥0
+> 𝑚 +2
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑧 𝑗 𝑥 𝑗 [1]
+
+such that 
+
+> 𝑚 +2
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑧 𝑗 𝑥 𝑗 [𝑖 + 1] ≤ 𝜌 𝑖 ∀𝑖 ∈ [ 𝑚 ]
+
+> 𝑚 +2
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑧 𝑗 = 1
+
+Since this is a linear program with 𝑚 +1 constraints, if feasible, its optimal solution can always be supported in 𝑚 + 1 variables, i.e., in the optimal solutions one of the 𝑧 𝑗 ’s would be 0. This means that we can always drop one variable from any potential solution, i.e., the optimal solution can be written as a convex combination of at most 𝑚 + 1 points of ¯𝐹 . This completes the proof. ■
+
+# C Omitted Proofs of Section 3 
+
+In this section, we include the omitted proofs of Section 3, of Lemmas 3.1 and 3.3. 27 Lemma 3.1 (Similar to [Fik+26, Lemma 2.1]) . Assume the learner is bidding using a pacing multiplier, updated by Eq. (3) , with 𝜂 ∈ ( 0, 1) and 𝜆 (1) ≥ 0. Assume the auction format is either first- or second-price. Then, for arbitrary behavior by the optimizer, with probability 1 it holds that 𝜆 (𝑡 ) ≥ 0 and the learner’s total payment by round 𝑇 is 𝜌 L𝑇 + 𝜆 (1) −𝜆 (𝑇 +1) 
+
+> 𝜂
+
+. In addition, if 𝜆 (1) ≤ 𝜌 L, then the learner never runs out of budget. Proof. To prove that the bids are non-negative, we notice that 
+
+𝜆 (𝑡 +1) = 𝜆 (𝑡 ) + 𝜂 
+
+
+
+𝜌 L − 𝑝 (𝑡 )
+
+> L
+
+
+
+≥ 𝜆 (𝑡 ) + 𝜂 
+
+
+
+𝜌 L − 𝜆 (𝑡 ) 
+
+= (1 − 𝜂 )𝜆 (𝑡 ) + 𝜂𝜌 L ≥ min 𝜆 (𝑡 ), 𝜌 L (21) where the first inequality follows from the payment rule in either first- or second-price and that 𝑣 L ≤ 1;the second inequality follows from 0 < 𝜂 < 1. Therefore, if 𝜆 (1) ≥ 0, then 𝜆 (𝑡 ) ≥ 0 in every round 𝑡 .By summing (3) over all 𝑡 ∈ [ 𝑇 ] we get that Í𝑡 ∈ [ 𝑇 ] 𝑝 (𝑡 ) 
+
+> L
+
+= 𝜌 L𝑇 + 𝜆 (1) −𝜆 (𝑇 +1) 
+
+> 𝜂
+
+which proves the payment part of the claim. We get that the learner does not run out of budget by Eq. (21), which recursively proves 
+
+𝜆 (𝑇 +1) ≥ min {𝜆 (1), 𝜌 L} = 𝜆 (1) , if 𝜆 (1) ≤ 𝜌 L. ■
+
+Lemma 3.3. Assume that both the optimizer and the learner have positive expected values. Then, strong duality holds: there exists 7 a 𝜇 ≥ 0 such that OPT = 𝑅 ★ + 𝜇𝜌 O, where 𝑅 ★ is the maximum Lagrangian reward the optimizer can achieve for this optimal 𝜇 :
+
+𝑅 ★ = sup   
+
+> ˆ𝑉 O∈Δ(R[0,1]≥0), 𝜆 ∈R≥0
+
+𝑈 O
+
+  ˆ𝑉 O
+
+ − 𝜇𝜆𝑃 O
+
+  ˆ𝑉 O
+
+ such that 𝜆𝑃 L
+
+  ˆ𝑉 O
+
+ ≥ 𝜌 L. (5) 
+
+Proof. We first simplify Optimization Program (4). Let 𝐹 ⊆ R2 
+
+> ≥0
+
+be all the pairs of expected utility and payment the optimizer can get while the learner is best responding: 
+
+𝐹 =
+
+n 
+
+𝑈 O ( ˆ𝑉 O), 𝜆 𝑃 O ( ˆ𝑉 O)
+
+
+
+: ˆ 𝑉 O ∈ Δ
+
+
+
+[0, 1] [0,1] 
+
+, 𝜆 ∈ R≥0, and 𝜆 𝑃 L ( ˆ𝑉 O) ≥ 𝜌 L
+
+o
+
+Let ¯𝐹 be the closure of 𝐹 and let cnvx ( ¯𝐹 ) be its convex hull. Then Optimization Program (4) corresponds to OPT = max    
+
+> 𝑥 ∈cnvx (¯𝐹 )
+
+𝑥 [1]
+
+such that 𝑥 [2] ≤ 𝜌 O
+
+(22) Then, if strong duality holds and the above problem always has a feasible solution, we have that the dual and the primal have the same value, and there exists a finite Lagrange multiplier that achieves this, i.e., 
+
+OPT = min   
+
+> 𝜇 ≥0
+
+max   
+
+> 𝑥 ∈¯𝐹
+
+𝑥 [1] − 𝜇 𝑥 [2] + 𝜇 𝜌 O.
+
+We get that we can maximize 𝑥 over 𝐹 instead of cnvx ( ¯𝐹 ) by noticing that the problem becomes linear and unconstrained, so the optimal value is achieved at a boundary point of cnvx ( ¯𝐹 ) which is included in ¯𝐹 .For strong duality to hold, we only need to show that there exists a point 𝑥 in the relative interior of cnvx ( ¯𝐹 ) such that 𝑥 [2] ≤ 𝜌 O [Ber09, Proposition 5.3.1]. Consider the optimizer bidding using 
+
+ˆ𝑉 O =
+
+(
+
+𝜀, w.p. 1 − 𝜀 2𝑝 
+
+2, w.p. 𝜀 2𝑝      
+
+> 7Formally, this optimal 𝜇 is the one that minimizes 𝑅 ★(𝜇 ) + 𝜇𝜌 O.
+
+28 for some 𝜀, 𝑝 ∈ ( 0, 1). Since the learner’s value has a positive expectation, we can always take 𝜀 small enough such that P [𝑣 L ≥ 𝜀 ] > 0 and therefore 𝑃 L (𝜀 ) > 0, where 𝑃 L (𝜀 ) is the learner’s expected payment when the optimizer bids 𝜀 (and similarly for 𝑃 O (𝜀 ), 𝑈 O (𝜀 )). Then, using 𝜆 = 𝜌 L    
+
+> (1−𝜀 2𝑝 )𝑃 L(𝜀 )
+
+we get 
+
+𝑈 O ( ˆ𝑉 O) =  (1 − 𝜀 2𝑝 ) P 𝑣 L < 𝜀  + 𝜀 2𝑝  ¯𝑣 O,𝜆𝑃 O ( ˆ𝑉 O) = 𝜆  (1 − 𝜀 2𝑝 )𝑃 O (𝜀 ) + 𝜀 2𝑝𝑃 O (2) ≤ 𝜌 L
+
+(1 − 𝜀 2𝑝 ) P [0 < 𝑣 L < 𝜀 ] + 2𝜀𝑝 
+
+(1 − 𝜀 2𝑝 ) P [𝜀 ≤ 𝑣 L] ,𝜆𝑃 L ( ˆ𝑉 O) = 𝜆 (1 − 𝜀 2𝑝 )𝑃 L (𝜀 ) = 𝜌 L.
+
+where the inequality holds due to the rules of first- and second-price auctions: 𝑃 O (𝜀 ) ≤ 𝜀 P [0 < 𝑣 L < 𝜀 ],
+
+𝑃 O (2) ≤ 2, and 𝑃 L (𝜀 ) ≥ 𝜀 P [𝜀 ≤ 𝑣 L]. By taking 𝜀 → 0, we can always guarantee that 𝜆𝑃 O ( ˆ𝑉 O) → 0, implying 
+
+𝜆𝑃 O ( ˆ𝑉 O) ≤ 𝜌 O. Now for a fixed (small) 𝜀 we notice that the terms 𝑈 O ( ˆ𝑉 O), 𝜆𝑃 O ( ˆ𝑉 O) are non-constant in 𝑝 , as long as P [𝑣 L < 𝜀 ] ≠ 1. This means that small variations in 𝑝 retain feasibility ( 𝜆𝑃 O ( ˆ𝑉 O) ≤ 𝜌 O) and generate points that form a line in R2. This means that cnvx (𝐴 ) consists of at least a linear segment that is feasible. In addition, because both 𝑈 O ( ˆ𝑉 O), 𝜆𝑃 O ( ˆ𝑉 O) vary in 𝑝 , this line is not parallel to the 𝑥 or 𝑦 axes. This allows us, by slightly increasing 𝜆 (retaining both 𝜆𝑃 L ( ˆ𝑉 O) ≥ 𝜌 L and 𝜆𝑃 O ( ˆ𝑉 O) ≤ 𝜌 O) to translate that line parallelly to the 𝑦 axis, while ensuring feasibility. Since the line is not parallel to the 𝑦 axis, this generates a region of positive measure, ensuring that there is a point in the relative interior of cnvx (𝐴 ) that is feasible. This completes the proof for second-price auctions. ■
+
+# D Second-price Budgeted Stackelberg Equilibrium with multiple Opti-mizer strategies 
+
+In this section, we present an example of a Budgeted Stackelberg Equilibrium where the optimizer gets strictly more utility by mixing between multiple strategies. We consider the following value distributions: the optimizer’s value is 𝑣 O = 1 with probability 1, while the learner’s value is 𝑣 L = 1/2 with probability 1/3 and 𝑣 L = 1 with probability 2/3. Since the optimizer has a deterministic value, her fake value ˆ𝑣 O is just a non-negative number instead of a function. This leads to the following functions for the optimizer’s expected utility and payment and the learner’s payment if the optimizer uses ˆ𝑣 O ≥ 0:
+
+𝑈 O ( ˆ𝑣 O) =
+
+
+
+0, if ˆ𝑣 O ≤ 1213 , if 12 < ˆ𝑣 O ≤ 11, if 1 < ˆ𝑣 O
+
+, 𝑃 O ( ˆ𝑣 O) =
+
+
+
+0, if ˆ𝑣 O ≤ 1216 , if 12 < ˆ𝑣 O ≤ 1 
+
+> 56
+
+, if 1 < ˆ𝑣 O
+
+, 𝑃 L ( ˆ𝑣 O) =
+
+
+
+ˆ𝑣 O, if ˆ𝑣 O ≤ 12
+
+ˆ𝑣 O 23 , if 12 < ˆ𝑣 O ≤ 10, if 1 < ˆ𝑣 O
+
+which we also show visually in Fig. 3 (left). We can assume that any optimal strategy by the optimizer uses only ˆ𝑣 O ∈ { 12 , 1, 2}, since 1 achieves that same utility and payment compared to any other 12 < ˆ𝑣 O ≤ 1 but maximizes the Learner’s payment. A similar argument proves that 12 is optimal compared to any ˆ𝑣 O ≤ 12 ,and 2 is picked arbitrarily from all ˆ𝑣 O > 1.We now analyze how much utility the Optimizer can achieve if they uses a single fixed bidding strategy when their budget is some 𝜌 ≥ 0 and the learner has a budget of 1. If this utility function is strictly convex in any region, then there is a budget for the optimizer where in the Budgeted Stackelberg Equilibrium they are incentivized to randomize between multiple action distributions. Since the optimizer is picking a 29 0.0 0.2 0.4 0.6 0.8 1.0 1.2          
+
+> Optimizer's vO
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0 UO(vO)
+> PO(vO)
+> PL(vO)
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Optimizer's budget
+> OPT( )
+
+Figure 3: The functions 𝑈 O (·) , 𝑃 O (·) , 𝑃 L (·) , of the example of Section D (left) and the optimizer’s optimal value when she uses a single distribution of actions with a budget of 𝜌 (right). distribution over ˆ𝑣 O ∈ { 12 , 1, 2}, the optimization problem we have to solve is 
+
+dOPT (𝜌 ) = max  
+
+> 𝜆,𝑞 1,𝑞 2,𝑞 3≥0
+> 𝑞 1+𝑞 2+𝑞 3=1
+
+𝑝 1 𝑈 O ( 12 ) + 𝑝 2 𝑈 O (1) + 𝑝 3 𝑈 O (2)
+
+such that 𝜆 
+
+
+
+𝑝 1 𝑃 O ( 12 ) + 𝑝 2 𝑃 O (1) + 𝑝 3 𝑃 O (2)
+
+
+
+≤ 𝜌 𝜆 
+
+
+
+𝑝 1 𝑃 L ( 12 ) + 𝑝 2 𝑃 L (1) + 𝑝 3 𝑃 L (2)
+
+
+
+= 1
+
+which has optimal solution 
+
+dOPT (𝜌 ) =
+
+( 𝜌  
+
+> 1−𝜌
+
+, if 𝜌 ≤ 14
+
+1 − 56(1+𝜌 ) , if 𝜌 ≥ 14
+
+,
+
+
+
+𝜆 𝑝 1
+
+𝑝 2
+
+𝑝 3
+
+
+
+=
+
+h
+
+2(1 − 𝜌 ) 1 − 3𝜌  
+
+> 1−𝜌
+> 3𝜌
+> 1−𝜌
+
+0
+
+i⊤
+
+, if 𝜌 ≤ 14
+
+h 6(1+𝜌 ) 
+
+> 5
+
+0 54(1+𝜌 ) 1 − 54(1+𝜌 )
+
+i⊤
+
+, if 𝜌 ≥ 14
+
+.
+
+We also plot the function dOPT (𝜌 ) in Fig. 3 (right). We notice that for 𝜌 < 14 , the function dOPT (𝜌 ) is strictly convex, since its second derivative is 2  
+
+> (1−𝜌 )3
+
+> 0. This means that in that range the optimizer should mix be-tween two bidding strategies to achieve their optimal Budgeted Stackelberg Equilibrium value. Therefore, for 0 < 𝜌 < 14 , the optimizer, instead of using the optimal strategy of dOPT (𝜌 ), should do with probability 
+
+1 − 4𝜌 the optimal strategy of dOPT (0) and with probability 4𝜌 the optimal strategy of dOPT ( 14 ).
+
+# E Example where the Optimizer can get almost linearly more utility than the Equilibrium without the assumption of Theorem 3.4 
+
+In this section, we show an example where the optimizer can get almost Θ(𝑇 ) more utility than what the BSE suggests when the learner has large probability mass around value 0.30 The optimizer’s value is 𝑣 O = 1 with probability 1. The learner’s value is sampled from the following CDF 
+
+𝐹 𝐿 (𝑥 ) =
+
+ 
+
+> 12
+
+(2𝑥 )𝛿 , if 𝑥 ≤ 1212 , if 12 ≤ 𝑥 < 11, if 1 ≤ 𝑥 
+
+for some small 𝛿 > 0. In other words, with probability 1/2, 𝑣 L ∈ [ 0, 1/2] and with probability 1/2, 𝑣 L = 1.When the optimizer bids ˆ𝑣 , we have the following functions 
+
+𝑈 O ( ˆ𝑣 ) =
+
+ 
+
+> 12
+
+(2ˆ 𝑣 )𝛿 , if ˆ𝑣 ≤ 1212 , if 12 ≤ ˆ𝑣 ≤ 11, if 1 < ˆ𝑣 , 𝑃 O ( ˆ𝑣 ) =
+
+   
+
+> 𝛿 ˆ𝑣 𝛿 +1
+> 21−𝛿 (𝛿 +1)
+
+, if ˆ𝑣 ≤ 12  
+
+> 𝛿
+> 4(1+𝛿 )
+
+, if 12 ≤ ˆ𝑣 ≤ 1  
+
+> 𝛿
+> 4(1+𝛿 )
+
++ 12 , if 1 < ˆ𝑣 , 𝑃 L ( ˆ𝑣 ) = ˆ𝑣  1 − 𝑈 O ( ˆ𝑣 )
+
+Let the budget shares be 𝜌 L = 𝑃 L (1) = 12 and 𝜌 O = 12 𝑃 O (1) = 𝛿   
+
+> 8(1+𝛿 )
+
+. We will prove that the following is the optimal solution to the Budgeted Stackelberg equilibrium: 
+
+(  𝜆 ★ 
+
+> 1
+
+, ˆ𝑣 ★
+
+> 1
+
+ = (1, 1), w.p. 12
+
+ 𝜆 ★ 
+
+> 2
+
+, ˆ𝑣 ★
+
+> 2
+
+ = (+∞ , 0), w.p. 12
+
+where by (𝜆 ★ 
+
+> 2
+
+, ˆ𝑣 ★ 
+
+> 2
+
+) = (+∞ , 0) we mean the limit of (𝜆, ˆ𝑣 ) → (∞ , 0). We first notice that this is indeed a feasible strategy. For both pairs the learner is best responding: 𝜆 ★ 
+
+> 1
+
+𝑃 L ( ˆ𝑣 ★ 
+
+> 1
+
+) = 𝑃 L ( ˆ𝑣 ★ 
+
+> 1
+
+) = 𝜌 L and for (𝜆 ★ 
+
+> 2
+
+, ˆ𝑣 ★ 
+
+> 2
+
+)
+
+for every positive 𝜀 > 0, it holds 𝑃 L (𝜀 ) > 0, implying that there exists a limiting sequence that satisfies the learner’s budget constraint. As for the optimizer’s budget, their spending is 12 𝜆 ★ 
+
+> 1
+
+𝑃 O ( ˆ𝑣 ★ 
+
+> 1
+
+) = 12 𝑃 O (1) = 𝜌 O.Then, the optimizer’s utility is 
+
+OPT = 12𝑈 O (1) = 14
+
+We now show that this is indeed optimal. To do so, we consider the Lagrangian relaxation of the optimizer’s constraint using multiplier 𝜇 = OPT  
+
+> 𝜌 O
+
+= 2 1+𝛿 𝛿 and its value 𝑅 ★, as defined in Lemma 3.3. Since 𝜇𝜌 O = OPT , all we have to prove is that R★ ≤ 0 (equality is achieved by examining our solution above), where 
+
+𝑅 ★ = sup   
+
+> ˆ𝑉 O∈Δ(R≥0), 𝜆 ∈R≥0
+
+𝑈 O
+
+  ˆ𝑉 O
+
+ − 𝜇𝜆𝑃 O
+
+  ˆ𝑉 O
+
+ such that 𝜆 ˜𝑃 L
+
+  ˆ𝑉 O
+
+ ≥ 𝜌 L
+
+= sup   
+
+> ˆ𝑉 O∈Δ(R≥0), 𝜆 ∈R≥0
+
+𝑈 O
+
+  ˆ𝑉 O
+
+ − 𝜇𝜌 L
+
+𝑃 O
+
+  ˆ𝑉 O
+
+
+
+𝑃 L
+
+  ˆ𝑉 O
+
+ .
+
+Since all we have to show is that 𝑅 ★ ≤ 0, all we need to show is that for all ˆ𝑉 O and 𝜆 it holds that 
+
+𝑈 O
+
+  ˆ𝑉 O
+
+ − 𝜇𝜌 L
+
+𝑃 O
+
+  ˆ𝑉 O
+
+
+
+𝑃 L
+
+  ˆ𝑉 O
+
+ ≤ 0 ⇐⇒ 𝑈 O
+
+  ˆ𝑉 O
+
+𝑃 L
+
+  ˆ𝑉 O
+
+ ≤ 𝜇𝜌 L𝑃 O
+
+  ˆ𝑉 O
+
+
+
+We prove the above inequality using the following case analysis: 
+
+• If we restrict to ˆ𝑉 O ∈ Δ([ 0, 1/2]) , then 𝑈 O (·) , 𝑃 L (·) are concave and 𝑃 O (·) is convex. This means that what we have to prove is that for every ˆ𝑣 O ∈ [ 0, 1/2] it holds 
+
+𝑈 O
+
+  ˆ𝑣 O
+
+𝑃 L
+
+  ˆ𝑣 O
+
+ ≤ 𝜇𝜌 L𝑃 O
+
+  ˆ𝑣 O
+
+ ⇐⇒ 2−2+𝛿 ˆ𝑣 1+𝛿  
+
+> O
+
+(2 − 2𝛿 ˆ𝑣 𝛿  
+
+> O
+
+) ≤ 2−1+𝛿 ˆ𝑣 1+𝛿 
+
+> O
+
+which we can easily check is true. 31 0 1 2 3 4 5 6        
+
+> 2.00
+> 1.75
+> 1.50
+> 1.25
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> g
+> g*( )
+> 020 40 60 80 100
+> g*( )
+> -0.5
+> -0.4
+> -0.3
+> -0.2
+> -0.1
+> -0.0
+> 0.1
+> 0.2 f ( ,  g)
+
+Figure 4: The dual 𝑓 (𝜆, 𝑔 ) function of the example of Section E, along with the induced 𝑔 ★(𝜆 ) function, for 
+
+𝛿 = 0.05 . Plotted for small and large 𝜆 . We note that 𝑔 ★(𝜆 ) goes to 0 at a very slow rate, indicating the optimizer’s ability to gain substantial utility as 𝜆 (𝑡 ) increases in the repeated game. 
+
+• Consider that ˆ𝑉 O ∈ [ 0, 1/2] with probability 𝑞 1, achieving expected value ˆ𝑣 O condition on that interval. Then the only other optimal values are 1 or anything above 1, e.g., 2. Assume that ˆ𝑉 O = 1 with probability 
+
+𝑞 2 and ˆ𝑉 O = 2 with probability 𝑞 3. Then, using our observation about convexity/concavity on [0, 1/2],all we have to prove is that 
+
+ 𝑞 1𝑈 O ( ˆ𝑣 O) + 𝑞 2𝑈 O (1) + 𝑞 3𝑈 O (2)   𝑞 1𝑃 L ( ˆ𝑣 O) + 𝑞 2𝑃 L (1) + 𝑞 3𝑃 L (2) ≤ 𝜇𝜌 L
+
+ 𝑞 1𝑃 O ( ˆ𝑣 O) + 𝑞 2𝑃 O (1) + 𝑞 3𝑃 O (2)
+
+which, using 𝑞 3 = 1 − 𝑞 1 − 𝑞 2 and substituting 𝑈 O, 𝑃 L, 𝑃𝑂 , we can re-write as 
+
+𝛿 
+
+
+
+𝑞 1𝑞 2
+
+
+
+−1 + 2ˆ 𝑣 O + ( 2ˆ 𝑣 O)𝛿 − 3ˆ 𝑣 O (2ˆ 𝑣 O)𝛿 
+
++ ( 1 − 𝑞 1 − 𝑞 2)( 𝑞 2 − 3 + 4ˆ 𝑣 O𝑞 1 (1 − ( 2ˆ 𝑣 O)𝛿 )) − 𝑞 21 ˆ𝑣 O (2ˆ 𝑣 O)2𝛿 
+
+
+
+− 2(1 − 𝑞 1 − 𝑞 2) ≤ 0
+
+We prove the above by showing that the term in each line is non-positive. First, we notice that −1 +
+
+2ˆ 𝑣 O + ( 2ˆ 𝑣 O)𝛿 − 3ˆ 𝑣 O (2ˆ 𝑣 O)𝛿 is concave for ˆ𝑣 O ≥ 0, implying the maximum is attained where the derivative is 0. By evaluating the derivative we see it is 0 when ˆ𝑣 O = 1/2, which makes the maximum 0 and implies 
+
+−1 + 2ˆ 𝑣 O + ( 2ˆ 𝑣 O)𝛿 − 3ˆ 𝑣 O (2ˆ 𝑣 O)𝛿 ≤ 0.Second, the term 4ˆ 𝑣 O (1−( 2ˆ 𝑣 O)𝛿 ) is also concave with respect to ˆ𝑣 O and its maximum is at ˆ𝑣 O = 12 (1+𝛿 )−1/𝛿 ,making the term 4ˆ 𝑣 O (1 − ( 2ˆ 𝑣 O)𝛿 ) ≤ 2𝛿 (1 + 𝛿 )− 1+𝛿 𝛿 ≤ 1/2. This makes the term of the second line at most 
+
+(1 − 𝑞 1 − 𝑞 2)( 𝑞 2 − 3 + 𝑞 1/2), which is non-positive since 𝑞 1 + 𝑞 2 ≤ 1.The third and fourth terms are both non-positive, making the entire expression non-negative. Now consider the repeated setting over 𝑇 rounds. As we will show, the optimizer here can achieve more than OPT · 𝑇 + O( 𝑇 2/3) reward, unlike our guarantee in Theorem 3.4. This is because our distributional assumption, that there exists 𝜀 > 0 such that P [0 < 𝑣 L < 𝜀𝑣 O] = P [0 < 𝑣 L < 𝜀 ] fails. In fact, for 𝜀 ≤ 1/2 we have that P [0 < 𝑣 L < 𝜀 ] = 12 (2𝜀 )𝛿 , i.e., this goes to 0 at a very slow rate. The more technical reason why this example fails is that Lemma 5.5 fails: 𝑔 ★(𝜆 ) remains positive for all 𝜆 . We note that in this example, the second condition of that lemma also fails: it holds that 𝑅 ★ = E 𝑣 O1𝑣 L=0
+
+ = 0. In Fig. 4 we see that 𝑔 ★(𝜆 )
+
+converges to 0 at a very slow rate. 32 To achieve OPT ·𝑇 reward, the optimizer should bid 𝜆 (𝑡 ) ˆ𝑣 ★ 
+
+> 1
+
+in rounds 𝑡 ≤ 𝑇 /2 rounds, and then start bidding 
+
+0. For rounds 𝑡 ≤ 𝑇 /2, the learner’s payment is 𝜆 (𝑡 ) 𝑃 L (𝑣 ★ 
+
+> 1
+
+) = 12 𝜆 (𝑡 ) . This makes the expected change in the learner’s 𝜆 is 𝜂 (𝜌 L − 𝜆 (𝑡 ) 𝑃 L (𝑣 ★ 
+
+> 1
+
+)) = 𝜂  
+
+> 2
+
+(1 − 𝜆 (𝑡 ) ), implying the Learner will stabilize around 𝜆 (𝑡 ) ≈ 1 = 𝜆 ★ 
+
+> 1
+
+in the first 𝑇 /2 rounds, as suggested by the Budgeted Stackelberg equilibrium. This implies that the optimizer is going to approximately satisfy her budget constraint, leading to the desired OPT · 𝑇 reward. However, consider the optimizer’s strategy to switch from bidding 𝜆 (𝑡 ) ˆ𝑣 ★ 
+
+> 1
+
+to bidding 1/𝜇 (i.e., use ˆ𝑣 = 1/𝜆 (𝑡 ) 𝜇 )(recall the Lagrange multiplier 𝜇 = 2 1+𝛿 𝛿 ) after the first 𝑇 /2 − 𝜏 rounds for some 𝜏 . We note that the second strategy is not arbitrary: it is the one that maximizes the optimizer’s Lagrangian reward when ignoring the learner’s budget constraint. We now analyze this strategy when everything happens in expectation, i.e., the Learner’s payment is exactly 𝑃 L (1/𝜆 (𝑡 ) 𝜇 ) in round 𝑡 ; this is accurate, since as 𝑇 grows larger, 𝜂 grows smaller and deviations due to random events become irrelevant. We then complement this analysis with experimental data in Section E.1. Let us calculate the learner’s spending: when at 𝜆 (𝑡 ) , the learner will increase her pacing multiplier in expectation by 
+
+𝜆 (𝑡 +1) − 𝜆 (𝑡 ) = 𝜂 
+
+
+
+𝜌 L − 𝜆 (𝑡 ) 𝑃 L
+
+ 1
+
+𝜆 (𝑡 ) 𝜇 
+
+ 
+
+= 𝜂 
+
+ 𝛿 1+𝛿 
+
+4(𝛿 + 1)𝛿 +1 (𝜆 (𝑡 ) )𝛿 + 12(𝛿 + 1)
+
+
+
+(23) Since 𝜆 (𝑇 /2−𝜏 ) = 1, and the above difference is always non-negative, we have that for round 𝑡 ≥ 𝑇 /2 − 𝜏 , it holds that 
+
+1 +
+
+
+
+𝑡 − 𝑇 
+
+2 + 𝜏 
+
+ 𝜂 
+
+2(𝛿 + 1) ≤ 𝜆 (𝑡 ) ≤ 1 +
+
+
+
+𝑡 − 𝑇 
+
+2 + 𝜏 
+
+ 𝜂 
+
+2
+
+
+
+1 − 𝛿 
+
+2 − O 
+
+
+
+𝛿 2 log 1
+
+𝛿 
+
+ 
+
+We now analyze the optimizer’s expected payment 
+
+> 𝑇
+
+∑︁  
+
+> 𝑡 =𝑇 /2−𝜏 +1
+
+𝜆 (𝑡 ) 𝑃 O
+
+ 1
+
+𝜆 (𝑡 ) 𝜇 
+
+
+
+= 𝛿 2+𝛿 
+
+4(1 + 𝛿 )2+𝛿 𝑇 ∑︁  
+
+> 𝑡 =𝑇 /2−𝜏 +1
+
+(𝜆 (𝑡 ) )−𝛿 
+
+≤ 𝛿 2+𝛿 
+
+4(1 + 𝛿 )2+𝛿 𝑇 /2+𝜏 ∑︁ 
+
+> 𝑡 =1
+
+
+
+1 + 𝑡 𝜂 
+
+2(𝛿 + 1)
+
+ −𝛿 
+
+≤ 𝛿 2+𝛿 
+
+4(1 + 𝛿 )2+𝛿 
+
+∫ 𝑇 /2+𝜏 𝑡 =0
+
+
+
+1 + 𝑡 𝜂 
+
+2(𝛿 + 1)
+
+ −𝛿 
+
+= 𝛿 2+𝛿 
+
+4(1 + 𝛿 )2+𝛿 
+
+
+
+1 +  𝑇  
+
+> 2
+
++ 𝜏  𝜂 
+
+> 2(𝛿 +1)
+
+1−𝛿 
+
+− 1
+
+(1 − 𝛿 ) 𝜂  
+
+> 2(1+𝛿 )
+
+≈
+
+𝛿 2
+
+8 − O 
+
+
+
+𝛿 3 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 
+
+where in the last inequality we assumed that 𝜏 = 𝑜 (𝑇 ), 𝜂𝑇 = 𝜔 (1) and take 𝛿 ≈ 0. Since the spending of the optimizer in the first 𝑇 /2 − 𝜏 rounds is 𝜆 ★ 
+
+> 1
+
+𝑃 O (1) = 𝛿   
+
+> 4(1+𝛿 )
+
+per round and her total budget is 𝜌 O𝑇 = 𝛿   
+
+> 8(1+𝛿 )
+
+𝑇 
+
+we pick 𝜏 so that 
+
+𝛿 
+
+4(1 + 𝛿 )
+
+𝑇 
+
+2 − 𝜏 
+
+
+
++
+
+𝛿 2
+
+8 − O 
+
+
+
+𝛿 3 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 = 𝛿 
+
+8(1 + 𝛿 )𝑇 
+
+which yields 
+
+𝜏 = 4(1 + 𝛿 )
+
+𝛿 
+
+𝛿 2
+
+8 − O 
+
+
+
+𝛿 3 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 =
+
+𝛿 
+
+2 − O 
+
+
+
+𝛿 2 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 
+
+33 We note that this indeed yields 𝜏 = 𝑜 (𝑇 ) under our previous assumption that 𝜂𝑇 = 𝜔 (1). We now calculate the optimizer’s utility in the last 𝑇 + 𝜏 /2 rounds: 
+
+> 𝑇
+
+∑︁   
+
+> 𝑡 =𝑇 /2−𝜏 +1
+
+𝑈 O
+
+ 1
+
+𝜆 (𝑡 ) 𝜇 
+
+
+
+= 𝛿 𝛿 
+
+2(1 + 𝛿 )𝛿 𝑇 ∑︁  
+
+> 𝑡 =𝑇 /2−𝜏 +1
+
+
+
+𝜆 (𝑡 )  −𝛿 
+
+≥ 𝛿 𝛿 
+
+2(1 + 𝛿 )𝛿 𝑇 /2+𝜏 ∑︁ 
+
+> 𝑡 =1
+
+
+
+1 + 𝑡 𝜂 
+
+2
+
+
+
+1 − 𝛿 
+
+2 − O 
+
+
+
+𝛿 2 log 1
+
+𝛿 
+
+ −𝛿 
+
+≥ 𝛿 𝛿 
+
+2(1 + 𝛿 )𝛿 
+
+∫ 𝑇 /2+𝜏 𝑡 =1
+
+
+
+1 + 𝑡 𝜂 
+
+2
+
+
+
+1 − 𝛿 
+
+2 − O 
+
+
+
+𝛿 2 log 1
+
+𝛿 
+
+ −𝛿 
+
+= 𝛿 𝛿 
+
+2(1 + 𝛿 )𝛿 
+
+
+
+1 +  𝑇  
+
+> 2
+
++ 𝜏  𝜂 
+
+> 2
+
+
+
+1 − 𝛿  
+
+> 2
+
+− O  𝛿 2 log 1
+
+> 𝛿
+
+ 1−𝛿 
+
+−
+
+
+
+1 + 𝜂 
+
+> 2
+
+
+
+1 − 𝛿  
+
+> 2
+
+− O  𝛿 2 log 1
+
+> 𝛿
+
+ 1−𝛿 𝜂 
+
+> 2
+
+
+
+1 − 𝛿  
+
+> 2
+
+− O  𝛿 2 log 1
+
+> 𝛿
+
+
+
+(1 − 𝛿 )≈
+
+ 14 − O 
+
+
+
+𝛿 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 
+
+Since in the first 𝑇 /2 − 𝜏 rounds the optimizer is getting value 12 per round, the above implies that the total value the optimizer gets is 
+
+𝑇 
+
+4 − 𝜏 
+
+2 +
+
+ 14 − O 
+
+
+
+𝛿 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 ≈ 𝑇 
+
+4 +
+
+ 14 − O 
+
+
+
+𝛿 log 1
+
+𝛿 
+
+ 𝑇 1−𝛿 
+
+𝜂 𝛿 
+
+If we were to set 𝜂 = Θ(𝑇 −𝛼 ) for some 𝛼 ∈ ( 0, 1) (which satisfies all our previous assumptions), the optimizer’s benefit would be Ω(𝑇 1− ( 1−𝛼 )𝛿 ). As 𝛿 → 0 this converges to linear in 𝑇 benefit by switching to bidding 1/𝜇 after round 𝑇 /2 − 𝜏 compared to the BSE strategy to bidding 1 for the first 𝑇 /2 rounds. 
+
+E.1 Experimental Analysis 
+
+We complement the above analysis of the expected outcome with the following experiment. First, we fix 
+
+𝜂 = 𝑇 −2/3, as in Theorem 3.4, in which it is guaranteed that the optimizer can get at most O( 𝑇 2/3) above her BSE value. The learner starts at 𝜆 (1) = 0 and follows the update Eq. (3). We then compare the following two strategies by the Optimizer: 1. The optimizer bids 𝜆 (𝑡 ) in round 𝑡 , as long as there is budget remaining. 2. The optimizer bids 𝜆 (𝑡 ) in round 𝑡 , for 𝑡 ≤ 𝑇  
+
+> 2
+
+− 𝜏 and then bids 1 
+
+> 𝜇
+
+= 𝛿   
+
+> 2(1+𝛿 )
+
+. If at any point there is no budget remaining, bid 0.We notice that bidding 𝜆 (𝑡 ) and then stopping after half the rounds is the BSE. In fact, because the learner starts at a low 𝜆 (1) = 0 and takes Θ(1/𝜂 ) rounds to converge to 𝜆 = 1, we expect strategy 1 to do slightly higher than the BSE value of 𝑇  
+
+> 4
+
+. We show the value that the optimizer gets for different values of 𝑇 and 𝛿 .Specifically, we consider 10 5 ≤ 𝑇 ≤ 10 7 and 0.01 ≤ 𝛿 ≤ 0.9.We present the results of the experiments in Fig. 5. We make multiple observations. 1. Due to the large number of rounds, there is little variation between experiments, implying that random events concentrate very well. 2. For all the values of 𝛿 , strategy 1 does slightly better than the BSE value of 𝑇  
+
+> 4
+
+. In fact, for all the values of 𝛿 we examine, this strategy does consistently the same. 3. Strategy 2 does considerably better. Specifically, according to our previous analysis and since 𝜂 = 𝑇 −2/3,we expect the optimizer’s reward to be 𝑇 
+
+> 4
+
+ 1 + 𝑇 −𝛿 /3 for small 𝛿 . For 𝛿 = 0.01 , this reward becomes 34 0.0 0.2 0.4 0.6 0.8 1.0                
+
+> Total Number of rounds T1e7
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> Total  reward
+> 1e6
+> = 0.01
+> = 0.05
+> = 0.10
+> = 0.20
+> = 0.50
+> = 0.90 0.0 0.2 0.4 0.6 0.8 1.0
+> Total Number of rounds T1e7
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> 0.45
+> Averaged  reward
+
+Figure 5: The experiments of Section E.1. For 10 5 ≤ 𝑇 ≤ 10 7 (x-axis) and different 𝛿 (different lines) we compare the optimizer’s reward when using strategy 1 (dotted lines that collapse to one line) and strategy 2 (solid lines). 
+
+> 𝑇
+> 4
+
+ 1 + 𝑇 −0.003 . For the range 10 5 ≤ 𝑇 ≤ 10 7, this makes the optimizer’s average reward 14
+
+ 1 + 𝑇 −0.007  ∈[0.487 , 0.491 ]. This is very close to double the BSE value of 𝑇 /4 and also very close to what we get experimentally. 35

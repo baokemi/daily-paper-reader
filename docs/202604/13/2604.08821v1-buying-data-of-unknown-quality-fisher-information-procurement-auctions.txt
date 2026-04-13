@@ -1,0 +1,1867 @@
+Title: Buying Data of Unknown Quality: Fisher Information Procurement Auctions
+
+URL Source: https://arxiv.org/pdf/2604.08821v1
+
+Published Time: Mon, 13 Apr 2026 00:17:20 GMT
+
+Number of Pages: 38
+
+Markdown Content:
+# Buying Data of Unknown Quality: Fisher Information Procurement Auctions 
+
+Yuchen Hu, Martin J. Wainwright, Stephen Bates MIT 
+
+April 13, 2026 
+
+Abstract 
+
+We study statistical parameter estimation in the setting of data markets. A buyer seeks to estimate a parameter based on samples that can be purchased from competing providers that differ in their data quality and provision costs. When quality is known ex ante, we define a cost-per-information score that summarizes each provider’s provision cost per unit of information about the buyer’s estimation objective. We describe second-score procurement mechanism that ranks providers by this score, and endogenously chooses both a provider and a sample size while making truthful cost reports optimal. We then turn to the more realistic setting where data quality is private, and can only be indirectly observed via the delivered data. In this setting, we propose a simple mechanism that augments the second-score rule with a lenient ex post statistical test of the reported quality. We prove that under mild conditions, there exists an equilibrium in which sellers report costs truthfully and report quality up to deviations that vanish as the procured sample size grows. Our analysis highlights how the choice of verification test and the buyer’s accuracy-cost tradeoff jointly shape participation and misreporting incentives in data markets. 
+
+# 1 Introduction 
+
+Many organizations now purchase data at scale, either by contracting with external providers or by outsourcing parts of their data collection to specialized teams (Liang et al., 2018). Data providers differ widely in both the quality and cost of the data they can supply: some data sets are cheap to obtain but noisy or weakly informative, while others are expensive because they require careful measurement, recruiting hard-to-reach populations, or running complex experiments (Haug et al., 2011). Yet, before any contract is signed, it is difficult to know how informative a provider’s data will be, and it is even harder to verify the provider’s internal cost of collection. This information asymmetry raises a central question for data procurement: how can a buyer design a mechanism that elicits sellers’ private information, while deciding from whom to buy, how much data to acquire, and how much to pay? For eliciting costs, second-price auctions are by now classical tools: when each seller has a single private cost parameter, these mechanisms make truthful cost reporting a weakly dominant strategy and select the cheapest provider (Vickrey, 1961; Myerson, 1981). However, applying this logic to data procurement is more subtle. When purchasing data, the buyer must decide not only which seller to buy from, but also how much data to purchase, and the optimal quantity depends not only on cost but also on data quality. In certain settings, it can be better to buy a smaller amount of high-quality data at a higher per-unit price than a large amount of low-quality, inexpensive data. At the same time, each seller’s data quality is hidden, which renders the auction problem multi-dimensional. It is thus in general difficult to enforce truthful reporting via a single scalar 1
+
+> arXiv:2604.08821v1 [cs.GT] 9 Apr 2026
+
+bid, as sellers can adjust the different components of their report to alter the purchased quantity (and thus their profit) without necessarily changing the bid (Armstrong, 1996; Rochet and Chon´ e, 1998). 
+
+1.1 Our contributions 
+
+In this paper, we study data procurement in a stylized model. Suppose that a single buyer wishes to estimate a scalar parameter (e.g., the mean of a distribution), and can do so by purchasing observations from a collection of M potential providers. Each provider i ∈ [M ] := {1, . . . , M }
+
+has a private cost ci associated with producing data, as well as a private measure Vi of data informativeness or quality, and the buyer’s objective is to balance statistical accuracy against total procurement cost. We first show that in the ideal setting of known data informativeness, the buyer’s problem can be summarized by a “price per information” score: it ranks providers by how expensive it is to obtain a unit of information from them. Using this score as a per-unit price for information, we design a benchmark second-score mechanism that chooses the provider with the lowest per-unit price and then buys from the winner the amount of information that would be optimal at the per-unit price set by the runner-up. Because both the information quantity and the payment are tied to this runner-up price rather than to the winner’s own report, truthful cost revelation is weakly dominant even though the amount of data purchased is endogenously determined. In practice, of course, data informativeness is not known ex ante. Instead, it can often only be inferred from the data that end up being procured. Our second contribution is to show how the buyer can exploit this noisy ex post information while retaining the simplicity of the second-score structure. When the buyer must rely on sellers’ reports about quality as well as cost, we augment the benchmark mechanism with a simple statistical test applied to the realized data: if the delivered quality falls too far below the report, the contract is voided but the seller still bears their collection cost. Under mild conditions, we show that there exists a Bayesian Nash equilibrium in which all participating sellers report qualities in a neighborhood of the truth while continuing to report costs truthfully. Furthermore, when the buyer procures a sufficiently large sample, this equilibrium becomes almost truthful and individually rational for all but the sellers with extremely high cost per information, so the mechanism effectively behaves like a truthful data-procurement procedure. Our results also shed light on how the choice of statistical test and the accuracy-cost tradeoff shape incentives, and provide practical guidance on how much data a buyer should purchase in order to sustain near-truthful behavior when quality can only be verified noisily. 
+
+1.2 Related work 
+
+Our work builds on the classic literature in auction theory and mechanism design (Laffont and Martimort, 2002). Truthful mechanism design originates from the Vickrey–Clarke–Groves (VCG) framework (Vickrey, 1961; Clarke, 1971; Groves, 1973), which characterizes efficient and incentive-compatible mechanisms under quasi-linear preferences. Myerson (1981) further provides a general theory of optimal auctions in single-parameter environments that maximize the seller’s expected revenue under incentive and participation constraints. These frameworks have since inspired a broad class of contracting mechanisms that aim to elicit truthful cost reports while maximizing allocation efficiency or minimizing expenditure. The procurement setting we study is a natural dual of the auction problem, where a buyer seeks to minimize procurement costs while ensuring sufficient quality of the procured goods or 2services (Laffont and Tirole, 1993). In these settings, the buyer faces the reverse problem of Myerson’s auction: rather than allocating goods to bidders with the highest virtual values, the principal selects suppliers with the lowest virtual costs. In procurement auctions, the principal often needs to balance price and quality considerations (Klein and Leffler, 1981; Manelli and Vincent, 1995; Asker and Cantillon, 2010; Yao and Tanaka, 2020). A key challenge arises when the buyer does not know the supplier’s quality ex ante. Prior work has addressed this by modeling procurement with costly pre-contract qualification of suppliers (Wan and Beil, 2009; Chen et al., 2018); by studying mechanisms with exact ex post verification (Ben-Porath et al., 2014; Mylovanov and Zapechelnyuk, 2017); and by leveraging relational and reputational enforcement, such as contract termination or discriminatory scoring mechanisms in repeated relationships (Board, 2011; Auriol and Søreide, 2017; Albano et al., 2017). Our study contributes to this line of research by proposing a procurement mechanism with statistical quality verification, where the buyer cross-checks the reported data quality using noisy empirical information estimates and voids the contract when the verification fails. Perhaps most closely related to our work is the growing literature on data procurement for improving the performance of statistical estimation and machine learning models. Like this work, many of these studies build upon Myerson’s seminal framework and adapt it to address challenges unique to data acquisition. One prevalent design for data procurement with multiple agents is to use peer prediction (see, e.g., Miller et al. 2005; Richardson et al. 2019; Chen et al. 2020; Clinton et al. 2025 and references therein), which leverages mutual information between reports to make truth-telling an equilibrium. Beyond static designs, recent work has studied data procurement mechnisms in online settings, where the principal sequentially acquires data while balancing exploration, budget constraints, and incentive compatibility (Abernethy et al., 2015; Cao et al., 2017; An et al., 2017; Chen et al., 2018; Chen and Zheng, 2019; Li et al., 2021). Our work is also closely related to research on data collection delegation (Cai et al., 2015; Gast et al., 2020; Ananthakrishnan et al., 2024; Saig et al., 2023), in which data providers act as “workers” who can improve the quality of their data through costly effort, and mechanisms are designed to incentivize such effort so that high-quality data are produced at low cost for statistical estimation. In contrast, we consider a setting where the quality of each agent’s data is fixed and exogenous, and the principal’s goal is to select agents with inherently higher data quality rather than incentivizing them to improve it. The mechanism we study relies on a verification test of the amount of statistical information contained in the reported data, compared to the information implied by the agent’s report. In this spirit, our work is related to information elicitation. For prediction and estimation, proper scoring rules have been widely used to elicit truthful reports of probabilistic forecasts and sufficient statistics (Gneiting and Raftery, 2007; Lambert et al., 2008; Frankel and Kamenica, 2019). For decision making, they have been extended to design mechanisms that align incentives with optimal actions or posterior beliefs in decision-theoretic settings (Osband, 1989; Chen and Kash, 2011; Shi et al., 2024, 2025), and, in particular, to develop decision scoring rules that incentivize agents to truthfully report costly information (Oesterheld and Conitzer, 2020; Neyman et al., 2021; Li et al., 2022; Papireddygari and Waggoner, 2022). Compared with these works, we study a more challenging setting in which agents may benefit from misreporting the information required for the principal’s decision by an unknown and unobservable amount, which we mitigate through an auction-based design. Finally, at a high level, our work contributes to the growing literature on mechanism design for data sharing and data markets (Liang et al., 2018; Castro Fernandez, 2023). Much of this literature 3focuses on developing fair and truth-incentivizing data valuation strategies implemented through centralized data-access platforms or third-party intermediaries (Jia et al., 2019; Ghorbani and Zou, 2019; Yoon et al., 2020; Wang and Jia, 2023; Jiang et al., 2023; Just et al., 2023; Zhao et al., 2023; Huang et al., 2023; Lu et al., 2024), as well as on privacy-preserving mechanisms for data procurement, exchange, and aggregation (Ghosh and Roth, 2011; Fleischer and Lyu, 2012; Li et al., 2014; Anjarlekar et al., 2023; Cummings et al., 2023; Fallah et al., 2024). In contrast, we study a decentralized data procurement problem, where data remain privately held by self-interested agents, and the principal must design incentives to elicit and verify data quality without relying on a trusted intermediary. 
+
+# 2 Problem set-up 
+
+In this section, we begin by setting up the problem more precisely, including the goals of the statistician (Section 2.1) and the generic buyer-seller interaction (Section 2.2) that underlies the class of procurement auctions that we study. 
+
+2.1 Statistical Goal 
+
+A statistician, also referred to as the principal, wishes to estimate the parameter θ ∈ Θ of some unknown distribution using data. In order to do so, she can interact with a collection of M sellers, each of whom can provide samples relevant to estimating θ, but of varying quality, measured by their informativeness for the buyer’s target parameter. We formalize this notion of quality by associating with each data provider a Fisher information Ii > 0. If the statistician purchases ni
+
+samples from a given seller i ∈ [M ] := {1, . . . , M }, then standard asymptotics dictates that she can estimate the parameter θ up to mean-squared accuracy MSE ≍ 1
+
+niIi
+
+≡ Vi
+
+ni
+
+, (1) Here we have introduced the inverse Fisher information Vi := 1 /Ii so as to simplify notation in the sequel. Let us consider some examples to illustrate: 
+
+• Gaussian location model: The statistician seeks to estimate the mean θ of an unknown Gaussian, and data provider i generates samples from the normal distribution N (θ, σ 2 
+
+> i
+
+) with mean θ and variance σ2. Here the inverse Fisher information is given by Vi = σ2 
+
+> i
+
+.
+
+• Location-scale families: More generally, say that agent i generates samples from the the location-scale family fθ,α i (x) = (1 /α i)gi
+
+  x−θαi
+
+ for some fixed base density gi, shared location parameter 
+
+θ and scale parameter αi > 0. For this entire class, when estimating the location parameter θ,the inverse Fisher information takes the form Vi = κiα2 
+
+> i
+
+for some constant κi > 0 depending on the base density gi. The Gaussian location-scale family is the special case where the base density is the standard normal. 
+
+• Vector-valued parameters: Our set-up is not limited to scalar parameters. As a simple example, suppose that the statistician performs linear regression to estimate the regression vector θ ∈ Rd.Agent i provides random pairs of the form ( Y, X ) ∈ R × Rd with E[X] = 0, Cov( X) = Σ and (Y | X = x) ∼ N  θT x, σ 2 
+
+> i
+
+). In this case, we have 1 Vi = σ2 
+
+> i
+
+trace(Σ −1).     
+
+> 1To be clear, the inverse Fisher information for θis given by σ2
+> iΣ−1, and we take the trace to capture the MSE.
+
+4While we focus here on MSEs that decay at the of rate 1 /n i, many non-parametric statistical tasks exhibit slower convergence rates, of the order 1 /n ρi for some exponent ρ ∈ (0 , 1). In Section S3, we show how the mechanisms developed for (1) can be extended to such generalized mean-squared accuracy scalings with only minor modifications. 
+
+2.2 Buyer-Seller Interaction 
+
+In a data procurement auction, the statistician (buyer in this case) receives a price pi from each agent i ∈ I in the subset I ⊆ [M ] of agents who chose to opt-in, referred to as the opt-in set .The statistican seeks to balance their procurement cost with statistical accuracy; this tradeoff is controlled by a pre-specified scalar β > 0. If the statistician buys ni samples at price pi from agent 
+
+i, then their corresponding loss is given by the weighted sum 
+
+L(i, p i, n i) := β · Vi/n i
+
+| {z } 
+
+Error + pini
+
+|{z} 
+
+Data cost 
+
+, (2) where the inverse Fisher information Vi, also referred to as the data quality , controls the estimation error. The principal (or statistician) wishes to select a single seller j∗ ∈ I ,2 and to determine how many samples nj∗ to purchase, so as to obtain the minimal loss L(j∗, p j∗ , n j∗ ). On the seller (or data-provider) side, there are costs associating with generating and providing data. More precisely, seller i incurs cost ci to produce a sample; this per-sample cost can reflect privacy concerns, computational burden, or other opportunity costs. Thus, seller i’s private infor-mation can be summarized by the type pair ti := ( ci, Vi), corresponding to the cost of data provision and its underlying quality. Suppose that the procurement auction leads to seller j∗ being selected. In this case, seller j∗
+
+receives payment ¯ pj∗ nj∗ and incurs cost cj∗ nj∗ , so that their net utility is given by the difference (¯ pj∗ − cj∗ )nj∗ . Sellers who are not selected receive zero utility. We are interested in designing procurement mechanisms that elicit information about sellers’ types and jointly determine the triple ( j∗, n j∗ , p j∗ ), subject to incentive and participation constraints. 
+
+# 3 Main Results 
+
+In this section, we present our Fisher-information procurement mechanisms based on a price-per-information metric and discuss their theoretical properties. We start by analyzing an idealized benchmark in which the principal knows each seller’s data quality ex ante . In Section 3.1, we introduce a simple second-price-per-information mechanism, Mechanism 1, and show that it is truthful and individually rational. We then turn to the realistic case in which data quality is privately known to the sellers and can only be assessed ex post . In Section 3.2, we introduce an augmented second-price-per-information mechanism, Mechanism 2, together with a general class of verification tests. Our main results in Section 3.3 establish that (i) there exists a Bayesian Nash equilibrium of Mechanism 2 in which all participating sellers report costs truthfully and report data qualities within a shrinking neighborhood of the truth (Theorem 3); and (ii) for types whose equilibrium winning score remains separated from the runner-up’s score, these (almost) 
+
+> 2In our scalar-information setting, once the per-sample prices are given, the principal’s optimization problem is equivalent to the problem of purchasing information optimally from the seller with the lowest cost per unit of information, in which case all purchased samples should come from that seller.
+
+5truthful reports also weakly dominate opting out (Proposition 5), so that in large-sample regimes Mechanism 2 is approximately incentive compatible and its performance is close to the second-price-per-information benchmark with known data qualities. 
+
+3.1 Truthful Mechanism with Known Quality 
+
+Recall that each agent i is associated with the type ti := ( Vi, c i) of (inverse) data quality Vi and data cost ci. In this section, we begin by studying the simpler setting which the principal is given 
+
+a priori knowledge of the data qualities {Vi}Mi=1 across the full agent population. The per-sample costs {ci}Mi=1 remain private. We design a simple one-shot mechanism that elicits cost bids, is truthful and individually rational, and yields a transparent characterization of the principal’s loss. Note that our problem can be viewed as an instance of quality-adjusted procurement: the principal cares about both the cost of acquiring data and the statistical precision it delivers. Our protocol is based upon the score si := piVi ≡ pi/Ii, corresponding to the price per unit Fisher information for buying from agent i. Thus, this score can be regarded as a cost-effectiveness measure for learning precision. We note that similar “score-based” procurement rules are widely used in practice. Examples include public agencies evaluating bids based on a weighted combination of price and quality, or firms selecting vendors using a cost-per-performance index (Laffont and Tirole, 1993). Our mechanism formalizes this idea for data acquisition, with statistical precision playing the role of quality. 
+
+Mechanism 1. Second-Price-per-Information Mechanism. 1. Bidding : Each agent i ∈ [M ] decides whether to enter the mechanism, leading the opt-in set I ⊆ [M ] of participating agents. Each opt-in agent i ∈ I submits a per-sample price bid pi.2. Scoring : The principal computes the scores si := piVi for each i ∈ I .3. Selection : The principal chooses the agent j∗ := arg min  
+
+> i∈I
+
+si with the lowest score. a
+
+4. Unit Payment : Letting s(2) := min  
+
+> i∈I\{ j∗}
+
+si denote the smallest b score among the losing agents, the winner j∗ is paid a per-sample price ¯pj∗ := s(2) 
+
+> Vj∗
+
+= s(2) Ij∗ (3a) corresponding to the second-best score scaled by the winner’s Fisher information. 5. Quantity : The principal purchases a total of 
+
+nj∗ =
+
+√β Vj∗
+
+√s(2) 
+
+samples from seller j∗. (3b)     
+
+> aAny ties are broken according to a fixed rule.
+> bIf only one seller participates (i.e., |I| = 1), we define s(2) as a fixed upper bound on the scores.
+
+6Note that conditional on the competitors’ bids, the principal purchases fixed total amount of infor-mation from the winner, regardless of the winner’s own report as long as they win. Mechanism 1 can be viewed as a second-score procurement mechanism with an endogenous purchas-ing quantity. Let s(1) and s(2) denote the lowest and second-lowest scores among the participating agents; by construction, the winner has score s(1) and is paid based on score s(2) . In particular, the winning agent is paid an information-adjusted per-sample price ¯ pj∗ that yields the same price per unit of information as buying from the runner-up. Furthermore, recall from the principal’s loss function (2) that, for a fixed per-sample price pi, the optimal sample size n∗ 
+
+> i
+
+to purchase follows from the first-order optimality condition for the loss function (2). In particular, we have 
+
+∂L
+
+∂n i
+
+(i, p i, n i) ni=n∗
+
+> i
+
+= −β Vi
+
+(n∗ 
+
+> i
+
+)2 + pi = 0 ⇒ n∗ 
+
+> i
+
+=
+
+s
+
+βVi
+
+pi
+
+. (4) This square-root rule is analogous to Neyman allocation in stratified sampling and to A-optimal design for one-parameter linear Gaussian models, where optimal sample sizes are proportional to the standard deviation divided by the square root of the per-unit cost (see, e.g., Neyman 1934, Pukelsheim 2006). Now, in the mechanism, the principal uses the information-adjusted second price ¯ pj∗ , which, when substituted into (4), gives exactly the sample size nj∗ in Mechanism 1. Together, these choices ensure that the winning agent’s payment does not depend on their own report, and thus makes the mechanism truthful and individually rational. Under this mechanism, the principal’s total loss is given by 
+
+L(j∗, ¯pj∗ , n j∗ ) = β Vj∗
+
+nj∗
+
++ ¯ pj∗ nj∗ = 2 
+
+q
+
+β s (2) ,
+
+which coincides with the loss from optimally buying from the runner-up at their true cost under full information. Therefore, the principal incurs a 2 √β(√s(2) − √s(1) )-gap from the first-best solution. This structure is analogous to standard second-price and scoring auctions, where truthful implementation replaces the best supplier’s terms by those of the marginal competitor, so that efficiency loss is driven entirely by the gap between the first and second-best scores (Vickrey, 1961; Myerson, 1981). The structure of Mechanism 1 is robust to more general scalings of the mean-squared error (MSE). In Section S3, we describe an extension (Mechanism 3) that applies when the MSE decays at a slower rate, as is expected for non-parametric estimation problems. Having set up this mechanism, let us now formalize its key property: it is truthful and individ-ually rational. 
+
+Proposition 1. Consider a collection of M agents, where agent i has private cost ci and publi-cally known data quality Vi. Then truthfully bidding pi = ci is a weakly dominant strategy under Mechanism 1. 
+
+See Section S4.1 for the proof. In this particular case, with a single unknown parameter ci per agent, the argument follows along the lines of the VCG logic (Vickrey, 1961; Clarke, 1971; Groves, 1973) for single-parameter environments: Mechanism 1 is a second-price auction for units of information, so truthful cost reporting is weakly dominant. The assumption of known data quality Vi is natural in certain settings, including when the principal can benchmark potential suppliers on public test tasks, or data quality is certified by 7regulation. However, there exist many data markets in which data quality remains private to the seller. When the data qualities Vi are no longer known and must instead be reported by the agents, Mechanism 1 no longer ensures truthfulness. Suppose that agent i reports inverse data quality eVi.Since the resulting score si = pieVi is strictly increasing in eVi, the agent has incentive to report a lower value. Furthermore, conditional on winning, the total payment is independent of the report, while the quantity supplied decreases with eVi. Hence, by reporting a smaller eVi, the seller can always increase their profit. This difficulty is not specific to our design: when bidders have multi-dimensional private information, extending Vickrey’s second-price framework to “second-score” auctions is in general challenging, as a single scalar score typically cannot capture all the relevant incentive structures in the problem (Armstrong, 1996; Rochet and Chon´ e, 1998). 
+
+3.2 Second-Score Mechanism with Quality Verification 
+
+As previously discussed, when the data quality is private, agents benefit from under-reporting their (inverse) data quality Vi—that is, by inflating the statistical utility of the data. In this section, we introduce a verification-based mechanism designed to mitigate this incentive. The mechanism relies on an empirical test of Fisher information; it penalizes agents for mis-reporting by voiding the contract if the delivered data exhibit a higher inverse Fisher information than reported. As we show in the sequel, although this mechanism does not always guarantee exact truthfulness, it makes substantial mis-reporting unprofitable with high probability, thereby achieving approximate or “almost truthful” behavior. The following mechanism extends Mechanism 1 to the setting where data qualities are reported by agents and verified ex post through a quality test: 
+
+Mechanism 2. Second-Price-per-Information Mechanism with Statistical Verification. 1. Bidding : Each agent i in the opt-in set I reports the pair ( pi, eVi). 2. Scoring : The principal computes the scores si := pieVi for each opt-in agent i ∈ I .3. Selection : The principal selects the agent j∗ = arg min  
+
+> i∈I
+
+si.4. Unit Payment : Letting s(2) := min  
+
+> i∈I\{ j∗}
+
+si denote the smallest score among the losing agents, the winner’s per-sample payment is ¯pj∗ := s(2) 
+
+eVj∗
+
+. (5a) 5. Quantity : The principal purchases 
+
+nj∗ := 
+
+√β eVj∗
+
+√s(2) 
+
+(5b) samples from the winning agent j∗.6. Verification Test : After collecting the data, the principal computes an estimate bVj∗ of the inverse Fisher information based on nj∗ samples. The contract is voided a if bVj∗ > eVj∗ .
+
+> aIf the contract is voided, the principal pays nothing while the agent still incurs the data provision cost.
+
+8In terms of the report eVj∗ of the winning agent, the principal’s loss is given by 
+
+L(j∗, ¯pj∗ , n j∗ ) = β Vj∗
+
+nj∗
+
++ ¯ pj∗ nj∗ =  1 + Vj∗ /eVj∗
+
+ q
+
+βs (2) . (6) Under truthful reports from the sellers (i.e., eVi = Vi), the principal’s loss simplifies to 2 pβs (2) ,so the principal achieves the same expected loss as in Mechanism 1. However, once agents may strategically misreport eVi, the equivalence no longer holds. It is important to understand how verification in Step (6) of the protocol can restore truthful behavior. In order to build intuition, let us begin with an idealized case where the principal can directly observe the true data quality 
+
+ex post .
+
+3.2.1 Verification with Observed ex post Quality 
+
+Suppose that the principal can observe the true data quality Vj∗ of the winning agent after the data are procured. In this case, Mechanism 2 enforces perfect verification of reported quality, and hence becomes fully truthful. Let us summarize this conclusion in a formal way: 
+
+Proposition 2. Under Mechanism 2, if the principal observes the ground truth Vj∗ after data procurement and sets bVj∗ = Vj∗ , truthfully reporting (pi, eVi) = ( ci, Vi) is a weakly dominating strategy for every agent. 
+
+See Section S4.2 for the proof. This result shows that, under perfect ex post verification, Mechanism 2 collapses to the truthful scoring auction in Mechanism 1. The principal can effectively treat the data qualities Vi as truthfully reported and hence as known at the allocation stage. Intuitively, when the principal can perfectly verify quality, under-stating the inverse data quality Vi is punished by contract termination, while over-stating only increases the amount of data the seller must supply at a fixed total payment. Thus, sellers prefer to report their true data quality, and we return to the truthful scoring auction of Mechanism 1. 
+
+3.2.2 Verification with Quality Estimated from Procured Data 
+
+In the previous section, we established that Mechanism 2 is fully truthful if the principal is given exact knowledge of winner’s data quality Vj∗ . In practice, however, the principal only sees a finite sample of delivered data from the selected seller j∗, and can only form an estimate bVj∗ . We will soon develop an equilibrium result for Mechanism 2 that shows that with appropriate verification methods it is approximately truthful, but first we pause to build up intuition for impact of imperfect verification. Intuitively, one would hope that if this estimate is sufficiently accurate, agents will still find it nearly optimal to report their true quality. There are competing effects, however; agents receive higher reward (if they pass verification) when reporting higher quality, but they are also more likely to fail the verification step. As such, it the agent behavior is not immediately clear. To gain insight, we begin a simple calculation of conditional individual-rationality. Fix a seller 
+
+i, and let s−i, (1) denote the smallest score among the other sellers who opt in. Conditionally on 
+
+s−i, (1) , suppose that agent i reports the pair ( pi, eVi) and wins the auction with score si(pi, eVi) = 9pieVi < s −i, (1) . The (conditional) winning utility for agent i is therefore 
+
+Ui(pi, eVi) = P Vi ≤ eVi
+
+ ·
+
+q
+
+βs −i, (1) −√βc ieVi
+
+√s−i, (1) 
+
+. (7a) Under truthful reporting, ( pi, eVi) = ( ci, Vi), this expected utility is non-negative only if 
+
+P bVi ≤ Vi
+
+ ≥ si(ci, Vi)
+
+s−i, (1) 
+
+. (7b) where si(ci, Vi) = ciVi is agent i’s true score. In words, conditional on the rivals’ scores, a truth-ful agent finds participation individually rational only if the probability of failing verification is sufficiently low relative to the separation between their bid and that of the second second best. We now examine this in more detail with a naive verification strategy. Consider a Gaussian location model, for which the (inverse) data quality Vi ≡ σ2 
+
+> i
+
+corresponds to the variance of the observations. A natural estimate of the variance bσ2 
+
+> i
+
+is the sample variance based on the nj∗
+
+procured samples. By classical large-sample theory (van der Vaart, 1998), the sample variance bσ2
+
+> i
+
+falls below the true value with probability close to one half for large nj∗ —that is, we have 
+
+P bσ2 
+
+> i
+
+≤ σ2
+
+> i
+
+ − 12 = O
+
+ 1
+
+√nj∗
+
+
+
+. (8) Consequently, when the ratio between the first-best and second-best scores is smaller than 1 /2, a truthful best-quality seller would expect negative utility from winning. Thus, such an agent should find participation unattractive whenever their score is not sufficiently larger than the smallest competing score. The above calculation shows that participation can be sensitive to how often a report triggers test failure. Returning to the general setting, we now consider a statistic bVi := Qnj∗ (α; Vi) indexed by a failure parameter α ∈ (0 , 1) such that 
+
+P [Qn(α; Vi) ≤ Vi] ≥ (1 − α) − ξn, (9) where the tolerance parameter ξn → 0 as n → ∞ . The statistic Qn(α; V) is an approximate (1 − α)-level lower confidence bound for V: for large sample size n, the probability that a truthful agent fails the test is approximately α. The parameter α indexes how stringent the verification rule is, where a small α means a loose test that rarely rejects a truthful report. Our naive use sample variance (8) is a special case with α = 1 /2. We discuss additional examples of this more general family of tests in Section 4. In the discussion above, we implicitly treat the other agents’ scores (summarized by s−i, (1) ) as fixed. In the actual mechanism, however, neither the sellers nor the principal observe these scores at the time they choose bids or design the verification rule; instead, their behavior is guided by beliefs about other agents’ types. To analyze participation and misreporting more rigorously, we therefore embed Mechanism 2 in a Bayesian framework with a common prior over costs and qualities, and analyze equilibrium behavior and participation in this noisy-verification setting. Furthermore, the sample size nj∗ is intrincitly random and endogenious, so it is not obvious what a “large-sample regime” should mean. environment. Instead, we need to consider a sequence of problem instances in which this random sample size is likely to become larger and larger. The next section formalizes both the Bayesian framework and an asymptotic sequence along which the random sample size grows, and derives our main results on equilibrium behavior and participation under noisy verification. 10 3.3 Bayesian Equilibrium Analysis with Noisy Quality Verification 
+
+In this section, we place Mechanism 2 in a standard Bayesian game-theoretic environment (e.g., Harsanyi (1967)) and formalize the noisy verification setting described in Section 3.2. Given some mild reg-ularity conditions, we show that there exists a Bayesian Nash equilibrium in which, conditional on participating, each agent is guaranteed to (a) report its cost truthfully, and (b) give a data quality report that belongs to a shrinking interval around the truth. Furthermore, for agents whose equilibrium winning score maintains a non-trivial gap over the runner-up’s score, we show that such (almost) truthful reports also weakly dominate opting out. Thus, in large-sample regimes, agents are (almost) truthful, and we recover the performance of the second-price-per-information mechanism with known quality, up to a small error. To formalize the Bayesian game, recall that each agent i is associated with a type ti = ( ci, Vi) ∈ T ,where ci is the per-sample cost and Vi is the inverse Fisher information. In the Bayesian setting, types are drawn independently from a common prior distribution F on T , and this prior is common knowledge. Given their type ti, seller i chooses an action ai ∈ A out := A ∪ { out }, where actions in A are participation reports ai = ( pi, eVi) and the special action “out” corresponds to opting out. A (possibly mixed) reporting strategy for seller i is a measurable mapping ri : T → ∆( Aout ) that assigns to each type ti a distribution over actions. Let r = ( r1, . . . , r M ) denote a strategy profile across all M agents, and write Ui(ai, a −i; ti) for seller i’s utility when they choose action ai, their competitors chooses action a−i, and their true type is ti.Throughout this section, we impose the following regularity assumptions on types and bids. These are standard in private-value Bayesian auction models (Myerson, 1981), and are important for our equilibrium existence result give in Section 3.3.1. 
+
+Assumption 1. There exist constants 0 < c < c < ∞ and 0 < V < V < ∞ such that, for each agent i ∈ [M ], their type ti = ( ci, Vi) takes values in T := [ c, c ] × [V, V], and the prior distribution over types has full support on the M -fold Cartesian product space T M . Furthermore, agent i’s reporting action ai = ( pi, eVi) is restricted to A = [ c, c ] × [V, V]. 
+
+Assumption 2. Given the type distribution and any measurable strategy profile, the induced distribution of scores has no atoms; in particular, ties occur with probability zero. 
+
+3.3.1 Almost-Truthful Bayesian Equilibriums 
+
+With noisy verification, the dominant-strategy structure of the perfect-verification benchmark may break down: with only a finite amount of procured data, it is not clear whether (i) a seller would prefer to under-report their inverse data quality eVi to increase the chance of winning and reduce the required sample size, or conversely (ii) to over-report eVi to be conservative and pass the test more easily. In fact, a seller may even misreport solely to control how much data the principal gets to see. To analyze such strategic reporting, we now formally introduce the notion of equilibrium in this Bayesian game. 
+
+Definition 1. A strategy profile r∗ := ( r∗
+
+> 1
+
+, . . . , r ∗ 
+
+> M
+
+) is a Bayesian Nash equilibrium means that for every seller i ∈ [M ] and type ti ∈ T ,supp r∗ 
+
+> i
+
+(ti) ⊆ arg max  
+
+> ai∈A out
+
+Er∗
+
+Ui(ai, A −i; Ti) Ti = ti
+
+ . (10) 11 where supp r∗ 
+
+> i
+
+(ti) denotes the support of the distribution r∗ 
+
+> i
+
+(ti), and the expectation is taken over the other sellers’ types T−i from the common prior F , their actions A−i ∼ r∗−i(T−i), as well as the randomness of the quality test. In addition to the notion of equilibrium, we also need a way to formalize a “large-sample” regime when the purchased sample size is random and endogenous. We do this by considering a sequence of problem instances indexed by an integer k = 1 , 2, . . . , with corresponding accuracy weights βk > 0. Recall from equation (2) that β governs how much the principal values estimation accuracy relative to payment. We fix any increasing squence {βk}∞ 
+
+> k=1
+
+such that βk → ∞ , and refer to the environment with parameter β = βk as “instance k”. Along any such sequence, and under Assumption 1, the optimal sample size chosen by the mechanism diverges whenever a best-score seller wins (see Lemma 10 in Section S5.1). Intuitively, as k grows the principal cares more about accuracy and the mechanism responds by purchasing more samples, so that the procured sample size eventually becomes large. Under the instance regime described above, we can now formalize the informativeness of a verification test. We require some control on the deviations of the random variable bV, as used in the verification test, around the true quality level V. More precisely, given a family {ϕn}∞
+
+> n=1
+
+of functions mapping the interval (0 , ∞) to itself, we say that it is regular if the following three conditions hold: (i) the function n 7 → ϕn(δ) is non-increasing for each fixed δ > 0; (ii) the function 
+
+δ 7 → ϕn(δ) is non-increasing for each fixed n; and (iii) the tail integrals ζn(δ) := R ∞ 
+
+> δ
+
+ϕn(u)du are finite, and lim n→∞ ζn(δ) = 0 for each δ > 0. 
+
+Assumption 3. There is a regular family {ϕn}∞ 
+
+> n=1
+
+such that conditionally on ( V, n ), the random variable bV has a density fV,n such that sup 
+
+> |x−V|≥ δ
+
+fV,n (x)
+
+ϕn(|x − V|) ≤ 1 for each δ > 0. (11) This condition controls how much density the verification statistic bV can place at points that are δ-away from the true value V. Specifically, it asks that this envelope decrease both as the distance δ increases and as the sample size n increases. For example, in the Gaussian variance setting with bV equal to the sample variance, Assumption 3 is satisfied because the sample variance has an explicit scaled χ2 density whose mass becomes increasingly concentrated near V as n grows. A similar envelope is also natural for the lower-confidence-bound statistic in (9), since it differs from the sample variance only by an OP (n−1/2) term. Given an interval J around zero, we say that a Bayes Nash Equilibrium r∗ = ( r∗
+
+> 1
+
+, . . . , r ∗ 
+
+> M
+
+) is 
+
+J-truthful if supp  r∗ 
+
+> i
+
+(ti)) ⊆ { out } ∪ { (ci, Vi + δ) | δ ∈ J} for each i ∈ [M ]. (12) A J-truthful equilibrium has a simple structure: every type either opts out, or they participate and report their true cost ci, and a data quality eVi = Vi + δ for some δ ∈ J. The following result guarantees the existence of equilibria of this type, and shows that they become “almost-truthful” in the limit as k → ∞ .
+
+Theorem 3. Under Assumptions 1–3, there exists a sequence of intervals Jk containing zero, and a sequence of mixed-strategy Bayesian Nash equilibria r∗ 
+
+> k
+
+= ( r∗
+
+> k1
+
+, . . . , r ∗ 
+
+> kM
+
+) of Mechanism 2 such that: 
+
+12 (a) The Bayes Nash equilibrium r∗ 
+
+> k
+
+is Jk-truthful, and (b) The intervals satisfy lim k→∞ Jk = {0}.
+
+See Section S4.3 for the proof, where we specify the intervals in the form Jk = [ −δk, δ k], and explicit expressions the endpoints δk and δk in terms of the parameters from Assumptions 1–3. In Theorem 3 above, we construct equilibrium bounds in terms of the abstract concentration bounds of the test in Assumption 3. To see more concretely how the behavior of participating agents in equilibrium is jointly shaped by the test bV and the tradeoff parameter β, it is helpful to look again at the conditional utility expression in (7a). Conditionally on the rivals’ scores and winning the contract, by overreporting their (inverse) quality eVi, an agent reduces the probability that the verification test fails but increases the cost; by underreporting, they lower the cost but raise the failure probability. Equilibrium reports thus need to balance this tradeoff and therefore lie in a neighborhood of the true quality, as captured by Theorem 3. To understand this tradeoff in the concrete tests we consider, note that Condition (9) implies that, under a truthful report eVi = Vi, the failure probability is approximately α. For a test with a small α, truthful reporting is already quite safe, so agents can afford to shade their reports slightly downward: this increases the failure probability but lowers their cost, until driving eVi too far below  
+
+> Vi
+
+would make failure overwhelmingly likely (in which case the conditional expected utility becomes negative). For a test with a large α, truthful reporting is relatively risky, and agents instead have incentives to shade their reports slightly upward: this reduces the failure probability but raises the cost, and it is no longer beneficial once the report is far above the true Vi and further reductions in failure probability are negligible. As the instance size k grows and the procured sample size increases, the range of reports for which such shading is profitable shrinks: in the large-instance limit of Theorem 3, equilibrium reports are therefore confined to a very tight neighborhood of Vi, so any under- or over-reporting remains quantitatively small. Our simulations in Section 4 illustrate these finite-sample shading patterns for concrete choices of the verification rule in a Gaussian model. A direct consequence of Theorem 3 is that, if the agents with the first-best and second-best truthful scores both participate in the equilibrium r∗
+
+> k
+
+, then the principal’s relative regret with re-spect to the first-best benchmark is asymptotically no worse than the corresponding gap under the truthful second-score benchmark, up to the asymptotically negligible equilibrium slacks. For-mally, let str  
+
+> i
+
+:= ciVi denote the truthful score of agent i, with order statistics str (1) ≤ str (2) , let 
+
+LFB  
+
+> k
+
+:= 2 
+
+q
+
+β s tr (1) denote the first-best loss, and let Lk denote the principal’s realized loss un-der Mechanism 2. The corollary below shows that, the additional principal-side distortion induced by noisy verification is of order O  δk + δk
+
+.
+
+Corollary 4. Under the assumptions of Theorem 3, assume in addition that the agents with truthful scores str  
+
+> (1)
+
+and str  
+
+> (2)
+
+both participate in the equilibrium r∗
+
+> k
+
+. Then, for any realized report profile in the support of r∗
+
+> k
+
+,
+
+Lk − LFB 
+
+> k
+
+LFB 
+
+> k
+
+≤
+
+vuut str 
+
+> (2)
+
+str 
+
+> (1)
+
+− 1 + O  δk + δk
+
+ . (13) In particular, since δk, δ k → 0, the additional principal-side inefficiency induced by noisy verifica-tion vanishes in large samples. Thus, asymptotically, we recover the relative regret of Mechanism 1 under known quality, which is driven by the gap between the first- and second-best agents and can 13 be small when there are many agents. In Section 3.3.2 and Section S1, we further show that such high-quality agents are indeed the ones more likely to participate. 
+
+Remark 1. In Section S2, we provide explicit forms of the finite-sample lower and upper equilibrium slacks, δk and δk. In general, the size of the equilibrium reporting neighborhood depends mainly on two ingredients: (i) the concentration behavior of the verification statistic in Assumption 3; and (ii) how the procured sample size scales with βk. In a Gaussian location model where the verification statistic is based on the sample variance (and more generally whenever the verification statistic has sub-Gaussian concentration around the truth), the equilibrium slacks admit near-parametric rates. In particular, the downward slack is of order p1/N k, while the upward slack is of order plog Nk/N k, where Nk is a deterministic lower bound on the procured sample size at βk,as provided in Lemma 10. 
+
+3.3.2 Equilibrium Participation and Approximate Incentive Compatibility 
+
+Above, we show that any agent who opts into the mechanism reports their cost truthfully and their quality within a shrinking interval around the truth in an equilibrium. This result describes how reports behave conditional on participation, but it does not yet tell us which agents choose to participate rather than opting out. In this section, we show that, under a mild non-degeneracy condition, participation is indeed individually rational for agents whose equilibrium winning score maintains a non-trivial gap over the runner-up’s score. In Mechanism 2, the only reason why an agent might incur a negative utility (and strongly prefer opting out) is that their expected winning utility is negative. This can happen when the expected loss from failing the verification test cannot be offset by the surplus they obtain when they win and the test passes. Thus, the participation decision is governed by two key quantities: the probability of failing the test, and the expected gap between an agent’s own score and the runner-up’s score once they win. In particular, if an agent’s surplus conditional on winning is always zero, for instance because their score is always tied with the second-best score, then the expected utility from participating is always non-positive. To rule out this pathology in such knife-edge environments, we impose below a mild non-degeneracy condition on the equilibrium score distribution. 
+
+Assumption 4. For any agent i and any reporting action ai = ( ci, eVi) satisfying Assumption 1 with eVi ≤ V − η, let si = cieVi denote i’s score and let S(k) 
+
+> −i, (1)
+
+be the smallest score among the other agents when everyone else plays according to the equilibrium r∗ 
+
+> k
+
+in Theorem 3. There exists constants η > 0 and γ > 0 such that, for all sufficiently large k,
+
+E
+
+h
+
+S(k) 
+
+> −i, (1)
+
+− si S(k) 
+
+> −i, (1)
+
+≥ si
+
+i
+
+≥ γ. (14) This assumption requires that, for any agent who reports a quality at least η below the upper bound, conditional on winning the auction, the expected gap between their score and the runner-up score is bounded away from zero. In other words, such “interior” types do not win by a razor-thin margin, and they enjoy a non-trivial buffer in the score space. This assumption is satisfied in many generic environments where types are drawn from a continuous distribution and equilibrium strategies vary smoothly with type, so that the distribution of scores is not too heavily concentrated 14 near a single value and winners typically beat the runner-up by a non-negligible margin whenever their quality report is bounded away from the upper bound V.Combined with our concentration arguments for estimated variances, this buffer allows us to show in Proposition 5 that, for any interior type and any small ϵ > 0, when k is large enough, there exists an ϵ-near-truthful report that weakly dominates all other reports (and opting out) in the equilibrium environment of Theorem 3. Thus, for these types the mechanism is approximately dominant-strategy truthful and individually rational in the large-instance limit. 
+
+Proposition 5. Under Assumptions 1–4, fix any ϵ > 0 and any agent i with type (ci, Vi) satisfying  
+
+> Vi
+
+≤ V − η − ϵ. Then, for all sufficiently large k, when the other agents play r∗ 
+
+> k
+
+from Theorem 3, agent i has a reporting action 
+
+(ci, eVi) with eVi ∈ (Vi − ϵ, Vi + ϵ) (15) 
+
+that weakly dominates all their other reporting actions (and opting out). 
+
+See Section S4.5 for the proof. This proposition says that, for agents with “interior” types, it is (in the large-instance limit) always incentive compatible to join the mechanism. This is not surprising. Intuitively, in a large-instance environment where the principal is expected to purchase a large amount of data, any agent whose true quality Vi is not near the upper boundary V can over-report by a tiny amount to eliminate the random risk of failing the test. At the same time, if the agent’s score is not arbitrarily close to the runner-up’s score when they win, such a small upward perturbation has essentially no effect on their willingness to participate. In this case, the agent is strictly better off being slightly conservative and participating than opting out. Proposition 5 applies to any verification rule whose quality estimator bV satisfies Assumption 3. In finite samples, however, different tests can induce different magnitudes of this conservative slack: within the LCB family Qn(α; V), a larger α (a stricter test) makes truthful reporting riskier and typically leads to a larger upward reporting margin, which in turn can cause more marginal types to prefer opting out. We illustrate these finite-sample patterns in Section 4. In Proposition 5, we show that all interior types weakly prefers participating and slightly over-reporting than opting out in large instances. However, for honest agents that reports truthfully, the condition for participation is more restrictive, because they now face a non-trivial failure prob-ability of α under the verification test. Nevertheless, in Section S1 we show that, under the LCB condition (9), truthful participation remains individually rational for high-quality agents: in large instances, any interior type whose data are sufficiently cheap and precise (formally, whose cost-effectiveness index falls strictly below 1 − α) earns nonnegative expected utility when reporting truthfully. Thus, Mechanism 2 does not discourage the participation of truthful, high-quality agents. 
+
+# 4 Numerical Illustration 
+
+In this section, we provide a concrete normal-model example to illustrate how the verification test can be implemented in practice and what reporting incentives it induces. Throughout, we consider 
+
+M = 10 symmetric agents with types ti = ( ci, Vi) drawn i.i.d. from a common prior with compact support, where ci ∼ Uniform(0 .1, 0.2) and Vi ∼ Uniform(10 , 20). Conditional on type, agent i’s data Xi,t are i.i.d. from a normal distribution N (0 , σ 2 
+
+> i
+
+). In this Gaussian example, Vi coincides with the variance σ2 
+
+> i
+
+, and for notational convenience we will write σ2 
+
+> i
+
+in what follows. 15 4.1 Verification Tests 
+
+To construct the test, we need a statistic bσ2 
+
+> j∗
+
+= Qnj∗ (α; σ2 
+
+> j∗
+
+) such that condition (9) and As-sumption 3 are satisfied. It is possible to construct such a statistic from the sample variance. In particular, we define 
+
+S2 
+
+> n
+
+:= 1
+
+n
+
+> n
+
+X
+
+> t=1
+
+(Xt − ¯X)2, and ˆμ4,n := 1
+
+n
+
+> n
+
+X
+
+> t=1
+
+(Xt − ¯X)4, (16) where ¯X is the sample mean of the procured data. Under a finite sixth moment, a one-sided normal approximation for the sample variance yields the lower confidence bound (LCB) 
+
+Qn(α; σ2) = S2 
+
+> n
+
+− z1−α
+
+√n
+
+q
+
+ˆμ4,n − (S2
+
+> n
+
+)2 (17) where z1−α is the (1 − α)-quantile of the standard normal distribution. This LCB can be interpreted as an estimate minus a safety margin. By construction, Qn(α; σ2)satisfies the LCB condition (9) with failure parameter α, where a truthful seller fails only with prob-ability about α + O(1 /√n). It is also straightforward to check that the test satisfies Assumption 3: the sample variance S2 
+
+> n
+
+has an explicit scaled χ2 density and concentrates at V, and Qn(α; σ2) differs from S2 
+
+> n
+
+by an OP (1 /√n) term, so it inherits the same tail behavior. Here, we compare two verification rules: (i) a “0.05 LCB” rule that uses the test statistic described above with α = 0 .05 and accepts if Qnj∗ (α; σ2 
+
+> j∗
+
+) ≤ eσ2 
+
+> j∗
+
+; and (ii) a “Sample Variance” rule that accepts if the realized sample variance S2 
+
+> nj∗
+
+≤ eσ2 
+
+> j∗
+
+. In both cases, conditional on passing the test, the mechanism sets price and quantity as in Mechanism 2, and if the test fails, the contract is voided and the agent still incurs the acquisition cost. 
+
+4.2 Optimal Reporting Behavior 
+
+We start by examining the agent’s interim expected utility and the corresponding optimal reported variance when the other agents report truthfully. To isolate incentives, we fix a focal agent i
+
+with opportunity cost ci = 0 .12 and data variance σ2 
+
+> i
+
+∈ { 10 , 11 , 12 , 13 , 14 }. For each verification rule, we evaluate the focal agent’s expected utility as a function of their reported variance eσ2 
+
+> i
+
+∈
+
+[10 , 16] for three values of the tradeoff parameter β ∈ { 10 , 100 , 1000 }, and approximate the interim expected utility using 5,000 Monte Carlo repetitions. Under the prior on types, the choices β ∈{10 , 100 , 1000 } imply minimal procured sample sizes of approximately 15, 50, and 158, respectively. Figure 1 plots the resulting interim expected utility as a function of eσ2 
+
+> i
+
+. Each panel corre-sponds to a focal variance σ2 
+
+> i
+
+(columns) and a verification rule (rows). The solid curves show 
+
+E Ui(( ci, eσ2 
+
+> i
+
+), r tr 
+
+> −i
+
+(T−i); Ti) Ti = ti
+
+ for different values of β, where rtr denotes truthful reporting by the other agents. The vertical black dot-dashed line marks the true variance σ2 
+
+> i
+
+; for each β,the colored dashed line and filled circle indicate the report eσ2 
+
+> i
+
+that maximizes the focal agent’s expected utility. Across all panels, as β increases, the utility-maximizing report moves closer to the true variance. For moderate values of β, both under- and over-reporting can be optimal for the same agent under different verification rules: the less strict 0.05 LCB test tends to induce mild under-reporting, whereas the stricter Sample Variance test leads to more conservative over-reporting, especially for larger σ2. This aligns with the equilibrium shading patterns we discussed in Section S4.3, 16 Sample Variance                                                           
+
+> σ2=10
+> Sample Variance
+> σ2=11
+> Sample Variance
+> σ2=12
+> Sample Variance
+> σ2=13
+> Sample Variance
+> σ2=14
+> 0.05 LCB
+> σ2=10
+> 0.05 LCB
+> σ2=11
+> 0.05 LCB
+> σ2=12
+> 0.05 LCB
+> σ2=13
+> 0.05 LCB
+> σ2=14
+> 10 11 12 13 14 15 16 10 11 12 13 14 15 16 10 11 12 13 14 15 16 10 11 12 13 14 15 16 10 11 12 13 14 15 16
+> −5.0 −2.5 0.0 2.5 5.0
+> −5.0 −2.5 0.0 2.5 5.0
+> σ~2
+> Expected Utility
+> β10 100 1000
+
+Figure 1. Interim expected utility of the focal agent as a function of the reported variance, for different true variances (columns), verification rules (rows), and loss parameters (colors). The black dot–dashed line marks the true variance; colored dashed lines and dots indicate, for each β, the report that maximizes interim expected utility. 
+
+where lenient tests tend to make slight under-reporting attractive, while stricter tests tend to push equilibrium reports above the true variance. Although our theory implies that both tests yield almost-truthful behavior in the large-β limit (since both statistics are consistent), the numerical results show that the 0.05 LCB test drives optimal reports toward the truth much more rapidly: for the panels in the first row, the optimal reported variances essentially overlap with the true variance when β = 1000, whereas for the panels in the second row the optimal reports remain noticeably above the truth even for large β. This suggests that, in our example, a lenient test is more effective for truth elicitation at finite β.
+
+4.3 Participation Incentives 
+
+Next, we examine participation incentives across a broader set of types. We fix β = 1000 and, for each test, evaluate a grid of types ( ci, σ 2 
+
+> i
+
+) with ci ∈ [0 .11 , 0.19] and σ2 
+
+> i
+
+∈ [10 , 20]. For each grid point, we compute the focal agent’s interim expected winning utility at their optimal report (given truthful reporting by the other agents), and compare this to the outside option of not participating, which yields zero. Figure 2 plots the resulting expected utility as a function of ( ci, σ 2 
+
+> i
+
+) under the two verification rules. Within each panel, green cells indicate positive expected winning utility at the optimal report, while grey cells indicate types for which participating yields negative expected winning utility; the color intensity indicates the magnitude of these utilities in absolute value. Under the 0.05 LCB test, we observe that interior types with moderate cost and variance obtain strictly positive utility, and the participation region extends over almost the entire grid except for very high costs and variances near the upper bound. In contrast, under the Sample Variance test, the participation region is noticeably smaller, where types with variances near σ2 
+
+> i
+
+≈ 17 − 20 prefers to opt out. These patterns are consistent with our theoretical results: for interior types, the combination of a favorable 17 0.05 LCB Sample Variance                      
+
+> 10 11 12 13 14 15 16 17 18 19 20 10 11 12 13 14 15 16 17 18 19 20
+> 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19
+> Variance
+> Cost
+
+Figure 2. Interim expected winning utility at the optimal report as a function of type ( ci, σ 2 
+
+> i
+
+) for 
+
+β = 1000, under the 0.05 LCB test (left) and the Sample Variance test (right). Darker green indi-cates higher winning utility (preference for participation), while darker grey indicates more negative winning utility (preference for opting out). 
+
+score and a relatively lenient verification rule (0.05 LCB) makes participation strictly attractive, while types close to the upper bound of the variance support are approximately indifferent or prefer to opt out. Together with Figure 1, this participation map illustrates that in the normal example the lenient 0.05 LCB test not only induces near-truthful reporting for interior types, but also delivers a larger region of types who strictly prefer to participate. 
+
+# 5 Discussion 
+
+We take a step toward a theory of data procurement as information acquisition under limited prior knowledge of providers’ costs and data quality. Our mechanism combines a selection rule from second-score procurement auctions with an enforcement device in the spirit of scoring-rule-based forecast evaluation. By leveraging competition and a noisy ex post signal about the in-formation delivered, it implements an almost truthful and individually rational data-procurement procedure—something that is hard to obtain with purely auction-based or purely scoring-rule-based mechanisms. Our analysis has focused on a scalar information setting, where each agent’s data quality is captured by a one-dimensional information metric, such as how noisy their data are. In this case, for any fixed pricing scheme, the purchasing rule that minimizes the principal’s loss is a winner-take-all one, where it is optimal to buy all samples from a single agent even though the principal could, in principle, buy from multiple agents. This property inherently enables us to design a simple second-score mechanism that always ensures an optimal procurement quantity. In many applications, however, the optimal design would involve purchasing data from multiple agents, for example, when the parameter of interest is vector-valued and different agents are informative about different components or regions of the covariate space, or when the principal wants to guard against source-specific biases by combining data from multiple agents. Extending our framework to such 18 settings, where the optimal allocation may buy positive quantities from multiple agents rather than always from a single source, would require mechanisms that jointly determine prices and quantities across all data providers, and we leave this as an interesting direction for future work. 
+
+# References 
+
+J. Abernethy, Y. Chen, C.-J. Ho, and B. Waggoner. Low-cost learning via active data procurement. In Proceedings of the Sixteenth ACM Conference on Economics and Computation , pages 619–636, 2015. G. L. Albano, B. Cesi, and A. Iozzi. Public procurement with unverifiable quality: The case for discriminatory competitive procedures. Journal of Public Economics , 145:14–26, 2017. D. An, Q. Yang, W. Yu, D. Li, Y. Zhang, and W. Zhao. Towards truthful auction for big data trad-ing. In 2017 IEEE 36th International Performance Computing and Communications Conference (IPCCC) , pages 1–7. IEEE, 2017. N. Ananthakrishnan, S. Bates, M. Jordan, and N. Haghtalab. Delegating data collection in decen-tralized machine learning. In International Conference on Artificial Intelligence and Statistics ,pages 478–486. PMLR, 2024. A. Anjarlekar, R. Etesami, and R. Srikant. Striking a balance: An optimal mechanism design for heterogenous differentially private data acquisition for logistic regression. arXiv preprint arXiv:2309.10340 , 2023. M. Armstrong. Multiproduct nonlinear pricing. Econometrica , 64(1):51–75, 1996. J. Asker and E. Cantillon. Procurement when price and quality matter. The Rand journal of economics , 41(1):1–34, 2010. E. Auriol and T. Søreide. An economic analysis of debarment. International Review of Law and Economics , 50:36–49, 2017. E. Ben-Porath, E. Dekel, and B. L. Lipman. Optimal allocation with costly verification. American Economic Review , 104(12):3779–3813, 2014. S. Board. Relational contracts and the value of loyalty. American Economic Review , 101(7): 3349–3367, 2011. Y. Cai, C. Daskalakis, and C. Papadimitriou. Optimum statistical estimation with strategic data sources. In Conference on Learning Theory , pages 280–296. PMLR, 2015. X. Cao, Y. Chen, and K. R. Liu. Data trading with multiple owners, collectors, and users: An iterative auction mechanism. IEEE Transactions on Signal and Information Processing over Networks , 3(2):268–281, 2017. R. Castro Fernandez. Data-sharing markets: Model, protocol, and algorithms to incentivize the formation of data-sharing consortia. Proceedings of the ACM on Management of Data , 1(2):1–25, 2023. 19 Y. Chen and I. A. Kash. Information elicitation for decision making. In The 10th International Con-ference on Autonomous Agents and Multiagent Systems - Volume 1 , AAMAS ’11, page 175–182, Richland, SC, 2011. International Foundation for Autonomous Agents and Multiagent Systems. Y. Chen and S. Zheng. Prior-free data acquisition for accurate statistical estimation. In Proceedings of the 2019 ACM Conference on Economics and Computation , pages 659–677, 2019. Y. Chen, N. Immorlica, B. Lucier, V. Syrgkanis, and J. Ziani. Optimal data acquisition for statistical estimation. In Proceedings of the 2018 ACM Conference on Economics and Computation , pages 27–44, 2018. Y. Chen, Y. Shen, and S. Zheng. Truthful data acquisition via peer prediction. Advances in Neural Information Processing Systems , 33:18194–18204, 2020. E. H. Clarke. Multipart pricing of public goods. Public Choice , pages 17–33, 1971. A. Clinton, T. Zeng, Y. Chen, X. Zhu, and K. Kandasamy. A Cram´ er–von Mises approach to incentivizing truthful data sharing. arXiv preprint arXiv:2506.07272 , 2025. R. Cummings, H. Elzayn, E. Pountourakis, V. Gkatzelis, and J. Ziani. Optimal data acquisition with privacy-aware agents. In 2023 IEEE Conference on Secure and Trustworthy Machine Learning (SaTML) , pages 210–224. IEEE, 2023. A. Fallah, A. Makhdoumi, A. Malekian, and A. Ozdaglar. Optimal and differentially private data acquisition: Central and local mechanisms. Operations Research , 72(3):1105–1123, 2024. L. K. Fleischer and Y.-H. Lyu. Approximately optimal auctions for selling privacy when costs are correlated with data. In Proceedings of the 13th ACM conference on electronic commerce , pages 568–585, 2012. A. Frankel and E. Kamenica. Quantifying information and uncertainty. American Economic Review ,109(10):3650–3680, 2019. N. Gast, S. Ioannidis, P. Loiseau, and B. Roussillon. Linear regression from strategic data sources. 
+
+ACM Transactions on Economics and Computation (TEAC) , 8(2):1–24, 2020. A. Ghorbani and J. Zou. Data shapley: Equitable valuation of data for machine learning. In 
+
+International conference on machine learning , pages 2242–2251. PMLR, 2019. A. Ghosh and A. Roth. Selling privacy at auction. In Proceedings of the 12th ACM conference on Electronic commerce , pages 199–208, 2011. I. L. Glicksberg. A further generalization of the Kakutani fixed point theorem, with application to Nash equilibrium points. Proceedings of the American Mathematical Society , 3(1):170–174, 1952. T. Gneiting and A. E. Raftery. Strictly proper scoring rules, prediction, and estimation. Journal of the American statistical Association , 102(477):359–378, 2007. T. Groves. Incentives in teams. Econometrica , pages 617–631, 1973. J. C. Harsanyi. Games with incomplete information played by “bayesian” players, i–iii part i. the basic model. Management science , 14(3):159–182, 1967. 20 A. Haug, F. Zachariassen, and D. Van Liempd. The costs of poor data quality. Journal of Industrial Engineering and Management (JIEM) , 4(2):168–193, 2011. B. Huang, S. P. Karimireddy, and M. I. Jordan. Evaluating and incentivizing diverse data contri-butions in collaborative learning. arXiv preprint arXiv:2306.05592 , 2023. R. Jia, D. Dao, B. Wang, F. A. Hubis, N. M. Gurel, B. Li, C. Zhang, C. J. Spanos, and D. Song. Efficient task-specific data valuation for nearest neighbor algorithms. arXiv preprint arXiv:1908.08619 , 2019. K. Jiang, W. Liang, J. Y. Zou, and Y. Kwon. Opendataval: a unified benchmark for data valuation. 
+
+Advances in Neural Information Processing Systems , 36:28624–28647, 2023. H. A. Just, F. Kang, J. T. Wang, Y. Zeng, M. Ko, M. Jin, and R. Jia. Lava: Data valuation without pre-specified learning algorithms. arXiv preprint arXiv:2305.00054 , 2023. B. Klein and K. B. Leffler. The role of market forces in assuring contractual performance. Journal of Political Economy , 89(4):615–641, 1981. J.-J. Laffont and D. Martimort. The theory of incentives: the principal-agent model . Princeton Paperbacks, 2002. J.-J. Laffont and J. Tirole. A theory of incentives in procurement and regulation . MIT press, 1993. N. S. Lambert, D. M. Pennock, and Y. Shoham. Eliciting properties of probability distributions. In Proceedings of the 9th ACM Conference on Electronic Commerce , pages 129–138, 2008. C. Li, D. Y. Li, G. Miklau, and D. Suciu. A theory of pricing private data. ACM Transactions on Database Systems (TODS) , 39(4):1–28, 2014. Y. Li, X. Yu, and N. Koudas. Data acquisition for improving machine learning models. arXiv preprint arXiv:2105.14107 , 2021. Y. Li, J. D. Hartline, L. Shan, and Y. Wu. Optimization of scoring rules. In Proceedings of the 23rd ACM Conference on Economics and Computation , pages 988–989, 2022. F. Liang, W. Yu, D. An, Q. Yang, X. Fu, and W. Zhao. A survey on big data market: Pricing, trading and protection. IEEE Access , 6:15132–15154, 2018. C. Lu, B. Huang, S. P. Karimireddy, P. Vepakomma, M. Jordan, and R. Raskar. Daved: Data acquisition via experimental design for data markets. arXiv preprint arXiv:2403.13893 , 2024. A. M. Manelli and D. R. Vincent. Optimal procurement mechanisms. Econometrica , 63:591–620, 1995. N. Miller, P. Resnick, and R. Zeckhauser. Eliciting informative feedback: The peer-prediction method. Management Science , 51(9):1359–1373, 2005. R. B. Myerson. Optimal auction design. Mathematics of Operations Research , 6(1):58–73, 1981. T. Mylovanov and A. Zapechelnyuk. Optimal allocation with ex post verification and limited penalties. American Economic Review , 107(9):2666–2694, 2017. 21 E. Neyman, G. Noarov, and S. M. Weinberg. Binary scoring rules that incentivize precision. In 
+
+Proceedings of the 22nd ACM Conference on Economics and Computation , pages 718–733, 2021. J. Neyman. On the two different aspects of the representative method: The method of stratified sampling and the method of purposive selection. Journal of the Royal Statistical Society , 97(4): 558–625, 1934. C. Oesterheld and V. Conitzer. Minimum-regret contracts for principal-expert problems. In Inter-national Conference on Web and Internet Economics , pages 430–443. Springer, 2020. K. Osband. Optimal forecasting incentives. Journal of Political Economy , 97(5):1091–1112, 1989. M. Papireddygari and B. Waggoner. Contracts with information acquisition, via scoring rules. In 
+
+Proceedings of the 23rd ACM Conference on Economics and Computation , pages 703–704, 2022. F. Pukelsheim. Optimal design of experiments . SIAM, 2006. A. Richardson, A. Filos-Ratsikas, and B. Faltings. Rewarding high-quality data via influence functions. arXiv preprint arXiv:1908.11598 , 2019. J.-C. Rochet and P. Chon´ e. Ironing, sweeping, and multidimensional screening. Econometrica , 66 (4):783–826, 1998. E. Saig, I. Talgam-Cohen, and N. Rosenfeld. Delegated classification. Advances in Neural Infor-mation Processing Systems , 36:13200–13236, 2023. F. C. Shi, S. Bates, and M. J. Wainwright. Sharp results for hypothesis testing with risk-sensitive agents. arXiv preprint arXiv:2412.16452 , 2024. F. C. Shi, M. J. Wainwright, and S. Bates. Instance-adaptive hypothesis tests with heterogeneous agents. arXiv preprint arXiv:2510.21178 , 2025. A. W. van der Vaart. Asymptotic statistics . Cambridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press, 1998. W. Vickrey. Counterspeculation, auctions, and competitive sealed tenders. The Journal of Finance ,16(1):8–37, 1961. Z. Wan and D. R. Beil. RFQ auctions with supplier qualification screening. Operations Research ,57(4):934–949, 2009. J. T. Wang and R. Jia. Data banzhaf: A robust data valuation framework for machine learning. In International Conference on Artificial Intelligence and Statistics , pages 6388–6421. PMLR, 2023. Y. Yao and M. Tanaka. Price-quality trade-off in procurement auctions with an uncertain quality threshold. Journal of Economic Behavior & Organization , 177:56–70, 2020. J. Yoon, S. Arik, and T. Pfister. Data valuation using reinforcement learning. In International Conference on Machine Learning , pages 10842–10851. PMLR, 2020. 22 B. Zhao, B. Lyu, R. C. Fernandez, and M. Kolar. Addressing budget allocation and revenue allocation in data market environments using an adaptive sampling algorithm. In International Conference on Machine Learning , pages 42081–42097. PMLR, 2023. 23 Supplementary Materials S1 Truthful Participation in Large Sample Regimes 
+
+In this section, we revisit the participation tradeoff we discussed in Section 3.2.2 and understand when truthful types are even willing to participate. A basic requirement for the mechanism to be appealing is that, under noisy verification, high-quality agents who report their true cost and quality do not face systematically negative expected payoffs. Thus, in this section, we keep reporting behavior fixed at truthful bidding and ask: for which types, under a given verification test and truthful environment, is Mechanism 2 individually rational in large sample regimes? To make this precise, we introduce below a summary statistic that aggregates how the winner’s score compares to the lowest competing score. This quantity depends only on the common prior and the number of agents, and will be convenient for characterizing the truthful types who find participation attractive when the verification test is not too harsh. As before, let S(1) ≤ S(2) be the (now random) lowest and second-lowest scores among all partic-ipating agents. When everyone reports truthfully, each score Si is not only a cost-effective measure for the principal, but also measures the cost each agent incurs to provide a unit of information. For a realized lowest score S(1) = s, define the winning advantage ratio as 3
+
+κ(s) := E S(1) /pS(2) S(1) = s
+
+E p S(2) S(1) = s . (S1) Note that κ(s) measures the expected cost-to-payment burden an agent faces when winning with score s. It is large when the winner barely beats the runner-up, and low when the winner has a comfortable margin. In this way, it captures the tightness of competition and therefore the “difficulty” of satisfying IR conditioning on the agent’s own cost-per-information. With this winning advantage ratio, the next theorem shows that, under any verification test that does not reject truthful reports too frequently, truthful participation is individually rational in large instances for all types whose own score si = ciVi yields a large enough “winning advantage”, or equivalently a small enough value of κ(si). 
+
+Proposition 6. Under Assumptions 1 and 2, consider Mechanism 2 applied with the verification tests bVi = Qn∗ 
+
+> k
+
+(α; Vi). Then, for any ϵ > 0, α ∈ (0 , 1) , and finite set of agents i ∈ [M ] with truthful types ti = ( ci, Vi), given that all other agents, if they participate, report truthfully, there exists an integer k0 such that for all k ≥ k0, participation with truthful reporting is individually rational for every agent i ∈ [M ] whose type satisfies 
+
+κ(ciVi) ≤ 1 − α − ϵ. (S2) See Section S4.6 for the proof. 
+
+Remark 2. Proposition 6 provides a simple characterization of when truthful agents find it indi-vidually rational to opt in. The condition (S2) shows that, as long as the verification test accepts truthfully reported noise levels with sufficiently high probability, all truthful agents whose types    
+
+> 3Under Assumption 2, the minimum score S(1) is continuously distributed, and thus all statements involving κ(s)should be interpreted as holding except on a measure-zero set of scores. In particular, whenever we fix a set of scores, we implicitly restrict attention to realizations such that each score lies outside this exceptional set.
+
+1Uniform(0,1)          
+
+> 10 Agents
+> Uniform(0,1)
+> 100 Agents
+> 0.00 0.25 0.50 0.75 1.00 0.00 0.25 0.50 0.75 1.00
+> 0.00 0.25 0.50 0.75 1.00
+> Score (Price per Information)
+> kappa
+> Opt−In Types
+
+Figure S1. Winning advantage ratio κ(s) as a function of the score s (price per information). Shaded regions indicate values of s for which the participation condition (12) is satisfied with α = 0 .05. 
+
+yield a sufficiently large “winning advantage” (or equivalently, a small κ(si)) will choose to partic-ipate. This advantage is summarized by the function κ(·), which measures how strongly an agent with score si is expected to outperform the second-best competitor, conditional on winning. Figure S1 illustrates the function s 7 → κ(s) for seller populations with sizes M = 10 and 
+
+M = 100, with a common prior Uniform(0 , 1) on agent scores. For illustration, we set α = 0 .05. The figure shows that agents with lower scores (equivalently, lower price per information) are more willing to opt in. As si increases, the conditional distribution of S(2) given S(1) = si moves closer to 
+
+si, which tends to raise κ(si) in these examples. Intuitively, conditioning on winning, a low-scoring agent faces weaker competition from nearby types, which leads to a larger winning advantage. 
+
+# S2 Finite-Sample Equilibrium Slacks 
+
+In this section, we extract explicit constructions of the finite-sample lower and upper equilibrium slacks, δk and δk, from the proofs of Lemma 7 and Lemma 8, and discuss how the size of the equilib-rium reporting neighborhood depends on the concentration behavior of the verification statistic and on the instance parameter βk. Throughout, we express the bounds in terms of Nk, a deterministic lower bound on the procured sample size, since the realized winning sample size is endogenous and random. In Lemma 10, we show the choice of Nk = √βV/√s is a valid lower bound of the procured sample size under Assumption 1. We begin with the lower slack δk, the smallest downward deviation for which the verification failure risk is already large enough to make further underreporting unprofitable. From the proof of Lemma 7, δk can be chosen as 
+
+δk = inf {δ > 0 : ζNk (δ) ≤ s/s } , (S3) where ζNk (δ) = R ∞ 
+
+> δ
+
+ϕNk (u)du bounds the lower-tail probability beyond a downward shift of size δ.Thus, δk can be interpreted as a one-sided lower-tail detection radius at effective sample size Nk,the smallest downward shift below the truth for which the lower tail of the verification statistic becomes sufficiently small relative to the score ratio s/s . As k grows, Nk increases, the tail envelope shrinks, and therefore the permissible downward slack becomes smaller. 2We next turn to the upper slack δk, the smallest conservative overreporting radius needed so that the local verification risk becomes small enough to make larger upward reports weakly dominated. From the proof of Lemma 8, there could be multiple constructions of δk, with 
+
+δk ≍ inf {δ > 0 : ϕNk (δ) ≤ c/s } . (S4) This quantity can be interpreted as an upper-side local resolution radius, the order of the smallest upward radius beyond which the verification statistic places sufficiently little local mass, at the scale relevant for the incentive comparison. Similarly, as Nk grows, the local concentration envelope shrinks, and therefore the permissible upward slack becomes smaller. In the Gaussian location model, the inverse Fisher information is V ≡ σ2, and the verification statistic based on the sample variance concentrates around V at the usual n−1/2 scale. Indeed, since the sample variance has a scaled χ2 distribution, Assumption 3 is satisfied with a sub-Gaussian envelope of the form 
+
+ϕn(u) ≲ C1
+
+√n exp 
+
+
+
+−C2nu 2/V2
+
+, ζn(u) ≲ C3 exp 
+
+
+
+−C4nu 2/V2
+
+, (S5) uniformly over V ∈ [V, V] for some constants C1, ..., C 4. Plugging these bounds into (S3) shows that the lower equilibrium slack satisfies 
+
+δk ≲ V
+
+s
+
+log( s/s )
+
+Nk
+
+= O(N −1/2 
+
+> k
+
+). (S6) Likewise, the upper slack from (S4) suggests 
+
+δk ≲ V
+
+s
+
+log Nk
+
+Nk
+
+. (S7) Since Nk = √βV/√s, both slacks vanish as k → ∞ with rates O(β−1/4 
+
+> k
+
+) on the lower side and 
+
+O(β−1/4
+
+> k
+
+√log βk) on the upper side. Thus, in the Gaussian example (or more generally, whenever the verification statistic admits a sub-Gaussian concentration envelope), equilibrium reports lie in a shrinking neighborhood of the truth, whose width is essentially the standard-error scale of the variance estimator, up to a mild logarithmic factor on the conservative (upward) side. 
+
+# S3 Extensions to Non-Root-n Losses 
+
+In this section, we discuss how our information procurement mechanisms can be extended to the cases where the estimation cannot in general achieve a parametric rate. Specifically, we consider a setting where the statistician (i.e., the principal) can estimate the parameter of interest up to mean-squared accuracy of MSE ≍
+
+ 1
+
+niIi
+
+ρ
+
+≡
+
+ Vi
+
+ni
+
+ρ
+
+(S8) for some problem-dependent exponent ρ ∈ (0 , 1), in which case her loss is given by the weighted sum 
+
+L(i, p i, n i) := β ·
+
+ Vi
+
+ni
+
+ρ
+
++ pini. (S9) 3In this case, Vi is a generalized inverse information parameter that captures the per-sample inverse information. Such errors are prevalent, for example, in nonparametric regression and density esti-mation, where Vi reflects agent-specific data quality such as noise level and covariate spread, while 
+
+ρ depends on problem-specific features such as smoothness and dimensionality. Mechanism 3 below extends Mechanism 1 to sample purchasing in these generalized loss settings. Since Vi continues to capture per-sample inverse information, minimizing the buyer’s loss is still equivalent to minimizing piVi. Therefore, the scoring rule, the selection of the winner, and the unit pricing rule need not be altered and remain the same as in Mechanism 1. The only change is in Step 5, which now sets the purchased quantity to the optimal sample size corresponding to the unit payment pj∗ under the generalized loss, so that the principal still buys an optimal amount of data at the actual price she pays. 
+
+Mechanism 3. Second-Price-per-Information Mechanism. 1. Bidding : Each agent i ∈ [M ] decides whether to enter the mechanism, leading the opt-in set I ⊆ [M ] of participating agents. Each opt-in agent i ∈ I submits a per-sample price bid pi.2. Scoring : The principal computes the scores si := piVi for each i ∈ I .3. Selection : The principal chooses the agent j∗ := arg min  
+
+> i∈I
+
+si with the lowest score. 4. Unit Payment : Letting s(2) := min  
+
+> i∈I\{ j∗}
+
+si denote the smallest score among the losing agents, the winner j∗ is paid a per-sample price ¯pj∗ := s(2) 
+
+> Vj∗
+
+= s(2) Ij∗ (S10a) corresponding to the second-best score scaled by the winner’s Fisher information. 5. Quantity : The principal purchases a total of 
+
+nj∗ =
+
+ βρ s(2) 
+
+ 1 
+
+> ρ+1
+> Vj∗
+
+samples from seller j∗. (S10b) It is not hard to verify that, under Mechanism 3, the principal achieves a total loss of 
+
+L(j∗, ¯pj∗ , n j∗ ) = (1 + ρ)ρ−ρ/ (ρ+1) β1/(ρ+1)  s(2) 
+
+−ρ/ (ρ+1) .
+
+This is exactly the optimal loss that would be achieved if the principal could purchase optimally from the second-best agent with the true cost. It gives rise to a gap from the first-best solution (1 + ρ)ρ−ρ/ (ρ+1) β1/(ρ+1) n s(2) 
+
+−ρ/ (ρ+1) −  s(1) 
+
+−ρ/ (ρ+1) o
+
+,
+
+which is entirely driven by the optimal-loss gap between the first-best and second-best agents. Since Mechanism 3 does not use the winner’s own report to determine either the unit price or the 4purchased quantity, it retains the same truthful and individually rational properties as Mechanism 1, in line with standard second-score mechanisms. Similarly, we can extend Mechanism 2 to this setting by augmenting Mechanism 3 with an ex post test of the generalized inverse information. We expect the main conclusion of Section 3.3 to continue to hold: under mild regularity conditions, there exists a Bayesian Nash equilibrium in which each participating agent reports its cost truthfully and reports its quality within a shrinking interval around the truth, except that now the interval may shrink more slowly, for example because the purchased sample size grows more slowly and the information is estimated at a slower rate under the new loss scaling. Nevertheless, as β → ∞ , we still expect the same asymptotic conclusion to go through. 
+
+# S4 Proof of Theorems and Propositions 
+
+In this section, we collect the proofs of our main claims, including Proposition 1 in Section 3.1, Proposition 2 in Section 3.2, Theorem 3 and Proposition 5 in Section 3.3, and Proposition 6 in Section S1. 
+
+S4.1 Proof of Proposition 1 
+
+We introduce the shorthand ¯ pi := min j̸ =i sj (pj ) 
+
+> Vi
+
+. According to the mechanism, agent i wins the contract if and only if si(pi) = piVi ≤ min j̸ =i sj (pj ), or equivalently, if and only if pi ≤ ¯pi. If agent 
+
+i wins, then the associated utility is given by 
+
+Ui(pi; ci) = (¯ pi − ci)
+
+s
+
+β Vi
+
+¯pi
+
+,
+
+which does not depend on the value pi. On the other hand, if pi > ¯pi and agent i loses, then we have Ui(pi; ci) = 0 always. Now consider the following two mutually exclusive cases: 
+
+• First, suppose that ci ≤ ¯pi. Then the utility from winning the contract is non-negative; that is, we have Ui(pi; ci) ≥ 0. Any bid with pi ≤ ¯pi yields the same fixed non-negative utility, while bidding pi > ¯pi yields a zero utility. As a consequence, truthfully bidding pi = ci ≤ ¯pi
+
+is optimal. 
+
+• Otherwise, we may assume that ci > ¯pi. In this case, if agent i were to win, then the utility from winning the contract would be Ui(pi; ci) < 0, so that winning is strictly worse than losing. Therefore, any bid with pi > ¯pi is optimal, including truthfully bidding pi = ci > ¯pi.
+
+S4.2 Proof of Proposition 2 
+
+We introduce the shorthand s−i, (1) = min sj (pj , eVj ) | j̸ = i, and j opts in . According to the mechanism, agent i wins the contract if and only if si(pi, eVi) ≤ s−i, (1) .First, we show that the truthful report eVi = Vi is dominant for all fixed pi. Conditioning on the event that agent i wins, s(2) = s−i, (1) , and we have 
+
+Ui(pi, eVi) = I(Vi ≤ eVi) ·
+
+q
+
+βs −i, (1) −√βc ieVi
+
+√s−i, (1) 
+
+,
+
+5which is non-negative if eVi ≥ Vi. If the agent underreports eVi < Vi, this yields a negative utility 
+
+Ui(pi, eVi) < 0, which is strictly worse than truthful reporting. If the agent overreports eVi > Vi,
+
+Ui(pi, eVi) < Ui(pi, Vi) as the agent needs to give more data for a fixed payment, which is also worse than truthful reporting. We now drop the conditioning. For any fixed reported price pi, there are two cases to consider: 
+
+• If si(pi, Vi) > s −i, (1) (cannot win by truthfully reporting Vi), to win the agent must underre-port, so that eVi < Vi, but this will lead to a negative utility. Thus, the best response is to lose, which includes truthfully reporting eVi = Vi.
+
+• If si(pi, Vi) ≤ s−i, (1) (can win by truthfully reporting Vi), the argument above shows that the utility from winning is maximized when the agent truthfully reports eVi = Vi.Thus, truthfully reporting eVi = Vi is weakly dominant. Now, given that the agents report eVi = Vi, it follows from Proposition 1 that the agents will truthfully report pi = ci. Combining this with the first part yields the claimed result. 
+
+S4.3 Proof of Theorem 3 
+
+We start by showing that, for any fixed reporting strategies r′−i of other agents and reported price 
+
+pi of agent i, there exists an instance-dependent neighborhood of the true quality Vi such that any quality report outside this neighborhood cannot yield a strictly higher interim expected utility for the agent; the size of this neighborhood is determined by how accurate the verification test is expected to be. Throughout, for any profile of reporting strategies r−i of the other agents, we write for shorthand 
+
+E Ui(( pi, eVi), r −i(T−i); ti) ti
+
+ := E Ui(( pi, eVi), A −i; Ti) Ti = ti
+
+ (S11) where T−i is drawn from the common prior F and A−i|T−i = t−i ∼ r−i(t−i). First, we show that reporting eVi to be too small always leads to a non-positive interim expected utility, and is therefore (weakly) dominated by opting out. 
+
+Lemma 7. Under the conditions of Theorem 3, there exists some δk > 0 such that, for all reporting strategies r′−i of other agents and reported price pi of agent i, we have 
+
+E Ui(( pi, eVi), r −i(T−i); ti) ti
+
+ ≤ 0 for all eVi ≤ Vi − δk. (S12) 
+
+Furthermore, the sequence δk → 0 as k → ∞ .
+
+See Section S5.2 for the proof and a construction of δk in terms of the test parameters. Next, we show that reporting eVi to be too large is also never strictly beneficial. In particular, any report whose declared quality lies above this neighborhood is weakly dominated by a report with a smaller declared quality. 
+
+Lemma 8. Under the conditions of Theorem 3, there exists some δk > 0 such that, for all reporting strategies r′−i of other agents, reported price pi of agent i,
+
+E
+
+h
+
+Ui(( pi, eV′
+
+> i
+
+), r −i(T−i); ti) ti
+
+i
+
+≤ E Ui(( pi, eVi), r −i(T−i); ti) ti
+
+ , (S13) 
+
+for all eV′ 
+
+> i
+
+≥ Vi + δk and some eVi < Vi + δk. Furthermore, the sequence δk → 0 as k → ∞ .
+
+6See Section S5.3 for the proof and a construction of δk in terms of the test parameters. So far, we have shown that the agent would never deviate too far from reporting the true quality for any given price. We next show that, conditional on participating, it is without loss of generality to restrict the attention to reports that use the true cost. More precisely, any participation strategy can be weakly improved by a report that keeps the cost at ci and chooses a quality within the above neighborhood of Vi.
+
+Lemma 9. Under the conditions of Theorem 3, for all reporting strategies r′−i of the other agents and any type ti = ( ci, Vi) of agent i, there exists eVi ∈ (Vi − δk, Vi + δk) such that reporting (ci, eVi) is weakly dominating for all participating agents. 
+
+See Section S5.4 for the proof. Now, fix any instance k, agent i and type ti. By Lemma 9, there exist δk and δk such that, for all reporting strategies r′−i, agent i has a weakly dominating response of the form ( ci, eVi) for some 
+
+eVi ∈ (Vi − δk, Vi + δk) or opting out. Define the restricted action set 
+
+Bi(ti) := (ci, eVi) : eVi ∈ [Vi − δk, Vi + δk] ∪ { opting out } .
+
+By construction, the set Bi(ti) is nonempty and compact for every type ti = ( ci, Vi). More-over Lemma 9 implies that, for any profile of opponents’ strategies r′−i and any action ai in the original action set, there exists some bi ∈ B i(ti) that weakly dominates ai. Hence any best response in the original game can be chosen to lie in Bi(ti). Consider now the Bayesian game in which type spaces and payoff functions are as in Mecha-nism 2, but the action correspondence of each type ti is restricted to Bi(ti). Under Assumption 1, scores and payments are bounded; the winner selection rule is discontinuous only on tie events, which occur with probability zero by Assumption 2; and the verification outcome has a continuous distribution by Assumption 3. Thus, the interim expected utility is a bounded, continuous function of the action profile. Together with the compactness of Bi(ti) and the finiteness of the participant set, this implies the existence of a mixed-strategy Bayesian Nash equilibrium by Glicksberg’s theo-rem (Glicksberg, 1952). Thus there exists a mixed-strategy equilibrium r∗ in the restricted game. Finally, we verify that r∗ is also a mixed-strategy Bayesian Nash equilibrium of the original mechanism. Suppose, by contradiction, that some agent i, type ti, and deviation ai in the original action set yield strictly higher expected utility against r∗−i than r∗ 
+
+> i
+
+(ti). By the weak-dominance property above, there exists bi ∈ B i(ti) that weakly dominates ai for this type and every profile of opponents’ strategies. Hence deviating to bi would be at least as profitable as deviating to ai in the restricted game. Therefore no profitable deviation exists and r∗ is a mixed-strategy Bayesian Nash equilibrium of Mechanism 2. 
+
+S4.4 Proof of Corollary 4 
+
+Let i1, i2 denote the agents with truthful scores str (1) and str (2) . By Theorem 3, every participating agent reports cost truthfully and reports a quality in the interval Vi ∈ [Vi − δk, Vi + δk]. Moreover, under Mechanism 2 the principal’s realized loss is 
+
+Lk =  1 + Vj∗ /eVj∗
+
+ q
+
+βks(2) , (S14) 7where j∗ is the winning agent and s(2) is the second-lowest reported score. Since both i1 and i2
+
+participate, their reported scores satisfy 
+
+cih eVih ≤ str (2) + cδ k, h = 1 , 2. (S15) Thus, the second-lowest reported score among all participants is bounded by str (2) + cδ k.Next, by Assumption 1 and Jk-truthfulness, 1 + Vj∗
+
+eVj∗
+
+≤ 1 + Vj∗ 
+
+> Vj∗
+
+− δk
+
+≤ 1 + 11 − δk/V . (S16) As a result, 
+
+Lk
+
+LFB 
+
+> k
+
+≤ 12
+
+
+
+1 + 11 − δk/V
+
+ vuut str (2) + cδ k
+
+str (1) 
+
+=
+
+vuut str (2) 
+
+str (1) 
+
++ O  δk + δk
+
+ , (S17) which gives the claimed result, where the equality follows from expanding around str (2) /s tr (1) .
+
+S4.5 Proof of Proposition 5 
+
+Fix an agent i ∈ [M ] and a type ti = ( ci, Vi). Consider instance k and the deviation ai = ( ci, eVi)with eVi = Vi + η. Under this deviation, the score of agent i is the constant cieVi. The agent wins if and only if S(k) 
+
+> −i, (1)
+
+≥ cieVi, in which case the second score in Mechanism 2 is S(k)(2) = S(k)
+
+> −i, (1)
+
+. For notational simplicity, let’s suppress for now the dependence of everything on k while keep in mind that the other agents scores are generated by a game indexed by k.As before, conditionally on winning, we have 
+
+E Ui(ci, eVi) | ti, S i = S(1) 
+
+
+
+= E
+
+"
+
+P bVi ≤ eVi Vi, n i
+
+ ·
+
+q
+
+βS (2) −√βc ieVi
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+= E
+
+"
+
+P bVi ≤ eVi Vi, n i
+
+ ·
+
+q
+
+βS −i, (1) −√βc ieVi
+
+pS−i, (1) 
+
+ti, S −i, (1) ≥ cieVi
+
+# (S18) By Assumption 3, for every ni and every η > 0, 
+
+P bVi ≤ eVi Vi, n i
+
+ ≥ 1 − ζni (η). (S19) By Lemma 10, for each instance k there exists Nk → ∞ such that ni ≥ Nk for all feasible reports (pi, eVi). Thus, given any ϵ > 0, we can choose K(ϵ, η ) large enough so that for all k ≥ K(ϵ, η ), 
+
+P bVi ≤ eVi Vi, n i
+
+ ≥ 1 − ϵ. (S20) 8Plugging (S20) back into (S18), 
+
+E Ui(pi, eVi)|ti, S i = S(1) 
+
+
+
+≥ pβE
+
+"
+
+(1 − ϵ) ·
+
+q
+
+S−i, (1) − cieVi
+
+pS−i, (1) 
+
+ti, S −i, (1) ≥ cieVi
+
+#
+
+≥ pβE
+
+" (1 − ϵ) ·  S−i, (1) − si
+
+ − ϵs i
+
+pS−i, (1) 
+
+S−i, (1) ≥ si
+
+#
+
+≥
+
+r β
+
+¯s E (1 − ϵ) ·  S−i, (1) − si
+
+ − ϵs i S−i, (1) ≥ si
+
+ −
+
+ √β
+
+√s −√β
+
+√¯s
+
+
+
+ϵs i
+
+(S21) where ¯ s and s are the upper and lower bounds of the reported scores, and we denote si := cieVi as in Assumption 4. By Assumption 4, there exists γ > 0 such that, for all sufficiently large k,
+
+E (1 − ϵ)  S−i, (1) − si
+
+ S−i, (1) ≥ si
+
+ ≥ (1 − ϵ)γ. 
+
+Since ϵ > 0 is arbitrary and si ≤ ¯s, we can choose ϵ small enough so that (1 − ϵ)γ ≥√¯s
+
+√s ϵs i,
+
+q and the interim expected utility is guaranteed to be nonnegative. Now, fix η > 0 from Assumption 4 and define η′ = η + ϵ for some arbitrary ϵ > 0. Take any type ( ci, Vi) with  
+
+> Vi
+
+≤ V − η′ = V − η − ϵ, 
+
+and consider the report eVi = V + ϵ. Then 
+
+eVi ≤ V − η, 
+
+and Assumption 4 applies. By the argument above, there exists some K1 such that the agent has a nonnegative interim expected utility for all k ≥ K1. On the other hand, Lemma 8 implies that there exists a sequence δk with δk → 0 such that, for each k, any report with (inverse) quality 
+
+eVi ≥ Vi + δk is weakly dominated by some report with eV′ 
+
+> i
+
+< Vi + δk. Thus, we can choose K2 so that for all k ≥ K2, δk < ϵ , which implies that there exists some eV′ 
+
+> i
+
+< Vi + ϵ with interim expected utility 
+
+E
+
+h
+
+Ui(ci, eV′
+
+> i
+
+) ti
+
+i
+
+≥ E Ui(ci, eVi) ti
+
+ ≥ 0. (S22) Furthermore, by Lemma 7, the interim expected utility is non-positive for all eV′′  
+
+> i
+
+≤ Vi −δk, with δk →
+
+0 as k → ∞ . Thus, there exists K3 so that for all k ≥ K3, playing eV′′  
+
+> i
+
+≤ Vi − ϵ is weakly dominated. Putting everything together, for any ϵ > 0 and all large enough instances k ≥ max ( K1, K 2, K 3), the strategy ( ci, eVi) with eVi ∈ (Vi − ϵ, Vi + ϵ) is weakly dominating. 9S4.6 Proof of Proposition 6 
+
+Recall that, conditionally on winning (i.e., Si = S(1) ), 
+
+E Ui(ci, Vi) | ti, S i = S(1) 
+
+ = E
+
+"
+
+I(bVi ≤ eVi) ·
+
+q
+
+βS (2) −√βS (1) 
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+, (S23) where we condition on the type of agent i, ti, to emphasize that they are known to the agent. For notational simplicity, we also drop the dependence of Ui on r−i(T−i) and ti as they are always fixed. By equation (9), we have the lower bound 
+
+P bVi ≤ Vi ti, S i = S(1) , n i
+
+ ≥ 1 − α − ξni . (S24) Plugging (S24) back into (S23), 
+
+E Ui(ci, Vi) | ti, S i = S(1) 
+
+ ≥ E
+
+"
+
+(1 − α − ξni ) ·
+
+q
+
+βS (2) −√βS (1) 
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+= E
+
+"
+
+(1 − α) ·
+
+q
+
+βS (2) −√βS (1) 
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+− E
+
+h
+
+ξni ·
+
+q
+
+βS (2) ti, S i = S(1) 
+
+i
+
+(S25) Suppose that 
+
+E
+
+h
+
+ξni ·
+
+q
+
+S(2) ti, S i = S(1) 
+
+i
+
+≤ E
+
+h
+
+ϵ ·
+
+q
+
+S(2) ti, S i = S(1) 
+
+i
+
+(S26) for sufficiently large instances k. Then, for all agents with types (S2), we have the lower bound (S25) ≥ E
+
+"
+
+(1 − α − ϵ)
+
+q
+
+βS (2) −√βS (1) 
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+≥ E S(1) /pS(2) ti, S i = S(1) 
+
+
+
+E p S(2) ti, S i = S(1) 
+
+ · E
+
+hq 
+
+βS (2) ti, S i = S(1) 
+
+i
+
+− E
+
+" √βS (1) 
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+= 0 ,
+
+(S27) and thus Mechanism 2 is individually rational for all such truthful types in all sufficiently large instances k.It remains to show that inequality (S26) holds. Since ξn → 0 and ϵ > 0 is fixed, there exists an integer N such that ξn ≤ ϵ for all n ≥ N . By Lemma 10, there exists a sequence Nk → ∞ such that for all k and all feasible reports in Mechanism 2, we have nk∗ ≥ Nk. Thus, there exists an integer K such that for all k ≥ K, ni,k ≥ Nk ≥ N , and hence ξni,k ≤ qϵ . Since M is finite, we can choose k0 large enough so that the preceding condition holds uniformly for all i ∈ [M ]. 
+
+# S5 Technical Details 
+
+In this section, we collect auxiliary results and proofs of lemmas, including a lower bound on the procured sample size, as well as the proofs of Lemma 7–Lemma 10. 10 S5.1 Lower Bound on Procured Sample Size 
+
+Lemma 10. Let j∗ 
+
+> k
+
+be the optimal provider in instance k, and write n∗ 
+
+> k
+
+:= nj∗ 
+
+> k
+
+for the corresponding sample size. Under Assumption 1, there exist a deterministic sequence {Nk}k≥1 with Nk → ∞ as 
+
+k → ∞ such that, for all k and all feasible report (p, eV) in Mechanism 2, 
+
+n∗ 
+
+> k
+
+≥ Nk. (S28) See Section S5.5 for the proof. 
+
+S5.2 Proof of Lemma 7 
+
+As the losing utility is always 0, it suffices to show that, conditionally on winning (i.e., Si = S(1) ), 
+
+E Ui(( pi, eVi), r −i(T−i); ti) ti, S i = S(1) 
+
+ ≤ 0 (S29) for any fixed eVi ≤ Vi − δk. For notational simplicity, we drop the dependence of Ui on r−i(T−i) and 
+
+ti as they are always fixed. Recall that conditionally on winning, 
+
+E Ui(pi, eVi)|ti, S i = S(1) 
+
+
+
+= E
+
+"
+
+I(bVi ≤ eVi) ·
+
+q
+
+βS (2) −√βc ieVi
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+= E
+
+"
+
+P bVi ≤ eVi Vi, n i
+
+ ·
+
+q
+
+βS (2) −√βc ieVi
+
+pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+,
+
+(S30) where we write ni as the sample size pruchased if i wins. By Assumption 3, for any eVi ≤ Vi − δk,
+
+P bVi ≤ eVi Vi, n i
+
+ ≤ P bVi ≤ Vi − δk Vi, n i
+
+ ≤ min {1, ζ ni (δk)} , (S31) Plugging back, 
+
+E Ui(pi, eVi)|ti, S i = S(1) 
+
+
+
+≤ E
+
+h
+
+min {1, ζ ni (δk)} · 
+
+q
+
+βS (2) ci, Vi, S i = S(1) 
+
+i
+
+− E
+
+" √βc ieVi
+
+pS(2) 
+
+ci, Vi, S i = S(1) 
+
+#
+
+≤ pβs E min {1, ζ ni (δk)} ci, Vi, S i = S(1) 
+
+ −
+
+r βs 2
+
+s ,
+
+(S32) where s = c · V and s = c · V are the upper and lower bounds of the scores by Assumption 1. Note that this conditional expected utility is non-positive if 
+
+E min {1, ζ ni (δk)} ti, S i = S(1) 
+
+ ≤ s/s. (S33) Now, set N = Nk from Lemma 10, and δk > 0 large enough so that 
+
+ζN (δk) ≤ s/s. (S34) 11 This is possible because, for each fixed n, ζn(δ) → 0 as δ → ∞ by Assumption 3. Then, by Lemma 10, 
+
+E min {1, ζ ni (δk)} ti, S i = S(1) 
+
+
+
+≤ E ζni (δk) ni ≥ N, t i, S i = S(1) 
+
+
+
+≤ s/s. 
+
+(S35) Finally, we show that δk → 0 as k → ∞ . Fix any ϵ > 0. We show that δk ≤ ϵ for sufficiently large k. By Assumption 3, we have ζn(ϵ) → 0 as n → ∞ . Thus, there exists some integer T (ϵ) such that 
+
+ζn(ϵ) ≤ s/s 
+
+for all n ≥ T (ϵ). Moreover, by Lemma 10 we have Nk → ∞ , so there exists K(ϵ) such that 
+
+Nk ≥ T (ϵ) for all k ≥ K(ϵ). For such k we obtain ζNk (ϵ) ≤ s/s . By the definition of δk in equation (S34) and using that δ 7 → ζNk (δ) is nonincreasing, it follows that δk ≤ ϵ for all k ≥ K(ϵ). 
+
+S5.3 Proof of Lemma 8 
+
+Pick an arbitrarily small ϵ > 0, and set eVi = Vi + ϵ + ( δk − ϵ)/2. We first show that, conditionally on winning (i.e., Si = S(1) ), with some δk to be chosen later, for eV′ 
+
+> i
+
+≥ Vi + δk,
+
+E
+
+h
+
+Ui(( pi, eV′
+
+> i
+
+), r −i(T−i); ti) ti, S i = S(1) 
+
+i
+
+< E Ui(( pi, eVi), r −i(T−i); ti) ti, S i = S(1) 
+
+ ,
+
+Again, for notational simplicity, we drop the dependence of Ui on r−i(T−i) and ti as they are always fixed. Consider the difference in expected utility 
+
+E
+
+h
+
+Ui(pi, eV′
+
+> i
+
+) − U i(pi, eVi)|ti, S i = S(1) 
+
+i
+
+= E
+
+P
+
+heVi ≤ bVi ≤ eV′ 
+
+> iVi
+
+, n i
+
+i
+
+·
+
+q
+
+βS (2) −√βc i
+
+eV′ 
+
+> i
+
+− eVi
+
+pS(2) 
+
+ti, S i = S(1) 
+
+
+
+≤ E
+
+"
+
+P
+
+heVi ≤ bVi ≤ eV′ 
+
+> iVi
+
+, n i
+
+i
+
+·
+
+q
+
+βS (2) −√βc i(δk − ϵ)2pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+,
+
+(S36) where we write ni as the sample size purchased if i wins. By Assumption 3, 
+
+P
+
+heVi ≤ bVi ≤ eV′ 
+
+> iVi
+
+, n i
+
+i
+
+≤ ϕni (ϵ + ( δk − ϵ)/2) · (δk − ϵ)/2, (S37) Plugging back, 
+
+E
+
+h
+
+Ui(pi, eV′
+
+> i
+
+) − U i(pi, eVi)|ti, S i = S(1) 
+
+i
+
+≤ E
+
+"
+
+ϕni (ϵ + ( δk − ϵ)/2) ·
+
+pβS (2) (δk − ϵ)2 ti, S i = S(1) 
+
+#
+
+− E
+
+" √βc i(δk − ϵ)2pS(2) 
+
+ti, S i = S(1) 
+
+#
+
+≤√βs (δk − ϵ)2 E ϕni (ϵ + ( δk − ϵ)/2) ti, S i = S(1) 
+
+ −√βc (δk − ϵ)2√s .
+
+(S38) 12 Note that this conditional expected utility is non-positive if 
+
+E ϕni (ϵ + ( δk − ϵ)/2) ti, S i = S(1) 
+
+ ≤ c/s. (S39) Set N = Nk from Lemma 10, and δk > 0 large enough so that 
+
+ϕN (ϵ + ( δk − ϵ)/2) ≤ c/s. (S40) This is possible because, for fixed n, the map u 7 → ϕn(u) is nonincreasing and ϕn(u) → 0 as u → ∞ .By Lemma 10, we have ni ≥ Nk = N , and thus ϕni (u) ≤ ϕNk (u). Therefore, 
+
+E ϕni (ϵ + ( δk − ϵ)/2) ti, S i = S(1) 
+
+
+
+≤ E ϕni (ϵ + ( δk − ϵ)/2) ni ≥ N, t i, S i = S(1) 
+
+
+
+≤ c/s. 
+
+(S41) So far, we have shown that, conditionally on winning, reporting eV′ 
+
+> i
+
+is always weakly dominated by reporting eVi. Now, consider the following two cases: 
+
+• If Si(pi, eVi) > min j̸ =i Sj (cannot win by reporting eVi), to win the agent must underreport. Thus, the agent couldn’t be better off by reporting eV′
+
+> i
+
+.
+
+• If Si(pi, eVi) ≤ min j̸ =i Sj (can win by reporting eVi), the agent may report eV′ 
+
+> i
+
+and still win the contract, but our proof above haven shown that they cannot be better off by deviating further than δk.Next, we show that δk → ϵ as k → ∞ . Fix any ϵ′ > 0. We show that δk ≤ ϵ + ϵ′ for sufficiently large k. By Assumption 3, ζn(ϵ + ϵ′/2) → 0 as n → ∞ , and as a result ϕn(ϵ + ϵ′/2) → 0 as well. Thus, there exists some integer T (ϵ′) such that 
+
+ϕn(ϵ + ϵ′/2) ≤ c/s 
+
+for all n ≥ T (ϵ′). Furthermore, by Lemma 10, there exists K(ϵ′) such that for all k ≥ K(ϵ′), 
+
+Nk ≥ T (ϵ′). For such k, combining the above two inequalities gives 
+
+ϕNk (ϵ + ϵ′/2) ≤ c/s. (S42) By the definition of δk and the fact that u 7 → ϕNk (u) is nonincreasing, we can take δk = ϵ + ϵ′ for all k ≥ K(ϵ′) that lim sup k→∞ δk ≤ ϵ. Since by construction δk ≥ ϵ, we conclude that δk → ϵ as 
+
+k → ∞ .Finally, we apply the above construction with ϵℓ := 1 /ℓ for each ℓ ≥ 1 to obtain a single sequence shrinking to zero. Let 
+
+n
+
+δ(ℓ)
+
+> k
+
+o 
+
+> k≥1
+
+denote the resulting sequence. Then, δ(ℓ) 
+
+> k
+
+→ 1/ℓ as k → ∞ . Thus, for each ℓ, there exists an integer Kℓ such that δ(ℓ) 
+
+> k
+
+≤ 2/ℓ for all k ≥ Kℓ. Now, define a new sequence 
+
+δk k≥1 by setting δk := δ(ℓ) 
+
+> k
+
+whenever Kℓ ≤ k < K ℓ+1 . For each such k, the dominance conclusion established above continues to hold since δk is taken from one of the valid fixed-ϵℓ constructions. Moreover, δk ≤ 2/ℓ on the block Kℓ ≤ k < K ℓ+1 and therefore δk → 0 as k → ∞ .13 S5.4 Proof of Lemma 9 
+
+From Lemma 7 and Lemma 8, it follows that, for all reporting strategies r′−i and reported price pi,reporting eVi ∈ (Vi − δk, Vi + δk) is weakly domonating for all agents with a non-negative expected participating utility. Below, we show that, for all reports eVi, reporting the true cost pi = ci is also weakly domonating. Accoding to the mechanism, agent i will win the contract if and only if 
+
+Si(pi, eVi) = pieVi ≤ min   
+
+> j̸=i
+
+Sj (r′ 
+
+> j
+
+(tj )) .
+
+As a result, for any fixed eVi, to win the agent must report 
+
+pi ≤ min j̸ =i Sj (r′ 
+
+> j
+
+(tj )) 
+
+eVi
+
+=: ¯ pi(eVi).
+
+From now on, we fix all other agents’ scores Sj , and show that reporting pi = ci is always weakly dominating regardless of others’ scores. Consider the following two cases: 
+
+• ci ≤ ¯pi(eVi) (can win by truthfully reporting pi = ci). Then conditionally on winning, 
+
+E Ui(pi, eVi)|ti, S −i
+
+ = E
+
+"
+
+P bVi ≤ eVi Vi, n i
+
+ ·
+
+q
+
+βS (2) −√βc ieVi
+
+pS(2) 
+
+ti, S −i
+
+#
+
+, (S43) which does not depend on pi. Now, 
+
+– If E Ui(pi, eVi)|ti, S −i
+
+ < 0, no best response can have positive winning probability: such a report is strictly dominated by setting pi large enough to never win, which yields utility 0 instead of a negative payoff. 
+
+– If E Ui(pi, eVi)|ti, S −i
+
+ ≥ 0, then bidding pi ≤ ¯pi(eVi) gives the same non-negative utility, whereas any bid with pi ≥ ¯pi(eVi) never wins and hence yields utility 0. Therefore any bid with pi ≤ ¯pi(eVi) is optimal, including truthfully bidding pi = ci ≤ ¯pi(eVi). 
+
+• ci ≥ ¯pi(eVi) (cannot win by truthfully reporting pi = ci). To win the agent must underreport 
+
+pi < ¯pi(eVi). However, if i were to win, the expected utility from winning the contract 
+
+E Ui(pi, eVi)|ti, S −i
+
+
+
+≤ E
+
+"
+
+P bVi ≤ eVi Vi, n i
+
+ ·√βeVi
+
+pS(2) 
+
+ ¯pi(eVi) − ci
+
+ ti, S −i
+
+#
+
+≤ 0,
+
+(S44) and thus winning is no better than losing. Therefore, any bid with pi ≥ ¯pi(eVi) is optimal, including truthfully bidding pi = ci ≥ ¯pi(eVi). Combining the two cases, we see that for any fixed eVi in ( Vi − δk, Vi + δk) and any realized profile 
+
+S−i of opponents’ scores, agent i has a best response in pi that is either (i) a bid that never wins (yielding utility 0, which is weakly dominated by opting out), or (ii) a winning bid pi ≤ ¯pi(eVi), among which the truthful bid pi = ci is always a best response whenever winning is part of a best response. Hence for participating agents, reporting ( ci, eVi) with some eVi ∈ (Vi −δk, Vi +δk) is weakly dominating for all participating agents. 14 S5.5 Proof of Lemma 10 
+
+By Assumption 1, there exist constants 0 < c ≤ ¯c < ∞ and 0 < V ≤ V < ∞ such that every feasible report satisfies p ∈ [c, ¯c] and eV ∈ [V, V]. Thus, each score Si = pieVi lies in the interval [ s, ¯s], where 
+
+s := cV > 0 and ¯ s := ¯ cV < ∞. In particular, for any report profile we have S(2) ≤ ¯s and, for the winning seller j∗, eVj∗ ≥ V.Under Mechanism 2 the procured sample size for instance k is 
+
+n∗ =
+
+√βVj∗
+
+pS(2) 
+
+≥√βV
+
+√¯s =: Nk. (S45) This inequality holds for every k and every feasible report profile. Since βk → ∞ and the constants  
+
+> V
+
+and ¯ s do not depend on k, we have Nk → ∞ as k → ∞ .15

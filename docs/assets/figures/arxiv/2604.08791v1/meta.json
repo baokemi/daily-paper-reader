@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08791v1/fig-001.webp",
+      "caption": "Figure 1: eBandit evaluation. (A) Adversarial three-phase bandwidth trace (jitter → cliff → rocket). (B) Cumulative QoE on the adversarial trace, averaged over 10 seeds; shaded bands are±1𝜎 . (C)MeanQoE per chunk on 42 NorwayHSDPA sessions (±SEM); eBandit (warm) achieves the highest score.",
+      "page": 2,
+      "index": 1,
+      "width": 495,
+      "height": 285
+    }
+  ]
+}

@@ -1,0 +1,335 @@
+Title: Prototype-Regularized Federated Learning for Cross-Domain Aspect Sentiment Triplet Extraction
+
+URL Source: https://arxiv.org/pdf/2604.09123v1
+
+Published Time: Mon, 13 Apr 2026 01:07:39 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# Prototype-Regularized Federated Learning for Cross-Domain Aspect Sentiment Triplet Extraction 
+
+## Zongming Cai 1 Jianhang Tang 1 Zhenyong Zhang 2
+
+## Jinghui Qin 3 Kebing Jin 1∗ Hankz Hankui Zhuo 41State Key Laboratory of Public Big Data, Guizhou University 
+
+> 2
+
+## College of Computer Science and Technology, Guizhou University 
+
+> 3
+
+## School of Information Engineering, Guangdong University of Technology 
+
+> 4
+
+## School of Artificial Intelligence, Nanjing University Abstract 
+
+Aspect Sentiment Triplet Extraction (ASTE) aims to extract all sentiment triplets of aspect terms, opinion terms, and sentiment polarities from a sentence. Existing methods are typically trained on individual datasets in isolation, failing to jointly capture the common feature representations shared across domains. Moreover, data privacy constraints pre-vent centralized data aggregation. To address these challenges, we propose Prototype-based Cross-Domain Span Prototype extraction (PCD-SpanProto ), a prototype-regularized federated learning framework to enable distributed clients to exchange class-level prototypes instead of full model parameters. Specifically, we design a weighted performance-aware aggregation strategy and a contrastive regularization module to improve the global prototype under domain heterogeneity and the promotion between intra-class compactness and inter-class separability across clients. Extensive experiments on four ASTE datasets demonstrate that our method outperforms baselines and reduces communication costs, validating the effec-tiveness of prototype-based cross-domain knowledge transfer. 
+
+## 1 Introduction 
+
+Aspect Sentiment Triplet Extraction (ASTE) is a subtask of aspect-based sentiment analysis (ABSA) (Zhang et al., 2022), aiming to extract sentiment triplets (i.e., aspect term, opinion term, sentiment polarity) from a sentence (Peng et al., 2020). By jointly capturing what is being eval-uated, how it is described, and the underlying sentiment, ASTE provides more opinion informa-tion than earlier subtasks such as aspect-level sen-timent classification. Driven by the success of 
+
+> ∗
+> Corresponding author: kbjin@gzu.edu.cn
+
+pre-trained language models and span-based ar-chitectures, recent methods have achieved remark-able success on standard benchmarks (Liang et al., 2023; Xu et al., 2021; Nuo and Guo, 2024). However, existing models are trained and evaluated on individual datasets, thereby ne-glecting the latent common features and trans-ferable knowledge shared across different do-mains. In practice, different domains exhibit over-lapping sentiment expression patterns. However, models optimized on a single domain are unable to adapt to unseen domains, as single-domain models suffer substantial performance deterioration when evaluated on out-of-domain data (Xu et al., 2023). An intuitive approach is to merge data across do-mains for joint training. However, raw data merg-ing can introduce cross-domain noise that disrupts domain-specific pattern learning, making mod-els that underperform single-domain-based ap-proaches (Wang et al., 2024). Moreover, in realis-tic scenarios, centralized aggregation through data collection is often impractical due to privacy con-straints and organizational boundaries. To overcome those challenges of domain het-erogeneity and data privacy, one way is to intro-duce a framework to share cross-domain knowl-edge, which neither merges raw data nor directly exposes private local data, e.g., Federated learn-ing (FL) (McMahan et al., 2017; Rahman, 2025). It enables collaborative model training across dis-tributed clients while preserving data privacy, where clients upload locally trained model pa-rameters or locally computed gradients (Hu et al., 2024; Lu et al., 2025) obtained from local train-ing to the server to achieve aggregation and up-date the global model. However, conventional fed-erated learning approaches that directly aggregate full model parameters face critical challenges in the context of ASTE. Firstly, transmitting the full set of model parameters per round incurs substan-tial communication cost, especially in the LLM-
+
+> arXiv:2604.09123v1 [cs.CL] 10 Apr 2026
+
+based natural language tasks. Secondly, the non-independent and identically distributed (non-IID) data across clients, where each domain exhibits distinct sentiment expressions client drift during local training, leading to aggregated models that converge slowly or fail to generalize across do-mains (Lu et al., 2024). Thirdly, conventional FL typically produces a unified global model shared by all clients, which is insufficient for capturing domain-specific characteristics and therefore can-not provide personalized adaptation for heteroge-neous client domains. At last, directly averag-ing heterogeneous model parameters across do-mains may blur domain-specific representations rather than facilitate effective knowledge trans-fer (Huang et al., 2023). Considering the non-IID challenge caused by heterogeneous domain distributions, personalized federated learning (pFL) has been introduced to preserve client-specific modeling ability while still benefiting from collaborative training (Lu et al., 2024). In particular, prototype-based federated learning has emerged as a promising solution, since it reduces communication overhead and al-leviates heterogeneity through compact class-level representation sharing (Tan et al., 2022; Wu et al., 2024; Yin et al., 2025). However, existing pFL methods are largely designed for classification problems, where each instance is mapped to a sin-gle categorical label. This assumption does not hold for ASTE tasks, requiring structured span-level prediction over aspect terms, opinion terms, and their sentiment relations. Specifically, ASTE involves jointly identifying multiple spans, deter-mining their boundaries, and modeling the rela-tions among them to form sentiment triplets. As a result, key components in existing classification-oriented pFL frameworks, including prototype de-sign, local training objectives, and global aggre-gation strategies, cannot be directly applied to ASTE. Although FL has recently been explored for several ABSA-related tasks, e.g., aspect cate-gory sentiment analysis (Ahmad et al., 2024) and document-level sentiment classification (Ayman et al., 2026), these methods fundamentally focus on classification tasks and thus are inadequate for the structured extraction of ASTE. Therefore, we propose PCD-SpanProto 
+
+(Prototype-based Cross-Domain Span Proto type extraction), a prototype-regularized federated learning framework for cross-domain ASTE. Our framework builds on the STAGE span-level tagging model (Liang et al., 2023) and introduces a prototype-based contrastive module that enables clients to exchange semantic knowledge across domains through prototype representations. Specifically, each client constructs local class-level prototypes from its span representations and uploads them to a central server, which aggregates them using performance-aware weights derived from clients’ validation F1 scores. The aggregated global prototypes are then broadcast back to clients to regularize local training via contrastive alignment and separation losses, promoting intra-class compactness and inter-class separability across domains. Our main contributions are as follows: • We identify the limitations of existing ASTE models that train on individual datasets in isolation, and propose a federated learning framework that enables cross-domain knowl-edge sharing without centralizing raw data. • We introduce a prototype-based contrastive regularization strategy for the prediction of sentiment triplets, allowing clients to ex-change class-level prototypes instead of full model parameters. • Extensive experiments on four benchmark datasets demonstrate that our method con-sistently outperforms baselines, while the prototype-based communication component substantially reduces transmission cost. 
+
+## 2 Related Work 
+
+2.1 Aspect-Based Sentiment Analysis (ABSA) 
+
+Early approaches to Aspect Sentiment Triplet Extraction (ASTE) primarily adopted a pipeline framework. For example, Peng et al. (Peng et al., 2020) proposed a two-stage method utiliz-ing LSTMs to encode context and extract aspect and opinion terms independently, followed by a triplet pairing step. Subsequent studies improved feature representation by incorporating pre-trained language models (e.g., BERT (Li et al., 2023b)and T5 (Gao et al., 2022)) to capture contextual seman-tics and Graph Neural Networks (GNNs) (Chen et al., 2021b) to encode syntactic dependencies. However, these pipeline-based methods inevitably suffer from error propagation, thereby limiting overall performance. Figure 1: Overview of the Prototype-Regularized Federated Learning Framework for Cross-Domain ASTE. 
+
+To address this limitation, recent research has focused on end-to-end solutions. The table-filling paradigm (Wu et al., 2020), which formulates ASTE as a 2D grid tagging problem, has emerged as a prominent direction. Furthermore, acknowl-edging that aspect and opinion expressions often comprise multi-word phrases, researchers intro-duced span-based representation methods (Chen et al., 2022b) (Jin et al., 2024). By constructing span-level features rather than relying on single-token representations, they enable more precise modeling of entity boundaries (Li et al., 2024). To further capture complex dependencies between spans, recent works integrate GNNs (Chen et al., 2022a) or biaffine attention mechanisms (Nuo and Guo, 2024). However, those models are trained on individual datasets, thereby neglecting the la-tent common features and transferable knowledge shared across different datasets. 
+
+2.2 Personalized Federated Learning (pFL) 
+
+Federated learning (FL) (McMahan et al., 2017)enables collaborative model training across distributed clients while preserving data privacy. However, it suffers from severe statistical het-erogeneity across different clients. Personalized federated learning (pFL) addresses this issue by learning client-specific models instead of a sin-gle global model. Existing pFL methods mainly include model mixing (Hanzely and Richtárik, 2020) (Deng et al., 2020), regularization or multi-task learning (Smith et al., 2017) (Li et al., 2021), meta-learning (Fallah et al., 2020), and parame-ter decoupling (Arivazhagan et al., 2019). These methods have achieved remarkable performance. However, many of them rely on heuristic de-signs or incur extra communication and compu-tation costs. Recently, prototype-based pFL meth-ods have explored sharing class-level representa-tions rather than model parameters. FedProto (Tan et al., 2022) aggregates class-wise feature pro-totypes to guide local training. However, most existing prototype-based methods (Zhang et al., 2023) (Issaid et al., 2025) are designed for stan-dard classification tasks. They cannot be directly applied to structured prediction problems. 
+
+## 3 The Proposed PCD-SpanProto 
+
+The input of the model is a sentence X =[x1, x 2, . . . , x n], where xi denotes the i-th word in the sentence and n is the sentence length. The objective of the Aspect Sentiment Triplet Ex-traction (ASTE) task is to extract N sentiment triplets (aspect, opinion, sentiment), i.e., T =
+
+{(ak, o k, s k)}Nk=1 , from X. The sentiment triplet consists of an aspect term ak, its correspond-ing opinion term ok, and a sentiment label sk ∈{POS , NEU , NEG } indicating the sentiment po-larity expressed by the opinion toward the aspect, where POS , NEU , and NEG respectively denote positive, neutral, and negative sentiment. As illustrated in Figure 1, we present PCD-SpanProto , a prototype-regularized federated learning framework for cross-domain aspect sen-timent triplets extraction, which consists of two components: a client-side local training module and a server-side prototype aggregation module. 
+
+Client-side local training module serves to extract information while preserving the privacy of client data, providing local knowledge to the global prototypes and cross-client knowledge inte-gration. On each client, we adopt a STAGE-based ASTE model to encode local sentences and learn span-level representations, producing the primary task loss to guide the model to learn span-level representations. Additionally, we incorporate aprototype-based contrastive module that aligns local class-wise prototypes with global prototypes from the server. The generated prototype loss encourages consistency between local and global representations, promoting intra-class compact-ness and inter-class separability across clients. We jointly optimize them during local training, after which the updated local prototypes are uploaded to the server for global prototype aggregation. 
+
+Server-side prototype aggregation module: 
+
+This module integrates knowledge from all clients to guide local training. After each client completes local training, it uploads its class-level prototypes to the server. The server then aggregates these prototypes using F1-based weights derived from clients’ local validation performance, constructing global prototypes. Then the server broadcasts the aggregated global prototypes to all clients for the next round of federated optimization. 
+
+3.1 Sentence Encoding and Span Representation 
+
+At the beginning of local training, we encode the input sentences to obtain span-level features, used both for predicting local sentiment triplets and for constructing prototypes within the feder-ated framework. To capture aspect terms, opinion terms, and sentiment relations, each input sentence 
+
+X = [ x1, x 2, . . . , x n] is first encoded using the BERT encoder to obtain contextualized token rep-resentations, then used to construct span-level rep-resentations. The encoded token representations are denoted as H = [ h1, h 2, . . . , h m], where hi ∈
+
+Rd denotes the contextual embedding of the i-th token and m represents the length of the tokenized sequence produced by BERT. However, the BERT tokenizer may split a single word into multiple subwords, leading to semantic integrity breaking and fragmented representations. Therefore, we re-construct word-level representations by averaging the embeddings of its corresponding subwords to better capture the complete meaning of each word. Specifically, if a word xi is tokenized into a set of subwords {hk, h k+1 , . . . , h k+t}, its word-level representation ˜hi is computed as: 
+
+˜hi = 1
+
+t + 1 
+
+> k+t
+
+X
+
+> j=k
+
+hj (1) After this reconstruction step, we obtain the sequence of word-level representations: ˜H =[˜h1, ˜h2, . . . , ˜hn]. Then, we adopt a span-based rep-resentation strategy to capture multi-word aspects and opinion expressions. For a candidate span si,j 
+
+consisting of tokens from positions i to j, we com-pute its representation using an attention-based ag-gregation mechanism. First, an attention score is assigned to each token within the span: 
+
+αk = exp( Wa˜hk)
+
+Pjt=i exp( Wa˜ht) (2) where Wa is a trainable parameter. The span rep-resentation si,j is obtained as a weighted combi-nation of the token embeddings: 
+
+si,j =
+
+> j
+
+X
+
+> k=i
+
+αk ˜hk (3) To improve computational efficiency, we apply a linear projection layer to map the span represen-tation si,j into a lower-dimensional space. This results in the final span representation zi,j , as de-fined in Eq (4), where Ws and bs are trainable pa-rameters. And zi,j will be used for the prediction of sentiment triplets and the subsequent prototype construction and regularization process. 
+
+zi,j = Wssi,j + bs (4) 
+
+3.2 Prototype Construction and Contrastive Regularization 
+
+Although federated learning provides an effective solution for enabling knowledge sharing across multiple datasets, directly sharing full model pa-rameters is limited to the large model size and po-tential privacy risks (Huang et al., 2023). There-fore, we introduce a prototype-based representa-tion learning mechanism that allows clients to ex-change class-level prototypes instead of full model weights, reducing the communication overhead while preserving the cross-domain semantic infor-mation accuracy for effective ASTE. Concretely, each prototype class corresponds to a tag (ta, t o, t s) indicating whether it is an aspect term, an opinion term, and the sentiment polar-ity. We assign each span representation zi,j ob-tained from Eq (4) to its corresponding prototype class based on the predicted tag. For example, 
+
+(N, O, POS ) denotes a span that serves as an opin-ion term in a positive aspect–opinion pair. 
+
+Span Tagging Scheme To define these spans, given an input sentence X = [ x1, x 2, ..., x n], we enumerate candidate spans SP i,j where 1 ≤ i ≤
+
+j ≤ n. Each SP i,j represents a contiguous seg-ment of the sentence and serves as a potential as-pect, opinion, or sentiment span. Formally, the candidate span set is SP =
+
+{SP i,j | 1 ≤ i ≤ j ≤ n}. Each span is then assigned a three-dimensional tag represent-ing its roles in the ASTE task. Specifically, each span is labeled with a composite tag (ta, t o, t s)
+
+where ta ∈ {A, N }, to ∈ {O, N }, and ts ∈{POS , NEG , NEU , N }. ta indicates whether the span is an aspect term. to indicates whether the span is an opinion term. ts represents the senti-ment polarity of the span. The meanings of the span-level tags are summarized in Table 1. 
+
+Label Meaning 
+
+A-O-S span contains both an aspect and an opinion term, expressing a sentiment N-O-S span contains an opinion term, ex-pressing a sentiment A-N-S span contains an aspect term, express-ing a sentiment N-N-S span expresses a sentiment without containing aspect or opinion terms N-N-N span has no semantic role and carries no sentiment      
+
+> Table 1: Prototype labels derived from the three-dimensional span tagging scheme, where ts̸=Nin-dicates the span expresses a sentiment.
+
+Figure 2 illustrates the span tagging process with a concrete example. For example, given a sentence “I especially like the backlit keyboard.”, all candidate spans are enumerated and organized as an upper triangular span matrix. Each span is then classified into its corresponding tag. For in-stance, the span “backlit keyboard” is predicted as A-N -N , indicating it functions as an aspect term, while “like the backlit keyboard” is labeled as N -N -P OS , representing a span expressing a positive sentiment toward the aspect. 
+
+> Figure 2: Illustration of the span tagging process.
+
+Local Prototype Construction Based on the span-level tags defined above, we construct lo-cal prototypes to summarize the representations of spans in each semantic category. Let C denote the set of all composite span tags (ta, t o, t s) from the span tagging scheme. Each c ∈ C corresponds to a specific aspect, opinion, or sentiment polarity. Given the span representations zi,j computed in Eq (4), we apply a classification layer to predict the probability of each tag for the span: 
+
+p(y|zi,j ) = Softmax (Wz zi,j + b) (5) where Wz denotes the classification parameters and y represents one of the tag categories. For each category c, we collect all span representations which belong to that class and then compute the local prototype by averaging them: 
+
+ˆpc = 1
+
+|Sc|
+
+X
+
+> z∈Sc
+
+z (6) where Sc denotes the set of spans assigned to cate-gory c. After computing the local span prototypes 
+
+ˆpc, we update the prototype representations to en-hance training robustness. However, directly using the current batch prototypes may lead to noisy or inaccurate prototype representations due to small batch sizes or feature variations. Therefore, we adopt a momentum-based update, which smooths the prototype over successive training steps, using the following rule: 
+
+p(t) 
+
+> c
+
+= βp (t−1)  
+
+> c
+
++ (1 − β)ˆ pc (7) where β is the momentum coefficient and t de-notes the current training round. 
+
+3.3 Performance-Aware Prototype Aggregation 
+
+After each federated round, the server aggregates the local prototypes uploaded by all clients to up-date the global prototypes. A simple choice is to aggregate the prototypes with equal weights across clients. However, under domain heterogeneity, clients with weaker local performance may upload less reliable prototypes, and assigning them equal weight risks polluting the global prototype with noisy or poorly representations. To address this, the server collects the validation F1 scores from participating clients and adopts a performance-aware weighting strategy that assigns higher ag-gregation weights to clients with stronger local performance, reflecting their relative reliability. Let Fk denote the validation F1 score of client k.The aggregation weight is defined as: 
+
+wk = Fk
+
+PKi=1 Fi
+
+(8) Using these weights, the server aggregates the uploaded local prototypes to obtain a weighted global prototype for each category. Let Pk,c de-note the prototype of category c uploaded from client k. The global prototype is computed as: 
+
+P global c =
+
+> K
+
+X
+
+> k=1
+
+wkPk,c (9) 
+
+3.4 Loss Computation 
+
+To jointly optimize the span tagging task and prototype-based representation learning, we de-fine a unified training objective that integrates the primary STAGE loss with a prototype-based con-trastive regularization term. Building upon the span-level predictions and the constructed proto-types described above, the overall objective for each client is defined as the combination of the primary STAGE loss and the prototype-based con-trastive regularization term: 
+
+L = Lstage + λL proto (10) where λ is a balancing coefficient that scales the prototype regularization term. 
+
+Primary STAGE Loss Given span representa-tions zi,j , the model predicts the tag distribution via a softmax classifier and optimizes the corre-sponding cross-entropy loss, denoted as Lstage .
+
+Lstage = − 1
+
+|SP |
+
+X
+
+> (i,j )∈SP
+
+X
+
+> c∈C
+
+yi,j,c log p(y=c | zi,j )
+
+(11) where SP denotes the set of all candidate spans in the sentence, C is the set of composite span tags, 
+
+yi,j,c is the ground-truth indicator for class c, and 
+
+p(y = c | zi,j ) represents the predicted probability of assigning tag c to span (i, j ).
+
+Prototype Contrastive Loss Let Pc denote the global prototype of class c ∈ C broadcast by the server. For each span representation z with la-bel y, we encourage intra-class alignment with 
+
+Py and inter-class separation from prototypes of other classes. Concretely, we define: 
+
+Lproto = αL align + βL sep (12) where α and β are balancing coefficients. The alignment loss encourages span representations to be close to the prototype of the category: 
+
+Lalign = − cos( z, P y) (13) where z denotes the span representation and Py
+
+represents the prototype of the ground-truth class. The separation loss pushes the span representa-tion away from prototypes of other classes: 
+
+Lsep = log X
+
+> c∈C , c ̸=y
+
+exp(cos( z, P c)) (14) 
+
+3.5 Triplet Decoding 
+
+Based on the predicted tags, we construct three span sets: the set of aspect spans A = {SP i,j |
+
+ti,j a = A}, the set of opinion spans O = {SP i,j |
+
+ti,j o = O}, and the set of sentiment spans D =
+
+{(SP i,j , s ) | ti,j s = s, s ∈ { POS, NEG, NEU }} ,where i and j denote the start and end token posi-tions of a span, respectively. For each sentiment span (SP i,j , s ) ∈ D , we col-lect all candidate aspect spans CA = {SP i′,j ′ ∈A | i ≤ i′ ≤ j′ ≤ j} and opinion spans 
+
+CO = {SP i′,j ′ ∈ O | i ≤ i′ ≤ j′ ≤ j} whose boundaries fall within [i, j ]. Here, CA and CO de-note the sets of candidate aspect and opinion spans that are fully contained within the sentiment span 
+
+(i, j ), where (i′, j ′) represents the start and end positions of a candidate span. Specifically, if both sets are non-empty, we form a triplet by select-ing the aspect span with the largest right bound-ary j′ and the opinion span with the smallest left boundary i′, together with the sentiment polarity s.When the opinion span precedes the aspect span, the same procedure is applied symmetrically by exchanging the roles of CA and CO.4 Experiments 
+
+4.1 Experimental Setup Datasets We conduct experiments on the ASTE-Data-V2 benchmark datasets (Xu et al., 2020), consisting of one laptop-domain dataset (14Lap) and three restaurant-domain datasets (14Res, 15Res, and 16Res) derived from the SemEval Challenges. Since our method jointly trains on all four datasets on different clients, the original test instances may appear in the other training or val-idation datasets. To prevent data leakage, we re-move all training or validation instances that over-lap with the test datasets. Table 2 reports the dataset statistics before and after deduplication.                                
+
+> Dataset Before After Train Val Test Train Val Test
+> 14Lap 906 219 328 906 219 328 14Res 1266 310 492 1265 310 492 15Res 605 148 322 605 147 322 16Res 857 210 326 599 145 326
+> Table 2: Statistics before and after deduplication.
+
+Implemention Details We implement our method across four datasets (14Lap, 14Res, 15Res, 16Res), each assigned to a distinct client. The STAGE model uses an uncased BERT-base encoder with a hidden dimension 768, producing logits for aspect, opinion, and sentiment spans. A prototype module is added with alignment loss weight 0.002, separation loss weight 0.00025, and EMA momentum 0.9. Training is conducted for 5 local epochs per client per federated round, with 50 rounds in total, and an AdamW optimizer with learning rates 2e-5 for BERT and 1e-3 for the classifier on a GPU (RTX 4090). 
+
+Baseline We evaluate the performance of PCD-SpanProto by comparing it against a set of base-lines commonly used in ASTE and span-based extraction tasks, which can be broadly divided into two categories. The first category is pipeline methods, including Peng-two-stage (Peng et al., 2020), BMRC (Chen et al., 2021a), and ASTE-RL (Yu Bai Jian et al., 2021), which extract aspects and opinions in separate stages. The second cate-gory is end-to-end methods, including GTS-BERT (Wu et al., 2020), Span-ASTE (Xu et al., 2021), EMC-GCN (Chen et al., 2022a), STAGE (Liang et al., 2023), DRN (Xia et al., 2024), ESSDB-GCN (Yang et al., 2024), MGEGCN (Tang et al., 2025), MEGCN (Xu et al., 2025), S&T (Nuo and Guo, 2024), SE-TRDF (Liu et al., 2025), and Sim-STAR (Li et al., 2023a), which jointly predict sen-timent triplets in a single framework. 
+
+Evaluation Protocol We evaluate triplet-level Precision, Recall, and F1-score as the evaluation metrics. In addition, we conduct four additional analyses to evaluate our framework: 1. Communication efficiency: We analyze the reduction in transmitted parameters achieved by our prototype-based approach relative to conven-tional federated learning. 2. Training strategy: We compare the feder-ated learning against raw data merging and single-domain training to validate the advantage of cross-domain knowledge sharing. 3. Aggregation strategy: We then compare our performance-aware F1-weighted aggregation against uniform aggregation to validate the adap-tive client weighting under domain heterogeneity. 4. Knowledge transferring : We evaluate the prototype representation effectiveness from cross-client prototype similarity, convergence behavior across federated rounds, and prototype represen-tation quality via t-SNE visualization. 
+
+4.2 Experimental Results 
+
+Table 3 presents the performance of our proposed method compared with several baselines on the four ASTE datasets (14Lap, 14Res, 15Res, and 16Res), measured in terms of Precision, Recall, and F1-score. Our method achieves the high-est F1-scores across most datasets, demonstrating the effectiveness of incorporating prototype-based cross-domain knowledge into span-level ASTE. Compared with the STAGE baseline, our model produces consistent improvements across all four datasets, confirming that federated prototype reg-ularization provides complementary supervision beyond what single-domain training can offer. Our approach further benefits from cross-domain prototype alignment, enabling more generalizable span representations without relying on explicit syntactic features. Moreover, the balanced gains in both precision and recall suggest that prototype regularization improves not only the identification of valid triplet candidates but also the suppres-sion of incorrect ones. These results suggest that the proposed framework can effectively leverage cross-domain prototypes and span-level represen-tations to improve ASTE performance. Model 14Lap 14Res 15Res 16Res                                                                                                                                                                                                    
+
+> PRF1PRF1PRF1PRF1
+> Peng-two-stage †37.38 50.38 42.87 43.24 63.66 51.46 48.07 57.51 52.32 46.96 54.21 50.41 GTS-BERT †58.62 52.35 55.29 68.14 68.77 68.45 62.37 59.71 60.98 66.16 68.81 67.44 BMRC †70.55 48.98 57.82 75.61 61.77 67.99 68.51 53.40 60.02 71.20 61.08 65.75 ASTE-RL †64.80 54.99 59.50 70.60 68.65 69.71 65.45 60.29 62.72 67.21 69.69 68.41 Span-ASTE †62.74 56.75 59.58 74.17 68.27 71.00 64.15 62.10 63.05 69.31 71.32 70.29 EMC-GCN †59.61 56.30 57.90 70.37 72.84 71.58 60.45 62.72 61.55 63.43 72.63 67.69 STAGE †71.98 55.86 61.58 78.58 69.58 73.76 73.63 57.90 64.79 76.67 70.12 73.24 ESSDB-GCN ⋄71.76 55.13 62.38 79.69 68.93 73.99 72.57 57.69 64.36 74.43 67.21 70.63 SimSTAR ⋄66.46 58.23 62.07 76.23 71.63 73.86 71.71 59.59 65.09 72.02 74.12 73.06 SE-TRDF ⋄66.89 48.89 56.49 73.03 65.84 69.24 69.47 54.43 61.04 73.02 64.78 68.65 S&T ⋄70.26 56.86 62.74 76.85 72.19 74.44 71.91 61.48 66.26 76.72 70.50 73.47 DRN ⋄66.99 52.61 58.94 75.24 64.49 69.45 68.61 55.47 61.34 73.30 64.42 68.57 MEGCN ⋄68.83 57.26 62.51 76.01 72.98 74.45 69.64 65.44 67.40 73.18 72.49 72.81 MGEGCN ⋄66.04 58.60 62.10 76.14 73.29 74.69 71.49 65.15 68.18 72.74 75.29 74.00 Ours 72.32 55.64 63.66 79.65 73.36 75.49 74.49 65.01 69.24 77.81 75.32 74.13
+> ∆STAGE 2.08 ↑1.73 ↑4.45 ↑0.89 ↑
+
+Table 3: Performance comparison of different models on ASTE datasets. P , R, and F1 denote Precision, Recall, and F1-score. The second best F1 results are underlined. The symbol “ †” indicates results retrieved from (Liang et al., 2023).The symbol “ ⋄ ” indicates results retrieved from their respective original papers. 
+
+4.3 Communication Efficiency of Prototype-Based Federated Learning 
+
+Conventional federated learning requires trans-mitting the full model parameters at each round, which in our case amounts to over 110M param-eters composing the BERT encoder and all classi-fication layers. In contrast, our prototype-based approach requires each client to upload only a set of class-level prototypes, reducing the trans-mitted parameters to 3,200 per round. As shown in Table 4, the prototypes are comparable in size to the STAGE classifier alone (3,216 parameters), but carry semantic information from the differ-ent domains that classifier weights cannot provide. This drastic reduction in communication overhead makes our federated framework significantly more practical for real-world deployment, where band-width and privacy constraints are critical concerns, while still preserving the span-level representa-tions for cross-domain ASTE. 
+
+Type Number of Parameters 
+
+Full STAGE Model 110,298,760 STAGE Classifier 3,216 Prototypes 3,200 
+
+Table 4: Comparison of parameter counts for different components and prototype-based communication. 
+
+4.4 Cross-Domain Training Strategy Comparison 
+
+To evaluate the benefits of cross-domain training, we conduct three experiments: 1. Merged single-model training: All four datasets are combined, and a single Base STAGE model is trained on the merged data, then evalu-ated on each dataset individually. 2. Single-domain base models: Four inde-pendent Base STAGE models are trained on each dataset separately. Each model is then evaluated on all four datasets to assess its cross-domain gen-eralization capability. 3. Federated cross-domain training: The four datasets are treated as distinct clients. Each client trains a local model with prototype-based regular-ization and is evaluated on all four datasets. Table 5 presents the triplet-level F1 scores across all three training strategies. The results show that: Firstly, raw data merging degrades performance. The Merged Single-Model un-derperforms the in-domain Base STAGE models across all datasets, confirming that directly com-bining heterogeneous datasets introduces cross-domain noise that disrupts domain-specific pat-tern learning. Secondly, Single-domain models suffer from severe cross-domain degradation. 
+
+Each Base STAGE model performs well on its own domain but degrades drastically when eval-uated on others, revealing that models trained in Method 14Lap 14Res 15Res 16Res Merged Single-Model 61.42 72.05 61.35 72.23 Base STAGE (14Lap) 61.58 52.49 40.05 49.25 Base STAGE (14Res) 40.10 73.76 58.58 64.62 Base STAGE (15Res) 30.85 65.91 64.79 69.75 Base STAGE (16Res) 32.98 65.26 62.85 73.24                 
+
+> Federated Client (14Lap) 63.66 54.33 56.96 66.24 Federated Client (14Res) 42.66 75.49 59.45 66.26 Federated Client (15Res) 40.80 67.34 69.24 72.29 Federated Client (16Res) 42.86 67.13 68.67 74.13
+
+Table 5: Cross-domain evaluation results (triplet-level F1 scores). Bold values indicate in-domain perfor-mance for each model. 
+
+isolation learn domain-specific features that fail to transfer across domain boundaries. At last, 
+
+federated learning improves both in-domain and cross-domain performance. Each client not only outperforms its Base STAGE counter-part on its own dataset, but also achieves sub-stantial cross-domain gains compared to the cor-responding single-domain model. This indicates that prototype-based FL enables effective cross-domain knowledge transfer, allowing each client to generalize beyond its local data distribution while maintaining in-domain specialization. 
+
+4.5 Effect of Performance-Aware Prototype Aggregation Aggregation 14Lap 14Res 15Res 16Res 
+
+Uniform 61.89 75.12 68.71 73.84 F1-weighted 63.66 75.49 69.24 74.13 
+
+Table 6: Ablation study on prototype aggregation strat-egy (F1 scores). 
+
+To validate the performance-aware aggregation strategy, we compare it against uniform aggre-gation, where the global prototype is computed as the simple average of all client prototypes, i.e., wk = 1 
+
+> K
+
+for all k. As shown in Table 6, F1-weighted aggregation consistently outperforms uniform aggregation across all four datasets. The performance disparity is most evident on 14Lap, which exhibits the lowest cross-domain prototype similarity with the restaurant clients, as illustrated in Figure 3. Under uniform aggregation, proto-types from incompatible semantic subspaces are assigned equal influence over the global proto-type, introducing noise that disrupts local repre-sentations. In contrast, the performance-aware weighting mechanism moderates the contribution of less compatible clients, preserving the integrity of cross-domain knowledge transfer. These re-sults confirm that adaptive weighting based on lo-cal validation performance is effective for proto-type aggregation under domain heterogeneity. 
+
+4.6 Effectiveness of Prototype-Based Cross-Domain Knowledge Transferring 
+
+To further investigate how prototype-based feder-ated learning facilitates cross-domain knowledge transfer, we analyze the problem from three per-spectives: the pairwise similarity between client prototypes, the convergence behavior across fed-erated rounds, and the geometric structure of pro-totype representations via t-SNE visualization. All prototype visualizations in the following experi-ments are based on the global prototypes obtained at the final federated round. 
+
+4.6.1 Cross-Client Prototype Similarity 
+
+Figure 3: Cross-Domain prototype similarity among federated clients on four ASTE benchmarks 
+
+Figure 3 presents the pairwise cosine similar-ity between the aggregated prototypes of all four clients. We observe a domain-driven similar-ity pattern. This asymmetric distribution vali-dates an assumption of our framework: intra-domain clients converge toward compatible pro-totype spaces, enabling more effective knowledge transfer through global aggregation, while inter-domain clients preserve domain-specific represen-tations that maintain local specialization. 
+
+4.6.2 Convergence of Federated Training 
+
+Figure 4 illustrates the triplet-level F1 scores of each client across 50 federated rounds, with dashed lines indicating the corresponding Base STAGE final performance trained independently on each dataset. It is noted that clients in the restaurant domain converge more rapidly dur-ing the early training rounds, primarily due to Figure 4: Triplet-level F1 scores of each client. 
+
+the higher inter-client prototype similarity within the domain, thereby enabling the construction of more informative global prototypes from the lo-cal dataset. Furthermore, 14Lap exhibits a grad-ual improvement, consistent with the low cross-domain similarity illustrated in Figure 5. The smooth convergence of all clients further demon-strates the stabilizing effect of momentum-based prototype updates (Eq (7)) and performance-aware aggregation weights (Eq (8)). 
+
+4.6.3 Prototype Representation Quality   
+
+> Figure 5: t-SNE visualization of 32 class-level proto-type vectors (8 classes ×4 clients).
+
+To qualitatively assess the discriminability of learned prototype representations, we apply t-SNE to project the 32 class-level prototypes into two dimensions, as shown in Figure 5. The visualiza-tion reveals a clear class-driven clustering struc-ture: prototypes of the same class tend to group together across clients, forming identifiable clus-ters in the projected space. However, the degree of clustering varies across classes. Semantically dis-tinct classes such as N-N-NEU, N-N-NEG, and N-O-POS exhibit tighter cross-client groupings, sug-gesting that these categories carry more consis-tent semantic signals across domains. In contrast, the laptop-domain client (14Lap, blue) shows a deviation from the restaurant clients in several classes, which is consistent with the lower cross-domain prototype similarity observed in Figure 3. This confirms that while prototype-based fed-erated learning promotes cross-client alignment, domain-specific variations are partially preserved, reflecting a balance between generalization and lo-cal specialization. Together, these observations provide qualitative support for the quantitative im-provements reported in Table 3. 
+
+4.7 Parameter Sensitivity               
+
+> Figure 6: Parameter sensitivity analysis of alignment weight α(left, βfixed at 2.5×10 −4) and separation weight β(right, αfixed at 2×10 −3).
+
+We investigate the sensitivity of the model to the prototype alignment weight α and separation weight β in Lproto by varying one parameter while fixing the other at its optimal value, as shown in Figure 6. In both cases, all four clients exhibit con-sistent trends across the search range, confirming that the optimal values provide a stable and effec-tive configuration across heterogeneous domains. 
+
+## 5 Conclusions 
+
+In this paper, we propose PCD-SpanProto, aprototype-regularized federated learning frame-work for cross-domain Aspect Sentiment Triplet Extraction, enabling clients to upload prototypes rather than full model parameters. We introduce a prototype-based contrastive module to regularize local training through alignment and separation losses, and a performance-aware aggregation strat-egy to infuse global prototypes with cross-domain knowledge. Experiments demonstrate consistent improvements over single-domain baselines and competitive results against end-to-end methods, confirming that our method effectively transfers cross-domain knowledge without compromising data privacy or prohibitive communication costs. Future work will explore investigating more fine-grained prototype construction that better captures domain-specific linguistic variations within each semantic category. References 
+
+Khwaja Mutahir Ahmad, Qiao Liu, Abdul-lah Aman Khan, Yanglei Gan, and Run Lin. 2024. Eafl: equilibrium augmentation mecha-nism to enhance federated learning for aspect category sentiment analysis. Expert Systems with Applications , 256:124828. Manoj Ghuhan Arivazhagan, Vinay Aggarwal, Aaditya Kumar Singh, and Sunav Choudhary. 2019. Federated learning with personalization layers. arXiv preprint arXiv:1912.00818 .Hesham Ayman, Shaimaa Haridy, Yasmine M Afify, and Walaa Gad. 2026. Fedensemble: federated learning model for efficient sentiment analysis. Computing , 108(1):11. Hao Chen, Zepeng Zhai, Fangxiang Feng, Ruifan Li, and Xiaojie Wang. 2022a. Enhanced multi-channel graph convolutional network for aspect sentiment triplet extraction. In Proceedings of the 60th annual meeting of the association for computational linguistics (volume 1: long pa-pers) , pages 2974–2985. Shaowei Chen, Yu Wang, Jie Liu, and Yuelin Wang. 2021a. Bidirectional machine reading comprehension for aspect sentiment triplet ex-traction. In Proceedings of the AAAI confer-ence on artificial intelligence , volume 35, pages 12666–12674. Yuqi Chen, Zequn Zhang, Guangyao Zhou, Xian Sun, and Keming Chen. 2022b. Span-based dual-decoder framework for aspect sentiment triplet extraction. Neurocomputing , 492:211– 221. Zhexue Chen, Hong Huang, Bang Liu, Xuanhua Shi, and Hai Jin. 2021b. Semantic and syntac-tic enhanced aspect sentiment triplet extraction. 
+
+arXiv preprint arXiv:2106.03315 .Yuyang Deng, Mohammad Mahdi Kamani, and Mehrdad Mahdavi. 2020. Adaptive person-alized federated learning. arXiv preprint arXiv:2003.13461 .Alireza Fallah, Aryan Mokhtari, and Asuman Ozdaglar. 2020. Personalized federated learn-ing with theoretical guarantees: A model-agnostic meta-learning approach. Advances in neural information processing systems ,33:3557–3568. Tianhao Gao, Jun Fang, Hanyu Liu, Zhiyuan Liu, Chao Liu, Pengzhang Liu, Yongjun Bao, and Weipeng Yan. 2022. Lego-absa: Aprompt-based task assemblable unified genera-tive framework for multi-task aspect-based sen-timent analysis. In Proceedings of the 29th international conference on computational lin-guistics , pages 7002–7012. Filip Hanzely and Peter Richtárik. 2020. Feder-ated learning of a mixture of global and local models. arXiv preprint arXiv:2002.05516 .Sixu Hu, Linshan Jiang, and Bingsheng He. 2024. Practical hybrid gradient compression for fed-erated learning systems. In IJCAI , pages 4147– 4155. Wenke Huang, Mang Ye, Zekun Shi, He Li, and Bo Du. 2023. Rethinking federated learn-ing with domain shift: A prototype view. In 
+
+2023 IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 16312–16322. IEEE. Chaouki Ben Issaid, Praneeth Vepakomma, and Mehdi Bennis. 2025. Tackling feature and sam-ple heterogeneity in decentralized multi-task learning: A sheaf-theoretic approach. arXiv preprint arXiv:2502.01145 .Zhigang Jin, Manyue Tao, Xiaodong Wu, and Hao Zhang. 2024. Span-based dependency-enhanced graph convolutional network for as-pect sentiment triplet extraction. Neurocomput-ing , 564:126966. Dongxu Li, Zhihao Yang, Yuquan Lan, Yunqi Zhang, Hui Zhao, and Gang Zhao. 2023a. Sim-ple approach for aspect sentiment triplet extrac-tion using span-based segment tagging and dual extractors. In Proceedings of the 46th inter-national ACM SIGIR conference on research and development in information retrieval , pages 2374–2378. Qingling Li, Wushao Wen, and Jinghui Qin. 2024. Improving span-based aspect sentiment triplet extraction with part-of-speech filtering and contrastive learning. Neural Networks ,177:106381. Tian Li, Shengyuan Hu, Ahmad Beirami, and Vir-ginia Smith. 2021. Ditto: Fair and robust feder-ated learning through personalization. In Inter-national conference on machine learning , pages 6357–6368. PMLR. Xuting Li, Daifeng Li, Ruo Du, Dingquan Chen, and Andrew Madden. 2023b. Double policy network for aspect sentiment triplet extraction (student abstract). In Proceedings of the AAAI conference on artificial intelligence , volume 37, pages 16256–16257. Shuo Liang, Wei Wei, Xian-Ling Mao, Yuanyuan Fu, Rui Fang, and Dangyang Chen. 2023. Stage: span tagging and greedy inference scheme for aspect sentiment triplet extraction. In Proceedings of the AAAI conference on ar-tificial intelligence , volume 37, pages 13174– 13182. Xiaoyong Liu, Jiahao Chen, Chunlin Xu, Zhiguo Du, Weiqi Chen, and Huihui Li. 2025. Sentiment-enhanced triplet region detection framework for aspect sentiment triplet extrac-tion. Neurocomputing , 644:130392. Xinyi Lu, Hao Zhang, Chenglin Li, Weijia Lu, Zhifei Yang, Wenrui Dai, Xiaofeng Ma, Can Zhang, Junni Zou, Hongkai Xiong, et al. 2025. Fedsmu: Communication-efficient and generalization-enhanced federated learning through symbolic model updates. Zili Lu, Heng Pan, Yueyue Dai, Xueming Si, and Yan Zhang. 2024. Federated learning with non-iid data: A survey. IEEE Internet of Things Journal , 11(11):19188–19209. Brendan McMahan, Eider Moore, Daniel Ram-age, Seth Hampson, and Blaise Aguera y Ar-cas. 2017. Communication-efficient learning of deep networks from decentralized data. In Ar-tificial intelligence and statistics , pages 1273– 1282. PMLR. Minghua Nuo and Chaofan Guo. 2024. Hybrid of spans and table-filling for aspect-level senti-ment triplet extraction. In Proceedings of the 2024 Joint International Conference on Com-putational Linguistics, Language Resources and Evaluation (LREC-COLING 2024) , pages 8464–8473. Haiyun Peng, Lu Xu, Lidong Bing, Fei Huang, Wei Lu, and Luo Si. 2020. Knowing what, how and why: A near complete solution for aspect-based sentiment analysis. In Proceedings of the AAAI conference on artificial intelligence , vol-ume 34, pages 8600–8607. Ratun Rahman. 2025. Federated learning: A sur-vey on privacy-preserving collaborative intelli-gence. arXiv preprint arXiv:2504.17703 .Virginia Smith, Chao-Kai Chiang, Maziar Sanjabi, and Ameet S Talwalkar. 2017. Federated multi-task learning. Advances in neural information processing systems , 30. Yue Tan, Guodong Long, Lu Liu, Tianyi Zhou, Qinghua Lu, Jing Jiang, and Chengqi Zhang. 2022. Fedproto: Federated prototype learning across heterogeneous clients. In Proceedings of the AAAI conference on artificial intelligence ,volume 36, pages 8432–8440. Mingwei Tang, Kun Yang, Linping Tao, Mingfeng Zhao, and Wei Zhou. 2025. Multi-granularity enhanced graph convolutional network for as-pect sentiment triplet extraction. Big Data Re-search , 39:100506. Haining Wang, Kang He, Bobo Li, Lei Chen, Fei Li, Xu Han, Chong Teng, and Donghong Ji. 2024. Refining and synthesis: A simple yet ef-fective data augmentation framework for cross-domain aspect-based sentiment analysis. In 
+
+Findings of the Association for Computational Linguistics: ACL 2024 , pages 10318–10329. Shu Wu, Jindou Chen, Xueli Nie, Yong Wang, Xi-ancun Zhou, Linlin Lu, Wei Peng, Yao Nie, and Waseef Menhaj. 2024. Global prototype dis-tillation for heterogeneous federated learning. 
+
+Scientific reports , 14(1):12057. Zhen Wu, Chengcan Ying, Fei Zhao, Zhifang Fan, Xinyu Dai, and Rui Xia. 2020. Grid tagging scheme for aspect-oriented fine-grained opinion extraction. arXiv preprint arXiv:2010.04640 .Tian Xia, Xia Sun, Yidong Yang, Yunfei Long, and Richard Sutcliffe. 2024. A dual relation-encoder network for aspect sentiment triplet ex-traction. Neurocomputing , 597:128064. Haowen Xu, Mingwei Tang, Tao Cai, Jie Hu, Zhongyuan Jiang, Deng Bian, and Shixuan Lv. 2025. Multiple-level enhanced graph convolu-tional network for aspect sentiment triplet ex-traction. Neurocomputing , 634:129834. Lu Xu, Yew Ken Chia, and Lidong Bing. 2021. Learning span-level interactions for aspect sen-timent triplet extraction. In Proceedings of the 59th annual meeting of the association for com-putational linguistics and the 11th international joint conference on natural language process-ing (volume 1: long papers) , pages 4755–4766. Lu Xu, Hao Li, Wei Lu, and Lidong Bing. 2020. Position-aware tagging for aspect sentiment triplet extraction. arXiv preprint arXiv:2010.02609 .Ting Xu, Huiyun Yang, Zhen Wu, Jiaze Chen, Fei Zhao, and Xinyu Dai. 2023. Measuring your aste models in the wild: A diversified multi-domain dataset for aspect sentiment triplet ex-traction. In Findings of the association for com-putational linguistics: ACL 2023 , pages 2837– 2853. Chao Yang, Jiajie Xing, Susu Wei, and Xianguo Zhang. 2024. Essdb-gcn: enhanced syntactic and semantic dual-branch graph convolutional network for aspect sentiment triple extraction. In 2024 international joint conference on neural networks (IJCNN) , pages 1–8. IEEE. Kangning Yin, Zhen Ding, Xinhui Ji, and Zhiguo Wang. 2025. Controlling update distance and enhancing fair trainable prototypes in federated learning under data and model heterogeneity. 
+
+Defence Technology , 47:15–31. Samson Yu Bai Jian, Tapas Nayak, Navonil Ma-jumder, and Soujanya Poria. 2021. Aspect sentiment triplet extraction using reinforcement learning. In Proceedings of the 30th ACM in-ternational conference on information & knowl-edge management , pages 3603–3607. Fuyao Zhang, Dan Wang, and Yalan Jiang. 2023. A efficient prototype-assisted clustered feder-ated learning framework for industrial inter-net of things. In 2023 IEEE 11th Interna-tional Conference on Information, Communi-cation and Networks (ICICN) , pages 322–328. IEEE. Wenxuan Zhang, Xin Li, Yang Deng, Lidong Bing, and Wai Lam. 2022. A survey on aspect-based sentiment analysis: Tasks, methods, and challenges. IEEE Transactions on Knowledge and Data Engineering , 35(11):11019–11038.

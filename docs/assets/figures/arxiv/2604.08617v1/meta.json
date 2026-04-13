@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08617v1/fig-001.webp",
+      "caption": "Figure 1. (a) Continual dynamic heterogeneity: clients see different class distributions over time, and each new task is learned with limited replay of past data. (b) Federated geometry-aware calibration: FEAT aligns client feature geometry and applies an energy-based correction at inference to calibrate prediction.",
+      "page": 1,
+      "index": 1,
+      "width": 493,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08617v1/fig-002.webp",
+      "caption": "Table 1. Performance comparison between FEAT and baselines across three datasets under varying levels of data heterogeneity (β) and different numbers of clients (K). Results are averaged over three random seeds, with standard deviations reported.",
+      "page": 6,
+      "index": 2,
+      "width": 1002,
+      "height": 475
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08617v1/fig-003.webp",
+      "caption": "Figure 2. Illustration of the proposed FEAT framework. It contains two main modules: 1) the Geometry Structure Alignment module aligns local representations with global ETF prototypes to alleviate inter-client heterogeneity; and 2) the Energy-based Geometric Correction module removes biased components from the feature space during inference.",
+      "page": 3,
+      "index": 3,
+      "width": 1034,
+      "height": 422
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08617v1/fig-004.webp",
+      "caption": "Figure 9. Visualization of visual attention. The GSA module corrects the attention bias of tail classes and strengthens the confidence of attention on head classes.",
+      "page": 8,
+      "index": 4,
+      "width": 487,
+      "height": 248
+    }
+  ]
+}

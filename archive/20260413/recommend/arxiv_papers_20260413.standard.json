@@ -1,0 +1,2246 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-13T20:37:45.454596+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 81,
+    "deep_cap": 8,
+    "deep_selected": 42,
+    "quick_candidates": 105,
+    "quick_skim_target": 13,
+    "quick_selected": 13
+  },
+  "deep_dive": [
+    {
+      "id": "2604.04261v1",
+      "source": "arxiv",
+      "title": "APPA: Adaptive Preference Pluralistic Alignment for Fair Federated RLHF of LLMs",
+      "abstract": "Aligning large language models (LLMs) with diverse human preferences requires pluralistic alignment, where a single model must respect the values of multiple distinct groups simultaneously. In federated reinforcement learning from human feedback (FedRLHF), these groups align a shared policy without centralizing preference data, which makes fair reward aggregation essential. Existing aggregation methods exhibit clear trade offs: average based aggregation systematically under aligns worst performing groups, while min aggregation prioritizes worst group performance at the cost of overall alignment. We propose APPA, an Adaptive Preference Pluralistic Alignment framework that dynamically reweights group level rewards based on historical alignment rewards. Our approach prioritizes under aligned groups without degrading well aligned ones, while requiring no access to raw preference data. Integrated into a proximal policy optimization (PPO) based FedRLHF pipeline and evaluated on GLOBALQA and OQA across three model families (Gemma 2 2B, Llama 3.2 3B, Qwen3 0.6B), APPA achieves strong fairness alignment trade offs, improving worst group alignment by up to 28% over average aggregation while maintaining higher overall alignment than min aggregation across most configurations.",
+      "authors": [
+        "Mahmoud Srewa",
+        "Tianyu Zhao",
+        "Salma Elmalaki"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-05T20:48:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.04261v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "federated reinforcement learning from human feedback (FedRLHF)",
+      "llm_evidence_cn": "联邦人类反馈强化学习 (FedRLHF)",
+      "llm_evidence": "联邦人类反馈强化学习 (FedRLHF)",
+      "canonical_evidence": "联邦人类反馈强化学习 (FedRLHF)",
+      "llm_tldr_en": "Introduces APPA for fair reward aggregation in federated RLHF to align LLMs with diverse preferences.",
+      "llm_tldr_cn": "提出 APPA 框架，在联邦 RLHF 中实现公平的奖励聚合，以对齐多样的用户偏好。",
+      "llm_tldr": "提出 APPA 框架，在联邦 RLHF 中实现公平的奖励聚合，以对齐多样的用户偏好。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04917v2",
+      "source": "arxiv",
+      "title": "Vero: An Open RL Recipe for General Visual Reasoning",
+      "abstract": "What does it take to build a visual reasoner that works across charts, science, spatial understanding, and open-ended tasks? The strongest vision-language models (VLMs) show such broad visual reasoning is within reach, but the recipe behind them remains unclear, locked behind proprietary reinforcement learning (RL) pipelines with non-public data. We introduce Vero, a family of fully open VLMs that matches or exceeds existing open-weight models across diverse visual reasoning tasks. We scale RL data and rewards across six broad task categories, constructing Vero-600K, a 600K-sample dataset from 59 datasets, and designing task-routed rewards that handle heterogeneous answer formats. Vero achieves state-of-the-art performance, improving over four base models by 3.6-5.3 points on average across VeroEval, our suite of 30 challenging benchmarks. Starting from Qwen3-VL-8B-Instruct, Vero outperforms Qwen3-VL-8B-Thinking on 23 of 30 benchmarks without additional proprietary thinking data. When trained from the same base model, Vero-600K exceeds existing RL datasets across task categories. Systematic ablations reveal that different task categories elicit qualitatively distinct reasoning patterns that transfer poorly in isolation, suggesting that broad data coverage is the primary driver of strong RL scaling. All data, code, and models are released.",
+      "authors": [
+        "Gabriel Sarch",
+        "Linrong Cai",
+        "Qunzhong Wang",
+        "Haoyang Wu",
+        "Danqi Chen",
+        "Zhuang Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-06T17:56:25+00:00",
+      "link": "https://arxiv.org/pdf/2604.04917v2",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "reinforcement learning recipe for general visual reasoning in VLMs",
+      "llm_evidence_cn": "视觉语言模型通用视觉推理的强化学习方案",
+      "llm_evidence": "视觉语言模型通用视觉推理的强化学习方案",
+      "canonical_evidence": "视觉语言模型通用视觉推理的强化学习方案",
+      "llm_tldr_en": "Provides an open reinforcement learning recipe and dataset to enhance visual reasoning in vision-language models.",
+      "llm_tldr_cn": "提供了一个开放的强化学习方案和数据集，以增强视觉语言模型的视觉推理能力。",
+      "llm_tldr": "提供了一个开放的强化学习方案和数据集，以增强视觉语言模型的视觉推理能力。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06916v1",
+      "source": "arxiv",
+      "title": "FP4 Explore, BF16 Train: Diffusion Reinforcement Learning via Efficient Rollout Scaling",
+      "abstract": "Reinforcement-Learning-based post-training has recently emerged as a promising paradigm for aligning text-to-image diffusion models with human preferences. In recent studies, increasing the rollout group size yields pronounced performance improvements, indicating substantial room for further alignment gains. However, scaling rollouts on large-scale foundational diffusion models (e.g., FLUX.1-12B) imposes a heavy computational burden. To alleviate this bottleneck, we explore the integration of FP4 quantization into Diffusion RL rollouts. Yet, we identify that naive quantized pipelines inherently introduce risks of performance degradation. To overcome this dilemma between efficiency and training integrity, we propose Sol-RL (Speed-of-light RL), a novel FP4-empowered Two-stage Reinforcement Learning framework. First, we utilize high-throughput NVFP4 rollouts to generate a massive candidate pool and extract a highly contrastive subset. Second, we regenerate these selected samples in BF16 precision and optimize the policy exclusively on them. By decoupling candidate exploration from policy optimization, Sol-RL integrates the algorithmic mechanisms of rollout scaling with the system-level throughput gains of NVFP4. This synergistic algorithm-hardware design effectively accelerates the rollout phase while reserving high-fidelity samples for optimization. We empirically demonstrate that our framework maintains the training integrity of BF16 precision pipeline while fully exploiting the throughput gains enabled by FP4 arithmetic. Extensive experiments across SANA, FLUX.1, and SD3.5-L substantiate that our approach delivers superior alignment performance across multiple metrics while accelerating training convergence by up to $4.64\\times$, unlocking the power of massive rollout scaling at a fraction of the cost.",
+      "authors": [
+        "Yitong Li",
+        "Junsong Chen",
+        "Shuchen Xue",
+        "Pengcuo Zeren",
+        "Siyuan Fu",
+        "Dinghao Yang",
+        "Yangyang Tang",
+        "Junjie Bai",
+        "Ping Luo",
+        "Song Han",
+        "Enze Xie"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-04-08T10:14:47+00:00",
+      "link": "https://arxiv.org/pdf/2604.06916v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Diffusion Reinforcement Learning for text-to-image alignment",
+      "llm_evidence_cn": "用于文生图对齐的扩散强化学习",
+      "llm_evidence": "用于文生图对齐的扩散强化学习",
+      "canonical_evidence": "用于文生图对齐的扩散强化学习",
+      "llm_tldr_en": "Explores efficient rollout scaling for Diffusion RL to align text-to-image models with human preferences.",
+      "llm_tldr_cn": "探索扩散强化学习的高效Rollout扩展，以实现文生图模型与人类偏好的对齐。",
+      "llm_tldr": "探索扩散强化学习的高效Rollout扩展，以实现文生图模型与人类偏好的对齐。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "explore cross domain methods combining federation, reinforcement, and multimodal generative techniques",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09459v1",
+      "source": "arxiv",
+      "title": "From Reasoning to Agentic: Credit Assignment in Reinforcement Learning for Large Language Models",
+      "abstract": "Reinforcement learning (RL) for large language models (LLMs) increasingly relies on sparse, outcome-level rewards -- yet determining which actions within a long trajectory caused the outcome remains difficult. This credit assignment (CA) problem manifests in two regimes: reasoning RL, where credit must be distributed across tokens and steps within a single chain-of-thought generation (500--30K+ tokens); and agentic RL, where multi-turn environment interaction introduces stochastic transitions, partial observability, and horizons of 100+ turns (100K--1M tokens), making episode-level credit increasingly uninformative.   We survey 47 CA methods (41 core, 6 adjacent enablers) published between 2024 and early 2026, organizing them in a two-dimensional taxonomy by assignment granularity (token, segment, step, turn, multi-agent) and methodology (Monte Carlo, temporal difference, model-based, game-theoretic, information-theoretic). Beyond the survey itself, we contribute three reusable resources: (1) a structured, machine-readable paper inventory with taxonomy labels, baseline families, and evidence levels; (2) a reporting checklist for future CA papers, validated against the reviewed literature to identify systematic methodological gaps; and (3) a benchmark protocol specification with task families, metadata requirements, and controlled bifurcation tasks, accompanied by a method selection decision tree.   Our synthesis suggests that the shift from reasoning to agentic RL complicates and reshapes the credit assignment landscape: reasoning CA is maturing around process reward models and critic-free group comparison, while agentic CA is driving genuinely new approaches -- hindsight counterfactual analysis, privileged asymmetric critics, and turn-level MDP reformulations -- that have no direct precedent in reasoning RL.",
+      "authors": [
+        "Chenchen Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-10T16:17:44+00:00",
+      "link": "https://arxiv.org/pdf/2604.09459v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "survey of credit assignment methods in reinforcement learning for LLMs",
+      "llm_evidence_cn": "大语言模型强化学习中的信用分配方法综述",
+      "llm_evidence": "大语言模型强化学习中的信用分配方法综述",
+      "canonical_evidence": "大语言模型强化学习中的信用分配方法综述",
+      "llm_tldr_en": "Surveys 47 credit assignment methods in RL for LLMs, covering reasoning and agentic regimes.",
+      "llm_tldr_cn": "综述了大语言模型强化学习中的47种信用分配方法，涵盖推理与智能体场景。",
+      "llm_tldr": "综述了大语言模型强化学习中的47种信用分配方法，涵盖推理与智能体场景。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.03998v1",
+      "source": "arxiv",
+      "title": "VA-FastNavi-MARL: Real-Time Robot Control with Multimedia-Driven Meta-Reinforcement Learning",
+      "abstract": "Interpreting dynamic, heterogeneous multimedia commands with real-time responsiveness is critical for Human-Robot Interaction. We present VA-FastNavi-MARL, a framework that aligns asynchronous audio-visual inputs into a unified latent representation. By treating diverse instructions as a distribution of navigable goals via Meta-Reinforcement Learning, our method enables rapid adaptation to unseen directives with negligible inference overhead. Unlike approaches bottlenecked by heavy sensory processing, our modality-agnostic stream ensures seamless, low-latency control. Validation on a multi-arm workspace confirms that VA-FastNavi-MARL significantly outperforms baselines in sample efficiency and maintains robust, real-time execution even under noisy multimedia streams.",
+      "authors": [
+        "Yang Zhang",
+        "Shengxi Jing",
+        "Fengxiang Wang",
+        "Yuan Feng",
+        "Hong Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-04-05T07:05:49+00:00",
+      "link": "https://arxiv.org/pdf/2604.03998v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multimedia-driven meta-reinforcement learning for robot control",
+      "llm_evidence_cn": "多媒体驱动的机器人控制元强化学习",
+      "llm_evidence": "多媒体驱动的机器人控制元强化学习",
+      "canonical_evidence": "多媒体驱动的机器人控制元强化学习",
+      "llm_tldr_en": "Integrates audio-visual inputs with meta-reinforcement learning for real-time robot navigation and control.",
+      "llm_tldr_cn": "将视听输入与元强化学习结合，实现机器人的实时导航与控制。",
+      "llm_tldr": "将视听输入与元强化学习结合，实现机器人的实时导航与控制。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "explore cross domain methods combining federation, reinforcement, and multimodal generative techniques",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04018v1",
+      "source": "arxiv",
+      "title": "1.x-Distill: Breaking the Diversity, Quality, and Efficiency Barrier in Distribution Matching Distillation",
+      "abstract": "Diffusion models produce high-quality text-to-image results, but their iterative denoising is computationally expensive.Distribution Matching Distillation (DMD) emerges as a promising path to few-step distillation, but suffers from diversity collapse and fidelity degradation when reduced to two steps or fewer. We present 1.x-Distill, the first fractional-step distillation framework that breaks the integer-step constraint of prior few-step methods and establishes 1.x-step generation as a practical regime for distilled diffusion models.Specifically, we first analyze the overlooked role of teacher CFG in DMD and introduce a simple yet effective modification to suppress mode collapse. Then, to improve performance under extreme steps, we introduce Stagewise Focused Distillation, a two-stage strategy that learns coarse structure through diversity-preserving distribution matching and refines details with inference-consistent adversarial distillation. Furthermore, we design a lightweight compensation module for Distill--Cache co-Training, which naturally incorporates block-level caching into our distillation pipeline.Experiments on SD3-Medium and SD3.5-Large show that 1.x-Distill surpasses prior few-step methods, achieving better quality and diversity at 1.67 and 1.74 effective NFEs, respectively, with up to 33x speedup over original 28x2 NFE sampling.",
+      "authors": [
+        "Haoyu Li",
+        "Tingyan Wen",
+        "Lin Qi",
+        "Zhe Wu",
+        "Yihuang Chen",
+        "Xing Zhou",
+        "Lifei Zhu",
+        "Xueqian Wang",
+        "Kai Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-05T08:30:35+00:00",
+      "link": "https://arxiv.org/pdf/2604.04018v1",
+      "tags": [
+        "query:FLRLVLDM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "advances in diffusion model distillation and efficiency",
+      "llm_evidence_cn": "扩散模型蒸馏与效率方面的进展",
+      "llm_evidence": "扩散模型蒸馏与效率方面的进展",
+      "canonical_evidence": "扩散模型蒸馏与效率方面的进展",
+      "llm_tldr_en": "Introduces 1.x-Distill to break efficiency barriers in diffusion model distillation for few-step generation.",
+      "llm_tldr_cn": "提出 1.x-Distill 框架，打破扩散模型蒸馏的步数限制，实现高效的高质量图像生成。",
+      "llm_tldr": "提出 1.x-Distill 框架，打破扩散模型蒸馏的步数限制，实现高效的高质量图像生成。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04215v1",
+      "source": "arxiv",
+      "title": "DARE: Diffusion Large Language Models Alignment and Reinforcement Executor",
+      "abstract": "Diffusion large language models (dLLMs) are emerging as a compelling alternative to dominant autoregressive models, replacing strictly sequential token generation with iterative denoising and parallel generation dynamics. However, their open-source ecosystem remains fragmented across model families and, in particular, across post-training pipelines, where reinforcement learning objectives, rollout implementations and evaluation scripts are often released as paper-specific codebases. This fragmentation slows research iteration, raises the engineering burden of reproduction, and makes fair comparison across algorithms difficult. We present \\textbf{DARE} (\\textbf{d}LLMs \\textbf{A}lignment and \\textbf{R}einforcement \\textbf{E}xecutor), an open framework for post-training and evaluating dLLMs. Built on top of verl~\\cite{sheng2024hybridflow} and OpenCompass~\\cite{2023opencompass}, DARE unifies supervised fine-tuning, parameter-efficient fine-tuning, preference optimization, and dLLM-specific reinforcement learning under a shared execution stack for both masked and block diffusion language models. Across representative model families including LLaDA, Dream, SDAR, and LLaDA2.x, DARE provides broad algorithmic coverage, reproducible benchmark evaluation, and practical acceleration. Extensive empirical results position that DARE serves as a reusable research substrate for developing, comparing, and deploying post-training methods for current and emerging dLLMs.",
+      "authors": [
+        "Jingyi Yang",
+        "Yuxian Jiang",
+        "Xuhao Hu",
+        "Shuang Cheng",
+        "Biqing Qi",
+        "Jing Shao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-05T18:13:19+00:00",
+      "link": "https://arxiv.org/pdf/2604.04215v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Alignment and reinforcement learning for diffusion large language models",
+      "llm_evidence_cn": "扩散大语言模型的对齐与强化学习执行器",
+      "llm_evidence": "扩散大语言模型的对齐与强化学习执行器",
+      "canonical_evidence": "扩散大语言模型的对齐与强化学习执行器",
+      "llm_tldr_en": "DARE is an open framework for the alignment and reinforcement learning of diffusion-based language models.",
+      "llm_tldr_cn": "DARE是一个针对扩散语言模型对齐和强化学习的开源框架，降低了研究门槛。",
+      "llm_tldr": "DARE是一个针对扩散语言模型对齐和强化学习的开源框架，降低了研究门槛。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04251v1",
+      "source": "arxiv",
+      "title": "MC-CPO: Mastery-Conditioned Constrained Policy Optimization",
+      "abstract": "Engagement-optimized adaptive tutoring systems may prioritize short-term behavioral signals over sustained learning outcomes, creating structural incentives for reward hacking in reinforcement learning policies. We formalize this challenge as a constrained Markov decision process (CMDP) with mastery-conditioned feasibility, in which pedagogical safety constraints dynamically restrict admissible actions according to learner mastery and prerequisite structure.   We introduce Mastery-Conditioned Constrained Policy Optimization (MC-CPO), a two-timescale primal-dual algorithm that integrates structural action masking with constrained policy optimization. In the tabular regime, we establish feasibility preservation and convergence to stationary feasible points under standard stochastic approximation conditions and derive a safety gap result showing that optimization within the mastery-conditioned feasible set can strictly dominate post-hoc filtering under identical safety budgets.   Empirical validation is conducted in minimal and extended tabular environments and in a neural tutoring setting. Across 10 random seeds and one million training steps in the neural regime, MC-CPO satisfies constraint budgets within tolerance, reduces discounted safety costs relative to unconstrained and reward-shaped baselines, and substantially lowers the Reward Hacking Severity Index (RHSI).   These results indicate that embedding pedagogical structure directly into the feasible action space provides a principled foundation for mitigating reward hacking in instructional reinforcement learning systems.",
+      "authors": [
+        "Oluseyi Olukola",
+        "Nick Rahimi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CY",
+        "cs.LG"
+      ],
+      "published": "2026-04-05T20:13:34+00:00",
+      "link": "https://arxiv.org/pdf/2604.04251v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "constrained policy optimization in reinforcement learning",
+      "llm_evidence_cn": "强化学习中的约束策略优化",
+      "llm_evidence": "强化学习中的约束策略优化",
+      "canonical_evidence": "强化学习中的约束策略优化",
+      "llm_tldr_en": "Introduces MC-CPO, an RL algorithm for adaptive tutoring that balances engagement with pedagogical constraints.",
+      "llm_tldr_cn": "引入了MC-CPO，一种平衡参与度与教学约束的自适应辅导强化学习算法。",
+      "llm_tldr": "引入了MC-CPO，一种平衡参与度与教学约束的自适应辅导强化学习算法。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04334v2",
+      "source": "arxiv",
+      "title": "Boosted Distributional Reinforcement Learning: Analysis and Healthcare Applications",
+      "abstract": "Researchers and practitioners are increasingly considering reinforcement learning to optimize decisions in complex domains like robotics and healthcare. To date, these efforts have largely utilized expectation-based learning. However, relying on expectation-focused objectives may be insufficient for making consistent decisions in highly uncertain situations involving multiple heterogeneous groups. While distributional reinforcement learning algorithms have been introduced to model the full distributions of outcomes, they can yield large discrepancies in realized benefits among comparable agents. This challenge is particularly acute in healthcare settings, where physicians (controllers) must manage multiple patients (subordinate agents) with uncertain disease progression and heterogeneous treatment responses. We propose a Boosted Distributional Reinforcement Learning (BDRL) algorithm that optimizes agent-specific outcome distributions while enforcing comparability among similar agents and analyze its convergence. To further stabilize learning, we incorporate a post-update projection step formulated as a constrained convex optimization problem, which efficiently aligns individual outcomes with a high-performing reference within a specified tolerance. We apply our algorithm to manage hypertension in a large subset of the US adult population by categorizing individuals into cardiovascular disease risk groups. Our approach modifies treatment plans for median and vulnerable patients by mimicking the behavior of high-performing references in each risk group. Furthermore, we find that BDRL improves the number and consistency of quality-adjusted life years compared with reinforcement learning baselines.",
+      "authors": [
+        "Zequn Chen",
+        "Wesley J. Marrero"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T01:00:08+00:00",
+      "link": "https://arxiv.org/pdf/2604.04334v2",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "advances in distributional reinforcement learning algorithms",
+      "llm_evidence_cn": "分布强化学习算法的进展",
+      "llm_evidence": "分布强化学习算法的进展",
+      "canonical_evidence": "分布强化学习算法的进展",
+      "llm_tldr_en": "Analyzes boosted distributional reinforcement learning for consistent decision-making in healthcare.",
+      "llm_tldr_cn": "分析了提升分布强化学习算法，旨在医疗等复杂领域实现一致性决策。",
+      "llm_tldr": "分析了提升分布强化学习算法，旨在医疗等复杂领域实现一致性决策。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04500v1",
+      "source": "arxiv",
+      "title": "Saliency-R1: Enforcing Interpretable and Faithful Vision-language Reasoning via Saliency-map Alignment Reward",
+      "abstract": "Vision-language models (VLMs) have achieved remarkable success across diverse tasks. However, concerns about their trustworthiness persist, particularly regarding tendencies to lean more on textual cues than visual evidence and the risk of producing ungrounded or fabricated responses. To address these issues, we propose Saliency-R1, a framework for improving the interpretability and faithfulness of VLMs reasoning. Specifically, we introduce a novel saliency map technique that efficiently highlights critical image regions contributing to generated tokens without additional computational overhead. This can further be extended to trace how visual information flows through the reasoning process to the final answers, revealing the alignment between the thinking process and the visual context. We use the overlap between the saliency maps and human-annotated bounding boxes as the reward function, and apply Group Relative Policy Optimization (GRPO) to align the salient parts and critical regions, encouraging models to focus on relevant areas when conduct reasoning. Experiments show Saliency-R1 improves reasoning faithfulness, interpretability, and overall task performance.",
+      "authors": [
+        "Shizhan Gong",
+        "Minda Hu",
+        "Qiyuan Zhang",
+        "Chen Ma",
+        "Qi Dou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T07:51:59+00:00",
+      "link": "https://arxiv.org/pdf/2604.04500v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning framework for vision-language reasoning",
+      "llm_evidence_cn": "视觉语言推理的强化学习框架",
+      "llm_evidence": "视觉语言推理的强化学习框架",
+      "canonical_evidence": "视觉语言推理的强化学习框架",
+      "llm_tldr_en": "Uses saliency-map alignment rewards in an RL framework to improve VLM interpretability and faithfulness.",
+      "llm_tldr_cn": "在强化学习框架中使用显著图对齐奖励来提高视觉语言模型的解释性。",
+      "llm_tldr": "在强化学习框架中使用显著图对齐奖励来提高视觉语言模型的解释性。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05125v1",
+      "source": "arxiv",
+      "title": "Offline RL for Adaptive Policy Retrieval in Prior Authorization",
+      "abstract": "Prior authorization (PA) requires interpretation of complex and fragmented coverage policies, yet existing retrieval-augmented systems rely on static top-$K$ strategies with fixed numbers of retrieved sections. Such fixed retrieval can be inefficient and gather irrelevant or insufficient information. We model policy retrieval for PA as a sequential decision-making problem, formulating adaptive retrieval as a Markov Decision Process (MDP). In our system, an agent iteratively selects policy chunks from a top-$K$ candidate set or chooses to stop and issue a decision. The reward balances decision correctness against retrieval cost, capturing the trade-off between accuracy and efficiency. We train policies using Conservative Q-Learning (CQL), Implicit Q-Learning (IQL), and Direct Preference Optimization (DPO) in an offline RL setting on logged trajectories generated from baseline retrieval strategies over synthetic PA requests derived from publicly available CMS coverage data. On a corpus of 186 policy chunks spanning 10 CMS procedures, CQL achieves 92% decision accuracy (+30 percentage points over the best fixed-$K$ baseline) via exhaustive retrieval, while IQL matches the best baseline accuracy using 44% fewer retrieval steps and achieves the only positive episodic return among all policies. Transition-level DPO matches CQL's 92% accuracy while using 47% fewer retrieval steps (10.6 vs. 20.0), occupying a \"selective-accurate\" region on the Pareto frontier that dominates both CQL and BC. A behavioral cloning baseline matches CQL, confirming that advantage-weighted or preference-based policy extraction is needed to learn selective retrieval. Lambda ablation over step costs $λ\\in \\{0.05, 0.1, 0.2\\}$ reveals a clear accuracy-efficiency inflection: only at $λ= 0.2$ does CQL transition from exhaustive to selective retrieval.",
+      "authors": [
+        "Ruslan Sharifullin",
+        "Maxim Gorshkov",
+        "Hannah Clay"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-04-06T19:40:26+00:00",
+      "link": "https://arxiv.org/pdf/2604.05125v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Offline RL and MDP for adaptive policy retrieval",
+      "llm_evidence_cn": "用于自适应策略检索的离线强化学习和马尔可夫决策过程",
+      "llm_evidence": "用于自适应策略检索的离线强化学习和马尔可夫决策过程",
+      "canonical_evidence": "用于自适应策略检索的离线强化学习和马尔可夫决策过程",
+      "llm_tldr_en": "Applies offline reinforcement learning to optimize the trade-off between accuracy and efficiency in policy retrieval.",
+      "llm_tldr_cn": "应用离线强化学习来优化策略检索中准确性与效率之间的权衡。",
+      "llm_tldr": "应用离线强化学习来优化策略检索中准确性与效率之间的权衡。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05268v2",
+      "source": "arxiv",
+      "title": "Region-R1: Reinforcing Query-Side Region Cropping for Multi-Modal Re-Ranking",
+      "abstract": "Multi-modal retrieval-augmented generation (MM-RAG) relies heavily on re-rankers to surface the most relevant evidence for image-question queries. However, standard re-rankers typically process the full query image as a global embedding, making them susceptible to visual distractors (e.g., background clutter) that skew similarity scores. We propose Region-R1, a query-side region cropping framework that formulates region selection as a decision-making problem during re-ranking, allowing the system to learn to retain the full image or focus only on a question-relevant region before scoring the retrieved candidates. Region-R1 learns a policy with a novel region-aware group relative policy optimization (r-GRPO) to dynamically crop a discriminative region. Across two challenging benchmarks, E-VQA and InfoSeek, Region-R1 delivers consistent gains, achieving state-of-the-art performances by increasing conditional Recall@1 by up to 20%. These results show the great promise of query-side adaptation as a simple but effective way to strengthen MM-RAG re-ranking.",
+      "authors": [
+        "Chan-Wei Hu",
+        "Zhengzhong Tu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-07T00:05:12+00:00",
+      "link": "https://arxiv.org/pdf/2604.05268v2",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "uses reinforcement learning for multimodal re-ranking in VLM systems",
+      "llm_evidence_cn": "在视觉语言模型系统中使用强化学习进行多模态重排序",
+      "llm_evidence": "在视觉语言模型系统中使用强化学习进行多模态重排序",
+      "canonical_evidence": "在视觉语言模型系统中使用强化学习进行多模态重排序",
+      "llm_tldr_en": "Applies reinforcement learning to optimize region cropping for improved multi-modal retrieval-augmented generation.",
+      "llm_tldr_cn": "应用强化学习优化区域裁剪，以改进多模态检索增强生成。",
+      "llm_tldr": "应用强化学习优化区域裁剪，以改进多模态检索增强生成。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05497v1",
+      "source": "arxiv",
+      "title": "Thinking Diffusion: Penalize and Guide Visual-Grounded Reasoning in Diffusion Multimodal Language Models",
+      "abstract": "Diffusion large language models (dLLMs) are emerging as promising alternatives to autoregressive (AR) LLMs. Recently, this paradigm has been extended to multimodal tasks, leading to the development of diffusion multimodal large language models (dMLLMs). These models are expected to retain the reasoning capabilities of LLMs while enabling faster inference through parallel generation. However, when combined with Chain-of-Thought (CoT) reasoning, dMLLMs exhibit two critical issues. First, we observe that dMLLMs often generate the final answer token at a very early timestep. This trend indicates that the model determines the answer before sufficient reasoning, leading to degraded reasoning performance. Second, during the initial timesteps, dMLLMs show minimal dependency on visual prompts, exhibiting a fundamentally different pattern of visual information utilization compared to AR vision-language models. In summary, these findings indicate that dMLLMs tend to generate premature final answers without sufficiently grounding on visual inputs. To address these limitations, we propose Position and Step Penalty (PSP) and Visual Reasoning Guidance (VRG). PSP penalizes tokens in later positions during early timesteps, delaying premature answer generation and encouraging progressive reasoning across timesteps. VRG, inspired by classifier-free guidance, amplifies visual grounding signals to enhance the model's alignment with visual evidence. Extensive experiments across various dMLLMs demonstrate that our method achieves up to 7.5% higher accuracy while delivering more than 3x speedup compared to reasoning with four times more diffusion steps.",
+      "authors": [
+        "Keuntae Kim",
+        "Mingyu Kang",
+        "Yong Suk Choi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-04-07T06:41:05+00:00",
+      "link": "https://arxiv.org/pdf/2604.05497v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "diffusion multimodal language models and visual-grounded reasoning",
+      "llm_evidence_cn": "扩散多模态语言模型与视觉接地推理",
+      "llm_evidence": "扩散多模态语言模型与视觉接地推理",
+      "canonical_evidence": "扩散多模态语言模型与视觉接地推理",
+      "llm_tldr_en": "Proposes a method to guide reasoning in diffusion-based multimodal large language models.",
+      "llm_tldr_cn": "提出一种引导扩散多模态大语言模型进行推理的方法，解决过早生成答案的问题。",
+      "llm_tldr": "提出一种引导扩散多模态大语言模型进行推理的方法，解决过早生成答案的问题。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05510v1",
+      "source": "arxiv",
+      "title": "Benchmarking Vision-Language Models under Contradictory Virtual Content Attacks in Augmented Reality",
+      "abstract": "Augmented reality (AR) has rapidly expanded over the past decade. As AR becomes increasingly integrated into daily life, its security and reliability emerge as critical challenges. Among various threats, contradictory virtual content attacks, where malicious or inconsistent virtual elements are introduced into the user's view, pose a unique risk by misleading users, creating semantic confusion, or delivering harmful information. In this work, we systematically model such attacks and present ContrAR, a novel benchmark for evaluating the robustness of vision-language models (VLMs) against virtual content manipulation and contradiction in AR. ContrAR contains 312 real-world AR videos validated by 10 human participants. We further benchmark 11 VLMs, including both commercial and open-source models. Experimental results reveal that while current VLMs exhibit reasonable understanding of contradictory virtual content, room still remains for improvement in detecting and reasoning about adversarial content manipulations in AR environments. Moreover, balancing detection accuracy and latency remains challenging.",
+      "authors": [
+        "Yanming Xiu",
+        "Zhengayuan Jiang",
+        "Neil Zhenqiang Gong",
+        "Maria Gorlatova"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-07T07:04:28+00:00",
+      "link": "https://arxiv.org/pdf/2604.05510v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "benchmark for evaluating the robustness of vision-language models (VLMs)",
+      "llm_evidence_cn": "评估视觉语言模型（VLM）鲁棒性的基准测试",
+      "llm_evidence": "评估视觉语言模型（VLM）鲁棒性的基准测试",
+      "canonical_evidence": "评估视觉语言模型（VLM）鲁棒性的基准测试",
+      "llm_tldr_en": "Introduces ContrAR, a benchmark to evaluate VLM robustness against virtual content attacks in augmented reality.",
+      "llm_tldr_cn": "引入ContrAR基准，用于评估视觉语言模型在增强现实中对抗虚拟内容攻击的鲁棒性。",
+      "llm_tldr": "引入ContrAR基准，用于评估视觉语言模型在增强现实中对抗虚拟内容攻击的鲁棒性。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05730v1",
+      "source": "arxiv",
+      "title": "Controllable Image Generation with Composed Parallel Token Prediction",
+      "abstract": "Conditional discrete generative models struggle to faithfully compose multiple input conditions. To address this, we derive a theoretically-grounded formulation for composing discrete probabilistic generative processes, with masked generation (absorbing diffusion) as a special case. Our formulation enables precise specification of novel combinations and numbers of input conditions that lie outside the training data, with concept weighting enabling emphasis or negation of individual conditions. In synergy with the richly compositional learned vocabulary of VQ-VAE and VQ-GAN, our method attains a $63.4\\%$ relative reduction in error rate compared to the previous state-of-the-art, averaged across 3 datasets (positional CLEVR, relational CLEVR and FFHQ), simultaneously obtaining an average absolute FID improvement of $-9.58$. Meanwhile, our method offers a $2.3\\times$ to $12\\times$ real-time speed-up over comparable methods, and is readily applied to an open pre-trained discrete text-to-image model for fine-grained control of text-to-image generation.",
+      "authors": [
+        "Jamie Stirling",
+        "Noura Al-Moubayed",
+        "Chris G. Willcocks",
+        "Hubert P. H. Shum"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-07T11:33:52+00:00",
+      "link": "https://arxiv.org/pdf/2604.05730v1",
+      "tags": [
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "controllable image generation using absorbing diffusion as a special case",
+      "llm_evidence_cn": "以吸收扩散为特例的可控图像生成",
+      "llm_evidence": "以吸收扩散为特例的可控图像生成",
+      "canonical_evidence": "以吸收扩散为特例的可控图像生成",
+      "llm_tldr_en": "Develops a formulation for composing discrete generative processes, improving controllable diffusion-based generation.",
+      "llm_tldr_cn": "开发了一种组合离散生成过程的公式，改进了基于扩散的可控图像生成。",
+      "llm_tldr": "开发了一种组合离散生成过程的公式，改进了基于扩散的可控图像生成。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05977v1",
+      "source": "arxiv",
+      "title": "Adaptive Incentive Design with Regret Minimization",
+      "abstract": "Incentive design constitutes a foundational paradigm for influencing the behavior of strategic agents, wherein a system planner (principal) publicly commits to an incentive mechanism designed to align individual objectives with collective social welfare. This paper introduces the Regret-Minimizing Adaptive Incentive Design (RAID) problem, which aims to synthesize incentive laws under information asymmetry and achieve asymptotically minimal regret compared to an oracle with full information. To this end, we develop the RAID algorithm, which employs a switching policy alternating between probing (exploration) and estimate-based incentivization (exploitation). The associated type estimator relies only on a weaker excitation condition required for strong consistency in least squares estimation, substantially relaxing the persistence-of-excitation assumptions previously used in adaptive incentive design. In addition, we establish the strong consistency of the proposed type estimator and prove that the incentive obtained asymptotically minimizes the planner's average regret almost surely. Numerical experiments illustrate the convergence rate of the proposed methodology.",
+      "authors": [
+        "Georgios Vasileiou",
+        "Lantian Zhang",
+        "Silun Zhang"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.GT",
+        "cs.MA",
+        "eess.SY"
+      ],
+      "published": "2026-04-07T15:08:06+00:00",
+      "link": "https://arxiv.org/pdf/2604.05977v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Adaptive incentive design and mechanism design for strategic agents",
+      "llm_evidence_cn": "针对策略型智能体的自适应激励设计与机制设计",
+      "llm_evidence": "针对策略型智能体的自适应激励设计与机制设计",
+      "canonical_evidence": "针对策略型智能体的自适应激励设计与机制设计",
+      "llm_tldr_en": "RAID algorithm addresses incentive design under information asymmetry using regret minimization.",
+      "llm_tldr_cn": "RAID算法通过悔恨最小化解决了信息不对称下的自适应激励机制设计问题。",
+      "llm_tldr": "RAID算法通过悔恨最小化解决了信息不对称下的自适应激励机制设计问题。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06610v1",
+      "source": "arxiv",
+      "title": "TwinLoop: Simulation-in-the-Loop Digital Twins for Online Multi-Agent Reinforcement Learning",
+      "abstract": "Decentralised online learning enables runtime adaptation in cyber-physical multi-agent systems, but when operating conditions change, learned policies often require substantial trial-and-error interaction before recovering performance. To address this, we propose TwinLoop, a simulation-in-the-loop digital twin framework for online multi-agent reinforcement learning. When a context shift occurs, the digital twin is triggered to reconstruct the current system state, initialise from the latest agent policies, and perform accelerated policy improvement with simulation what-if analysis before synchronising updated parameters back to the agents in the physical system. We evaluate TwinLoop in a vehicular edge computing task-offloading scenario with changing workload and infrastructure conditions. The results suggest that digital twins can improve post-shift adaptation efficiency and reduce reliance on costly online trial-and-error.",
+      "authors": [
+        "Nan Zhang",
+        "Zishuo Wang",
+        "Shuyu Huang",
+        "Georgios Diamantopoulos",
+        "Nikos Tziritas",
+        "Panagiotis Oikonomou",
+        "Georgios Theodoropoulos"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-08T02:43:04+00:00",
+      "link": "https://arxiv.org/pdf/2604.06610v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "simulation-in-the-loop digital twins for multi-agent reinforcement learning",
+      "llm_evidence_cn": "用于多智能体强化学习的仿真在环数字孪生",
+      "llm_evidence": "用于多智能体强化学习的仿真在环数字孪生",
+      "canonical_evidence": "用于多智能体强化学习的仿真在环数字孪生",
+      "llm_tldr_en": "Proposes TwinLoop to accelerate policy improvement in multi-agent reinforcement learning using digital twins.",
+      "llm_tldr_cn": "提出TwinLoop，利用数字孪生加速多智能体强化学习中的策略改进。",
+      "llm_tldr": "提出TwinLoop，利用数字孪生加速多智能体强化学习中的策略改进。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06819v1",
+      "source": "arxiv",
+      "title": "Beyond End-to-End: Dynamic Chain Optimization for Private LLM Adaptation on the Edge",
+      "abstract": "Federated fine-tuning enables privacy-preserving LLM adaptation but faces a critical bottleneck: the disparity between LLMs' high memory demands and edge devices' limited capacity. To break the memory barrier, we propose Chain Federated Fine-Tuning (ChainFed), an innovative paradigm that forgoes end-to-end updates in favor of a sequential, layer-by-layer manner. It first trains the initial adapter to convergence, freezes its weights, and then proceeds to the next. This iterative train-and-freeze process forms an optimization chain, gradually enhancing the model's task-specific proficiency. ChainFed further integrates three core techniques: 1) Dynamic Layer Co-Tuning to bridge semantic gaps between sequentially tuned layers and facilitate information flow; 2) Globally Perceptive Optimization to endow each adapter with foresight beyond its local objective; 3) Function-Oriented Adaptive Tuning to automatically identify the optimal fine-tuning starting point. Extensive experiments on multiple benchmarks demonstrate the superiority of ChainFed over existing methods, boosting average accuracy by up to 46.46\\%.",
+      "authors": [
+        "Yebo Wu",
+        "Jingguang Li",
+        "Chunlin Tian",
+        "Kahou Tam",
+        "Zhijiang Guo",
+        "Li Li"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-04-08T08:37:17+00:00",
+      "link": "https://arxiv.org/pdf/2604.06819v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "federated fine-tuning for private LLM adaptation",
+      "llm_evidence_cn": "私有大语言模型适配的联邦微调",
+      "llm_evidence": "私有大语言模型适配的联邦微调",
+      "canonical_evidence": "私有大语言模型适配的联邦微调",
+      "llm_tldr_en": "Introduces ChainFed, a layer-by-layer federated fine-tuning paradigm to reduce memory demands on edge devices.",
+      "llm_tldr_cn": "引入了ChainFed，一种逐层联邦微调范式，以降低边缘设备的内存需求。",
+      "llm_tldr": "引入了ChainFed，一种逐层联邦微调范式，以降低边缘设备的内存需求。",
+      "llm_tags": [
+        "query:visfed"
+      ],
+      "matched_query_tag": "query:visfed",
+      "matched_query_text": "research on federated learning frameworks for multimodal models",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07072v1",
+      "source": "arxiv",
+      "title": "Epistemic Robust Offline Reinforcement Learning",
+      "abstract": "Offline reinforcement learning learns policies from fixed datasets without further environment interaction. A key challenge in this setting is epistemic uncertainty, arising from limited or biased data coverage, particularly when the behavior policy systematically avoids certain actions. This can lead to inaccurate value estimates and unreliable generalization. Ensemble-based methods like SAC-N mitigate this by conservatively estimating Q-values using the ensemble minimum, but they require large ensembles and often conflate epistemic with aleatoric uncertainty. To address these limitations, we propose a unified and generalizable framework that replaces discrete ensembles with compact uncertainty sets over Q-values. %We further introduce an Epinet based model that directly shapes the uncertainty sets to optimize the cumulative reward under the robust Bellman objective without relying on ensembles. We also introduce a benchmark for evaluating offline RL algorithms under risk-sensitive behavior policies, and demonstrate that our method achieves improved robustness and generalization over ensemble-based baselines across both tabular and continuous state domains.",
+      "authors": [
+        "Abhilash Reddy Chenreddy",
+        "Erick Delage"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-08T13:26:00+00:00",
+      "link": "https://arxiv.org/pdf/2604.07072v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Advances in offline reinforcement learning using uncertainty sets over Q-values",
+      "llm_evidence_cn": "利用Q值不确定性集合的离线强化学习进展",
+      "llm_evidence": "利用Q值不确定性集合的离线强化学习进展",
+      "canonical_evidence": "利用Q值不确定性集合的离线强化学习进展",
+      "llm_tldr_en": "This paper proposes a framework to handle epistemic uncertainty in offline RL using compact uncertainty sets.",
+      "llm_tldr_cn": "该论文提出了一个利用紧凑不确定性集合处理离线强化学习中认知不确定性的框架。",
+      "llm_tldr": "该论文提出了一个利用紧凑不确定性集合处理离线强化学习中认知不确定性的框架。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07165v1",
+      "source": "arxiv",
+      "title": "Reason in Chains, Learn in Trees: Self-Rectification and Grafting for Multi-turn Agent Policy Optimization",
+      "abstract": "Reinforcement learning for Large Language Model agents is often hindered by sparse rewards in multi-step reasoning tasks. Existing approaches like Group Relative Policy Optimization treat sampled trajectories as independent chains, assigning uniform credit to all steps in each chain and ignoring the existence of critical steps that may disproportionally impact reasoning outcome. In this paper, we propose T-STAR(Tree-structured Self-Taught Agent Rectification), a framework that recovers the latent correlated reward structure across seemingly independent trajectories. Specifically, we consolidate trajectories into a unified Cognitive Tree by identifying and merging functionally similar steps/nodes. It enables an Introspective Valuation mechanism that back-propagates trajectory-level rewards through the tree to obtain a new notion of variance-reduced relative advantage at step-level. Using the Cognitive Tree, we also develop In-Context Thought Grafting to synthesize corrective reasoning by contrasting successful and failed branches at critical divergence points/steps. Our proposed Surgical Policy Optimization then capitalizes on the rich policy gradient information concentrated at these critical points/steps through a Bradley-Terry type of surgical loss. Extensive experiments across embodied, interactive, reasoning, and planning benchmarks demonstrate that T-STAR achieves consistent improvements over strong baselines, with gains most pronounced on tasks requiring extended reasoning chains.",
+      "authors": [
+        "Yu Li",
+        "Sizhe Tang",
+        "Tian Lan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-08T14:55:29+00:00",
+      "link": "https://arxiv.org/pdf/2604.07165v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for agent policy optimization",
+      "llm_evidence_cn": "智能体策略优化的强化学习",
+      "llm_evidence": "智能体策略优化的强化学习",
+      "canonical_evidence": "智能体策略优化的强化学习",
+      "llm_tldr_en": "T-STAR improves RL for LLM agents by recovering latent reward structures in multi-turn reasoning tasks.",
+      "llm_tldr_cn": "T-STAR框架通过恢复多轮推理任务中的潜在奖励结构，优化了LLM智能体的强化学习。",
+      "llm_tldr": "T-STAR框架通过恢复多轮推理任务中的潜在奖励结构，优化了LLM智能体的强化学习。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07419v1",
+      "source": "arxiv",
+      "title": "ReAlign: Optimizing the Visual Document Retriever with Reasoning-Guided Fine-Grained Alignment",
+      "abstract": "Visual document retrieval aims to retrieve a set of document pages relevant to a query from visually rich collections. Existing methods often employ Vision-Language Models (VLMs) to encode queries and visual pages into a shared embedding space, which is then optimized via contrastive training. However, during visual document representation, localized evidence is usually scattered across complex document layouts, making it difficult for retrieval models to capture crucial cues for effective embedding learning. In this paper, we propose Reasoning-Guided Alignment (ReAlign), a method that enhances visual document retrieval by leveraging the reasoning capability of VLMs to provide fine-grained visual document descriptions as supervision signals for training. Specifically, ReAlign employs a superior VLM to identify query-related regions on a page and then generates a query-aware description grounding the cropped visual regions. The retriever is then trained using these region-focused descriptions to align the semantics between queries and visual documents by encouraging the document ranking distribution induced by the region-focused descriptions to match that induced by the original query. Experiments on diverse visually rich document retrieval benchmarks demonstrate that ReAlign consistently improves visual document retrieval performance on both in-domain and out-of-domain datasets, achieving up to 2% relative improvements. Moreover, the advantages of ReAlign generalize across different VLM backbones by guiding models to better focus their attention on critical visual cues for document representation. All code and datasets are available at https://github.com/NEUIR/ReAlign.",
+      "authors": [
+        "Hao Yang",
+        "Yifan Ji",
+        "Zhipeng Xu",
+        "Zhenghao Liu",
+        "Yukun Yan",
+        "Zulong Chen",
+        "Shuo Wang",
+        "Yu Gu",
+        "Ge Yu"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-04-08T14:47:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.07419v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Optimizing visual document retrieval using Vision-Language Models (VLMs) and reasoning-guided alignment",
+      "llm_evidence_cn": "利用视觉语言模型（VLM）和推理引导对齐优化视觉文档检索",
+      "llm_evidence": "利用视觉语言模型（VLM）和推理引导对齐优化视觉文档检索",
+      "canonical_evidence": "利用视觉语言模型（VLM）和推理引导对齐优化视觉文档检索",
+      "llm_tldr_en": "ReAlign improves visual document retrieval by using VLMs to provide fine-grained reasoning-guided alignment.",
+      "llm_tldr_cn": "ReAlign通过利用VLM提供细粒度的推理引导对齐来改进视觉文档检索。",
+      "llm_tldr": "ReAlign通过利用VLM提供细粒度的推理引导对齐来改进视觉文档检索。",
+      "llm_tags": [
+        "query:visfed"
+      ],
+      "matched_query_tag": "query:visfed",
+      "matched_query_text": "find recent research papers on federated learning for visual language models",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07480v1",
+      "source": "arxiv",
+      "title": "Active Reward Machine Inference From Raw State Trajectories",
+      "abstract": "Reward machines are automaton-like structures that capture the memory required to accomplish a multi-stage task. When combined with reinforcement learning or optimal control methods, they can be used to synthesize robot policies to achieve such tasks. However, specifying a reward machine by hand, including a labeling function capturing high-level features that the decisions are based on, can be a daunting task. This paper deals with the problem of learning reward machines directly from raw state and policy information. As opposed to existing works, we assume no access to observations of rewards, labels, or machine nodes, and show what trajectory data is sufficient for learning the reward machine in this information-scarce regime. We then extend the result to an active learning setting where we incrementally query trajectory extensions to improve data (and indirectly computational) efficiency. Results are demonstrated with several grid world examples.",
+      "authors": [
+        "Mohamad Louai Shehab",
+        "Antoine Aspeel",
+        "Necmiye Ozay"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI",
+        "cs.FL"
+      ],
+      "published": "2026-04-08T18:19:55+00:00",
+      "link": "https://arxiv.org/pdf/2604.07480v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "learning reward machines from raw state trajectories for reinforcement learning",
+      "llm_evidence_cn": "从原始状态轨迹中学习强化学习的奖励机",
+      "llm_evidence": "从原始状态轨迹中学习强化学习的奖励机",
+      "canonical_evidence": "从原始状态轨迹中学习强化学习的奖励机",
+      "llm_tldr_en": "Proposes a method to infer reward machines from raw state and policy data to aid reinforcement learning.",
+      "llm_tldr_cn": "提出一种从原始状态和策略数据中推断奖励机的方法，以辅助强化学习。",
+      "llm_tldr": "提出一种从原始状态和策略数据中推断奖励机的方法，以辅助强化学习。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07634v1",
+      "source": "arxiv",
+      "title": "VSAS-BENCH: Real-Time Evaluation of Visual Streaming Assistant Models",
+      "abstract": "Streaming vision-language models (VLMs) continuously generate responses given an instruction prompt and an online stream of input frames. This is a core mechanism for real-time visual assistants. Existing VLM frameworks predominantly assess models in offline settings. In contrast, the performance of a streaming VLM depends on additional metrics beyond pure video understanding, including proactiveness, which reflects the timeliness of the model's responses, and consistency, which captures the robustness of its responses over time. To address this limitation, we propose VSAS-Bench, a new framework and benchmark for Visual Streaming Assistants. In contrast to prior benchmarks that primarily employ single-turn question answering on video inputs, VSAS-Bench features temporally dense annotations with over 18,000 annotations across diverse input domains and task types. We introduce standardized synchronous and asynchronous evaluation protocols, along with metrics that isolate and measure distinct capabilities of streaming VLMs. Using this framework, we conduct large-scale evaluations of recent video and streaming VLMs, analyzing the accuracy-latency trade-off under key design factors such as memory buffer length, memory access policy, and input resolution, yielding several practical insights. Finally, we show empirically that conventional VLMs can be adapted to streaming settings without additional training, and demonstrate that these adapted models outperform recent streaming VLMs. For example, Qwen3-VL-4B surpasses Dispider, the best streaming VLM on our benchmark, by 3% under the asynchronous protocol. The benchmark and code will be available at https://github.com/apple/ml-vsas-bench.",
+      "authors": [
+        "Pavan Kumar Anasosalu Vasu",
+        "Cem Koc",
+        "Fartash Faghri",
+        "Chun-Liang Li",
+        "Bo Feng",
+        "Zhengfeng Lai",
+        "Meng Cao",
+        "Oncel Tuzel",
+        "Hadi Pouransari"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-08T22:31:20+00:00",
+      "link": "https://arxiv.org/pdf/2604.07634v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "benchmark for Visual Streaming Assistant Models (VLMs)",
+      "llm_evidence_cn": "视觉流辅助模型（VLM）的基准测试",
+      "llm_evidence": "视觉流辅助模型（VLM）的基准测试",
+      "canonical_evidence": "视觉流辅助模型（VLM）的基准测试",
+      "llm_tldr_en": "Introduces VSAS-Bench, a benchmark for evaluating real-time streaming vision-language models.",
+      "llm_tldr_cn": "引入了 VSAS-Bench，这是一个用于评估实时流式视觉语言模型的基准。",
+      "llm_tldr": "引入了 VSAS-Bench，这是一个用于评估实时流式视觉语言模型的基准。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08103v1",
+      "source": "arxiv",
+      "title": "Reinforcement learning with reputation-based adaptive exploration promotes the evolution of cooperation",
+      "abstract": "Multi-agent reinforcement learning serves as an effective tool for studying strategy adaptation in evolutionary games. Although prior work has integrated Q-learning with reputation mechanisms to promote cooperation, most existing algorithms adopt fixed exploration rates and overlook the influence of social context on exploratory behavior. In practice, individuals may adjust their willingness to explore based on their reputation and perceived social standing. To address this, we propose a Q-learning model that couples exploration rates with local reputation differences and incorporates asymmetric, state-dependent reputation updates. Our results show that each mechanism independently promotes cooperation, and their combination yields a reinforcing effect. The joint mechanism enhances cooperation by making ``high reputation--low exploration, low reputation--high exploration'', while adjusting reputation updates to amplify cooperative gains at low status and defection penalties at high status. This study thus offers insights into how social evaluation can shape learning behavior in complex environments.",
+      "authors": [
+        "An Li",
+        "Wenqiang Zhu",
+        "Chaoqian Wang",
+        "Longzhao Liu",
+        "Hongwei Zheng",
+        "Yishen Jiang",
+        "Xin Wang",
+        "Shaoting Tang"
+      ],
+      "primary_category": "physics.comp-ph",
+      "categories": [
+        "physics.comp-ph"
+      ],
+      "published": "2026-04-09T11:22:08+00:00",
+      "link": "https://arxiv.org/pdf/2604.08103v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "The paper proposes a Q-learning model with reputation-based adaptive exploration to promote cooperation in multi-agent reinforcement learning.",
+      "llm_evidence_cn": "该论文提出了一种基于声誉自适应探索的Q学习模型，旨在促进多智能体强化学习中的合作演化。",
+      "llm_evidence": "该论文提出了一种基于声誉自适应探索的Q学习模型，旨在促进多智能体强化学习中的合作演化。",
+      "canonical_evidence": "该论文提出了一种基于声誉自适应探索的Q学习模型，旨在促进多智能体强化学习中的合作演化。",
+      "llm_tldr_en": "Introduces a reputation-based adaptive exploration strategy in reinforcement learning to enhance cooperation.",
+      "llm_tldr_cn": "在强化学习中引入基于声誉的自适应探索策略，以增强多智能体系统中的合作。",
+      "llm_tldr": "在强化学习中引入基于声誉的自适应探索策略，以增强多智能体系统中的合作。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08124v1",
+      "source": "arxiv",
+      "title": "Beyond Stochastic Exploration: What Makes Training Data Valuable for Agentic Search",
+      "abstract": "Reinforcement learning (RL) has become an effective approach for advancing the reasoning capabilities of large language models (LLMs) through the strategic integration of external search engines. However, current RL-based search agents often rely on a process of stochastic exploration guided by carefully crafted outcome rewards, leading to inefficient reasoning trajectories and unstable training. To address these issues, we propose a novel framework, Hierarchical Experience (HiExp), to enhance the performance and training stability of search agents. Specifically, we extract empirical knowledge through contrastive analysis and a multi-level clustering mechanism, transforming raw reasoning trajectories into hierarchical experience knowledge. By leveraging experience-aligned training, we effectively regularize stochastic exploration, evolving it into a strategic and experience-driven search process. Extensive evaluations on multiple complex agentic search and mathematical reasoning benchmarks demonstrate that our approach not only achieves substantial performance gains but also exhibits strong cross-task and cross-algorithm generalization.",
+      "authors": [
+        "Chuzhan Hao",
+        "Wenfeng Feng",
+        "Guochao Jiang",
+        "Guofeng Quan",
+        "Guohua Liu",
+        "Yuewei Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-09T11:44:44+00:00",
+      "link": "https://arxiv.org/pdf/2604.08124v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL-based search agents for LLM reasoning",
+      "llm_evidence_cn": "基于强化学习的LLM推理搜索代理",
+      "llm_evidence": "基于强化学习的LLM推理搜索代理",
+      "canonical_evidence": "基于强化学习的LLM推理搜索代理",
+      "llm_tldr_en": "Proposes HiExp to improve RL-based search agent stability and reasoning through hierarchical experience knowledge.",
+      "llm_tldr_cn": "提出HiExp框架，通过分层经验知识提升强化学习搜索代理的训练稳定性和推理性能。",
+      "llm_tldr": "提出HiExp框架，通过分层经验知识提升强化学习搜索代理的训练稳定性和推理性能。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08337v1",
+      "source": "arxiv",
+      "title": "InstAP: Instance-Aware Vision-Language Pre-Train for Spatial-Temporal Understanding",
+      "abstract": "Current vision-language pre-training (VLP) paradigms excel at global scene understanding but struggle with instance-level reasoning due to global-only supervision. We introduce InstAP, an Instance-Aware Pre-training framework that jointly optimizes global vision-text alignment and fine-grained, instance-level contrastive alignment by grounding textual mentions to specific spatial-temporal regions. To support this, we present InstVL, a large-scale dataset (2 million images, 50,000 videos) with dual-granularity annotations: holistic scene captions and dense, grounded instance descriptions. On the InstVL benchmark, InstAP substantially outperforms existing VLP models on instance-level retrieval, and also surpasses a strong VLP baseline trained on the exact same data corpus, isolating the benefit of our instance-aware objective. Moreover, instance-centric pre-training improves global understanding: InstAP achieves competitive zero-shot performance on multiple video benchmarks, including MSR-VTT and DiDeMo. Qualitative visualizations further show that InstAP localizes textual mentions to the correct instances, while global-only models exhibit more diffuse, scene-level attention.",
+      "authors": [
+        "Ashutosh Kumar",
+        "Rajat Saini",
+        "Jingjing Pan",
+        "Mustafa Erdogan",
+        "Mingfang Zhang",
+        "Betty Le Dem",
+        "Norimasa Kobori",
+        "Quan Kong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T15:10:25+00:00",
+      "link": "https://arxiv.org/pdf/2604.08337v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "instance-aware vision-language pre-training for spatial-temporal understanding",
+      "llm_evidence_cn": "用于时空理解的实例感知视觉语言预训练",
+      "llm_evidence": "用于时空理解的实例感知视觉语言预训练",
+      "canonical_evidence": "用于时空理解的实例感知视觉语言预训练",
+      "llm_tldr_en": "Introduces InstAP for fine-grained instance-level alignment in vision-language pre-training.",
+      "llm_tldr_cn": "引入InstAP，在视觉语言预训练中实现细粒度的实例级对齐。",
+      "llm_tldr": "引入InstAP，在视觉语言预训练中实现细粒度的实例级对齐。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08468v1",
+      "source": "arxiv",
+      "title": "TTVS: Boosting Self-Exploring Reinforcement Learning via Test-time Variational Synthesis",
+      "abstract": "Despite significant advances in Large Reasoning Models (LRMs) driven by reinforcement learning with verifiable rewards (RLVR), this paradigm is fundamentally limited in specialized or novel domains where such supervision is prohibitively expensive or unavailable, posing a key challenge for test-time adaptation. While existing test-time methods offer a potential solution, they are constrained by learning from static query sets, risking overfitting to textual patterns. To address this gap, we introduce Test-Time Variational Synthesis (TTVS), a novel framework that enables LRMs to self-evolve by dynamically augmenting the training stream from unlabeled test queries. TTVS comprises two synergistic modules: (1) Online Variational Synthesis, which transforms static test queries into a dynamic stream of diverse, semantically-equivalent variations, enforcing the model to learn underlying problem logic rather than superficial patterns; (2) Test-time Hybrid Exploration, which balances accuracy-driven exploitation with consistency-driven exploration across synthetic variants. Extensive experiments show TTVS yields superior performance across eight model architectures. Notably, using only unlabeled test-time data, TTVS not only surpasses other test-time adaptation methods but also outperforms state-of-the-art supervised RL-based techniques trained on vast, high-quality labeled data.",
+      "authors": [
+        "Sikai Bai",
+        "Haoxi Li",
+        "Jie Zhang",
+        "Yongjiang Liu",
+        "Song Guo"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T17:03:49+00:00",
+      "link": "https://arxiv.org/pdf/2604.08468v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "boosting reinforcement learning via variational synthesis",
+      "llm_evidence_cn": "通过变分合成增强强化学习",
+      "llm_evidence": "通过变分合成增强强化学习",
+      "canonical_evidence": "通过变分合成增强强化学习",
+      "llm_tldr_en": "TTVS enables large reasoning models to self-evolve using reinforcement learning and dynamic data synthesis.",
+      "llm_tldr_cn": "TTVS框架通过强化学习和动态数据合成，使大型推理模型能够实现自我进化。",
+      "llm_tldr": "TTVS框架通过强化学习和动态数据合成，使大型推理模型能够实现自我进化。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08476v1",
+      "source": "arxiv",
+      "title": "Faithful GRPO: Improving Visual Spatial Reasoning in Multimodal Language Models via Constrained Policy Optimization",
+      "abstract": "Multimodal reasoning models (MRMs) trained with reinforcement learning with verifiable rewards (RLVR) show improved accuracy on visual reasoning benchmarks. However, we observe that accuracy gains often come at the cost of reasoning quality: generated Chain-of-Thought (CoT) traces are frequently inconsistent with the final answer and poorly grounded in the visual evidence. We systematically study this phenomenon across seven challenging real-world spatial reasoning benchmarks and find that it affects contemporary MRMs such as ViGoRL-Spatial, TreeVGR as well as our own models trained with standard Group Relative Policy Optimization (GRPO). We characterize CoT reasoning quality along two complementary axes: \"logical consistency\" (does the CoT entail the final answer?) and \"visual grounding\" (does each reasoning step accurately describe objects, attributes, and spatial relationships in the image?). To address this, we propose Faithful GRPO (FGRPO), a variant of GRPO that enforces consistency and grounding as constraints via Lagrangian dual ascent. FGRPO incorporates batch-level consistency and grounding constraints into the advantage computation within a group, adaptively adjusting the relative importance of constraints during optimization. We evaluate FGRPO on Qwen2.5-VL-7B and 3B backbones across seven spatial datasets. Our results show that FGRPO substantially improves reasoning quality, reducing the inconsistency rate from 24.5% to 1.7% and improving visual grounding scores by +13%. It also improves final answer accuracy over simple GRPO, demonstrating that faithful reasoning enables better answers.",
+      "authors": [
+        "Sai Srinivas Kancheti",
+        "Aditya Kanade",
+        "Rohit Sinha",
+        "Vineeth N Balasubramanian",
+        "Tanuja Ganu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T17:15:47+00:00",
+      "link": "https://arxiv.org/pdf/2604.08476v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for multimodal reasoning models",
+      "llm_evidence_cn": "多模态推理模型的强化学习",
+      "llm_evidence": "多模态推理模型的强化学习",
+      "canonical_evidence": "多模态推理模型的强化学习",
+      "llm_tldr_en": "Improves visual spatial reasoning in multimodal models using constrained policy optimization (GRPO).",
+      "llm_tldr_cn": "通过约束策略优化（GRPO）改进多模态模型的视觉空间推理能力和推理质量。",
+      "llm_tldr": "通过约束策略优化（GRPO）改进多模态模型的视觉空间推理能力和推理质量。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "explore cross domain methods combining federation, reinforcement, and multimodal generative techniques",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08517v1",
+      "source": "arxiv",
+      "title": "Learning vs. Optimizing Bidders in Budgeted Auctions",
+      "abstract": "The study of repeated interactions between a learner and a utility-maximizing optimizer has yielded deep insights into the manipulability of learning algorithms. However, existing literature primarily focuses on independent, unlinked rounds, largely ignoring the ubiquitous practical reality of budget constraints. In this paper, we study this interaction in repeated second-price auctions in a Bayesian setting between a learning agent and a strategic agent, both subject to strict budget constraints, showing that such cross-round constraints fundamentally alter the strategic landscape.   First, we generalize the classic Stackelberg equilibrium to the Budgeted Stackelberg Equilibrium. We prove that an optimizer's optimal strategy in a budgeted setting requires time-multiplexing; for a $k$-dimensional budget constraint, the optimal strategy strictly decomposes into up to $k+1$ distinct phases, with each phase employing a possibly unique mixed strategy (the case of $k=0$ recovers the classic Stackelberg equilibrium where the optimizer repeatedly uses a single mixed strategy). Second, we address the intriguing question of non-manipulability. We prove that when the learner employs a standard Proportional controller (the \"P\" of the PID-controller) to pace their bids, the optimizer's utility is upper bounded by their objective value in the Budgeted Stackelberg Equilibrium baseline. By bounding the dynamics of the PID controller via a novel analysis, our results establish that this widely used control-theoretic heuristic is actually strategically robust.",
+      "authors": [
+        "Giannis Fikioris",
+        "Balasubramanian Sivan",
+        "Éva Tardos"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT"
+      ],
+      "published": "2026-04-09T17:54:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.08517v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "bidding strategies in auctions under strict budget constraints",
+      "llm_evidence_cn": "严格预算约束下的拍卖投标策略",
+      "llm_evidence": "严格预算约束下的拍卖投标策略",
+      "canonical_evidence": "严格预算约束下的拍卖投标策略",
+      "llm_tldr_en": "Analyzes strategic interactions and equilibria in repeated auctions with budgeted agents.",
+      "llm_tldr_cn": "研究了预算约束下重复拍卖中的策略性交互和预算 Stackelberg 均衡。",
+      "llm_tldr": "研究了预算约束下重复拍卖中的策略性交互和预算 Stackelberg 均衡。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08536v1",
+      "source": "arxiv",
+      "title": "RewardFlow: Generate Images by Optimizing What You Reward",
+      "abstract": "We introduce RewardFlow, an inversion-free framework that steers pretrained diffusion and flow-matching models at inference time through multi-reward Langevin dynamics. RewardFlow unifies complementary differentiable rewards for semantic alignment, perceptual fidelity, localized grounding, object consistency, and human preference, and further introduces a differentiable VQA-based reward that provides fine-grained semantic supervision through language-vision reasoning. To coordinate these heterogeneous objectives, we design a prompt-aware adaptive policy that extracts semantic primitives from the instruction, infers edit intent, and dynamically modulates reward weights and step sizes throughout sampling. Across several image editing and compositional generation benchmarks, RewardFlow delivers state-of-the-art edit fidelity and compositional alignment.",
+      "authors": [
+        "Onkar Susladkar",
+        "Dong-Hwan Jang",
+        "Tushar Prakash",
+        "Adheesh Juvekar",
+        "Vedant Shah",
+        "Ayush Barik",
+        "Nabeel Bashir",
+        "Muntasir Wahed",
+        "Ritish Shrirao",
+        "Ismini Lourentzou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T17:59:19+00:00",
+      "link": "https://arxiv.org/pdf/2604.08536v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "steers pretrained diffusion models through multi-reward Langevin dynamics",
+      "llm_evidence_cn": "通过多奖励朗之万动力学引导预训练扩散模型",
+      "llm_evidence": "通过多奖励朗之万动力学引导预训练扩散模型",
+      "canonical_evidence": "通过多奖励朗之万动力学引导预训练扩散模型",
+      "llm_tldr_en": "Introduces RewardFlow to steer diffusion models at inference time using diverse differentiable rewards.",
+      "llm_tldr_cn": "引入RewardFlow，在推理阶段利用多种可微奖励引导扩散模型生成。",
+      "llm_tldr": "引入RewardFlow，在推理阶段利用多种可微奖励引导扩散模型生成。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08617v1",
+      "source": "arxiv",
+      "title": "From Selection to Scheduling: Federated Geometry-Aware Correction Makes Exemplar Replay Work Better under Continual Dynamic Heterogeneity",
+      "abstract": "Exemplar replay has become an effective strategy for mitigating catastrophic forgetting in federated continual learning (FCL) by retaining representative samples from past tasks. Existing studies focus on designing sample-importance estimation mechanisms to identify information-rich samples. However, they typically overlook strategies for effectively utilizing the selected exemplars, which limits their performance under continual dynamic heterogeneity across clients and tasks. To address this issue, this paper proposes a Federated gEometry-Aware correcTion method, termed FEAT, which alleviates imbalance-induced representation collapse that drags rare-class features toward frequent classes across clients. Specifically, it consists of two key modules: 1) the Geometric Structure Alignment module performs structural knowledge distillation by aligning the pairwise angular similarities between feature representations and their corresponding Equiangular Tight Frame prototypes, which are fixed and shared across clients to serve as a class-discriminative reference structure. This encourages geometric consistency across tasks and helps mitigate representation drift; 2) the Energy-based Geometric Correction module removes task-irrelevant directional components from feature embeddings, which reduces prediction bias toward majority classes. This improves sensitivity to minority classes and enhances the model's robustness under class-imbalanced distributions.",
+      "authors": [
+        "Zhuang Qi",
+        "Ying-Peng Tang",
+        "Lei Meng",
+        "Guoqing Chao",
+        "Lei Wu",
+        "Han Yu",
+        "Xiangxu Meng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-04-09T06:17:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.08617v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "federated geometry-aware correction for continual learning",
+      "llm_evidence_cn": "用于持续学习的联邦几何感知校正",
+      "llm_evidence": "用于持续学习的联邦几何感知校正",
+      "canonical_evidence": "用于持续学习的联邦几何感知校正",
+      "llm_tldr_en": "Proposes FEAT to improve exemplar replay in federated continual learning under dynamic heterogeneity.",
+      "llm_tldr_cn": "提出FEAT，以改进动态异构环境下联邦持续学习中的样本回放。",
+      "llm_tldr": "提出FEAT，以改进动态异构环境下联邦持续学习中的样本回放。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "recent research on federated learning frameworks and optimization methods",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08620v1",
+      "source": "arxiv",
+      "title": "StructRL: Recovering Dynamic Programming Structure from Learning Dynamics in Distributional Reinforcement Learning",
+      "abstract": "Reinforcement learning is typically treated as a uniform, data-driven optimization process, where updates are guided by rewards and temporal-difference errors without explicitly exploiting global structure. In contrast, dynamic programming methods rely on structured information propagation, enabling efficient and stable learning. In this paper, we provide evidence that such structure can be recovered from the learning dynamics of distributional reinforcement learning. By analyzing the temporal evolution of return distributions, we identify signals that capture when and where learning occurs in the state space. In particular, we introduce a temporal learning indicator t*(s) that reflects when a state undergoes its strongest learning update during training. Empirically, this signal induces an ordering over states that is consistent with a dynamic programming-style propagation of information. Building on this observation, we propose StructRL, a framework that exploits these signals to guide sampling in alignment with the emerging propagation structure. Our preliminary results suggest that distributional learning dynamics provide a mechanism to recover and exploit dynamic programming-like structure without requiring an explicit model. This offers a new perspective on reinforcement learning, where learning can be interpreted as a structured propagation process rather than a purely uniform optimization procedure.",
+      "authors": [
+        "Ivo Nowak"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T09:21:20+00:00",
+      "link": "https://arxiv.org/pdf/2604.08620v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "advances in distributional reinforcement learning algorithms",
+      "llm_evidence_cn": "分布强化学习算法的进展",
+      "llm_evidence": "分布强化学习算法的进展",
+      "canonical_evidence": "分布强化学习算法的进展",
+      "llm_tldr_en": "Recovers dynamic programming structure from learning dynamics to improve distributional RL efficiency.",
+      "llm_tldr_cn": "通过从学习动力学中恢复动态规划结构，提升了分布强化学习的效率和稳定性。",
+      "llm_tldr": "通过从学习动力学中恢复动态规划结构，提升了分布强化学习的效率和稳定性。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08728v1",
+      "source": "arxiv",
+      "title": "Wireless Communication Enhanced Value Decomposition for Multi-Agent Reinforcement Learning",
+      "abstract": "Cooperation in multi-agent reinforcement learning (MARL) benefits from inter-agent communication, yet most approaches assume idealized channels and existing value decomposition methods ignore who successfully shared information with whom. We propose CLOVER, a cooperative MARL framework whose centralized value mixer is conditioned on the communication graph realized under a realistic wireless channel. This graph introduces a relational inductive bias into value decomposition, constraining how individual utilities are mixed based on the realized communication structure. The mixer is a GNN with node-specific weights generated by a Permutation-Equivariant Hypernetwork: multi-hop propagation along communication edges reshapes credit assignment so that different topologies induce different mixing. We prove this mixer is permutation invariant, monotonic (preserving the IGM condition), and strictly more expressive than QMIX-style mixers. To handle realistic channels, we formulate an augmented MDP isolating stochastic channel effects from the agent computation graph, and employ a stochastic receptive field encoder for variable-size message sets, enabling end-to-end differentiable training. On Predator-Prey and Lumberjacks benchmarks under p-CSMA wireless channels, CLOVER consistently improves convergence speed and final performance over VDN, QMIX, TarMAC+VDN, and TarMAC+QMIX. Behavioral analysis confirms agents learn adaptive signaling and listening strategies, and ablations isolate the communication-graph inductive bias as the key source of improvement.",
+      "authors": [
+        "Diyi Hu",
+        "Bhaskar Krishnamachari"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-09T19:42:17+00:00",
+      "link": "https://arxiv.org/pdf/2604.08728v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "advances in multi-agent reinforcement learning and value decomposition",
+      "llm_evidence_cn": "多智能体强化学习与价值分解的进展",
+      "llm_evidence": "多智能体强化学习与价值分解的进展",
+      "canonical_evidence": "多智能体强化学习与价值分解的进展",
+      "llm_tldr_en": "Proposes a MARL framework that conditions value decomposition on realistic wireless communication graphs.",
+      "llm_tldr_cn": "提出一种多智能体强化学习框架，将价值分解与现实无线通信图相结合。",
+      "llm_tldr": "提出一种多智能体强化学习框架，将价值分解与现实无线通信图相结合。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08791v1",
+      "source": "arxiv",
+      "title": "eBandit: Kernel-Driven Reinforcement Learning for Adaptive Video Streaming",
+      "abstract": "User-space Adaptive Bitrate (ABR) algorithms cannot see the transport layer signals that matter most, such as minimum RTT and instantaneous delivery rate, and they respond to network changes only after damage has already propagated to the playout buffer. We present eBandit, a framework that relocates both network monitoring and ABR algorithm selection into the Linux kernel using eBPF. A lightweight epsilon-greedy Multi-Armed Bandit (MAB) runs inside a sockops program, evaluating three ABR heuristics against a reward derived from live TCP metrics. On an adversarial synthetic trace eBandit achieves $416.3 \\pm 4.9$ cumulative QoE, outperforming the best static heuristic by $7.2\\%$. On 42 real-world sessions eBandit achieves a mean QoE per chunk of $1.241$, the highest across all policies, demonstrating that kernel-resident bandit learning transfers to heterogeneous mobile conditions.",
+      "authors": [
+        "Mahdi Alizadeh"
+      ],
+      "primary_category": "cs.NI",
+      "categories": [
+        "cs.NI",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T22:02:04+00:00",
+      "link": "https://arxiv.org/pdf/2604.08791v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Kernel-driven reinforcement learning for adaptive video streaming using multi-armed bandits",
+      "llm_evidence_cn": "基于多臂老虎机的内核驱动强化学习自适应视频流算法",
+      "llm_evidence": "基于多臂老虎机的内核驱动强化学习自适应视频流算法",
+      "canonical_evidence": "基于多臂老虎机的内核驱动强化学习自适应视频流算法",
+      "llm_tldr_en": "eBandit uses eBPF and reinforcement learning in the Linux kernel to optimize adaptive bitrate streaming.",
+      "llm_tldr_cn": "eBandit利用eBPF和强化学习在Linux内核中优化自适应比特率流媒体。",
+      "llm_tldr": "eBandit利用eBPF和强化学习在Linux内核中优化自适应比特率流媒体。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08821v1",
+      "source": "arxiv",
+      "title": "Buying Data of Unknown Quality: Fisher Information Procurement Auctions",
+      "abstract": "We study statistical parameter estimation in the setting of data markets. A buyer seeks to estimate a parameter based on samples that can be purchased from competing providers that differ in their data quality and provision costs. When quality is known ex ante, we define a cost-per-information score that summarizes each provider's provision cost per unit of information about the buyer's estimation objective. We describe second-score procurement mechanism that ranks providers by this score, and endogenously chooses both a provider and a sample size while making truthful cost reports optimal. We then turn to the more realistic setting where data quality is private, and can only be indirectly observed via the delivered data. In this setting, we propose a simple mechanism that augments the second-score rule with a lenient ex post statistical test of the reported quality. We prove that under mild conditions, there exists an equilibrium in which sellers report costs truthfully and report quality up to deviations that vanish as the procured sample size grows. Our analysis highlights how the choice of verification test and the buyer's accuracy-cost tradeoff jointly shape participation and misreporting incentives in data markets.",
+      "authors": [
+        "Yuchen Hu",
+        "Martin J. Wainwright",
+        "Stephen Bates"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "econ.TH",
+        "stat.ME"
+      ],
+      "published": "2026-04-09T23:30:22+00:00",
+      "link": "https://arxiv.org/pdf/2604.08821v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "procurement auctions for data quality in statistical estimation",
+      "llm_evidence_cn": "统计估计中针对数据质量的采购拍卖机制",
+      "llm_evidence": "统计估计中针对数据质量的采购拍卖机制",
+      "canonical_evidence": "统计估计中针对数据质量的采购拍卖机制",
+      "llm_tldr_en": "Studies procurement auctions for purchasing data of unknown quality to optimize statistical parameter estimation.",
+      "llm_tldr_cn": "研究了针对未知质量数据的采购拍卖机制，以优化数据市场中的统计参数估计。",
+      "llm_tldr": "研究了针对未知质量数据的采购拍卖机制，以优化数据市场中的统计参数估计。",
+      "llm_tags": [
+        "query:q18"
+      ],
+      "matched_query_tag": "query:q18",
+      "matched_query_text": "retrieve papers studying auction based bidding strategies in federated learning",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08865v1",
+      "source": "arxiv",
+      "title": "SPPO: Sequence-Level PPO for Long-Horizon Reasoning Tasks",
+      "abstract": "Proximal Policy Optimization (PPO) is central to aligning Large Language Models (LLMs) in reasoning tasks with verifiable rewards. However, standard token-level PPO struggles in this setting due to the instability of temporal credit assignment over long Chain-of-Thought (CoT) horizons and the prohibitive memory cost of the value model. While critic-free alternatives like GRPO mitigate these issues, they incur significant computational overhead by requiring multiple samples for baseline estimation, severely limiting training throughput. In this paper, we introduce Sequence-Level PPO (SPPO), a scalable algorithm that harmonizes the sample efficiency of PPO with the stability of outcome-based updates. SPPO reformulates the reasoning process as a Sequence-Level Contextual Bandit problem, employing a decoupled scalar value function to derive low-variance advantage signals without multi-sampling. Extensive experiments on mathematical benchmarks demonstrate that SPPO significantly surpasses standard PPO and matches the performance of computation-heavy group-based methods, offering a resource-efficient framework for aligning reasoning LLMs.",
+      "authors": [
+        "Tianyi Wang",
+        "Yixia Li",
+        "Long Li",
+        "Yibiao Chen",
+        "Shaohan Huang",
+        "Yun Chen",
+        "Peng Li",
+        "Yang Liu",
+        "Guanhua Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-10T01:58:21+00:00",
+      "link": "https://arxiv.org/pdf/2604.08865v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Sequence-Level PPO for long-horizon reasoning tasks",
+      "llm_evidence_cn": "针对长程推理任务的序列级PPO算法",
+      "llm_evidence": "针对长程推理任务的序列级PPO算法",
+      "canonical_evidence": "针对长程推理任务的序列级PPO算法",
+      "llm_tldr_en": "Introduces SPPO, a scalable RL algorithm that improves PPO efficiency and stability for LLM reasoning.",
+      "llm_tldr_cn": "引入SPPO算法，通过序列级优化提升大语言模型在长程推理任务中的强化学习效率与稳定性。",
+      "llm_tldr": "引入SPPO算法，通过序列级优化提升大语言模型在长程推理任务中的强化学习效率与稳定性。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08926v1",
+      "source": "arxiv",
+      "title": "Bridging SFT and RL: Dynamic Policy Optimization for Robust Reasoning",
+      "abstract": "Post-training paradigms for Large Language Models (LLMs), primarily Supervised Fine-Tuning (SFT) and Reinforcement Learning (RL), face a fundamental dilemma: SFT provides stability (low variance) but suffers from high fitting bias, while RL enables exploration (low bias) but grapples with high gradient variance. Existing unified optimization strategies often employ naive loss weighting, overlooking the statistical conflict between these distinct gradient signals. In this paper, we provide a rigorous theoretical analysis of this bias-variance trade-off and propose \\textbf{DYPO} (Dynamic Policy Optimization), a unified framework designed to structurally mitigate this conflict. DYPO integrates three core components: (1) a \\textit{Group Alignment Loss (GAL)} that leverages intrinsic group dynamics to significantly reduce RL gradient variance; (2) a \\textit{Multi-Teacher Distillation} mechanism that corrects SFT fitting bias via diverse reasoning paths; and (3) a \\textit{Dynamic Exploitation-Exploration Gating} mechanism that adaptively arbitrates between stable SFT and exploratory RL based on reward feedback. Theoretical analysis confirms that DYPO linearly reduces fitting bias and minimizes overall variance. Extensive experiments demonstrate that DYPO significantly outperforms traditional sequential pipelines, achieving an average improvement of 4.8\\% on complex reasoning benchmarks and 13.3\\% on out-of-distribution tasks. Our code is publicly available at https://github.com/Tocci-Zhu/DYPO.",
+      "authors": [
+        "Taojie Zhu",
+        "Dongyang Xu",
+        "Ding Zou",
+        "Sen Zhao",
+        "Qiaobo Hao",
+        "Zhiguo Yang",
+        "Yonghong He"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-10T03:42:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.08926v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Dynamic policy optimization bridging supervised fine-tuning and reinforcement learning",
+      "llm_evidence_cn": "连接监督微调与强化学习的动态策略优化",
+      "llm_evidence": "连接监督微调与强化学习的动态策略优化",
+      "canonical_evidence": "连接监督微调与强化学习的动态策略优化",
+      "llm_tldr_en": "Proposes DYPO to mitigate the bias-variance trade-off between SFT and RL in LLM post-training.",
+      "llm_tldr_cn": "提出 DYPO 框架，旨在缓解大模型训练中监督微调与强化学习之间的偏差-方差冲突。",
+      "llm_tldr": "提出 DYPO 框架，旨在缓解大模型训练中监督微调与强化学习之间的偏差-方差冲突。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08960v1",
+      "source": "arxiv",
+      "title": "Efficient Hierarchical Implicit Flow Q-learning for Offline Goal-conditioned Reinforcement Learning",
+      "abstract": "Offline goal-conditioned reinforcement learning (GCRL) is a practical reinforcement learning paradigm that aims to learn goal-conditioned policies from reward-free offline data. Despite recent advances in hierarchical architectures such as HIQL, long-horizon control in offline GCRL remains challenging due to the limited expressiveness of Gaussian policies and the inability of high-level policies to generate effective subgoals. To address these limitations, we propose the goal-conditioned mean flow policy, which introduces an average velocity field into hierarchical policy modeling for offline GCRL. Specifically, the mean flow policy captures complex target distributions for both high-level and low-level policies through a learned average velocity field, enabling efficient action generation via one-step sampling. Furthermore, considering the insufficiency of goal representation, we introduce a LeJEPA loss that repels goal representation embeddings during training, thereby encouraging more discriminative representations and improving generalization. Experimental results show that our method achieves strong performance across both state-based and pixel-based tasks in the OGBench benchmark.",
+      "authors": [
+        "Zhiqiang Dong",
+        "Teng Pang",
+        "Rongjian Xu",
+        "Guoqiang Wu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-10T05:04:29+00:00",
+      "link": "https://arxiv.org/pdf/2604.08960v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Advances in offline goal-conditioned reinforcement learning algorithms",
+      "llm_evidence_cn": "离线目标条件强化学习算法的进展",
+      "llm_evidence": "离线目标条件强化学习算法的进展",
+      "canonical_evidence": "离线目标条件强化学习算法的进展",
+      "llm_tldr_en": "Proposes a goal-conditioned mean flow policy to improve hierarchical offline reinforcement learning.",
+      "llm_tldr_cn": "提出目标条件均值流策略，以改进分层离线强化学习中的长程控制问题。",
+      "llm_tldr": "提出目标条件均值流策略，以改进分层离线强化学习中的长程控制问题。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09123v1",
+      "source": "arxiv",
+      "title": "Prototype-Regularized Federated Learning for Cross-Domain Aspect Sentiment Triplet Extraction",
+      "abstract": "Aspect Sentiment Triplet Extraction (ASTE) aims to extract all sentiment triplets of aspect terms, opinion terms, and sentiment polarities from a sentence. Existing methods are typically trained on individual datasets in isolation, failing to jointly capture the common feature representations shared across domains. Moreover, data privacy constraints prevent centralized data aggregation. To address these challenges, we propose Prototype-based Cross-Domain Span Prototype extraction (PCD-SpanProto), a prototype-regularized federated learning framework to enable distributed clients to exchange class-level prototypes instead of full model parameters. Specifically, we design a weighted performance-aware aggregation strategy and a contrastive regularization module to improve the global prototype under domain heterogeneity and the promotion between intra-class compactness and inter-class separability across clients. Extensive experiments on four ASTE datasets demonstrate that our method outperforms baselines and reduces communication costs, validating the effectiveness of prototype-based cross-domain knowledge transfer.",
+      "authors": [
+        "Zongming Cai",
+        "Jianhang Tang",
+        "Zhenyong Zhang",
+        "Jinghui Qin",
+        "Kebing Jin",
+        "Hankz Hankui Zhuo"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-10T09:03:44+00:00",
+      "link": "https://arxiv.org/pdf/2604.09123v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "federated learning framework for cross-domain multimodal extraction",
+      "llm_evidence_cn": "用于跨域多模态提取的联邦学习框架",
+      "llm_evidence": "用于跨域多模态提取的联邦学习框架",
+      "canonical_evidence": "用于跨域多模态提取的联邦学习框架",
+      "llm_tldr_en": "Proposes a prototype-regularized federated learning framework for cross-domain sentiment extraction.",
+      "llm_tldr_cn": "提出一种用于跨域情感提取的原型正则化联邦学习框架。",
+      "llm_tldr": "提出一种用于跨域情感提取的原型正则化联邦学习框架。",
+      "llm_tags": [
+        "query:visfed"
+      ],
+      "matched_query_tag": "query:visfed",
+      "matched_query_text": "research on federated learning frameworks for multimodal models",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09201v1",
+      "source": "arxiv",
+      "title": "CT-1: Vision-Language-Camera Models Transfer Spatial Reasoning Knowledge to Camera-Controllable Video Generation",
+      "abstract": "Camera-controllable video generation aims to synthesize videos with flexible and physically plausible camera movements. However, existing methods either provide imprecise camera control from text prompts or rely on labor-intensive manual camera trajectory parameters, limiting their use in automated scenarios. To address these issues, we propose a novel Vision-Language-Camera model, termed CT-1 (Camera Transformer 1), a specialized model designed to transfer spatial reasoning knowledge to video generation by accurately estimating camera trajectories. Built upon vision-language modules and a Diffusion Transformer model, CT-1 employs a Wavelet-based Regularization Loss in the frequency domain to effectively learn complex camera trajectory distributions. These trajectories are integrated into a video diffusion model to enable spatially aware camera control that aligns with user intentions. To facilitate the training of CT-1, we design a dedicated data curation pipeline and construct CT-200K, a large-scale dataset containing over 47M frames. Experimental results demonstrate that our framework successfully bridges the gap between spatial reasoning and video synthesis, yielding faithful and high-quality camera-controllable videos and improving camera control accuracy by 25.7% over prior methods.",
+      "authors": [
+        "Haoyu Zhao",
+        "Zihao Zhang",
+        "Jiaxi Gu",
+        "Haoran Chen",
+        "Qingping Zheng",
+        "Pin Tang",
+        "Yeyin Jin",
+        "Yuang Zhang",
+        "Junqi Cheng",
+        "Zenghui Lu",
+        "Peng Shu",
+        "Zuxuan Wu",
+        "Yu-Gang Jiang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-10T10:43:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.09201v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "vision-language modules and Diffusion Transformer for video generation",
+      "llm_evidence_cn": "用于视频生成的视觉语言模块和扩散Transformer",
+      "llm_evidence": "用于视频生成的视觉语言模块和扩散Transformer",
+      "canonical_evidence": "用于视频生成的视觉语言模块和扩散Transformer",
+      "llm_tldr_en": "Proposes CT-1, a vision-language-camera model using Diffusion Transformers for controllable video generation.",
+      "llm_tldr_cn": "提出CT-1模型，结合视觉语言模块与扩散Transformer实现可控视频生成。",
+      "llm_tldr": "提出CT-1模型，结合视觉语言模块与扩散Transformer实现可控视频生成。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09349v1",
+      "source": "arxiv",
+      "title": "Visually-Guided Policy Optimization for Multimodal Reasoning",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) has significantly advanced the reasoning ability of vision-language models (VLMs). However, the inherent text-dominated nature of VLMs often leads to insufficient visual faithfulness, characterized by sparse attention activation to visual tokens. More importantly, our empirical analysis reveals that temporal visual forgetting along reasoning steps exacerbates this deficiency. To bridge this gap, we propose Visually-Guided Policy Optimization (VGPO), a novel framework to reinforce visual focus during policy optimization. Specifically, VGPO initially introduces a Visual Attention Compensation mechanism that leverages visual similarity to localize and amplify visual cues, while progressively elevating visual expectations in later steps to counteract visual forgetting. Building on this mechanism, we implement a dual-grained advantage re-weighting strategy: the intra-trajectory level highlights tokens exhibiting relatively high visual activation, while the inter-trajectory level prioritizes trajectories demonstrating superior visual accumulation. Extensive experiments demonstrate that VGPO achieves better visual activation and superior performance in mathematical multimodal reasoning and visual-dependent tasks.",
+      "authors": [
+        "Zengbin Wang",
+        "Feng Xiong",
+        "Liang Lin",
+        "Xuecai Hu",
+        "Yong Wang",
+        "Yanlin Wang",
+        "Man Zhang",
+        "Xiangxiang Chu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-10T14:22:38+00:00",
+      "link": "https://arxiv.org/pdf/2604.09349v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for vision-language model reasoning",
+      "llm_evidence_cn": "用于视觉语言模型推理的强化学习",
+      "llm_evidence": "用于视觉语言模型推理的强化学习",
+      "canonical_evidence": "用于视觉语言模型推理的强化学习",
+      "llm_tldr_en": "Proposes VGPO to enhance visual focus in vision-language models using reinforcement learning with verifiable rewards.",
+      "llm_tldr_cn": "提出VGPO框架，利用带验证奖励的强化学习增强视觉语言模型的视觉关注度。",
+      "llm_tldr": "提出VGPO框架，利用带验证奖励的强化学习增强视觉语言模型的视觉关注度。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09529v1",
+      "source": "arxiv",
+      "title": "VL-Calibration: Decoupled Confidence Calibration for Large Vision-Language Models Reasoning",
+      "abstract": "Large Vision Language Models (LVLMs) achieve strong multimodal reasoning but frequently exhibit hallucinations and incorrect responses with high certainty, which hinders their usage in high-stakes domains. Existing verbalized confidence calibration methods, largely developed for text-only LLMs, typically optimize a single holistic confidence score using binary answer-level correctness. This design is mismatched to LVLMs: an incorrect prediction may arise from perceptual failures or from reasoning errors given correct perception, and a single confidence conflates these sources while visual uncertainty is often dominated by language priors. To address these issues, we propose VL-Calibration, a reinforcement learning framework that explicitly decouples confidence into visual and reasoning confidence. To supervise visual confidence without ground-truth perception labels, we introduce an intrinsic visual certainty estimation that combines (i) visual grounding measured by KL-divergence under image perturbations and (ii) internal certainty measured by token entropy. We further propose token-level advantage reweighting to focus optimization on tokens based on visual certainty, suppressing ungrounded hallucinations while preserving valid perception. Experiments on thirteen benchmarks show that VL-Calibration effectively improves calibration while boosting visual reasoning accuracy, and it generalizes to out-of-distribution benchmarks across model scales and architectures.",
+      "authors": [
+        "Wenyi Xiao",
+        "Xinchi Xu",
+        "Leilei Gan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-10T17:47:19+00:00",
+      "link": "https://arxiv.org/pdf/2604.09529v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:VisFed"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning framework for vision-language models",
+      "llm_evidence_cn": "视觉语言模型的强化学习框架",
+      "llm_evidence": "视觉语言模型的强化学习框架",
+      "canonical_evidence": "视觉语言模型的强化学习框架",
+      "llm_tldr_en": "Proposes a reinforcement learning framework to calibrate confidence in large vision-language models.",
+      "llm_tldr_cn": "提出了一种强化学习框架，用于校准大型视觉语言模型的置信度。",
+      "llm_tldr": "提出了一种强化学习框架，用于校准大型视觉语言模型的置信度。",
+      "llm_tags": [
+        "query:visfed"
+      ],
+      "matched_query_tag": "query:visfed",
+      "matched_query_text": "find recent research papers on federated learning for visual language models",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.04579v2",
+      "source": "arxiv",
+      "title": "Firebolt-VL: Efficient Vision-Language Understanding with Cross-Modality Modulation",
+      "abstract": "Recent advances in multimodal large language models (MLLMs) have enabled impressive progress in vision-language understanding, yet their high computational cost limits deployment in resource-constrained scenarios such as personal assistants, document understanding, and smart cameras. Most existing methods rely on Transformer-based cross-attention, whose quadratic complexity hinders efficiency. Moreover, small vision-language models often struggle to precisely capture fine-grained, task-relevant visual regions, leading to degraded performance on fine-grained reasoning tasks that limit their effectiveness in the real world. To address these issues, we introduce Firebolt-VL, an efficient vision-language model that replaces the Transformer-based decoder with a Liquid Foundation Model (LFM) decoder. To further enhance visual grounding, we propose a Token-Grid Correlation Module, which computes lightweight correlations between text tokens and image patches and modulates via the state-space model with FiLM conditioning. This enables the model to selectively emphasize visual regions relevant to the textual prompt while maintaining linear-time inference. Experimental results across multiple benchmarks demonstrate that Firebolt-VL achieves accurate, fine-grained understanding with significantly improved efficiency. Our model and code are available at: https://fireboltvl.github.io",
+      "authors": [
+        "Quoc-Huy Trinh",
+        "Mustapha Abdullahi",
+        "Bo Zhao",
+        "Debesh Jha"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T10:25:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.04579v2",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:VisFed"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "efficient vision-language model for resource-constrained scenarios",
+      "llm_evidence_cn": "适用于资源受限场景的高效视觉语言模型",
+      "llm_evidence": "适用于资源受限场景的高效视觉语言模型",
+      "canonical_evidence": "适用于资源受限场景的高效视觉语言模型",
+      "llm_tldr_en": "Introduces Firebolt-VL, an efficient vision-language model using cross-modality modulation.",
+      "llm_tldr_cn": "引入Firebolt-VL，一种通过跨模态调制实现的高效视觉语言模型。",
+      "llm_tldr": "引入Firebolt-VL，一种通过跨模态调制实现的高效视觉语言模型。",
+      "llm_tags": [
+        "query:visfed"
+      ],
+      "matched_query_tag": "query:visfed",
+      "matched_query_text": "find recent research papers on federated learning for visual language models",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03897v1",
+      "source": "arxiv",
+      "title": "Latency-Aware Resource Allocation over Heterogeneous Networks: A Lorentz-Invariant Market Mechanism",
+      "abstract": "We present a telecom-native auction mechanism for allocating bandwidth and time slots across heterogeneous-delay networks, ranging from low-Earth-orbit (LEO) satellite constellations to delay-tolerant deep-space relays. The Lorentz-Invariant Auction (LIA) treats bids as spacetime events and reweights reported values based on the \\emph{horizon slack}, a causal quantity derived from the earliest-arrival times relative to a public clearing horizon. Unlike other delay-equalization rules, LIA combines a causal-ordering formulation, a uniquely exponential slack correction implied by a semigroup-style invariance axiom, and a critical-value implementation that ensures truthful reported values once slacks are fixed by trusted infrastructure. We analyze the incentive result in the exogenous-slack regime and separately examine bounded slack-estimation error and endogenous-delay limitations. Under fixed feasible slacks, LIA is individually rational and achieves welfare at least \\(e^{-λΔ}\\) relative to the optimal feasible allocation, where \\(Δ\\) is the slack spread. We evaluate LIA on STARLINK-200, INTERNET-100, and DSN-30 across 52,500 baseline instances with market sizes \\(n\\in\\{10,20,30,40,50\\}\\) and conduct additional robustness sweeps. On Starlink and Internet, LIA maintains near-efficiency while eliminating measured timing rents. However, on DSN, welfare is lower in thin markets but improves with depth. We also distinguish winner-determination time from the background cost of maintaining slack estimates and study robustness beyond independent and identically distributed (iid) noise through error-spread bounds and structured (distance-biased and subnetwork-correlated) noise models. These results suggest that causal-consistent mechanism design offers a practical non-buffering alternative to synchronized delay equalization in heterogeneous telecom infrastructures.",
+      "authors": [
+        "Saad Alqithami"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "cs.AI",
+        "cs.NI"
+      ],
+      "published": "2026-04-04T23:48:19+00:00",
+      "link": "https://arxiv.org/pdf/2604.03897v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "auction mechanism for resource allocation with truthful reporting",
+      "llm_evidence_cn": "用于资源分配的拍卖机制，确保真实报告",
+      "llm_evidence": "用于资源分配的拍卖机制，确保真实报告",
+      "canonical_evidence": "用于资源分配的拍卖机制，确保真实报告",
+      "llm_tldr_en": "Proposes a Lorentz-Invariant Auction for latency-aware resource allocation in heterogeneous networks.",
+      "llm_tldr_cn": "提出一种用于异构网络延迟感知资源分配的洛伦兹不变拍卖机制。",
+      "llm_tldr": "提出一种用于异构网络延迟感知资源分配的洛伦兹不变拍卖机制。",
+      "llm_tags": [
+        "query:q18"
+      ],
+      "matched_query_tag": "query:q18",
+      "matched_query_text": "retrieve papers studying auction based bidding strategies in federated learning",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.03955v1",
+      "source": "arxiv",
+      "title": "Symbolic-Vector Attention Fusion for Collective Intelligence",
+      "abstract": "When autonomous agents observe different domains of a shared environment, each signal they exchange mixes relevant and irrelevant dimensions. No existing mechanism lets the receiver evaluate which dimensions to absorb. We introduce Symbolic-Vector Attention Fusion (SVAF), the content-evaluation half of a two-level coupling engine for collective intelligence. SVAF decomposes each inter-agent signal into 7 typed semantic fields, evaluates each through a learned fusion gate, and produces a remix -- new knowledge from the intersection of two domains. A band-pass model yields four outcomes (redundant, aligned, guarded, rejected), solving both selectivity and redundancy. The fusion gate independently discovers a cross-domain relevance hierarchy: mood emerges as the highest-weight field by epoch 1, before accuracy plateaus -- consistent with independent mechanistic evidence that LLM emotion representations are structurally embedded along valence-arousal axes. SVAF forms Layer 4 of the Mesh Memory Protocol (MMP); the other half of the coupling engine is a per-agent Closed-form Continuous-time (CfC) neural network at Layer 6, whose learned per-neuron time constants (tau) create the temporal dynamics from which collective intelligence emerges: fast neurons synchronise affect across agents in seconds, while slow neurons preserve domain expertise indefinitely. SVAF determines what enters each agent's cognitive state; CfC determines how that state evolves. Trained on 237K samples from 273 narrative scenarios, SVAF achieves 78.7% three-class accuracy. We verify the complete mesh cognition loop -- from per-field evaluation through remix, CfC state evolution, tau-modulated peer blending, and autonomous action -- in a live deployment with 7 nodes across macOS, iOS, and web.",
+      "authors": [
+        "Hongwei Xu"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI"
+      ],
+      "published": "2026-04-05T04:10:15+00:00",
+      "link": "https://arxiv.org/pdf/2604.03955v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "cross-domain relevance hierarchy and fusion for autonomous agents",
+      "llm_evidence_cn": "自主智能体的跨域相关性层级与融合",
+      "llm_evidence": "自主智能体的跨域相关性层级与融合",
+      "canonical_evidence": "自主智能体的跨域相关性层级与融合",
+      "llm_tldr_en": "Introduces SVAF to help autonomous agents evaluate and fuse relevant information across different domains.",
+      "llm_tldr_cn": "引入SVAF机制，帮助自主智能体在不同领域间评估并融合相关信息。",
+      "llm_tldr": "引入SVAF机制，帮助自主智能体在不同领域间评估并融合相关信息。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "explore cross domain methods combining federation, reinforcement, and multimodal generative techniques",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.05164v1",
+      "source": "arxiv",
+      "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning",
+      "abstract": "As LLM reasoning performance plateau, improving inference-time compute efficiency is crucial to mitigate overthinking and long thinking traces even for simple queries. Prior approaches including length regularization, adaptive routing, and difficulty-based budget allocation primarily focus on single-turn settings and fail to address the sequential dependencies inherent in multi-turn reasoning.In this work, we formulate multi-turn reasoning as a sequential compute allocation problem and model it as a multi-objective Markov Decision Process. We propose TAB: Turn-Adaptive Budgets, a budget allocation policy trained via Group Relative Policy Optimization (GRPO) that learns to maximize task accuracy while respecting global per-problem token constraints. Consequently, TAB takes as input the conversation history and learns to adaptively allocate smaller budgets to easier turns and save appropriate number of tokens for the crucial harder reasoning steps. Our experiments on mathematical reasoning benchmarks demonstrate that TAB achieves a superior accuracy-tokens tradeoff saving up to 35% tokens while maintaining accuracy over static and off-the-shelf LLM budget baselines. Further, for systems where a plan of all sub-questions is available apriori, we propose TAB All-SubQ, a budget allocation policy that budgets tokens based on the conversation history and all past and future sub-questions saving up to 40% tokens over baselines.",
+      "authors": [
+        "Neharika Jali",
+        "Anupam Nayak",
+        "Gauri Joshi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T20:48:51+00:00",
+      "link": "https://arxiv.org/pdf/2604.05164v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reinforcement learning for adaptive compute budget allocation",
+      "llm_evidence_cn": "用于自适应计算预算分配的强化学习",
+      "llm_evidence": "用于自适应计算预算分配的强化学习",
+      "canonical_evidence": "用于自适应计算预算分配的强化学习",
+      "llm_tldr_en": "Uses GRPO reinforcement learning to optimize adaptive thinking budgets for multi-turn LLM reasoning.",
+      "llm_tldr_cn": "使用 GRPO 强化学习优化多轮大模型推理的自适应思考预算分配。",
+      "llm_tldr": "使用 GRPO 强化学习优化多轮大模型推理的自适应思考预算分配。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03953v1",
+      "source": "arxiv",
+      "title": "Multimodal Structure Learning: Disentangling Shared and Specific Topology via Cross-Modal Graphical Lasso",
+      "abstract": "Learning interpretable multimodal representations inherently relies on uncovering the conditional dependencies between heterogeneous features. However, sparse graph estimation techniques, such as Graphical Lasso (GLasso), to visual-linguistic domains is severely bottlenecked by high-dimensional noise, modality misalignment, and the confounding of shared versus category-specific topologies. In this paper, we propose Cross-Modal Graphical Lasso (CM-GLasso) that overcomes these fundamental limitations. By coupling a novel text-visualization strategy with a unified vision-language encoder, we strictly align multimodal features into a shared latent space. We introduce a cross-attention distillation mechanism that condenses high-dimensional patches into explicit semantic nodes, naturally extracting spatial-aware cross-modal priors. Furthermore, we unify tailored GLasso estimation and Common-Specific Structure Learning (CSSL) into a joint objective optimized via the Alternating Direction Method of Multiplier (ADMM). This formulation guarantees the simultaneous disentanglement of invariant and class-specific precision matrices without multi-step error accumulation. Extensive experiments across eight benchmarks covering both natural and medical domains demonstrate that CM-GLasso establishes a new state-of-the-art in generative classification and dense semantic segmentation tasks.",
+      "authors": [
+        "Fei Wang",
+        "Yutong Zhang",
+        "Xiong Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-04-05T04:07:59+00:00",
+      "link": "https://arxiv.org/pdf/2604.03953v1",
+      "tags": [
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multimodal structure learning for vision-language features",
+      "llm_evidence_cn": "视觉语言特征的多模态结构学习",
+      "llm_evidence": "视觉语言特征的多模态结构学习",
+      "canonical_evidence": "视觉语言特征的多模态结构学习",
+      "llm_tldr_en": "Introduces CM-GLasso to align and disentangle shared and specific topologies in multimodal data.",
+      "llm_tldr_cn": "引入CM-GLasso来对齐和解耦多模态数据中的共享与特定拓扑结构。",
+      "llm_tldr": "引入CM-GLasso来对齐和解耦多模态数据中的共享与特定拓扑结构。",
+      "llm_tags": [
+        "query:visfed"
+      ],
+      "matched_query_tag": "query:visfed",
+      "matched_query_text": "survey multimodal federated learning approaches combining vision and text",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04101v1",
+      "source": "arxiv",
+      "title": "Restless Bandits with Individual Penalty Constraints: A New Near-Optimal Index Policy and How to Learn It",
+      "abstract": "This paper investigates the Restless Multi-Armed Bandit (RMAB) framework under individual penalty constraints to address resource allocation challenges in dynamic wireless networked environments. Unlike conventional RMAB models, our model allows each user (arm) to have distinct and stringent performance constraints, such as energy limits, activation limits, or age of information minimums, enabling the capture of diverse objectives including fairness and efficiency. To find the optimal resource allocation policy, we propose a new Penalty-Optimal Whittle (POW) index policy. The POW index of an user only depends on the user's transition kernel and penalty constraints, and remains invariable to system-wide features such as the number of users present and the amount of resource available. This makes it computationally tractable to calculate the POW Indices offline without any need for online adaptation. Moreover, we theoretically prove that the POW index policy is asymptotically optimal while satisfying all individual penalty constraints. We also introduce a deep reinforcement learning algorithm to efficiently learn the POW index on the fly. Simulation results across various applications and system configurations further demonstrate that the POW index policy not only has near-optimal performance but also significantly outperforms other existing policies.",
+      "authors": [
+        "Nida Zamir",
+        "I-Hong Hou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-05T12:53:10+00:00",
+      "link": "https://arxiv.org/pdf/2604.04101v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Resource allocation and penalty constraints in restless bandits",
+      "llm_evidence_cn": "休止多臂老虎机中的资源分配与惩罚约束",
+      "llm_evidence": "休止多臂老虎机中的资源分配与惩罚约束",
+      "canonical_evidence": "休止多臂老虎机中的资源分配与惩罚约束",
+      "llm_tldr_en": "This paper proposes a near-optimal index policy for resource allocation under individual penalty constraints.",
+      "llm_tldr_cn": "本文提出了一种在个体惩罚约束下进行资源分配的近优索引策略。",
+      "llm_tldr": "本文提出了一种在个体惩罚约束下进行资源分配的近优索引策略。",
+      "llm_tags": [
+        "query:q16"
+      ],
+      "matched_query_tag": "query:q16",
+      "matched_query_text": "research on federated learning under budget or incentive mechanisms",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.05257v1",
+      "source": "arxiv",
+      "title": "Extending Tabular Denoising Diffusion Probabilistic Models for Time-Series Data Generation",
+      "abstract": "Diffusion models are increasingly being utilised to create synthetic tabular and time series data for privacy-preserving augmentation. Tabular Denoising Diffusion Probabilistic Models (TabDDPM) generate high-quality synthetic data from heterogeneous tabular datasets but assume independence between samples, limiting their applicability to time-series domains where temporal dependencies are critical. To address this, we propose a temporal extension of TabDDPM, introducing sequence awareness through the use of lightweight temporal adapters and context-aware embedding modules. By reformulating sensor data into windowed sequences and explicitly modeling temporal context via timestep embeddings, conditional activity labels, and observed/missing masks, our approach enables the generation of temporally coherent synthetic sequences. Compared to baseline and interpolation techniques, validation using bigram transition matrices and autocorrelation analysis shows enhanced temporal realism, diversity, and coherence. On the WISDM accelerometer dataset, the suggested system produces synthetic time-series that closely resemble real world sensor patterns and achieves comparable classification performance (macro F1-score 0.64, accuracy 0.71). This is especially advantageous for minority class representation and preserving statistical alignment with real distributions. These developments demonstrate that diffusion based models provide effective and adaptable solutions for sequential data synthesis when they are equipped for temporal reasoning. Future work will explore scaling to longer sequences and integrating stronger temporal architectures.",
+      "authors": [
+        "Umang Dobhal",
+        "Christina Garcia",
+        "Sozo Inoue"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T23:46:40+00:00",
+      "link": "https://arxiv.org/pdf/2604.05257v1",
+      "tags": [
+        "query:FLRLVLDM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "denoising diffusion probabilistic models for time-series data",
+      "llm_evidence_cn": "用于时间序列数据的去噪扩散概率模型",
+      "llm_evidence": "用于时间序列数据的去噪扩散概率模型",
+      "canonical_evidence": "用于时间序列数据的去噪扩散概率模型",
+      "llm_tldr_en": "Extends tabular diffusion models to handle temporal dependencies in time-series data generation.",
+      "llm_tldr_cn": "扩展表格扩散模型以处理时间序列数据生成中的时间依赖性。",
+      "llm_tldr": "扩展表格扩散模型以处理时间序列数据生成中的时间依赖性。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03980v1",
+      "source": "arxiv",
+      "title": "Gram-Anchored Prompt Learning for Vision-Language Models via Second-Order Statistics",
+      "abstract": "Parameter-efficient prompt learning has become the de facto standard for adapting Vision-Language Models (VLMs) to downstream tasks. Existing approaches predominantly focus on aligning text prompts with first-order visual features (i.e., spatial feature maps). While effective for fine-grained semantic discrimination, we argue that relying solely on first-order information is insufficient for robust adaptation, as these spatially entangled features are highly susceptible to domain shifts and local noise. In this work, we propose \\textbf{Gram-Anchored Prompt Learning (GAPL)} for Vision-Language Models via Second-Order Statistics, a framework that synergizes local semantic alignment with global structural consistency. Methodologically, we introduce an additional second-order statistical stream via \\textbf{Gram matrices} that augments the standard first-order spatial interaction. By anchoring prompts to these second-order priors, our approach enables language representations to dynamically adapt to statistical distribution shifts across diverse domains. Extensive experiments indicate the effectiveness of the second-order features, and show compelling performances of GAPL on various benchmarks.",
+      "authors": [
+        "Minglei Chen",
+        "Weilong Wang",
+        "Jiang Duan",
+        "Ye Deng"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-05T06:02:07+00:00",
+      "link": "https://arxiv.org/pdf/2604.03980v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "query:FLRLVLDM",
+        "query:VisFed"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Prompt learning for adapting Vision-Language Models to downstream tasks",
+      "llm_evidence_cn": "视觉语言模型下游任务适配的提示学习",
+      "llm_evidence": "视觉语言模型下游任务适配的提示学习",
+      "canonical_evidence": "视觉语言模型下游任务适配的提示学习",
+      "llm_tldr_en": "Uses second-order statistics to improve the robustness of prompt learning for Vision-Language Models.",
+      "llm_tldr_cn": "利用二阶统计量提高视觉语言模型提示学习的鲁棒性。",
+      "llm_tldr": "利用二阶统计量提高视觉语言模型提示学习的鲁棒性。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04892v1",
+      "source": "arxiv",
+      "title": "Data Attribution in Adaptive Learning",
+      "abstract": "Machine learning models increasingly generate their own training data -- online bandits, reinforcement learning, and post-training pipelines for language models are leading examples. In these adaptive settings, a single training observation both updates the learner and shifts the distribution of future data the learner will collect. Standard attribution methods, designed for static datasets, ignore this feedback. We formalize occurrence-level attribution for finite-horizon adaptive learning via a conditional interventional target, prove that replay-side information cannot recover it in general, and identify a structural class in which the target is identified from logged data.",
+      "authors": [
+        "Amit Kiran Rege"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-06T17:41:32+00:00",
+      "link": "https://arxiv.org/pdf/2604.04892v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "data attribution in reinforcement learning and adaptive settings",
+      "llm_evidence_cn": "强化学习和自适应设置中的数据归因研究",
+      "llm_evidence": "强化学习和自适应设置中的数据归因研究",
+      "canonical_evidence": "强化学习和自适应设置中的数据归因研究",
+      "llm_tldr_en": "Formalizes data attribution for adaptive learning environments like RL and online bandits.",
+      "llm_tldr_cn": "为强化学习和在线老虎机等自适应学习环境正式定义了数据归因方法。",
+      "llm_tldr": "为强化学习和在线老虎机等自适应学习环境正式定义了数据归因方法。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.05341v1",
+      "source": "arxiv",
+      "title": "Curr-RLCER:Curriculum Reinforcement Learning For Coherence Explainable Recommendation",
+      "abstract": "Explainable recommendation systems (RSs) are designed to explicitly uncover the rationale of each recommendation, thereby enhancing the transparency and credibility of RSs. Previous methods often jointly predicted ratings and generated explanations, but overlooked the incoherence of such two objectives. To address this issue, we propose Curr-RLCER, a reinforcement learning framework for explanation coherent recommendation with dynamic rating alignment. It employs curriculum learning, transitioning from basic predictions (i.e., click through rating-CTR, selection-based rating) to open-ended recommendation explanation generation. In particular, the rewards of each stage are designed for progressively enhancing the stability of RSs. Furthermore, a coherence-driven reward mechanism is also proposed to enforce the coherence between generated explanations and predicted ratings, supported by a specifically designed evaluation scheme. The extensive experimental results on three explainable recommendation datasets indicate that the proposed framework is effective. Codes and datasets are available at https://github.com/pxcstart/Curr-RLCER.",
+      "authors": [
+        "Xiangchen Pan",
+        "Wei Wei"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-04-07T02:25:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.05341v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "curriculum reinforcement learning framework for recommendation",
+      "llm_evidence_cn": "用于推荐系统的课程强化学习框架",
+      "llm_evidence": "用于推荐系统的课程强化学习框架",
+      "canonical_evidence": "用于推荐系统的课程强化学习框架",
+      "llm_tldr_en": "Develops Curr-RLCER, a curriculum reinforcement learning framework to improve explainable recommendation systems.",
+      "llm_tldr_cn": "开发了Curr-RLCER，一种通过课程强化学习提升可解释推荐系统性能的框架。",
+      "llm_tldr": "开发了Curr-RLCER，一种通过课程强化学习提升可解释推荐系统性能的框架。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "advances and strategies in reinforcement learning algorithms",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.04347v1",
+      "source": "arxiv",
+      "title": "RoboPhD: Evolving Diverse Complex Agents Under Tight Evaluation Budgets",
+      "abstract": "2026 has brought an explosion of interest in LLM-guided evolution of agentic artifacts, with systems like GEPA and Autoresearch demonstrating that LLMs can iteratively improve prompts, code, and agent architectures across diverse domains. As adoption accelerates, a central question emerges: given the same information, the same seed agent, and the same objective, which optimization algorithm yields the best results under the same evaluation budget? This question becomes critical when evaluations are expensive, such as when they require human judgment or multiple LLM calls.   We present the first systematic comparison of three optimization paradigms -- Elo tournament selection (RoboPhD), Pareto-based selection (GEPA), and greedy hill-climbing (Autoresearch) -- across four benchmarks spanning abstract reasoning, cloud scheduling, SQL generation, and financial QA, all under a fixed budget of 1,500 evaluations. RoboPhD introduces validation-free evolution: instead of splitting the budget between training and validation, it uses Elo competition on training data to simultaneously evaluate agents and drive evolution. All three systems receive seed agents with diagnostic print() statements that evolution can grow, enabling self-instrumenting agents that develop increasingly informative diagnostics for the benefit of their evolutionary successors.   Using a single default configuration, RoboPhD outperforms both GEPA and Autoresearch on three of four benchmarks, losing only on the simplest task, where the winning solution (from our Autoresearch adaptation) required under 90 lines of code. On ARC-AGI, RoboPhD evolves a 22-line seed agent into a 1,013-line multi-strategy system, improving accuracy from 27.8% to 65.8% using Gemini 3.1 Flash Lite as the solver. We release RoboPhD as a versatile toolkit under the MIT license with a simple optimize_anything() API for evolving diverse complex agents.",
+      "authors": [
+        "Andrew Borthwick",
+        "Stephen Ash",
+        "Anthony Galczak"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-06T01:39:13+00:00",
+      "link": "https://arxiv.org/pdf/2604.04347v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "optimization of agentic artifacts under tight evaluation budgets",
+      "llm_evidence_cn": "在紧凑的评估预算下优化智能体架构",
+      "llm_evidence": "在紧凑的评估预算下优化智能体架构",
+      "canonical_evidence": "在紧凑的评估预算下优化智能体架构",
+      "llm_tldr_en": "Compares optimization paradigms for evolving agents under strict evaluation budget constraints.",
+      "llm_tldr_cn": "系统比较了在严格评估预算约束下进化智能体架构的三种优化范式。",
+      "llm_tldr": "系统比较了在严格评估预算约束下进化智能体架构的三种优化范式。",
+      "llm_tags": [
+        "query:q16"
+      ],
+      "matched_query_tag": "query:q16",
+      "matched_query_text": "research on federated learning under budget or incentive mechanisms",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.05296v1",
+      "source": "arxiv",
+      "title": "From Measurement to Mitigation: Quantifying and Reducing Identity Leakage in Image Representation Encoders with Linear Subspace Removal",
+      "abstract": "Frozen visual embeddings (e.g., CLIP, DINOv2/v3, SSCD) power retrieval and integrity systems, yet their use on face-containing data is constrained by unmeasured identity leakage and a lack of deployable mitigations. We take an attacker-aware view and contribute: (i) a benchmark of visual embeddings that reports open-set verification at low false-accept rates, a calibrated diffusion-based template inversion check, and face-context attribution with equal-area perturbations; and (ii) propose a one-shot linear projector that removes an estimated identity subspace while preserving the complementary space needed for utility, which for brevity we denote as the identity sanitization projection ISP. Across CelebA-20 and VGGFace2, we show that these encoders are robust under open-set linear probes, with CLIP exhibiting relatively higher leakage than DINOv2/v3 and SSCD, robust to template inversion, and are context-dominant. In addition, we show that ISP drives linear access to near-chance while retaining high non-biometric utility, and transfers across datasets with minor degradation. Our results establish the first attacker-calibrated facial privacy audit of non-FR encoders and demonstrate that linear subspace removal achieves strong privacy guarantees while preserving utility for visual search and retrieval.",
+      "authors": [
+        "Daniel George",
+        "Charles Yeh",
+        "Daniel Lee",
+        "Yifei Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-07T01:03:51+00:00",
+      "link": "https://arxiv.org/pdf/2604.05296v1",
+      "tags": [
+        "query:VisFed"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "diffusion-based template inversion and visual embeddings like CLIP",
+      "llm_evidence_cn": "基于扩散模型的模板反转与CLIP等视觉嵌入",
+      "llm_evidence": "基于扩散模型的模板反转与CLIP等视觉嵌入",
+      "canonical_evidence": "基于扩散模型的模板反转与CLIP等视觉嵌入",
+      "llm_tldr_en": "Benchmarks identity leakage in visual encoders and proposes a mitigation method using linear projection.",
+      "llm_tldr_cn": "评估视觉编码器中的身份泄露，并提出一种利用线性投影的缓解方法。",
+      "llm_tldr": "评估视觉编码器中的身份泄露，并提出一种利用线性投影的缓解方法。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.05365v1",
+      "source": "arxiv",
+      "title": "From Clues to Generation: Language-Guided Conditional Diffusion for Cross-Domain Recommendation",
+      "abstract": "Cross-domain Recommendation (CDR) exploits multi-domain correlations to alleviate data sparsity. As a core task within this field, inter-domain recommendation focuses on predicting preferences for users who interact in a source domain but lack behavioral records in a target domain. Existing approaches predominantly rely on overlapping users as anchors for knowledge transfer. In real-world scenarios, overlapping users are often scarce, leaving the vast majority of users with only single-domain interactions. For these users, the absence of explicit alignment signals makes fine-grained preference transfer intrinsically difficult. To address this challenge, this paper proposes Language-Guided Conditional Diffusion for CDR (LGCD), a novel framework that integrates Large Language Models (LLMs) and diffusion models for inter-domain sequential recommendation. Specifically, we leverage LLM reasoning to bridge the domain gap by inferring potential target preferences for single-domain users and mapping them to real items, thereby constructing pseudo-overlapping data. We distinguish between real and pseudo-interaction pathways and introduce additional supervision constraints to mitigate the semantic noise brought by pseudo-interaction. Furthermore, we design a conditional diffusion architecture to precisely guide the generation of target user representations based on source-domain patterns. Extensive experiments demonstrate that LGCD significantly outperforms state-of-the-art methods in inter-domain recommendation tasks.",
+      "authors": [
+        "Ziang Lu",
+        "Lei Sang",
+        "Lin Mu",
+        "Yiwen Zhang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-04-07T03:05:22+00:00",
+      "link": "https://arxiv.org/pdf/2604.05365v1",
+      "tags": [
+        "keyword:FLRLVLDM",
+        "keyword:VisFed",
+        "keyword:联邦激励",
+        "query:FLRLVLDM",
+        "query:VisFed",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "language-guided conditional diffusion for cross-domain tasks",
+      "llm_evidence_cn": "用于跨域任务的语言引导条件扩散模型",
+      "llm_evidence": "用于跨域任务的语言引导条件扩散模型",
+      "canonical_evidence": "用于跨域任务的语言引导条件扩散模型",
+      "llm_tldr_en": "Proposes a language-guided conditional diffusion model for cross-domain recommendation to handle data sparsity.",
+      "llm_tldr_cn": "提出一种语言引导的条件扩散模型，用于解决跨域推荐中的数据稀疏问题。",
+      "llm_tldr": "提出一种语言引导的条件扩散模型，用于解决跨域推荐中的数据稀疏问题。",
+      "llm_tags": [
+        "query:flrlvldm"
+      ],
+      "matched_query_tag": "query:flrlvldm",
+      "matched_query_text": "find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

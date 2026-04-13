@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05510v1/fig-001.webp",
+      "caption": "Table 2. Detection accuracy and latency of different detection methods on ContrAR benchmark.",
+      "page": 7,
+      "index": 1,
+      "width": 972,
+      "height": 591
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05510v1/fig-002.webp",
+      "caption": "Figure 3. Samples frames from the ContrAR dataset. Each column shows an AR application. The top row shows the contradictory examples. From left to right: (a) Indoor navigation: the text on the virtual arrow indicates the restroom is not accessible, which contradicts with the disabled sign on the virtual restroom sign; (b) Outdoor navigation: the text in the virtual dialog box instructs the user to park here, which is contradictory to the information provided by a virtual “No Parking” sign; (c) Safety inspection: the text in the virtual dialog box “Caution: Biohazard” is contradictory with the virtual sign which stands for “Caution: High Voltage”; (d) Smart apartment: the text in the virtual dialog box indicates the laptop is fully charged, which contradicts the virtual “low battery” sign; (e) Smart retail: the text on the virtual arrow tells the user the box is made in the Netherlands, which contradicts to the label next to the box saying it is from France. The bottom row shows the non-contradictory examples, where the information provided by different virtual content aligned with each other.",
+      "page": 5,
+      "index": 2,
+      "width": 931,
+      "height": 364
+    }
+  ]
+}

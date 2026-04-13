@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08821v1/fig-001.webp",
+      "caption": "Figure 1. Interim expected utility of the focal agent as a function of the reported variance, for different true variances (columns), verification rules (rows), and loss parameters (colors). The black dot–dashed line marks the true variance; colored dashed lines and dots indicate, for each β, the report that maximizes interim expected utility.",
+      "page": 17,
+      "index": 1,
+      "width": 968,
+      "height": 441
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08821v1/fig-002.webp",
+      "caption": "Figure 2. Interim expected winning utility at the optimal report as a function of type (ci, σ 2 i ) for β = 1000, under the 0.05 LCB test (left) and the Sample Variance test (right). Darker green indicates higher winning utility (preference for participation), while darker grey indicates more negative winning utility (preference for opting out).",
+      "page": 18,
+      "index": 2,
+      "width": 871,
+      "height": 400
+    }
+  ]
+}

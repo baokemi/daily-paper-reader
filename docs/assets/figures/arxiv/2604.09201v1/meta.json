@@ -1,0 +1,150 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-001.webp",
+      "caption": "Figure 3 Wavelet analysis of camera trajectories over 1,000 examples, including energy dominance, smoothness, geometric retention, and the trade-off between jitter and trajectory deviation across low- and high-frequency components.",
+      "page": 6,
+      "index": 1,
+      "width": 961,
+      "height": 210
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-002.webp",
+      "caption": "Table 4 Impact of the WavReg loss and the parameter β on the performance of the CT-1 model.",
+      "page": 11,
+      "index": 2,
+      "width": 586,
+      "height": 235
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-003.webp",
+      "caption": "Figure 12 Qualitative results of applying the trajectories results of the CT-1 on MotionCtrl [32] model, which is a camera-controllable video generation model. The tested scenes are from the MultiCamVideo dataset [1].",
+      "page": 21,
+      "index": 3,
+      "width": 976,
+      "height": 517
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-004.webp",
+      "caption": "Figure 11 Qualitative results of applying the trajectories results of the CT-1 on CameraCtrl [9] model, which is a camera-controllable video generation model. The tested scenes are from the RealEstate10K dataset [44].",
+      "page": 21,
+      "index": 4,
+      "width": 976,
+      "height": 414
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-005.webp",
+      "caption": "Figure 4 Overview of the CT-200K data curation pipeline, designed to address missing or ambiguous camera-motion annotations in existing datasets and to support annotation for reasoning scenarios.",
+      "page": 7,
+      "index": 5,
+      "width": 976,
+      "height": 521
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-006.webp",
+      "caption": "Figure 13 Qualitative results of deep reasoning-based setting, showcasing the CT-1 model’s ability to infer camera motion from semantic and visual clues in complex scenes. The red boxes highlight implicit cues in the text that require visual context for interpretation.",
+      "page": 22,
+      "index": 6,
+      "width": 974,
+      "height": 519
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-007.webp",
+      "caption": "Figure 5 Qualitative comparison in out-of-distribution (OOD) scenarios with CogVideoX [36], LTX-Video [8], and Wan2.2 [27].",
+      "page": 10,
+      "index": 7,
+      "width": 974,
+      "height": 666
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-008.webp",
+      "caption": "Figure 8 Visualization of a single image with multiple camera descriptions. Given a fixed reference image, we apply three different camera motion descriptions to the same scene and visualize the camera trajectories predicted by CT-1.",
+      "page": 18,
+      "index": 8,
+      "width": 979,
+      "height": 523
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-009.webp",
+      "caption": "Figure 7 Visualization of camera trajectories estimated by CT-1 under longer textual descriptions.",
+      "page": 18,
+      "index": 9,
+      "width": 979,
+      "height": 556
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-010.webp",
+      "caption": "Figure 14 Qualitative results of camera-controllable video generation in driving scenarios on DrivingDoJo dataset [31]. For each example, we provide a reference image and a forward-driving textual prompt as input to CT-1, which predicts the corresponding camera trajectory and drives the subsequent video diffusion model for synthesis.",
+      "page": 23,
+      "index": 10,
+      "width": 976,
+      "height": 496
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-011.webp",
+      "caption": "Figure 16 High- and low-frequency analysis of camera trajectories within a single scene, including angular velocity magnitude, linear velocity magnitude, acceleration energy, and high-frequency D1 energy.",
+      "page": 28,
+      "index": 11,
+      "width": 972,
+      "height": 539
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-012.webp",
+      "caption": "Figure 2 Overview of the proposed camera-controllable video generation framework based on the CT-1 model, which includes (a) a vision–language module for semantic embedding, (b) a Diffusion Transformer module for modeling camera trajectory distributions, and (c) controllable generation models that synthesize videos conditioned on the trajectories.",
+      "page": 4,
+      "index": 12,
+      "width": 976,
+      "height": 280
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-013.webp",
+      "caption": "Figure 9 Visualization of a single camera description with multiple reference images. Given a fixed camera motion description, we pair it with three different reference images and infer the corresponding camera trajectories using CT-1.",
+      "page": 19,
+      "index": 13,
+      "width": 976,
+      "height": 465
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-014.webp",
+      "caption": "Figure 6 Visualization of camera trajectories estimated by CT-1. The red (X), green (Y), and blue (Z) axes indicate the camera’s local coordinate system [25]: the red axis denotes the right–left direction, the green axis represents the vertical direction (down or up), and the blue axis corresponds to the viewing direction (forward or backward, i.e., zoom-in or zoom-out).",
+      "page": 17,
+      "index": 14,
+      "width": 976,
+      "height": 554
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-015.webp",
+      "caption": "Table 1 Zero-shot quantitative results on CameraBench100 for camera trajectory estimation across six typical tasks using the Success Rate metric. PE denotes Prompt Extension for fair comparison, and AR denotes autoregressive trajectory generation.",
+      "page": 9,
+      "index": 15,
+      "width": 981,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-016.webp",
+      "caption": "Table 2 Comparison of generated video quality with baseline methods using VBench. Results w/o PE are in gray.",
+      "page": 9,
+      "index": 16,
+      "width": 586,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-017.webp",
+      "caption": "Figure 17 Example instances from the CT-200 dataset. For the raw data, we apply the data curation pipeline proposed in this work to produce fine-grained annotations of camera motion descriptions. The figure shows representative video frames along with their corresponding camera motion prompts.",
+      "page": 31,
+      "index": 17,
+      "width": 974,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09201v1/fig-018.webp",
+      "caption": "Figure 10 Qualitative results of generated videos. Given an input reference image and a textual prompt, CT-1 infers semantically consistent camera motion trajectories, which are further used to drive a camera-controllable video generation model [40]. In each case, scene-related elements are highlighted with a light blue background to indicate the visual content explicitly referenced by the input camera description within the user intent.",
+      "page": 20,
+      "index": 18,
+      "width": 974,
+      "height": 620
+    }
+  ]
+}

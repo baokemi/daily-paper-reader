@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-001.webp",
+      "caption": "Figure 1: The baseline method (upper) makes overconfident assumptions. Instead, our method (lower) decouples confidence into visual and reasoning confidence, with clear identification of uncertainty sources and improved calibration.",
+      "page": 1,
+      "index": 1,
+      "width": 458,
+      "height": 647
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-002.webp",
+      "caption": "Table 1: Main Results. Comparison between the base model using verbalized confidence (Xiong et al., 2024) (Base), the strongest re-implemented baseline (Best), and our method (Ours) across Qwen3-VL 4B and 8B scales. Bold indicates the best result. Full results of all baselines are reported in Appendix § D.1.",
+      "page": 6,
+      "index": 2,
+      "width": 937,
+      "height": 532
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-003.webp",
+      "caption": "Figure 8: Entropy curves of different estimation: KLOnly, Entropy-Only, Ours (Combination of KL and Entropy). The entropy curve of ours shows training stability compared to others.",
+      "page": 15,
+      "index": 3,
+      "width": 461,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-004.webp",
+      "caption": "Table 10: Comparison of Base Model (8B), Best, and Our Method across various benchmarks. We report Accuracy, AUROC, and ECE. Best results are highlighted in bold.",
+      "page": 21,
+      "index": 4,
+      "width": 937,
+      "height": 710
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-005.webp",
+      "caption": "Figure 2: Overview of our framework. A) Decoupled Confidence Inference. The LVLM explicitly outputs separate visual and reasoning confidence to derive a holistic confidence. B) Intrinsic Visual Certainty Estimation. We quantify visual certainty by measuring visual grounding and internal certainty. C) GRPO Training. We align visual confidence with visual certainty score , and the holistic confidence with the answer accuracy. Additionally, we apply token-level advantage reweighting based on token visual certainty.",
+      "page": 2,
+      "index": 5,
+      "width": 950,
+      "height": 473
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-006.webp",
+      "caption": "Figure 15: Baselines Performance comparison with Qwen3-VL-4B in terms of Accuracy, ECE, and AUROC.",
+      "page": 22,
+      "index": 6,
+      "width": 950,
+      "height": 1115
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-007.webp",
+      "caption": "Figure 12: Detailed reliability diagrams of VL-Calibration-8B across the evaluation datasets.",
+      "page": 18,
+      "index": 7,
+      "width": 934,
+      "height": 1363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-008.webp",
+      "caption": "Figure 16: Baselines Performance comparison with Qwen3-VL-8B in terms of Accuracy, ECE, and AUROC.",
+      "page": 23,
+      "index": 8,
+      "width": 950,
+      "height": 1115
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-009.webp",
+      "caption": "Figure 6: Heatmap of visual vs. reasoning confidence. The off-diagonal distribution indicates that the model can be visually certain but logically uncertain, and vice versa.",
+      "page": 8,
+      "index": 9,
+      "width": 450,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-010.webp",
+      "caption": "Figure 14: Training dynamics of Qwen3-VL-4B (upper) and Qwen3-VL-8B (bottom). We visualize the ACC, AUROC, ECE curves on the validation set.",
+      "page": 19,
+      "index": 10,
+      "width": 950,
+      "height": 479
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-011.webp",
+      "caption": "Figure 13: Confidence Distribution across Visually Answerable and Unanswerable Problems. We visualize the distribution of confidence scores for the Base Model, RLCR, and Our Method (columns) on both Answerable and Unanswerable datasets (rows). While baselines tend to remain overconfident even on unanswerable queries (bottom row), Our Method exhibits a significant distributional shift towards lower confidence, demonstrating superior capability in recognizing visual input lack.",
+      "page": 19,
+      "index": 11,
+      "width": 928,
+      "height": 539
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-012.webp",
+      "caption": "Figure 11: Detailed reliability diagrams of VL-Calibration-4B across the evaluation datasets. While Table 9 reports metrics averaged over 8 rollouts (avg@8), this figure illustrates the results of a single representative rollout.",
+      "page": 17,
+      "index": 12,
+      "width": 934,
+      "height": 1363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-013.webp",
+      "caption": "Table 5: Training Hyperparameters",
+      "page": 12,
+      "index": 13,
+      "width": 377,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-014.webp",
+      "caption": "Figure 17: Case Study of Qwen3-VL-4B model trained with our method. Figure (a) (upper) showcases a correct response with high confidence, and Figure (b) (middle) illustrates a incorrect response with low confidence. In Figure (c) demonstrate a correct response with modest confidence.",
+      "page": 24,
+      "index": 14,
+      "width": 950,
+      "height": 1291
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-015.webp",
+      "caption": "Figure 7: Visualization of most visual-uncertain tokens. Darker red represents higher uncertainty.",
+      "page": 9,
+      "index": 15,
+      "width": 447,
+      "height": 404
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09529v1/fig-016.webp",
+      "caption": "Table 9: Comparison of Base Model (Qwen3-VL-4B), Best, and Our Method across various benchmarks. We report Accuracy, AUROC, and ECE. Best results are highlighted in bold.",
+      "page": 20,
+      "index": 16,
+      "width": 937,
+      "height": 710
+    }
+  ]
+}
