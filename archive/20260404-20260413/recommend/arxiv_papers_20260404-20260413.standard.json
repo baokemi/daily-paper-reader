@@ -1,0 +1,669 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-13T11:48:59.471939+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 12,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 34,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2604.04261v1",
+      "source": "arxiv",
+      "title": "APPA: Adaptive Preference Pluralistic Alignment for Fair Federated RLHF of LLMs",
+      "abstract": "Aligning large language models (LLMs) with diverse human preferences requires pluralistic alignment, where a single model must respect the values of multiple distinct groups simultaneously. In federated reinforcement learning from human feedback (FedRLHF), these groups align a shared policy without centralizing preference data, which makes fair reward aggregation essential. Existing aggregation methods exhibit clear trade offs: average based aggregation systematically under aligns worst performing groups, while min aggregation prioritizes worst group performance at the cost of overall alignment. We propose APPA, an Adaptive Preference Pluralistic Alignment framework that dynamically reweights group level rewards based on historical alignment rewards. Our approach prioritizes under aligned groups without degrading well aligned ones, while requiring no access to raw preference data. Integrated into a proximal policy optimization (PPO) based FedRLHF pipeline and evaluated on GLOBALQA and OQA across three model families (Gemma 2 2B, Llama 3.2 3B, Qwen3 0.6B), APPA achieves strong fairness alignment trade offs, improving worst group alignment by up to 28% over average aggregation while maintaining higher overall alignment than min aggregation across most configurations.",
+      "authors": [
+        "Mahmoud Srewa",
+        "Tianyu Zhao",
+        "Salma Elmalaki"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-05T20:48:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.04261v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "federated reinforcement learning from human feedback (FedRLHF) for LLMs",
+      "llm_evidence_cn": "大语言模型的联邦人类反馈强化学习 (FedRLHF)",
+      "llm_evidence": "大语言模型的联邦人类反馈强化学习 (FedRLHF)",
+      "canonical_evidence": "大语言模型的联邦人类反馈强化学习 (FedRLHF)",
+      "llm_tldr_en": "Introduces APPA for fair reward aggregation in federated reinforcement learning from human feedback.",
+      "llm_tldr_cn": "引入APPA框架，实现联邦人类反馈强化学习中的公平奖励聚合。",
+      "llm_tldr": "引入APPA框架，实现联邦人类反馈强化学习中的公平奖励聚合。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08517v1",
+      "source": "arxiv",
+      "title": "Learning vs. Optimizing Bidders in Budgeted Auctions",
+      "abstract": "The study of repeated interactions between a learner and a utility-maximizing optimizer has yielded deep insights into the manipulability of learning algorithms. However, existing literature primarily focuses on independent, unlinked rounds, largely ignoring the ubiquitous practical reality of budget constraints. In this paper, we study this interaction in repeated second-price auctions in a Bayesian setting between a learning agent and a strategic agent, both subject to strict budget constraints, showing that such cross-round constraints fundamentally alter the strategic landscape.   First, we generalize the classic Stackelberg equilibrium to the Budgeted Stackelberg Equilibrium. We prove that an optimizer's optimal strategy in a budgeted setting requires time-multiplexing; for a $k$-dimensional budget constraint, the optimal strategy strictly decomposes into up to $k+1$ distinct phases, with each phase employing a possibly unique mixed strategy (the case of $k=0$ recovers the classic Stackelberg equilibrium where the optimizer repeatedly uses a single mixed strategy). Second, we address the intriguing question of non-manipulability. We prove that when the learner employs a standard Proportional controller (the \"P\" of the PID-controller) to pace their bids, the optimizer's utility is upper bounded by their objective value in the Budgeted Stackelberg Equilibrium baseline. By bounding the dynamics of the PID controller via a novel analysis, our results establish that this widely used control-theoretic heuristic is actually strategically robust.",
+      "authors": [
+        "Giannis Fikioris",
+        "Balasubramanian Sivan",
+        "Éva Tardos"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT"
+      ],
+      "published": "2026-04-09T17:54:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.08517v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "repeated auctions between learning and strategic agents under budget constraints",
+      "llm_evidence_cn": "预算约束下学习型与策略型代理之间的重复拍卖研究",
+      "llm_evidence": "预算约束下学习型与策略型代理之间的重复拍卖研究",
+      "canonical_evidence": "预算约束下学习型与策略型代理之间的重复拍卖研究",
+      "llm_tldr_en": "Analyzes strategic bidding in repeated auctions under budget constraints using a new Stackelberg equilibrium.",
+      "llm_tldr_cn": "通过新的斯塔克尔伯格均衡分析预算约束下重复拍卖中的策略性投标。",
+      "llm_tldr": "通过新的斯塔克尔伯格均衡分析预算约束下重复拍卖中的策略性投标。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.03862v1",
+      "source": "arxiv",
+      "title": "SecureAFL: Secure Asynchronous Federated Learning",
+      "abstract": "Federated learning (FL) enables multiple clients to collaboratively train a global machine learning model via a server without sharing their private training data. In traditional FL, the system follows a synchronous approach, where the server waits for model updates from numerous clients before aggregating them to update the global model. However, synchronous FL is hindered by the straggler problem. To address this, the asynchronous FL architecture allows the server to update the global model immediately upon receiving any client's local model update. Despite its advantages, the decentralized nature of asynchronous FL makes it vulnerable to poisoning attacks. Several defenses tailored for asynchronous FL have been proposed, but these mechanisms remain susceptible to advanced attacks or rely on unrealistic server assumptions. In this paper, we introduce SecureAFL, an innovative framework designed to secure asynchronous FL against poisoning attacks. SecureAFL improves the robustness of asynchronous FL by detecting and discarding anomalous updates while estimating the contributions of missing clients. Additionally, it utilizes Byzantine-robust aggregation techniques, such as coordinate-wise median, to integrate the received and estimated updates. Extensive experiments on various real-world datasets demonstrate the effectiveness of SecureAFL.",
+      "authors": [
+        "Anjun Gao",
+        "Feng Wang",
+        "Zhenglin Wan",
+        "Yueyang Quan",
+        "Zhuqing Liu",
+        "Minghong Fang"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.DC",
+        "cs.LG"
+      ],
+      "published": "2026-04-04T21:03:19+00:00",
+      "link": "https://arxiv.org/pdf/2604.03862v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架与优化方法的最新研究",
+      "llm_evidence": "联邦学习框架与优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架与优化方法的最新研究",
+      "llm_tldr_en": "Introduces SecureAFL, a secure asynchronous federated learning framework designed to defend against poisoning attacks.",
+      "llm_tldr_cn": "引入SecureAFL，一种旨在防御中毒攻击的安全异步联邦学习框架。",
+      "llm_tldr": "引入SecureAFL，一种旨在防御中毒攻击的安全异步联邦学习框架。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04895v1",
+      "source": "arxiv",
+      "title": "Agentic Federated Learning: The Future of Distributed Training Orchestration",
+      "abstract": "Although Federated Learning (FL) promises privacy and distributed collaboration, its effectiveness in real-world scenarios is often hampered by the stochastic heterogeneity of clients and unpredictable system dynamics. Existing static optimization approaches fail to adapt to these fluctuations, resulting in resource underutilization and systemic bias. In this work, we propose a paradigm shift towards Agentic-FL, a framework where Language Model-based Agents (LMagents) assume autonomous orchestration roles. Unlike rigid protocols, we demonstrate how server-side agents can mitigate selection bias through contextual reasoning, while client-side agents act as local guardians, dynamically managing privacy budgets and adapting model complexity to hardware constraints. More than just resolving technical inefficiencies, this integration signals the evolution of FL towards decentralized ecosystems, where collaboration is negotiated autonomously, paving the way for future markets of incentive-based models and algorithmic justice. We discuss the reliability (hallucinations) and security challenges of this approach, outlining a roadmap for resilient multi-agent systems in federated environments.",
+      "authors": [
+        "Rafael O. Jarczewski",
+        "Gabriel U. Talasso",
+        "Leandro Villas",
+        "Allan M. de Souza"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T17:43:30+00:00",
+      "link": "https://arxiv.org/pdf/2604.04895v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "client-side agents dynamically managing privacy budgets in federated learning",
+      "llm_evidence_cn": "客户端代理在联邦学习中动态管理隐私预算",
+      "llm_evidence": "客户端代理在联邦学习中动态管理隐私预算",
+      "canonical_evidence": "客户端代理在联邦学习中动态管理隐私预算",
+      "llm_tldr_en": "Proposes Agentic-FL where LLM agents orchestrate federated learning and manage privacy budgets.",
+      "llm_tldr_cn": "提出Agentic-FL，利用大模型智能体编排联邦学习并管理隐私预算。",
+      "llm_tldr": "提出Agentic-FL，利用大模型智能体编排联邦学习并管理隐私预算。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04611v1",
+      "source": "arxiv",
+      "title": "Dynamic Free-Rider Detection in Federated Learning via Simulated Attack Patterns",
+      "abstract": "Federated learning (FL) enables multiple clients to collaboratively train a global model by aggregating local updates without sharing private data. However, FL often faces the challenge of free-riders, clients who submit fake model parameters without performing actual training to obtain the global model without contributing. Chen et al. proposed a free-rider detection method based on the weight evolving frequency (WEF) of model parameters. This detection approach is a leading candidate for practical free-rider detection methods, as it requires neither a proxy dataset nor pre-training. Nevertheless, it struggles to detect ``dynamic'' free-riders who behave honestly in early rounds and later switch to free-riding, particularly under global-model-mimicking attacks such as the delta weight attack and our newly proposed adaptive WEF-camouflage attack. In this paper, we propose a novel detection method S2-WEF that simulates the WEF patterns of potential global-model-based attacks on the server side using previously broadcasted global models, and identifies clients whose submitted WEF patterns resemble the simulated ones. To handle a variety of free-rider attack strategies, S2-WEF further combines this simulation-based similarity score with a deviation score computed from mutual comparisons among submitted WEFs, and separates benign and free-rider clients by two-dimensional clustering and per-score classification. This method enables dynamic detection of clients that transition into free-riders during training without proxy datasets or pre-training. We conduct extensive experiments across three datasets and five attack types, demonstrating that S2-WEF achieves higher robustness than existing approaches.",
+      "authors": [
+        "Motoki Nakamura"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CR"
+      ],
+      "published": "2026-04-06T11:54:05+00:00",
+      "link": "https://arxiv.org/pdf/2604.04611v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架与优化方法的最新研究",
+      "llm_evidence": "联邦学习框架与优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架与优化方法的最新研究",
+      "llm_tldr_en": "Develops a dynamic free-rider detection method in federated learning using simulated attack patterns.",
+      "llm_tldr_cn": "利用模拟攻击模式开发了一种联邦学习中的动态搭便车者检测方法。",
+      "llm_tldr": "利用模拟攻击模式开发了一种联邦学习中的动态搭便车者检测方法。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05845v1",
+      "source": "arxiv",
+      "title": "JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing",
+      "abstract": "Auto-bidding services optimize real-time bidding strategies for advertisers under key performance indicator (KPI) constraints such as target return on investment and budget. However, uncertainties such as model prediction errors and feedback latency can cause bidding strategies to deviate from ex-post optimality, leading to inefficient allocation. To address this issue, we propose JD-BP, a Joint generative Decision framework for Bidding and Pricing. Unlike prior methods, JD-BP jointly outputs a bid value and a pricing correction term that acts additively with the payment rule such as GSP. To mitigate adverse effects of historical constraint violations, we design a memory-less Return-to-Go that encourages future value maximizing of bidding actions while the cumulated bias is handled by the pricing correction. Moreover, a trajectory augmentation algorithm is proposed to generate joint bidding-pricing trajectories from a (possibly arbitrary) base bidding policy, enabling efficient plug-and-play deployment of our algorithm from existing RL/generative bidding models. Finally, we employ an Energy-Based Direct Preference Optimization method in conjunction with a cross-attention module to enhance the joint learning performance of bidding and pricing correction. Offline experiments on the AuctionNet dataset demonstrate that JD-BP achieves state-of-the-art performance. Online A/B tests at JD.com confirm its practical effectiveness, showing a 4.70% increase in ad revenue and a 6.48% improvement in target cost.",
+      "authors": [
+        "Linghui Meng",
+        "Chun Gan",
+        "Shengsheng Niu",
+        "Chengcheng Zhang",
+        "Chenchen Li",
+        "Chuan Yang",
+        "Yi Mao",
+        "Xin Zhu",
+        "Jie He",
+        "Zhangang Lin",
+        "Ching Law"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "cs.LG"
+      ],
+      "published": "2026-04-07T13:11:12+00:00",
+      "link": "https://arxiv.org/pdf/2604.05845v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "auto-bidding strategies under budget and KPI constraints",
+      "llm_evidence_cn": "预算和KPI约束下的自动投标策略",
+      "llm_evidence": "预算和KPI约束下的自动投标策略",
+      "canonical_evidence": "预算和KPI约束下的自动投标策略",
+      "llm_tldr_en": "Proposes a generative framework for joint auto-bidding and pricing to optimize advertiser ROI under budgets.",
+      "llm_tldr_cn": "提出一种联合自动投标与定价的生成式框架，在预算内优化广告商的投资回报率。",
+      "llm_tldr": "提出一种联合自动投标与定价的生成式框架，在预算内优化广告商的投资回报率。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.05977v1",
+      "source": "arxiv",
+      "title": "Adaptive Incentive Design with Regret Minimization",
+      "abstract": "Incentive design constitutes a foundational paradigm for influencing the behavior of strategic agents, wherein a system planner (principal) publicly commits to an incentive mechanism designed to align individual objectives with collective social welfare. This paper introduces the Regret-Minimizing Adaptive Incentive Design (RAID) problem, which aims to synthesize incentive laws under information asymmetry and achieve asymptotically minimal regret compared to an oracle with full information. To this end, we develop the RAID algorithm, which employs a switching policy alternating between probing (exploration) and estimate-based incentivization (exploitation). The associated type estimator relies only on a weaker excitation condition required for strong consistency in least squares estimation, substantially relaxing the persistence-of-excitation assumptions previously used in adaptive incentive design. In addition, we establish the strong consistency of the proposed type estimator and prove that the incentive obtained asymptotically minimizes the planner's average regret almost surely. Numerical experiments illustrate the convergence rate of the proposed methodology.",
+      "authors": [
+        "Georgios Vasileiou",
+        "Lantian Zhang",
+        "Silun Zhang"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.GT",
+        "cs.MA",
+        "eess.SY"
+      ],
+      "published": "2026-04-07T15:08:06+00:00",
+      "link": "https://arxiv.org/pdf/2604.05977v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "incentive mechanism designed to align individual objectives with collective social welfare",
+      "llm_evidence_cn": "旨在使个人目标与集体社会福利保持一致的激励机制设计",
+      "llm_evidence": "旨在使个人目标与集体社会福利保持一致的激励机制设计",
+      "canonical_evidence": "旨在使个人目标与集体社会福利保持一致的激励机制设计",
+      "llm_tldr_en": "Develops an adaptive incentive design algorithm to minimize regret under information asymmetry.",
+      "llm_tldr_cn": "开发了一种自适应激励设计算法，以在信息不对称下最小化遗憾。",
+      "llm_tldr": "开发了一种自适应激励设计算法，以在信息不对称下最小化遗憾。",
+      "llm_tags": [
+        "query:q5"
+      ],
+      "matched_query_tag": "query:q5",
+      "matched_query_text": "explore mechanism design and game theory approaches for federated learning incentives",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03606v1",
+      "source": "arxiv",
+      "title": "BlazeFL: Fast and Deterministic Federated Learning Simulation",
+      "abstract": "Federated learning (FL) research increasingly relies on single-node simulations with hundreds or thousands of virtual clients, making both efficiency and reproducibility essential. Yet parallel client training often introduces nondeterminism through shared random state and scheduling variability, forcing researchers to trade throughput for reproducibility or to implement custom control logic within complex frameworks. We present BlazeFL, a lightweight framework for single-node FL simulation that alleviates this trade-off through free-threaded shared-memory execution and deterministic randomness management. BlazeFL uses thread-based parallelism with in-memory parameter exchange between the server and clients, avoiding serialization and inter-process communication overhead. To support deterministic execution, BlazeFL assigns isolated random number generator (RNG) streams to clients. Under a fixed software/hardware stack, and when stochastic operators consume BlazeFL-managed generators, this design yields bitwise-identical results across repeated high-concurrency runs in both thread-based and process-based modes. In CIFAR-10 image-classification experiments, BlazeFL substantially reduces execution time relative to a widely used open-source baseline, achieving up to 3.1$\\times$ speedup on communication-dominated workloads while preserving a lightweight dependency footprint. Our open-source implementation is available at: https://github.com/kitsuyaazuma/blazefl.",
+      "authors": [
+        "Kitsuya Azuma",
+        "Takayuki Nishio"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-04T06:35:15+00:00",
+      "link": "https://arxiv.org/pdf/2604.03606v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架与优化方法的最新研究",
+      "llm_evidence": "联邦学习框架与优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架与优化方法的最新研究",
+      "llm_tldr_en": "Presents BlazeFL, a lightweight and deterministic framework for high-performance federated learning simulation.",
+      "llm_tldr_cn": "推出BlazeFL，一个轻量级且确定性的高性能联邦学习模拟框架。",
+      "llm_tldr": "推出BlazeFL，一个轻量级且确定性的高性能联邦学习模拟框架。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04030v1",
+      "source": "arxiv",
+      "title": "Jellyfish: Zero-Shot Federated Unlearning Scheme with Knowledge Disentanglement",
+      "abstract": "With the increasing importance of data privacy and security, federated unlearning emerges as a new research field dedicated to ensuring that once specific data is deleted, federated learning models no longer retain or disclose related information. In this paper, we propose a zero-shot federated unlearning scheme, named Jellyfish. It distinguishes itself from conventional federated unlearning frameworks in four key aspects: synthetic data generation, knowledge disentanglement, loss function design, and model repair. To preserve the privacy of forgotten data, we design a zero-shot unlearning mechanism that generates error-minimization noise as proxy data for the data to be forgotten. To maintain model utility, we first propose a knowledge disentanglement mechanism that regularises the output of the final convolutional layer by restricting the number of activated channels for the data to be forgotten and encouraging activation sparsity. Next, we construct a comprehensive loss function that incorporates multiple components, including hard loss, confusion loss, distillation loss, model weight drift loss, gradient harmonization, and gradient masking, to effectively align the learning trajectories of the objectives of ``forgetting\" and ``retaining\". Finally, we propose a zero-shot repair mechanism that leverages proxy data to restore model accuracy within acceptable bounds without accessing users' local data. To evaluate the performance of the proposed zero-shot federated unlearning scheme, we conducted comprehensive experiments across diverse settings. The results validate the effectiveness and robustness of the scheme.",
+      "authors": [
+        "Houzhe Wang",
+        "Xiaojie Zhu",
+        "Chi Chen"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.LG"
+      ],
+      "published": "2026-04-05T09:13:12+00:00",
+      "link": "https://arxiv.org/pdf/2604.04030v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "recent research on federated learning frameworks",
+      "llm_evidence_cn": "联邦学习框架的最新研究",
+      "llm_evidence": "联邦学习框架的最新研究",
+      "canonical_evidence": "联邦学习框架的最新研究",
+      "llm_tldr_en": "Introduces Jellyfish, a zero-shot federated unlearning scheme for data privacy and model repair.",
+      "llm_tldr_cn": "提出Jellyfish，一种用于数据隐私和模型修复的零样本联邦遗忘学习方案。",
+      "llm_tldr": "提出Jellyfish，一种用于数据隐私和模型修复的零样本联邦遗忘学习方案。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.06101v1",
+      "source": "arxiv",
+      "title": "Towards Securing IIoT: An Innovative Privacy-Preserving Anomaly Detector Based on Federated Learning",
+      "abstract": "In the light of the growing connectivity and sensitivity of industrial data,   cyberattacks and data breaches are becoming more common in the Industrial Internet of Things (IIoT). To cope with such threats, this study presents an anomaly detection system based on a novel Federated Learning (FL) framework. This system detects anomalies such as cyberattacks and protects industrial data privacy by processing data locally and training anomaly detection models on industrial agents without sharing raw data. The proposed FL framework incorporates two key components to enhance both privacy and efficiency. The first component is Homomorphic Encryption (HE), which is integrated into the framework to further protect sensitive data transmissions such as model parameters. HE enhances privacy in FL by preventing adversaries from inferring private industrial data through attacks, such as model inversion attacks. The second component is an innovative dynamic agent selection scheme, wherein a selection threshold is calculated based on agent delays and data size. The purpose of this new scheme is to mitigate the straggler effect and the communication bottleneck that occur in traditional FL architectures, such as synchronous and asynchronous architectures. It ensures that agents are not unfairly selected by the different delays resulting from heterogeneous data in IIoT environments, while simultaneously improving model performance and convergence speed.   The proposed framework exhibits superior performance over   baseline approaches in terms of accuracy, precision, F1-scores, communication costs, convergence speeds, and fairness rate.",
+      "authors": [
+        "Samira Kamali Poorazad",
+        "Chafika Benzaïd",
+        "Tarik Taleb"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR"
+      ],
+      "published": "2026-04-07T17:14:10+00:00",
+      "link": "https://arxiv.org/pdf/2604.06101v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架与优化方法的最新研究",
+      "llm_evidence": "联邦学习框架与优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架与优化方法的最新研究",
+      "llm_tldr_en": "Presents a privacy-preserving anomaly detector for IIoT based on a novel federated learning framework.",
+      "llm_tldr_cn": "提出一种基于新型联邦学习框架的工业物联网隐私保护异常检测系统。",
+      "llm_tldr": "提出一种基于新型联邦学习框架的工业物联网隐私保护异常检测系统。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03897v1",
+      "source": "arxiv",
+      "title": "Latency-Aware Resource Allocation over Heterogeneous Networks: A Lorentz-Invariant Market Mechanism",
+      "abstract": "We present a telecom-native auction mechanism for allocating bandwidth and time slots across heterogeneous-delay networks, ranging from low-Earth-orbit (LEO) satellite constellations to delay-tolerant deep-space relays. The Lorentz-Invariant Auction (LIA) treats bids as spacetime events and reweights reported values based on the \\emph{horizon slack}, a causal quantity derived from the earliest-arrival times relative to a public clearing horizon. Unlike other delay-equalization rules, LIA combines a causal-ordering formulation, a uniquely exponential slack correction implied by a semigroup-style invariance axiom, and a critical-value implementation that ensures truthful reported values once slacks are fixed by trusted infrastructure. We analyze the incentive result in the exogenous-slack regime and separately examine bounded slack-estimation error and endogenous-delay limitations. Under fixed feasible slacks, LIA is individually rational and achieves welfare at least \\(e^{-λΔ}\\) relative to the optimal feasible allocation, where \\(Δ\\) is the slack spread. We evaluate LIA on STARLINK-200, INTERNET-100, and DSN-30 across 52,500 baseline instances with market sizes \\(n\\in\\{10,20,30,40,50\\}\\) and conduct additional robustness sweeps. On Starlink and Internet, LIA maintains near-efficiency while eliminating measured timing rents. However, on DSN, welfare is lower in thin markets but improves with depth. We also distinguish winner-determination time from the background cost of maintaining slack estimates and study robustness beyond independent and identically distributed (iid) noise through error-spread bounds and structured (distance-biased and subnetwork-correlated) noise models. These results suggest that causal-consistent mechanism design offers a practical non-buffering alternative to synchronized delay equalization in heterogeneous telecom infrastructures.",
+      "authors": [
+        "Saad Alqithami"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "cs.AI",
+        "cs.NI"
+      ],
+      "published": "2026-04-04T23:48:19+00:00",
+      "link": "https://arxiv.org/pdf/2604.03897v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Auction mechanism for resource allocation in networks",
+      "llm_evidence_cn": "网络资源分配的拍卖机制",
+      "llm_evidence": "网络资源分配的拍卖机制",
+      "canonical_evidence": "网络资源分配的拍卖机制",
+      "llm_tldr_en": "Introduces a Lorentz-Invariant Auction mechanism for latency-aware resource allocation in heterogeneous networks.",
+      "llm_tldr_cn": "引入一种洛伦兹不变拍卖机制，用于异构网络中感知延迟的资源分配。",
+      "llm_tldr": "引入一种洛伦兹不变拍卖机制，用于异构网络中感知延迟的资源分配。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04125v1",
+      "source": "arxiv",
+      "title": "Mechanism and Communication Co-Design for Differentially Private Energy Sharing",
+      "abstract": "Integrating distributed energy resources (DERs) is a critical step toward addressing the global climate crisis. This transformation has driven the transition from traditional consumers to prosumers and given rise to new energy sharing business models. Existing works have extensively studied prosumer energy sharing mechanisms, yet little attention has been paid to privacy protection, particularly when communication constraints are taken into account. In this paper, we study an energy sharing mechanism where information is exchanged over wireless channels via over-the-air (OTA) multiple-input multiple-output (MIMO) aggregation to exploit spectral efficiency for scalable prosumer coordination. To characterize the privacy leakage risk during data transmission process, we introduce an adversarial attack model and demonstrate that, under certain conditions, the platform can extract and recover prosumers' private parameters from the base station observations. To safeguard the energy sharing mechanism against such attacks, we propose a differentially private equilibrium-seeking algorithm, analyze the achievable privacy level, and establish convergence guarantees that quantify the impact of privacy on the convergence accuracy. Numerical experiments demonstrate that our approach effectively protects prosumers' privacy while converging to near-optimal solutions.",
+      "authors": [
+        "Yingshuo Gu",
+        "Xi Weng",
+        "Yue Chen"
+      ],
+      "primary_category": "cs.IT",
+      "categories": [
+        "cs.IT",
+        "math.OC"
+      ],
+      "published": "2026-04-05T13:59:48+00:00",
+      "link": "https://arxiv.org/pdf/2604.04125v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Mechanism design for energy sharing with privacy and communication constraints",
+      "llm_evidence_cn": "具有隐私和通信约束的能源共享机制设计",
+      "llm_evidence": "具有隐私和通信约束的能源共享机制设计",
+      "canonical_evidence": "具有隐私和通信约束的能源共享机制设计",
+      "llm_tldr_en": "Studies mechanism and communication co-design for differentially private energy sharing among prosumers.",
+      "llm_tldr_cn": "研究了产消者之间差分隐私能源共享的机制与通信协同设计。",
+      "llm_tldr": "研究了产消者之间差分隐私能源共享的机制与通信协同设计。",
+      "llm_tags": [
+        "query:q5"
+      ],
+      "matched_query_tag": "query:q5",
+      "matched_query_text": "explore mechanism design and game theory approaches for federated learning incentives",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.06631v1",
+      "source": "arxiv",
+      "title": "SubFLOT: Submodel Extraction for Efficient and Personalized Federated Learning via Optimal Transport",
+      "abstract": "Federated Learning (FL) enables collaborative model training while preserving data privacy, but its practical deployment is hampered by system and statistical heterogeneity. While federated network pruning offers a path to mitigate these issues, existing methods face a critical dilemma: server-side pruning lacks personalization, whereas client-side pruning is computationally prohibitive for resource-constrained devices. Furthermore, the pruning process itself induces significant parametric divergence among heterogeneous submodels, destabilizing training and hindering global convergence. To address these challenges, we propose SubFLOT, a novel framework for server-side personalized federated pruning. SubFLOT introduces an Optimal Transport-enhanced Pruning (OTP) module that treats historical client models as proxies for local data distributions, formulating the pruning task as a Wasserstein distance minimization problem to generate customized submodels without accessing raw data. Concurrently, to counteract parametric divergence, our Scaling-based Adaptive Regularization (SAR) module adaptively penalizes a submodel's deviation from the global model, with the penalty's strength scaled by the client's pruning rate. Comprehensive experiments demonstrate that SubFLOT consistently and substantially outperforms state-of-the-art methods, underscoring its potential for deploying efficient and personalized models on resource-constrained edge devices.",
+      "authors": [
+        "Zheng Jiang",
+        "Nan He",
+        "Yiming Chen",
+        "Lifeng Sun"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-04-08T03:13:10+00:00",
+      "link": "https://arxiv.org/pdf/2604.06631v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架与优化方法的最新研究",
+      "llm_evidence": "联邦学习框架与优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架与优化方法的最新研究",
+      "llm_tldr_en": "Introduces SubFLOT for efficient personalized federated learning via server-side submodel extraction.",
+      "llm_tldr_cn": "提出SubFLOT框架，通过服务端子模型提取实现高效且个性化的联邦学习。",
+      "llm_tldr": "提出SubFLOT框架，通过服务端子模型提取实现高效且个性化的联邦学习。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.04243v1",
+      "source": "arxiv",
+      "title": "RELIEF: Turning Missing Modalities into Training Acceleration for Federated Learning on Heterogeneous IoT Edge",
+      "abstract": "Federated learning (FL) over heterogeneous IoT edge devices faces coupled system-modality-data heterogeneity: the lower-cost device carries both fewer sensors and less computational power, so the slowest device (straggler) produces the most incomplete gradient signals. Naively averaging their updates dilutes rare-modality information and wastes computation on absent-sensor parameters, whereas existing methods handle the triple heterogeneity (system, modality, data) in isolation and none addresses their coupling. To resolve this issue, we propose RELIEF, a framework that partitions the fusion-layer Low-Rank Adaptation (LoRA) projection matrix into modality-aligned column blocks and uses this partition as a unified interface for aggregation, elastic training, and communication. Each block is aggregated only within the cohort of devices possessing that modality, which eliminates cross-modal gradient interference; the server then allocates personalized training budgets by prioritizing blocks with the highest cohort-internal divergence, so that resource-constrained devices train fewer but more impactful parameters. We prove that cohort-wise aggregation removes interference from the convergence bound and that the divergence-guided allocation achieves sublinear regret. Experiments on two IoT sensor datasets (PAMAP2, MHEALTH) under both full-parameter (CNN) and parameter-efficient (LoRA) training show that RELIEF achieves up to 9.41x speedup and 37% energy reduction over FedAvg with up to 15.3 pp rare-modality F1 gains, and real-device validation on a two-Jetson AGX Orin testbed confirms these results.",
+      "authors": [
+        "Beining Wu",
+        "Zihao Ding",
+        "Jun Huang"
+      ],
+      "primary_category": "cs.NI",
+      "categories": [
+        "cs.NI"
+      ],
+      "published": "2026-04-05T19:55:06+00:00",
+      "link": "https://arxiv.org/pdf/2604.04243v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "federated learning on heterogeneous IoT edge with modality-data heterogeneity",
+      "llm_evidence_cn": "具有模态数据异构性的异构物联网边缘联邦学习",
+      "llm_evidence": "具有模态数据异构性的异构物联网边缘联邦学习",
+      "canonical_evidence": "具有模态数据异构性的异构物联网边缘联邦学习",
+      "llm_tldr_en": "Proposes RELIEF to handle modality and system heterogeneity in federated learning for IoT devices.",
+      "llm_tldr_cn": "提出RELIEF框架，解决物联网联邦学习中的模态、系统和数据异构性耦合问题。",
+      "llm_tldr": "提出RELIEF框架，解决物联网联邦学习中的模态、系统和数据异构性耦合问题。",
+      "llm_tags": [
+        "query:visfed:composite"
+      ],
+      "matched_query_tag": "query:visfed:composite",
+      "matched_query_text": "Papers central to 查询基于视觉语言模型的联邦学习相关论文, especially work that connects or combines: s; research on federated learning frameworks for multimodal models; find recent research papers on federated learning for visual language models; survey multimodal federated learning approaches combining vision and text; analyze privacy and efficiency challenges in vision language federated systems.",
+      "matched_requirement_id": "req-composite-visfed",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04347v1",
+      "source": "arxiv",
+      "title": "RoboPhD: Evolving Diverse Complex Agents Under Tight Evaluation Budgets",
+      "abstract": "2026 has brought an explosion of interest in LLM-guided evolution of agentic artifacts, with systems like GEPA and Autoresearch demonstrating that LLMs can iteratively improve prompts, code, and agent architectures across diverse domains. As adoption accelerates, a central question emerges: given the same information, the same seed agent, and the same objective, which optimization algorithm yields the best results under the same evaluation budget? This question becomes critical when evaluations are expensive, such as when they require human judgment or multiple LLM calls.   We present the first systematic comparison of three optimization paradigms -- Elo tournament selection (RoboPhD), Pareto-based selection (GEPA), and greedy hill-climbing (Autoresearch) -- across four benchmarks spanning abstract reasoning, cloud scheduling, SQL generation, and financial QA, all under a fixed budget of 1,500 evaluations. RoboPhD introduces validation-free evolution: instead of splitting the budget between training and validation, it uses Elo competition on training data to simultaneously evaluate agents and drive evolution. All three systems receive seed agents with diagnostic print() statements that evolution can grow, enabling self-instrumenting agents that develop increasingly informative diagnostics for the benefit of their evolutionary successors.   Using a single default configuration, RoboPhD outperforms both GEPA and Autoresearch on three of four benchmarks, losing only on the simplest task, where the winning solution (from our Autoresearch adaptation) required under 90 lines of code. On ARC-AGI, RoboPhD evolves a 22-line seed agent into a 1,013-line multi-strategy system, improving accuracy from 27.8% to 65.8% using Gemini 3.1 Flash Lite as the solver. We release RoboPhD as a versatile toolkit under the MIT license with a simple optimize_anything() API for evolving diverse complex agents.",
+      "authors": [
+        "Andrew Borthwick",
+        "Stephen Ash",
+        "Anthony Galczak"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-06T01:39:13+00:00",
+      "link": "https://arxiv.org/pdf/2604.04347v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "optimizing agent architectures under tight evaluation budgets",
+      "llm_evidence_cn": "在紧凑的评估预算下优化智能体架构",
+      "llm_evidence": "在紧凑的评估预算下优化智能体架构",
+      "canonical_evidence": "在紧凑的评估预算下优化智能体架构",
+      "llm_tldr_en": "Compares optimization algorithms for evolving LLM agents under strict evaluation budget constraints.",
+      "llm_tldr_cn": "比较了在严格评估预算约束下演化大语言模型智能体的各种优化算法。",
+      "llm_tldr": "比较了在严格评估预算约束下演化大语言模型智能体的各种优化算法。",
+      "llm_tags": [
+        "query:profile-3:composite"
+      ],
+      "matched_query_tag": "query:profile-3:composite",
+      "matched_query_text": "Papers central to 查找预算约束下的联邦学习激励机制或基于拍卖的投标策略研究论文, especially work that connects or combines: b; research on federated learning under budget or incentive mechanisms; find research papers on incentive mechanisms for federated learning under budget constraints; retrieve papers studying auction based bidding strategies in federated learning; explore mechanism design and game theory approaches for federated learning incentives.",
+      "matched_requirement_id": "req-composite-profile-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.06795v1",
+      "source": "arxiv",
+      "title": "FedDAP: Domain-Aware Prototype Learning for Federated Learning under Domain Shift",
+      "abstract": "Federated Learning (FL) enables decentralized model training across multiple clients without exposing private data, making it ideal for privacy-sensitive applications. However, in real-world FL scenarios, clients often hold data from distinct domains, leading to severe domain shift and degraded global model performance. To address this, prototype learning has been emerged as a promising solution, which leverages class-wise feature representations. Yet, existing methods face two key limitations: (1) Existing prototype-based FL methods typically construct a $\\textit{single global prototype}$ per class by aggregating local prototypes from all clients without preserving domain information. (2) Current feature-prototype alignment is $\\textit{domain-agnostic}$, forcing clients to align with global prototypes regardless of domain origin. To address these challenges, we propose Federated Domain-Aware Prototypes (FedDAP) to construct domain-specific global prototypes by aggregating local client prototypes within the same domain using a similarity-weighted fusion mechanism. These global domain-specific prototypes are then used to guide local training by aligning local features with prototypes from the same domain, while encouraging separation from prototypes of different domains. This dual alignment enhances domain-specific learning at the local level and enables the global model to generalize across diverse domains. Finally, we conduct extensive experiments on three different datasets: DomainNet, Office-10, and PACS to demonstrate the effectiveness of our proposed framework to address the domain shift challenges. The code is available at https://github.com/quanghuy6997/FedDAP.",
+      "authors": [
+        "Huy Q. Le",
+        "Loc X. Nguyen",
+        "Yu Qiao",
+        "Seong Tae Kim",
+        "Eui-Nam Huh",
+        "Choong Seon Hong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-08T08:08:33+00:00",
+      "link": "https://arxiv.org/pdf/2604.06795v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架与优化方法的最新研究",
+      "llm_evidence": "联邦学习框架与优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架与优化方法的最新研究",
+      "llm_tldr_en": "Proposes FedDAP, a domain-aware prototype learning method to address domain shift in federated learning.",
+      "llm_tldr_cn": "提出FedDAP，一种领域感知的原型学习方法，用于解决联邦学习中的领域偏移问题。",
+      "llm_tldr": "提出FedDAP，一种领域感知的原型学习方法，用于解决联邦学习中的领域偏移问题。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.04251v1",
+      "source": "arxiv",
+      "title": "MC-CPO: Mastery-Conditioned Constrained Policy Optimization",
+      "abstract": "Engagement-optimized adaptive tutoring systems may prioritize short-term behavioral signals over sustained learning outcomes, creating structural incentives for reward hacking in reinforcement learning policies. We formalize this challenge as a constrained Markov decision process (CMDP) with mastery-conditioned feasibility, in which pedagogical safety constraints dynamically restrict admissible actions according to learner mastery and prerequisite structure.   We introduce Mastery-Conditioned Constrained Policy Optimization (MC-CPO), a two-timescale primal-dual algorithm that integrates structural action masking with constrained policy optimization. In the tabular regime, we establish feasibility preservation and convergence to stationary feasible points under standard stochastic approximation conditions and derive a safety gap result showing that optimization within the mastery-conditioned feasible set can strictly dominate post-hoc filtering under identical safety budgets.   Empirical validation is conducted in minimal and extended tabular environments and in a neural tutoring setting. Across 10 random seeds and one million training steps in the neural regime, MC-CPO satisfies constraint budgets within tolerance, reduces discounted safety costs relative to unconstrained and reward-shaped baselines, and substantially lowers the Reward Hacking Severity Index (RHSI).   These results indicate that embedding pedagogical structure directly into the feasible action space provides a principled foundation for mitigating reward hacking in instructional reinforcement learning systems.",
+      "authors": [
+        "Oluseyi Olukola",
+        "Nick Rahimi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CY",
+        "cs.LG"
+      ],
+      "published": "2026-04-05T20:13:34+00:00",
+      "link": "https://arxiv.org/pdf/2604.04251v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "advances and strategies in reinforcement learning algorithms",
+      "llm_evidence_cn": "强化学习算法的进展与策略",
+      "llm_evidence": "强化学习算法的进展与策略",
+      "canonical_evidence": "强化学习算法的进展与策略",
+      "llm_tldr_en": "Introduces MC-CPO to handle reward hacking in RL-based tutoring systems using constrained policy optimization.",
+      "llm_tldr_cn": "提出MC-CPO算法，通过约束策略优化解决强化学习辅导系统中的奖励黑客问题。",
+      "llm_tldr": "提出MC-CPO算法，通过约束策略优化解决强化学习辅导系统中的奖励黑客问题。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

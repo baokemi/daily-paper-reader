@@ -1,0 +1,959 @@
+Title: JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing
+
+URL Source: https://arxiv.org/pdf/2604.05845v1
+
+Published Time: Wed, 08 Apr 2026 01:26:35 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing 
+
+# Linghui Meng ∗
+
+menglinghui1@jd.com JD.com China 
+
+# Chun Gan ∗† 
+
+ganchun1@jd.com JD.com China 
+
+# Shengsheng Niu 
+
+niushengsheng@jd.com JD.com China 
+
+# Chengcheng Zhang ‡
+
+224010028@link.cuhk.edu.cn The Chinese University of Hong Kong China 
+
+# Chenchen Li 
+
+lichenchen31@jd.com JD.com China 
+
+# Chuan Yang 
+
+yangchuan56@jd.com JD.com China 
+
+# Yi Mao 
+
+maoyi3@jd.com JD.com China 
+
+# Xin Zhu 
+
+zhuxin3@jd.com JD.com China 
+
+# Jie He 
+
+hejie67@jd.com JD.com China 
+
+# Zhangang Lin 
+
+linzhangang@jd.com JD.com China 
+
+# Ching Law 
+
+lawching@jd.com JD.com China 
+
+## Abstract 
+
+Auto-bidding services optimize real-time bidding strategies for ad-vertisers under key performance indicator (KPI) constraints such as target return on investment and budget. However, uncertainties such as model prediction errors and feedback latency can cause bidding strategies to deviate from ex-post optimality, leading to in-efficient allocation. To address this issue, we propose JD-BP , a Joint generative Decision framework for Bidding and Pricing. Unlike prior methods, JD-BP jointly outputs a bid value and a pricing cor-rection term that acts additively with the payment rule such as GSP. To mitigate adverse effects of historical constraint violations, we design a memory-less Return-to-Go that encourages future value maximizing of bidding actions while the cumulated bias is handled by the pricing correction. Moreover, a trajectory augmentation algo-rithm is proposed to generate joint bidding-pricing trajectories from a (possibly arbitrary) base bidding policy, enabling efficient plug-and-play deployment of our algorithm from existing RL/generative bidding models. Finally, we employ an Energy-Based Direct Prefer-ence Optimization method in conjunction with a cross-attention module to enhance the joint learning performance of bidding and pricing correction. Offline experiments on the AuctionNet dataset demonstrate that JD-BP achieves state-of-the-art performance. On-line A/B tests at JD.com confirm its practical effectiveness, showing  
+
+> ∗Both authors contributed equally to this research.
+> †Corresponding author.
+> ‡This work was performed during an internship at JD.com. Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+> Conference’17, Washington, DC, USA
+> ©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM. ACM ISBN 978-x-xxxx-xxxx-x/YYYY/MM https://doi.org/XXXXXXX.XXXXXXX
+
+a 4.70% increase in ad revenue and a 6.48% improvement in target cost. 
+
+## CCS Concepts 
+
+• Information systems → Online advertising ; • Computing methodologies → Machine learning .
+
+## Keywords 
+
+Auto-Bidding, Online Advertising, Joint-Decision Framework, Gen-erative Model 
+
+ACM Reference Format: 
+
+Linghui Meng, Chun Gan, Shengsheng Niu, Chengcheng Zhang, Chenchen Li, Chuan Yang, Yi Mao, Xin Zhu, Jie He, Zhangang Lin, and Ching Law. 2026. JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing. In . ACM, New York, NY, USA, 11 pages. https://doi.org/XXXXXX X.XXXXXXX 
+
+## 1 Introduction 
+
+Auto-bidding services have become integral to modern online ad-vertising ecosystems, acting as intelligent agents that place bids on behalf of advertisers to maximize value under KPI constraints such as target cost-per-click (CPC) and return on investment (ROI) [10, 36, 25, 4]. From a mathematical perspective, auto-bidding problem is typically formulated as a constrained optimization task where the objective is to maximize total advertiser value subject to predefined KPI constraints. When future values and the advertising environ-ment are known, exact optimal bidding formula can be derived through linear programming formulations and Lagrangian duality methods. [2, 14]. However, the practical implementation of auto-bidding faces significant challenges due to the stochastic and dynamic nature of advertising environments. Two primary sources of uncertainty dominate: (1) model prediction errors in estimating click-through rates (CTR) and conversion rates (CVR), and (2) feedback latency where conversion events may be observed hours or days after the initial impression. These uncertainties necessitate continuous  
+
+> arXiv:2604.05845v1 [cs.GT] 7 Apr 2026 Conference’17, July 2017, Washington, DC, USA Linghui Meng, Chun Gan, Shengsheng Niu, Chengcheng Zhang et al.
+
+adjustment of bidding strategies based on real-time performance feedback, transforming the problem into an online decision-making process with partial and delayed observability. To address this adaptive control challenge, the research com-munity has explored various approaches. Early work employed classical control methods such as Proportional-Integral-Derivative (PID) controllers and model predictive control [40]. More recently, reinforcement learning (RL) techniques have gained prominence for their ability to learn optimal policies through interaction with the environment [27, 5, 38]. The latest advances leverage genera-tive models, including Decision Transformers(DT) [8, 12, 23] and diffusion models [13, 24, 28], which can capture complex temporal dependencies in historical bidding data and generate more robust policies. Despite these methodological advancements, a fundamental lim-itation persists in current approaches: the bidding action is learned to simultaneously achieve two distinct objectives—value maximiza-tion and constraint satisfaction. This coupling creates inherent inefficiencies when KPI constraints are violated during interme-diate steps. Consider a scenario where an advertiser sets target ROI to be 10 while the observed real-time ROI at certain timestep equals to 6 due to either conversion delays or prediction inaccura-cies. Conventional auto-bidding algorithms typically respond by reducing future bid values to mitigate constraint violation risks [41, 37]. This conservative adjustment, while protecting against further constraint violations, may cause the advertiser to miss valuable con-version opportunities. More critically, such bidding strategy could lead to allocation inefficiency at the market level, where agents with lower true values may outbid those with genuinely higher values, distorting the auction mechanism’s intended efficiency properties. The core problem lies in the temporal misalignment between bidding actions and their consequences. When an agent attempts to compensate for historical constraint violations through future bidding decisions, it creates a feedback loop that distorts the rela-tionship between bid values and true advertiser valuations. Such misalignment is particularly problematic in second-price auction environments where the pricing mechanism depends on competi-tors’ bids, creating complex strategic interactions that single-action approaches cannot adequately address. To overcome these limitations, we propose a paradigm shift from single-action to dual-action optimization. Our key insight is that value maximization and constraint compensation should be decoupled into separate but coordinated actions. We introduce a novel joint optimization framework that incorporates both bidding actions (controlling auction participation) and pricing actions (ad-justing effective costs through mechanism correction). The pricing correction term acts additively on the underlying auction mecha-nism (such as Generalized Second Price), allowing the system to address historical constraint violations without distorting current bidding strategies that should reflect true advertiser valuations. We implement this framework through JD-BP (Joint Decision framework for Bidding and Pricing), a generative decision-making model based on the Decision Transformer architecture. The model features several innovative design elements: First, we introduce a pricing correction term that operates additively during the payment settlement phase. To effectively learn the joint bidding and pricing decisions, we design a memory-less Return-to-Go (RTG) that ex-cludes past constraint violation signals from the bidding decision process, ensuring bidding actions focus on future value maximiza-tion. We further incorporate a cross-attention module to enable pricing adjustments to perceive bidding actions. Since initial de-ployment lacks training data, we develop a trajectory augmentation algorithm that generates joint bidding-pricing trajectories from a (possibly arbitrary) base bidding policy, enabling efficient plug-and-play deployment of our algorithm from existing bidding models. Finally, we propose an energy-based Direct Preference Optimiza-tion (DPO) fine-tuning [29] using trajectories that pair high-reward outcomes with appropriate bidding-pricing action combinations, al-lowing our model to learn preference distinctions between different types of corrective actions. Our contributions are summarized as follows: 
+
+• We propose JD-BP , a novel joint optimization framework de-coupling value maximization (bidding) from historical constraint compensation (pricing). To the best of our knowledge, this is the first generative framework treating pricing mechanisms as an actionable dimension in auto-bidding. 
+
+• Rather than simply applying standard generative models, we in-troduce a memory-less RTG to decouple the sequential credit as-signment, and design a Gate-Selected Cross-Attention (GCA) 
+
+architecture to ensure pricing actions are causally conditioned on bidding outcomes. 
+
+• To overcome the limitation of categorical-based Direct Prefer-ence Optimization (DPO), we formulate an Energy-Based Con-tinuous DPO customized for deterministic regression tasks in auto-bidding, allowing the model to distinguish and align with high-reward trajectories without artificial distribution assump-tions. 
+
+• In addition to offline experimental validation achieving state-of-the-art results, we deploy JD-BP on a leading global e-commerce platform, resulting in a 4.70% increase in ad revenue and a 6.48% increase in target cost constraint satisfaction. 
+
+## 2 Preliminary 
+
+In this section, we first present the classical formulation of an auto-bidding task as a constrained optimization problem. We then discuss the closely related field of online decision-making and its relevance to the solution of the auto-bidding problem. 
+
+## 2.1 Auto-Bidding Problem 
+
+Consider the scenario where N bidding opportunities arrive se-quentially throughout the day, the classic auto-bidding problem can be formulated as follows: 
+
+max 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖
+
+𝑥 𝑖 𝑣 𝑖 
+
+𝑠.𝑡 . 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖
+
+𝑥 𝑖 𝑐 𝑖 ≤ 𝐵 
+
+Í𝑁 𝑖 𝑥 𝑖 𝑐 𝑖 
+
+Í𝑁 𝑖 𝑥 𝑖 𝛾 𝑖 𝑗 
+
+≤ 𝜌 𝑗 , ∀𝑗 𝑥 𝑖 ∈ { 0, 1}, ∀𝑖 
+
+(1) JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing Conference’17, July 2017, Washington, DC, USA 
+
+where 𝑣 𝑖 represents the advertiser’s estimated value for the i-th impression, 𝑐 𝑖 denotes actual payment (i.e., cost) charged to the advertiser and 𝑥 𝑖 indicates whether the advertiser has won this impression opportunity under a given bidding mechanism such as the second-price auction, the most common mechanism in in-dustrial practice. The model considers two types of constraints to ensure performance. One is the budget constraint, where 𝐵 rep-resents the total advertising budget. The second type pertains to Key Performance Indicator (KPI) constraints, such as CPC and ROI constraints. To solve this large-scale 0-1 programming problem, prior work typically relaxes the integer constraint on 𝑥 𝑖 , transforming it into a linear program. Moreover, in practical industrial systems, budget pacing is often handled by a separate control module, allowing the optimization to focus primarily on KPI constraints. When future values and the advertising environment are known, the optimal bidding strategy can be derived as: 
+
+𝑏𝑖𝑑 𝑖 = 𝜆 0𝑣 𝑖 +∑︁ 
+
+> 𝑗
+
+𝜌 𝑗 𝜆 𝑗 𝛾 𝑖 𝑗 (2) where 𝜆 0 and 𝜆 𝑗 denote the dual variables associated with the budget constraint and the KPI constraints, respectively [2, 14]. Without loss of generality, the subsequent discussion will focus on the problem considering both budget and ROI constraints, which is the most prevalent scenario in industrial practice. 
+
+## 2.2 Online Decision-Making for Auto-Bidding 
+
+The closed-form optimal solution given by Equation 2 depends on two essential assumptions: 1) knowing its future values {𝑣 𝑖 }
+
+and 2) the opponents’ values and bidding strategies are station-ary [17]. However, the advertising environment of online advertis-ing is highly competitive and uncertain, mainly due to the following three reasons. First, traffic distribution may shift significantly due to factors such as promotions, weather events, or other external stimuli. Sec-ond, conversion latency is a common phenomenon in e-Commerce that could bring challenge to online decision-making. This refers to the delay between a user’s click and subsequent conversion (e.g., purchase) [7, 6]. Last but not least, despite improvements in CTR and conversion rate prediction models, the prediction error of machine learning models always exists [30]. Consequently, auto-bidding is often modeled as an online Decision-Making problem in practice [3]. To characterize the gap between posterior result and optimal re-sult in hindsight, Regret for both value maximizing and constraints violation. Formally, let E be the advertising environment and 𝑇 be the total timesteps, respectively. For each time step 𝑡 ∈ { 1, 2, · · · ,𝑇 }, the auto-bidding agent receives a state 𝑠 𝑡 = [ℎ𝑡 , 𝑐 𝑡 , 𝑥 𝑡 ] ∈ S , where ℎ𝑡 
+
+contains information from its bidding history such as cost, remain-ing budget, 𝑐 𝑡 represents target constraints and 𝑥 𝑡 describes the traffic distribution. 
+
+## 3 Methodology 
+
+In this chapter, we first present the mathematical formulation for the joint modeling of bidding and pricing, along with the optimal closed-form solution under perfect information of future bidding opportunities. Given the powerful sequential decision-making ca-pabilities of the Decision Transformer, we adopt it as our backbone architecture to solve this joint decision-making problem. We pro-pose a memoryless offline trajectory generation method to produce high-quality trajectories with additional pricing action for model training. Notably, this method is applicable to all baseline models that consider only bidding actions. Finally, we introduce an DPO fine-tune module to further enhance the model’s performance. The overall algorithm architecture is illustrated in Fig. 1. 
+
+## 3.1 Joint Decision Framework 
+
+The core of our framework is a pricing correction term that operates additively during the settlement phase. Formally, for an impression opportunity at time (t), the final payment 𝑝 𝑡 is computed as: 𝑝 𝑡 =
+
+𝑐 𝑡 + 𝑦 𝑡 . Given that the ROI constraint fails to be met at time 𝑡 𝑚 ,indicated by a gap of 𝑏𝑎𝑙 between the total cost incurred and the total value obtained, the joint model is then formulated as follows: 
+
+max  
+
+> 𝑥 𝑡 ,𝑦 𝑡
+> 𝑇
+
+∑︁  
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑣 𝑡 
+
+𝑠.𝑡 . 
+
+> 𝑇
+
+∑︁  
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · ( 𝑐 𝑡 + 𝑦 𝑡 ) ≤ 𝐵 𝑡 𝑚 
+
+> 𝑇
+
+∑︁  
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑣 𝑡 ≥ 𝜌 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 𝑇 ∑︁  
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑦 𝑡 + 𝑏𝑎𝑙 = 0
+
+𝑥 𝑡 ∈ { 0, 1}, 𝑦 𝑡 ∈ R , ∀𝑡 ≥ 𝑡 𝑚 
+
+(3) where 𝑏𝑎𝑙 represents the historical financial deficit caused by ROI constraint violations before time 𝑡 𝑚 . Specifically, to achieve the target ROI 𝜌 , the historical accumulated cost should not exceed the total value divided by 𝜌 . Thus, we define the historical deficit as: 
+
+𝑏𝑎𝑙 = max 0,
+
+> 𝑡 𝑚 −1
+
+∑︁  
+
+> 𝑡 =0
+
+𝑥 𝑡 · 𝑐 𝑡 − 1
+
+𝜌 
+
+> 𝑡 𝑚 −1
+
+∑︁ 
+
+> 𝑡 =0
+
+𝑥 𝑡 · 𝑣 𝑡 
+
+!
+
+(4) This formulation ensures that 𝑏𝑎𝑙 acts as a known, non-negative deterministic constant ( 𝑏𝑎𝑙 ≥ 0) at time 𝑡 𝑚 , representing the exact overspent amount. 𝐵 𝑡 𝑚 represents the remaining budget at time 𝑡 𝑚 ,
+
+𝑐 𝑡 denotes the original cost under any given auction mechanism, and 𝑦 𝑡 is the decision variable for the pricing correction term. The first constraint indicates that the total cost (after pricing correction) from time 𝑡 𝑚 onwards must not exceed the current remaining budget. The second constraint requires the future ROI target to be achieved. The third constraint ensures that the sum of pricing corrections exactly compensates for the historical financial deficit 𝑏𝑎𝑙 .
+
+Theorem 3.1. Given complete knowledge of all future bidding opportunities after time 𝑡 𝑚 , problem (3) and problem (1) share an iden-tical optimal bidding formula structure, i.e., 𝑏𝑖𝑑 𝑡 = ˆ𝜆 0𝑣 𝑡 + Í𝑗 𝜌 𝑗 ˆ𝜆 𝑗 𝑦 𝑡 𝑗 ,and a feasible solution for pricing can be expressed as 𝑦 𝑡 = −𝑏𝑎𝑙 /Í𝑇 𝑡 =𝑡 𝑚 𝑥 𝑡 .
+
+Proof. At decision step 𝑡 𝑚 , the historical trajectory is fully ob-served, rendering 𝑏𝑎𝑙 a known non-negative constant. To prove the equivalence, we substitute the pricing correction condition Conference’17, July 2017, Washington, DC, USA Linghui Meng, Chun Gan, Shengsheng Niu, Chengcheng Zhang et al. 
+
+Í𝑇 𝑡 =𝑡 𝑚 𝑥 𝑡 · 𝑦 𝑡 = −𝑏𝑎𝑙 into the budget constraint of problem (3). The future budget constraint can be algebraically rewritten as: 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 +
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑦 𝑡 ≤ 𝐵 𝑡 𝑚 =⇒
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 − 𝑏𝑎𝑙 ≤ 𝐵 𝑡 𝑚 (5) By isolating the future pricing term 𝑦 𝑡 , problem (3) can be mathe-matically reformulated into an equivalent pure bidding problem: 
+
+max 
+
+> 𝑥 𝑡
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑣 𝑡 
+
+𝑠.𝑡 . 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 ≤ 𝐵 𝑡 𝑚 + 𝑏𝑎𝑙 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑣 𝑡 ≥ 𝜌 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 
+
+𝑥 𝑡 ∈ { 0, 1}, ∀𝑡 ≥ 𝑡 𝑚 
+
+(6) This formulation is structurally identical to the original single bid-ding action problem (1). The only mathematical difference is the relaxation of the budget bound from 𝐵 𝑡 𝑚 to an augmented budget 
+
+(𝐵 𝑡 𝑚 + 𝑏𝑎𝑙 ). Because this transformation preserves the linearity of the constraints regarding decision variables 𝑥 𝑡 , the Lagrangian duality methodology applies equivalently. Therefore, the structure of the optimal bidding policy remains unchanged. Any pricing strategy satisfying the third constraint, such as equally distributing the deficit over all winning impressions via 𝑦 𝑡 = −𝑏𝑎𝑙 /Í𝑇 𝑡 =𝑡 𝑚 𝑥 𝑡 ,constitutes a mathematically feasible correction strategy. □
+
+Corollary 3.2. Let 𝑉 ∗ 
+
+> 𝑂
+
+and 𝑉 ∗ 
+
+> 𝐽
+
+denote the optimal objective values of the original online decision problem and the joint optimization problem (3) , respectively. Then the inequality 𝑉 ∗ 
+
+> 𝑂
+
+≤ 𝑉 ∗ 
+
+> 𝐽
+
+holds. 
+
+Proof. The constraints of the original online decision problem at time 𝑡 𝑚 can be expressed as: 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 ≤ 𝐵 𝑡 𝑚 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑣 𝑡 ≥ 𝜌 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =𝑡 𝑚
+
+𝑥 𝑡 · 𝑐 𝑡 + 𝜌 · 𝑏𝑎𝑙 
+
+(7) Since the extent of ROI constraint violation is 𝑏𝑎𝑙 > 0. Thus, the optimal solution for constraints (7) is feasible to the constraints in problem (3). Then we complete the proof. □
+
+## 3.2 Trajectory Generation 
+
+In conventional DT based auto-bidding systems, trajectories follow the standard formulation: 
+
+𝜏 = {( 𝑟 𝑡 , 𝑠 𝑡 , 𝑎 bid  
+
+> 𝑡
+
+)} 𝑇 𝑡 =1
+
+where 𝑠 𝑡 ∈ S represents the state of the system, 𝑎 bid  
+
+> 𝑡
+
+ß𝑛 Abid denotes the bidding action, and 𝑟 𝑡 ∈ R is the RTG. In our joint decision-making framework, we extend this formu-lation to incorporate pricing correction actions, resulting in an augmented trajectory structure: 
+
+𝜏 joint = {( 𝑅 bid  
+
+> 𝑡
+
+, 𝑅 price  
+
+> 𝑡
+
+, 𝑠 𝑡 , 𝑎 bid  
+
+> 𝑡
+
+, 𝑎 price  
+
+> 𝑡
+
+, 𝐴 𝑡 )} 𝑇 𝑡 =1
+
+where 𝑅 bid  
+
+> 𝑡
+
+and 𝑅 price  
+
+> 𝑡
+
+represent the target returns for bidding and pricing objectives respectively, and 𝑎 price  
+
+> 𝑡
+
+∈ A price denotes the pricing correction action. While online interaction with the environment provides one mechanism for data collection, we propose a more efficient offline trajectory generation procedure based on the optimal solution de-rived from our theoretical analysis. Specifically, we randomly select a trajectory from the set generated by the base bidding policy. As-suming there exists a constraint violation 𝑏𝑎𝑙 𝑡 at time step 𝑡 and we aim to compensate for it within the remaining steps, we com-pute 𝑎 price  
+
+> 𝑡
+
+via a PID controller [42]. The choice of PID controller is motivated by practical considerations: training a high-quality pricing model requires diverse and effective pricing action data. A fixed pricing action would be insufficient because it lacks diver-sity and cannot guarantee improved constraint satisfaction. PID controllers, while not the only viable option, are widely applicable, capable of dynamically adjusting actions to generate richer training data, and have proven effective in enhancing target achievement rates—thereby producing high-quality training samples. Although any algorithm satisfying these two criteria could be used, PID is preferred for its simplicity of implementation and strong inter-pretability. This allows us to update the subsequent state and, based on this updated state and the base bidding policy, generate the next bidding action. This allows us to update the subsequent state and, based on this updated state and the base bidding policy, generate the next bidding action. We repeat the above steps until a complete trajectory is generated and calculate the corresponding 𝑅 bid  
+
+> 𝑡
+
+and 
+
+𝑅 price  
+
+> 𝑡
+
+.Simultaneously, at each step of the loop, we additionally generate a new trajectory without pricing actions following the base bidding policy. This enables computation of the advantage between apply-ing versus not applying pricing actions in the current state, thereby enhancing the model’s exploration capability during training. We detail the trajectory generation process in Algorithm 1. 
+
+3.2.1 Memoryless RTG. In our model, the introduction of pric-ing actions decouples bidding decisions from historical constraint violations, allowing the bidding policy to focus solely on future value maximization under future constraint satisfaction. Conse-quently, differing from the conventional definition of RTG in prior DT-related research, we introduce a memoryless RTG to guide the model in generating bidding actions that prioritize future con-straint fulfillment and value maximization. The memoryless RTG formulations for bidding and pricing are defined as: 
+
+𝑅 𝑏 𝑡 = min 
+
+  Í𝑇 𝑖 =𝑡 𝑣 𝑖 
+
+Í𝑇 𝑖 =𝑡 𝑐 𝑖 
+
+2, 1
+
+
+
+·
+
+> 𝑇
+
+∑︁ 
+
+> 𝑖 =𝑡
+
+𝑣 𝑖 (8) 
+
+𝑅 𝑝 𝑡 = min 
+
+ Í𝑇 𝑖 =1 𝑣𝑖 
+
+Í𝑇 𝑖 =1 (𝑐 𝑖 + 𝑦 𝑖 ) ,
+
+Í𝑇 𝑖 =1 (𝑐 𝑖 + 𝑦 𝑖 )
+
+Í𝑇 𝑖 =1 𝑣 𝑖 
+
+2      
+
+> Í𝑇 𝑖 =𝑡 𝑦 𝑖
+> Í𝑇 𝑖 =1𝑣 𝑖 −Í𝑇 𝑖 =1𝑐 𝑖 −Í𝑡 𝑖 =1𝑦 𝑖
+> −1+1
+
+(9) where 𝑐 𝑖 , 𝑣 𝑖 , 𝑦 𝑖 represent the charge value before applying the pric-ing correction actions, the value of 𝑖 -th impression and the pricing correction value, respectively. The 𝑅 𝑏 𝑡 incorporates the constraint fulfillment penalty term over the total advertising value after time step 𝑡 . 𝑅 𝑝 𝑡 is designed to ensure that the post-correction cost closely JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing Conference’17, July 2017, Washington, DC, USA 
+
+Figure 1: JD-BP framework with Energy-Based DPO Fine-tuning. (a) Dual-stream transformer: Bidding Stream (value maxi-mization) and Pricing Stream (corrective actions). (b) GCA module fuses bidding information via learnable gating 𝜎 . (c) RTG variants: Memoryless (future efficiency) and Memory-based (historical constraint satisfaction). (d) Energy-Based Continuous DPO aligns model by energy distance optimization. (e) Complete offline training pipeline. 
+
+approximates the advertising value while satisfying cost constraints. The RTG metric consists of two main components: the base repre-sents the ratio of the post-correction cost to the advertising value over the entire period, and the exponent assesses the ability to recover both the current and future pricing deviations by the end of the period. This design ensures that the 𝑅 𝑝 𝑡 ranges from 0 to 1. It is important to note that when calculating 𝑅 𝑏 𝑡 , we use the pre-correction cost rather than the post-correction cost. Using post-correction costs would create perverse incentives: the bidding policy could aggressively maximize value while relying on pricing policy to satisfy constraints, thereby degrading allocation efficiency. By masking post-correction costs, we maintain economically efficient bidding behavior. Such behavior would severely undermine allo-cation efficiency. Therefore, in practical applications, we mask the actual fulfillment status after pricing correction to maintain bidding at a reasonable level. 
+
+## 3.3 Joint Decision Transformer with Energy-Based DPO Fine-tuning 
+
+DT has been used as the backbone model in several generative auto-bidding works for its capability of capturing trajectory-wise infor-mation. However, the self-attention module in causal transformer grants the bidding agent access to past KPI violation conditions, leading to allocation inefficiency. Moreover, extended trajectories generated in the offline environment may cause further distribu-tion shifting. To address these two challenges, we propose a joint decision transformer model with energy-based DPO fine-tuning. The overall algorithmic framework is illustrated in Algorithm 2. 
+
+Algorithm 1 Trajectory Generation Algorithm 
+
+Input: Original Offline Dataset D0, Base policy with bidding action only 𝜋 0, correction window ℎ
+
+Output: Djoint  
+
+> 1:
+
+Select 𝜏 = {( 𝑠 𝑡 , 𝑅 𝑏 𝑡 , 𝑎 𝑏 𝑡 )} 𝑇 𝑡 =0 ∈ D 0 
+
+> 2:
+
+Generate intermediate trajectory 𝜏 int = {( 𝑅 𝑏 𝑡 , ˆ𝑠 𝑡 , ˆ𝑎 𝑏 𝑡 , 𝑎 𝑝 𝑡 , 𝐴 𝑡 )}  
+
+> 3:
+
+for 𝑡 = 0, 1, . . . ,𝑇 do  
+
+> 4:
+
+Compute 𝑎 𝑝 𝑡  
+
+> 5:
+
+State transition: ˆ𝑠 𝑡 +1 = 𝑓 env ( ˆ𝑠 𝑡 , ˆ𝑎 𝑏 𝑡 , 𝑎 𝑝 𝑡 ) 
+
+> 6:
+
+Generate the bidding action by the base policy: ˆ𝑎 𝑏 𝑡 +1 =
+
+𝜋 0 ([ 𝜏 [0 : 𝑡 ], ˆ𝑠 𝑡 +1])  
+
+> 7:
+
+for 𝑙 = 𝑡, 1, . . . ,𝑇 do  
+
+> 8:
+
+State transition without pricing action: 𝑠 𝑡 +1 =
+
+𝑓 env ( ˆ𝑠 𝑡 , ˆ𝑎 𝑏 𝑡 , 0) 
+
+> 9:
+
+Generate the bidding action by the base policy: 𝑎 𝑏 𝑡 +1 =
+
+𝜋 0 ([ 𝜏 [0 : 𝑡 ], 𝑠 𝑡 +1])  
+
+> 10:
+
+end for  
+
+> 11:
+
+Compute 𝑅 𝑏 𝑡 ( ˆ𝑠 𝑡 ) under state ˆ𝑠 𝑡 without employing pricing actions henceforth.  
+
+> 12:
+
+end for  
+
+> 13:
+
+for 𝑡 = 0, 1, . . . ,𝑇 do  
+
+> 14:
+
+Compute 𝑅 𝑏 𝑡 , 𝑅 𝑝 𝑡 , and advantage value 𝐴 𝑡 = 𝑅 𝑝 𝑡 − 𝑅 𝑏 𝑡 ( ˆ𝑠 𝑡 ) 
+
+> 15:
+
+end for  
+
+> 16:
+
+Generate augmented trajectory: 
+
+𝜏 joint = {( 𝑅 𝑏 𝑡 , 𝑅 𝑝 𝑡 , ˆ𝑠 𝑡 , ˆ𝑎 𝑏 𝑡 , 𝑎 𝑝 𝑡 , 𝐴 𝑡 )} 
+
+3.3.1 Joint Decision Transformer. Let the extended sequence 𝜏 ∈D𝑗𝑜𝑖𝑛𝑡 at time 𝑡 be represented as: 
+
+𝜏 𝑡 = (𝑠 𝑡 , 𝑅 b 
+
+> 𝑡
+
+, 𝑅 p 
+
+> 𝑡
+
+, 𝐴 𝑡 , 𝑎 b 
+
+> 𝑡
+
+, 𝑎 p 
+
+> 𝑡
+
+).Conference’17, July 2017, Washington, DC, USA Linghui Meng, Chun Gan, Shengsheng Niu, Chengcheng Zhang et al. 
+
+We first divide the extended trajectory 𝜏 𝑡 at time 𝑡 into a bidding trajectory 𝜏 𝑏 𝑡 and a pricing trajectory 𝜏 𝑝 𝑡 where 
+
+𝜏 𝑏 𝑡 = (𝑠 𝑡 , 𝑅 𝑏 𝑡 , 𝑎 𝑏 𝑡 ), 𝜏 𝑝 𝑡 = (𝑠 𝑡 , 𝑅 𝑝 𝑡 , 𝑎 𝑝 𝑡 ). (10) The bidding trajectory is fed into a standard causal transformer [35] 
+
+H1: 𝑡 𝑏 = Transformer 𝑏 ([ e𝑏  
+
+> 1
+
+, . . . , e𝑏 𝑡 ]) , (11) 
+
+h𝑏 𝑡 = H1: 𝑡 𝑏 [− 1], (12) 
+
+𝑎 𝑏 𝑡 = 𝑊 𝑏  
+
+> out
+
+· LayerNorm (h𝑏 𝑡 ). (13) Similarly, the pricing trajectory is processed by a causal trans-former followed by a cross attention module with the last hidden state of bidding transformer. 
+
+Gate-Selected Cross-Attention for Coordinated Correction 
+
+The pricing stream dynamically adapts based on bidding outcomes through GCA: 
+
+g𝑏 𝑡 = 𝜎 (𝑊 𝐺𝐴𝑇 𝐸 (H1: 𝑡 𝑏 )) · H1: 𝑡 𝑏 (14) 
+
+Q𝑝 = 𝑊 cross  
+
+> 𝑄
+
+· [ h𝑝 𝑡 , 𝑔 𝑏 𝑡 ] (15) 
+
+K𝑝 = 𝑊 cross  
+
+> 𝐾
+
+· h𝑝 𝑡 (16) 
+
+V𝑝 = 𝑊 cross  
+
+> 𝑉
+
+· h𝑝 𝑡 (17) 
+
+c𝑡 = Softmax Q𝑝 K⊤
+
+> 𝑝
+
+√𝑑 𝑘 
+
+!
+
+V𝑝 (18) 
+
+˜e𝑝 𝑡 = e𝑝 𝑡 + 𝑊 enhance · c𝑡 (19) 
+
+𝜎 represents sigmoid function. This mechanism enables the pricing module to access the complete bidding context (beyond just the final bid), allowing for sophisticated corrections that consider bidding strategy, budget utilization, and competitive positioning. Pricing decisions explicitly correct for bidding outcomes: 
+
+H1: 𝑡 𝑝 = Transformer 𝑝 ([ e𝑝  
+
+> 1
+
+, . . . , e𝑝 𝑡 −1, ˜e𝑝 𝑡 ]) (20) 
+
+h𝑝 𝑡 = H1: 𝑡 𝑝 [− 1] (21) 
+
+𝑎 𝑝 𝑡 = 𝑊 𝑝  
+
+> out
+
+· LayerNorm (h𝑝 𝑡 ) (22) When bidding acquires high-value traffic, the pricing module im-plements premium strategies. Conversely, when bidding yields marginal traffic, it applies corrective measures to maintain prof-itability. This independence prevents pricing considerations from corrupt-ing core bidding logic, which is crucial for maintaining impression volume and market competitiveness. The model employs a cross-attention mechanism to coordinate bidding and pricing decisions while respecting system constraints. Pricing corrections naturally depend on bidding outcomes, however, existing approaches often fail to adequately capture this causal relationship. We propose a dual-stream architecture that explicitly models this sequential dependency, where bidding decisions are made first, followed by pricing corrections that are conditioned on the bidding outcomes. To address the joint learning of bidding and pricing actions, we employ a supervised regression loss to align the model’s outputs with the ground truth actions. The loss function is defined as: 
+
+Laction = 1
+
+𝑇 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =1
+
+h
+
+𝜆 𝑏 · ∥ 𝑎 𝑏 𝑡 − 𝑎 𝑏 ∗ 
+
+> 𝑡
+
+∥2 + 𝜆 𝑝 · ∥ 𝑎 𝑝 𝑡 − 𝑎 𝑝 ∗ 
+
+> 𝑡
+
+∥2 i
+
+, (23) where 𝑎 𝑏 𝑡 and 𝑎 𝑝 𝑡 denote the model’s predicted bidding and pricing actions at time step 𝑡 , 𝑎 𝑏 ∗ 
+
+> 𝑡
+
+and 𝑎 𝑝 ∗ 
+
+> 𝑡
+
+are the corresponding ground-truth actions, and 𝜆 𝑏 , 𝜆 𝑝 are weighting coefficients. 
+
+3.3.2 Energy-Based DPO Fine-tuning. We collect sample pairs for DPO fine-tuning using the procedure described in Algorithm 1. At each decision step, we determine the positive (winner) sample 
+
+𝑎 + and negative (loser) sample 𝑎 − based on the advantage value 
+
+𝐴 𝑡 = 𝑅 𝑝 𝑡 −𝑅 𝑏 𝑡 ( ˆ𝑠 𝑡 ). Specifically, if the RTG increases after introducing the pricing action, we label the corresponding action as positive; otherwise, it is labeled as negative. While standard DPO was developed for stochastic policies (LLMs) via categorical distributions, our bidding and pricing framework uti-lizes a deterministic policy that directly outputs continuous scalar values. To apply DPO in this deterministic regression setting with-out imposing artificial distribution assumptions on the model ar-chitecture, we derive the objective through an energy-based formu-lation [21, 9]. 
+
+Energy-Based Theoretical Derivation. In the context of continuous control, we define an energy function 𝐸 (𝑎, 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 ) that quantifies the "cost" or incompatibility between a predicted action 𝑎 and a target value 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 . For our task, we adopt the L1 distance as the energy metric: 𝐸 (𝑎, 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 ) = |𝑎 − 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 |. Lower energy implies higher compatibility. Under the Boltzmann distribution assumption commonly used in energy-based models, the implicit preference probability is proportional to the negative energy, i.e., 𝑃 (𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 |𝑎 ) ∝ 
+
+exp (− 1 
+
+> 𝛽
+
+𝐸 (𝑎, 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 )) . Consequently, the standard DPO term, which represents the log-ratio of the policy to the reference model, can be reformulated as the relative energy gain: 
+
+log 𝜋 𝜃 (𝑎 |·) 
+
+𝜋 ref (𝑎 |·) ≡ − 1
+
+𝛽 
+
+ 𝐸 (𝑎, 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 ) − 𝐸 (𝑎 ref , 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 )
+
+= 1
+
+𝛽 
+
+ |𝑎 ref − 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 | − | 𝑎 − 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 | (24) This transformation maps the probabilistic objective of DPO into a deterministic distance minimization problem. It interprets the optimization goal not as increasing token probability, but as ensur-ing the current model 𝜋 𝜃 reduces the error (energy) relative to the frozen reference model 𝜋 ref .
+
+Loss Function. We define the similarity score 𝑆 (𝑎, 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 ) as this relative energy gain. This term measures how much the trained model improves upon the reference model’s prediction for a given target 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 :
+
+𝑆 (𝑎, 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 ) = |𝑎 ref − 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 | − | 𝑎 − 𝑦 𝑡𝑎𝑟𝑔𝑒𝑡 | (25) Substituting this regression-based preference term into the Bradley-Terry model used by DPO, we obtain the final loss function for a JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing Conference’17, July 2017, Washington, DC, USA 
+
+pair of positive ( 𝑎 +) and negative ( 𝑎 − ) samples: 
+
+LDPO = −E(𝑠,𝑎 +,𝑎 − )∼D 
+
+log 𝜎  𝛽  𝑆 (𝑎, 𝑎 +) − 𝑆 (𝑎, 𝑎 − ) 
+
+= − log 𝜎 
+
+©«
+
+𝛽 
+
+h
+
+(| 𝑎 ref − 𝑎 + | − | 𝑎 − 𝑎 + |) 
+
+| {z }
+
+> Energy Reduction on Positive
+
+− (| 𝑎 ref − 𝑎 − | − | 𝑎 − 𝑎 − |) 
+
+| {z }
+
+> Energy Reduction on Negative
+
+iª ®®®¬
+
+(26) where 𝑎 = 𝜇 𝜃 (𝑠 ) is the continuous scalar output of the model. This objective directs the gradient to maximize the relative improvement on the positive sample 𝑎 + significantly more than on the negative sample 𝑎 − , thereby aligning the continuous policy with high-reward regions. 
+
+Algorithm 2 Overall Algorithmic Framework 
+
+Input: Trajectory T generated by Algorithm 1, initialized bidding and pricing joint model M0
+
+Output: Trained joint model M∗ 
+
+> 1:
+
+for each training iteration do  
+
+> 2:
+
+Randomly sample a batch of trajectories {𝜏 𝑖 }batch_size  
+
+> 𝑖 =1
+
+from 
+
+T according to the RTG  
+
+> 3:
+
+Infer bidding results 𝑎 𝑏 𝑡 using the joint model M according to Equations (9)–(11)  
+
+> 4:
+
+Interact with the pricing module via cross attention and output the corresponding pricing results 𝑎 𝑝 𝑡 according to Equations (12)–(20)  
+
+> 5:
+
+Compute the action loss 𝐿 action and perform backpropagation  
+
+> 6:
+
+end for  
+
+> 7:
+
+Obtain the trained JD-BP model MJD-BP  
+
+> 8:
+
+for each DPO fine-tuning iteration do  
+
+> 9:
+
+Load the trained JD-BP model MJD-BP  
+
+> 10:
+
+Construct paired samples for preference modeling  
+
+> 11:
+
+Fine-tune the model using the 𝐿 cDPO objective  
+
+> 12:
+
+end for  
+
+> 13:
+
+Output the final trained joint model M∗
+
+## 4 Offline Experiments 4.1 Setup 
+
+4.1.1 Datasets. We utilize the Alibaba open-source AuctionNet dataset [32] to evaluate the performance of our approach. This dataset is the largest publicly available resource in the auto-bidding domain, containing key information such as the prior estimated value and bid price for each advertiser in every ad request. Re-searchers can aggregate multiple requests over specific time inter-vals to reconstruct complete bidding trajectories. However, since the original AuctionNet data does not contain pricing actions, we employ a PID algorithm to dynamically adjust the pricing process, with the objective of fitting the true CPA to the target TCPA. As established in Section 3.1, optimizing for tCPA is mathematically equivalent to our formulated tROI constraints by taking the recip-rocal of the target value. This structural equivalence allows us to directly apply our theoretically derived joint-decision framework to the tCPA-based AuctionNet dataset. This process enables us to collect the comprehensive bidding and pricing trajectories neces-sary for training the model. In this dataset, each ad request involves 48 advertisers competing in the auction, and a CPM-based second-price pricing mechanism is employed. The dataset spans 21 delivery periods, specifically periods 7 to 21. Following the experimental protocol established in previous studies, we use data from periods 7 to 13 as the training set and periods 14 to 20 as the test set. During testing, we iterate through all 48 advertisers, assigning the algo-rithm under evaluation to each one in turn, while the remaining 47 advertisers use the baseline bidding strategy. This procedure yields a total of 336 test scores. 
+
+4.1.2 Parameter Settings. During training, we employ the PyTorch framework on a single NVIDIA H100 GPU. The model is optimized using AdamW with a learning rate of 1e −4, a batch size of 32, and a weight decay of 1e −4. The state dimension in our dataset is set to 23, including features related to cost before correction. The value weighting coefficients 𝜆 𝑏 and 𝜆 𝑝 are both 1. For DPO fine-tuning, we set 𝛽 to 0.15 and train for 3 epochs with a learning rate of 1e −5.Additionally, we filter out trajectories where the advantage value 
+
+𝐴 𝑡 equals zero. For each trajectory, at decision step 𝑡 , we further exclude samples if the future target cost (computed as TCPA ·Í𝑇 𝑖 =𝑡 𝑣 𝑖 )is less than 0.5.
+
+4.1.3 Experimental Environment and Fair Comparison. It is impor-tant to emphasize that all offline experiments in this paper are conducted under a sufficient budget assumption, focusing pri-marily on target cost constraints. The rationale is fairness: since our JD-BP framework incorporates pricing correction (which often involves refunding or reducing costs), it naturally recovers budget. In a strictly budget-constrained environment, JD-BP would possess an overwhelming, structurally unfair advantage over bid-only base-lines by artificially extending its lifespan. By ensuring sufficient budget, we isolate and fairly evaluate the algorithm’s capability to balance value maximization and constraint satisfaction. Regarding the baseline performance, the score of the GAVE base-line in Table 1 (118.97) is lower than the officially reported score (approx. 201) on the original AuctionNet dataset. Through our replication process, we found that GAVE is extremely sensitive to hyperparameter tuning and traffic environment variations. The reported result in Table 1 reflects the best-performing model we could obtain after thorough hyperparameter sweeping in our spe-cific experimental setup. 
+
+4.1.4 Metrics. We adopt the evaluation metric officially defined by AuctionNet, where the score is calculated as follows: 
+
+𝑆𝑐𝑜𝑟𝑒 = min 
+
+  Í𝑇 𝑖 =1 𝑣 𝑖 
+
+Í𝑇 𝑖 =1 𝑐 𝑖 
+
+2, 1
+
+
+
+·
+
+> 𝑇
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑣 𝑖 (27) In addition, we use the average TCPA/CPA to assess the achieve-ment of advertisers’ objectives. 
+
+4.1.5 Baselines. We compare two categories of algorithms: rein-forcement learning-based methods and generative algorithm-based methods. 
+
+Reinforcement Learning Based Algorithms Conference’17, July 2017, Washington, DC, USA Linghui Meng, Chun Gan, Shengsheng Niu, Chengcheng Zhang et al. 
+
+Method P14 P15 P16 P17 P18 P19 P20 AVG Baselines 
+
+BC 96.05 105.98 111.31 116.53 98.08 113.20 90.43 104.51 CQL 111.73 122.17 125.63 132.02 114.62 134.69 102.66 120.50 IQL 98.46 101.97 106.83 116.51 96.51 111.73 88.40 102.91 DiffBid 81.76 111.72 103.93 114.61 93.59 125.56 82.90 102.01 DT 104.81 119.96 117.17 127.63 112.27 140.28 101.15 117.61 GAVE 106.30 123.64 119.11 131.81 110.24 143.73 97.95 118.97 
+
+JD-BP Framework: Core Components 
+
+JD-BP w. hisRTG 113.79 119.28 130.50 115.69 125.73 149.21 111.30 123.64 JD-BP w.o. GCA 137.56 159.08 155.55 164.70 146.74 186.15 136.07 155.12 JD-BP (Base Model) 140.14 158.21 158.32 170.53 151.46 190.24 138.51 158.20 
+
++ Energy-Based DPO Enhancement 
+
+JD-BP (Full Model) 158.02 189.13 184.04 197.06 176.30 221.29 167.91 184.28 Table 1: Performance comparison across different methods and periods. The best results among baselines are underlined. The best overall results are in bold. All values denote score, higher is better. The table presents: (1) Baselines; (2) Core component analysis of the JD-BP Framework; (3) The full model with DPO enhancement. 
+
+• BC (Behavior Cloning) [34]: This approach learns a con-servative value function to address the overestimation issues commonly encountered in offline reinforcement learning. By imitating the behavior observed in the dataset, BC seeks to derive stable policies under offline settings. 
+
+• IQL (Implicit Q-Learning) [19]: IQL employs expectile regression to facilitate policy improvement, allowing the algorithm to update policies without explicitly evaluating actions that fall outside the data distribution, thereby en-hancing robustness in offline scenarios. 
+
+• CQL (Conservative Q-Learning) [20]: CQL mitigates the selection of out-of-distribution actions by leveraging a con-servative Q-learning framework, ensuring that the learned policy remains close to the observed data and reducing the risk of overestimation. 
+
+Generative Algorithm Based Methods 
+
+• DT [8]: Utilizing a transformer-based architecture, DT mod-els sequential decision-making processes. It adopts a behav-ior cloning approach to learn the average bidding strategy directly from historical data, enabling effective policy learn-ing in complex environments. 
+
+• GAVE [12]: Built upon the DT backbone, GAVE incorporates additional modules such as value estimation to address the OOD challenges that arise during exploration. This enhances the model’s ability to generalize and maintain robustness in dynamic bidding environments. 
+
+• DiffBid [13]: DiffBid leverages diffusion models to simulate bidding trajectories and capture the temporal dependencies within bidding sequences. By modeling the sequential nature of bidding, DiffBid can generate realistic and diverse bidding strategies. 
+
+## 4.2 Overall Performance 
+
+The results of the offline experiments are summarized in Table 1 and Table 2. Table 1 presents the scores achieved by our proposed methods and various baselines across different periods, while Ta-ble 2 evaluates the fulfillment of advertiser cost constraints (values closer to 1 indicate better performance). As shown in Table 1, our proposed methods demonstrate signifi-cant advantages. Our base JD-BP framework achieves an average score of 158.20, already substantially outperforming all baseline methods. This validates the effectiveness of our core design, includ-ing the joint bidding-pricing mechanism and memoryless RTG. Further enhanced with Direct Preference Optimization (DPO), our complete method (JD-BP w. DPO) achieves the best overall performance, with an average score of 184.28. As observed in Table 2, for certain specific periods, a few baseline methods achieve TCPA/CPA ratios marginally closer to the ideal value of 1 compared to JD-BP. However, as demonstrated in Table 1, this strict constraint satisfaction comes at a severe cost: a drastic degradation in total value maximization (e.g., CQL scores 132.02 in P17 while JD-BP scores 197.06). Baselines tend to adopt overly con-servative bidding strategies to strictly avoid constraint violations, leading to significant impression starvation. In contrast, our JD-BP framework successfully balances these dual objectives. It intention-ally allows for minor, industrially acceptable cost deviations (with an overall average TCPA/CPA of 1.0112, merely a 1.12% deviation from the target) to capture high-value traffic, thereby delivering a substantial surge in overall advertising performance. This trade-off is highly desirable in real-world auto-bidding systems. Overall, these results confirm that: (1) our base JD-BP framework is a highly competitive solution, and (2) the DPO enhancement further pushes the performance boundary, forming our final, best-performing method. JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing Conference’17, July 2017, Washington, DC, USA 
+
+Method P14 P15 P16 P17 P18 P19 P20 AVG Baselines 
+
+BC 1.0119 1.0304 0.9603 1.1254 0.9381 1.0825 0.9513 1.0143 CQL 0.9506 0.9267 0.8880 1.0140 0.9099 1.0235 0.9461 0.9506 IQL 1.0552 1.0502 1.0180 1.1465 0.9773 1.0942 1.0014 1.0490 DiffBid 0.5474 0.5788 0.6007 0.6100 0.5712 0.6417 0.5683 0.5883 DT 0.7367 0.6980 0.7547 0.7712 0.7045 0.7844 0.6919 0.7345 GAVE 0.6626 0.6507 0.6736 0.6976 0.6534 0.7297 0.6438 0.6730 
+
+JD-BP Framework: Core Components 
+
+JD-BP w. hisRTG 0.9911 0.9552 1.0076 0.9355 0.9555 1.1087 1.0262 0.9971 
+
+JD-BP w.o. GCA 0.8219 0.7855 0.8238 0.8548 0.7800 0.9141 0.7921 0.8246 JD-BP (Base Model) 0.8210 0.7773 0.8308 0.8771 0.7900 0.9228 0.8023 0.8316 
+
++ Energy-Based DPO Enhancement 
+
+JD-BP (Full Model) 0.9899 0.9249 1.0151 1.0724 0.9591 1.1270 0.9900 1.0112 
+
+Table 2: Comparison of TCPA/CPA ratios for different methods across periods. Values closer to 1 indicate better performance. The best results among baselines are underlined. The best results among our proposed methods are in bold. The table follows the same organization as Table 1. 
+
+## 4.3 Ablation Studies 
+
+To dissect the contributions of individual components within our framework, we conduct ablation studies focusing on three key as-pects: the RTG design, the GCA module, and the DPO enhancement. The results are presented alongside the full model in Tables 1 and 2. (1) Effect of RTG Design (JD-BP w. hisRTG): This variant modifies the bidding RTG calculation by incorporating his-torical delivery information, adopting a more conservative strategy to ensure cost constraints over the entire period: 
+
+𝑅 𝑏 𝑡 = min 
+
+  Í𝑇 𝑖 =1 𝑣 𝑖 
+
+Í𝑇 𝑖 =1 𝑐 𝑖 
+
+2, 1
+
+
+
+·
+
+> 𝑇
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑣 𝑖 − min 
+
+  Í𝑡 −1 
+
+> 𝑖 =1
+
+𝑣 𝑖 
+
+Í𝑡 −1 
+
+> 𝑖 =1
+
+𝑐 𝑖 
+
+2, 1
+
+
+
+· 
+
+> 𝑡 −1
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑣 𝑖 
+
+Compared to our base JD-BP, this conservative approach leads to a noticeable score drop (123.64 vs. 158.20) but achieves the best cost constraint satisfaction (TCPA/CPA: 0.9971 vs. 0.8316). This trade-off validates our design choice of a mem-oryless RTG for the base model, which prioritizes score max-imization while maintaining reasonable cost control—a bal-ance often required in practical deployment. (2) Effect of GCA Module (JD-BP w.o. GCA): 
+
+Removing the Gate-Selected Cross-Attention module results in a performance drop from 158.20 to 155.12, alongside a decrease in cost satisfaction (0.8246 vs. 0.8316). While a 3-point score gap might appear mathematically marginal, in large-scale industrial advertising systems, a 2% improvement in overall utility translates to millions of dollars in revenue, which is highly significant. Furthermore, GCA serves a critical theoretical purpose: it addresses the concern that pure decoupling might lead to un-coordinated, extreme deviations. By explicitly conditioning the pricing stream on the bidding outcomes through GCA, we establish a causal, asymmetric coupling (Bid → Price). This explicit architectural design prevents the model from relying on unpredictable, entangled implicit coupling within hidden layers, ensuring robust and interpretable strategy adjustments. (3) Effect of DPO Enhancement: Comparing the base JD-BP with the full JD-BP w. DPO model quantifies the impact of the preference optimization stage. DPO provides a substantial 
+
+16.5% score improvement (184.28 vs. 158.20) while main-taining competitive cost satisfaction (TCPA/CPA: 1.0112 vs. 0.8316). This demonstrates that DPO effectively aligns the model with high-efficiency trajectories, offering significant performance gains orthogonal to the architectural improve-ments. In summary, the ablation studies validate our key design choices: the memoryless RTG balances performance objectives, the GCA module contributes to model capacity, and the DPO stage delivers substantial additional gains. Together, these components enable our complete method (JD-BP w. DPO) to achieve the best overall results. 
+
+## 4.4 Online Deployment 
+
+To validate the effectiveness of JD-BP in real-world industrial sys-tems, we deployed it on an advertising platform and conducted large-scale online experiments. The detailed online architecture is shown in Fig. 2. On this platform, the revenue generated from Target bidding type ads can reach tens of millions, which is suffi-cient to ensure reliable results. Since JD-BP introduces a pricing action, it is not possible to collect training data in the initial state. To address this, we followed the approach used in offline exper-iments and deployed a PID-based pricing algorithm to generate training data. After accumulating sufficient data, we collected com-plete trajectories of bidding and pricing events to train our model. Conference’17, July 2017, Washington, DC, USA Linghui Meng, Chun Gan, Shengsheng Niu, Chengcheng Zhang et al. 
+
+Figure 2: Online deployment workflow of the bidding and pricing system. User requests are processed by the Ad Server, followed by value prediction and bidding & pricing mod-ules. The results are submitted to the auction and charging components. All operational data are recorded in logs and monitored by the Bidding & Pricing Perception Center for continuous optimization and system feedback. 
+
+We compared three key metrics: advertising revenue, target cost, and achievement rate, as summarized in Table 3. Here, achievement is defined as TCPA/CPA falling within the range of 0.8 to 1.2. We then calculate the proportion of ads achieving this criterion, which is defined as achievement rate. 
+
+Table 3: Online Experimental Results of JD-BP Deployment 
+
+Impression Ad Revenue target cost Achievement Rate +2.74% +4.70% +6.48% +3.92pp 
+
+## 5 Related Works 5.1 Offline Reinforcement Learning for Auto-Bidding 
+
+Reinforcement learning (RL) is a powerful framework for sequential decision-making [33], where an agent learns to optimize its actions through interaction with an environment. Classic RL algorithms, such as Deep Q-Networks (DQN) [26] and Proximal Policy Opti-mization (PPO) [31], have achieved remarkable success in domains ranging from games to robotics by learning policies through online exploration and feedback. However, in real-world applications like auto-bidding for online advertising, direct exploration can be expensive, risky, or even infeasible. In these scenarios, offline reinforcement learning (Offline RL) [22, 1], also known as batch RL, has emerged as an important paradigm. Offline RL aims to learn effective policies solely from previously collected datasets, such as historical user interactions, ad impressions, and conversion logs, without further interaction with the live environment. Unlike online RL, Offline RL faces unique challenges including distributional shift and overestimation bias, as the learned poli-cies may diverge from the behavior policy present in the data. To address these issues, a range of methods have been proposed, in-cluding behavior regularization, uncertainty estimation, and model-based approaches. Notable works such as BCQ [11], CQL [20], and MOPO [39] have demonstrated strong performance by constraining policy updates, introducing conservative objectives, or leveraging learned environment models. These advances have facilitated the application of RL to auto-bidding in online advertising, where safe and efficient policy improvement is crucial for maximizing cam-paign effectiveness. 
+
+## 5.2 Generative Methods 
+
+Recently, generative models have demonstrated significant poten-tial in the field of automated bidding. Mainstream approaches in-clude Variational Autoencoders (VAE) [18], diffusion models [15], and sequence modeling architectures such as Decision Transformer [8] and Trajectory Transformer [16], which can effectively represent complex distributions or conditional relationships in bidding envi-ronments. Transformer-based frameworks leverage autoregressive mechanisms to capture high-dimensional dependencies within ad-vertising platforms, as exemplified by models like GAVE [12] and GAS [23]. In parallel, diffusion models generate high-quality bid-ding samples through iterative conditional denoising processes [13, 24, 28]. These generative methods offer new avenues for optimiz-ing bidding strategies and provide robust solutions to practical challenges like data sparsity and dynamic market conditions. 
+
+## 6 Conclusion 
+
+In this work, we present JD-BP, a novel joint generative decision-making framework for bidding and pricing in online advertising auctions. By jointly optimizing both bid and pricing correction terms, JD-BP effectively addresses misalignment issues caused by model uncertainty and feedback latency, thus improving allocation efficiency under KPI constraints. Our introduction of a memory-less Return-to-Go (RTG) design prevents bias accumulation from historical constraint violations, ensuring more robust and adaptive bidding strategies. Additionally, the integration of Direct Prefer-ence Optimization (DPO) in post-training further enhances market efficiency by encouraging the model to favor high-quality bidding trajectories. Comprehensive experiments on both offline AuctionNet datasets and online A/B tests at a leading global e-commerce platform vali-date the effectiveness of JD-BP, showing significant improvements in ad revenue and target cost. These results demonstrate the practi-cal value of our approach in real-world advertising systems, high-lighting its potential to set new standards for automated bidding and pricing mechanisms in highly competitive environments. 
+
+## References        
+
+> [1] Rishabh Agarwal, Dale Schuurmans, and Mohammad Norouzi. 2019. An opti-mistic perspective on offline reinforcement learning. In International Conference on Machine Learning . https://api.semanticscholar.org/CorpusID:212628904. [2] Gagan Aggarwal, Ashwinkumar Badanidiyuru, and Aranyak Mehta. 2019. Autobidding with constraints. In International Conference on Web and Internet Economics . Springer, 17–30. [3] Kareem Amin, Michael Kearns, Peter B. Key, and Anton Schwaighofer. 2012. Budget optimization for sponsored search: censored learning in mdps. ArXiv ,abs/1210.4847. https://api.semanticscholar.org/CorpusID:9179247. [4] Santiago R. Balseiro, Yuan Deng, Jieming Mao, Vahab S. Mirrokni, and Song Zuo. 2021. The landscape of auto-bidding auctions: value versus utility maximization.
+> Proceedings of the 22nd ACM Conference on Economics and Computation . https: //api.semanticscholar.org/CorpusID:234904963.
+
+JD-BP: A Joint-Decision Generative Framework for Auto-Bidding and Pricing Conference’17, July 2017, Washington, DC, USA 
+
+[5] Han Cai, Kan Ren, Weinan Zhang, Kleanthis Malialis, Jun Wang, Yong Yu, and Defeng Guo. 2017. Real-time bidding by reinforcement learning in display advertising. Proceedings of the Tenth ACM International Conference on Web Search and Data Mining . https://api.semanticscholar.org/CorpusID:2077417. [6] Zhangming Chan et al. 2023. Capturing conversion rate fluctuation during sales promotions: a novel historical data reuse approach. Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . https: //api.semanticscholar.org/CorpusID:258833354. [7] Olivier Chapelle. 2014. Modeling delayed feedback in display advertising. Pro-ceedings of the 20th ACM SIGKDD international conference on Knowledge dis-covery and data mining . https://api.semanticscholar.org/CorpusID:14993056. [8] Lili Chen, Kevin Lu, Aravind Rajeswaran, Kimin Lee, Aditya Grover, Michael Laskin, P. Abbeel, A. Srinivas, and Igor Mordatch. 2021. Decision transformer: reinforcement learning via sequence modeling. In Neural Information Processing Systems . https://api.semanticscholar.org/CorpusID:235294299. [9] Yilun Du and Igor Mordatch. 2019. Implicit generation and modeling with energy based models. In Neural Information Processing Systems . https://api.sem anticscholar.org/CorpusID:202765664. [10] David S. Evans. 2009. The online advertising industry: economics, evolution, and privacy. Consumer Law eJournal . https://api.semanticscholar.org/Corpus ID:154745950. [11] Scott Fujimoto, David Meger, and Doina Precup. 2018. Off-policy deep rein-forcement learning without exploration. In International Conference on Machine Learning . https://api.semanticscholar.org/CorpusID:54457299. [12] Jingtong Gao et al. 2025. Generative auto-bidding with value-guided explo-rations. Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval . https://api.semanticscholar.org/Cor pusID:277954657. [13] Jiayan Guo, Yusen Huo, Zhilin Zhang, Tianyu Wang, Chuan Yu, Jian Xu, Yan Zhang, and Bo Zheng. 2024. Aigb: generative auto-bidding via diffusion model-ing. ArXiv , abs/2405.16141. https://api.semanticscholar.org/CorpusID:27006303 0. [14] Yue He, Xiujun Chen, Di Wu, Junwei Pan, Qing Tan, Chuan Yu, Jian Xu, and Xiaoqiang Zhu. 2021. A unified solution to constrained bidding in online display advertising. In Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining , 2993–3001. [15] Jonathan Ho, Ajay Jain, and P. Abbeel. 2020. Denoising diffusion probabilistic models. ArXiv , abs/2006.11239. https://api.semanticscholar.org/CorpusID:2199 55663. [16] Michael Janner, Qiyang Li, and Sergey Levine. 2021. Offline reinforcement learn-ing as one big sequence modeling problem. In Neural Information Processing Systems . https://api.semanticscholar.org/CorpusID:235313679. [17] Junqi Jin, Cheng-Ning Song, Han Li, Kun Gai, Jun Wang, and Weinan Zhang. 2018. Real-time bidding with multi-agent reinforcement learning in display advertising. Proceedings of the 27th ACM International Conference on Information and Knowledge Management . https://api.semanticscholar.org/CorpusID:359595 5. [18] Diederik P. Kingma and Max Welling. 2013. Auto-encoding variational bayes. 
+
+CoRR , abs/1312.6114. https://api.semanticscholar.org/CorpusID:216078090. [19] Ilya Kostrikov, Ashvin Nair, and Sergey Levine. 2021. Offline reinforcement learning with implicit q-learning. ArXiv , abs/2110.06169. https://api.semantics cholar.org/CorpusID:238634325. [20] Aviral Kumar, Aurick Zhou, G. Tucker, and Sergey Levine. 2020. Conservative q-learning for offline reinforcement learning. ArXiv , abs/2006.04779. https://ap i.semanticscholar.org/CorpusID:219530894. [21] Yann LeCun, Sumit Chopra, Raia Hadsell, Aurelio Ranzato, and Fu Jie Huang. 2006. A tutorial on energy-based learning. In https://api.semanticscholar.org /CorpusID:8531544. [22] Sergey Levine, Aviral Kumar, G. Tucker, and Justin Fu. 2020. Offline reinforce-ment learning: tutorial, review, and perspectives on open problems. ArXiv ,abs/2005.01643. https://api.semanticscholar.org/CorpusID:218486979. [23] Yewen Li, Shuai Mao, Jingtong Gao, Nan Jiang, Yunjian Xu, Qingpeng Cai, Fei Pan, Peng Jiang, and Bo An. 2024. Gas: generative auto-bidding with post-training search. Companion Proceedings of the ACM on Web Conference 2025 .https://api.semanticscholar.org/CorpusID:274982740. [24] Yewen Li et al. 2025. Generative auto-bidding in large-scale competitive auc-tions via diffusion completer-aligner. ArXiv , abs/2509.03348. https://api.semant icscholar.org/CorpusID:281092272. [25] Hongtao Lv, Zhilin Zhang, Zhenzhe Zheng, Jinghan Liu, Chuan Yu, Lei Liu, Li-zhen Cui, and Fan Wu. 2022. Utility maximizer or value maximizer: mechanism design for mixed bidders in online advertising. In AAAI Conference on Artificial Intelligence . https://api.semanticscholar.org/CorpusID:254069993. [26] Volodymyr Mnih et al. 2015. Human-level control through deep reinforcement learning. Nature , 518, 529–533. https://api.semanticscholar.org/CorpusID:2052 42740. [27] Zhiyu Mou, Yusen Huo, Rongquan Bai, Mingzhou Xie, Chuan Yu, Jian Xu, and Bo Zheng. 2022. Sustainable online reinforcement learning for auto-bidding. 
+
+Advances in Neural Information Processing Systems , 35, 2651–2663. [28] Yunshan Peng, Wenzheng Shu, Jiahao Sun, Yanxiang Zeng, Jinan Pang, Wentao Bai, Yunke Bai, Xialong Liu, and Peng Jiang. 2025. Expert-guided diffusion planner for auto-bidding. Proceedings of the 34th ACM International Conference on Information and Knowledge Management . https://api.semanticscholar.org /CorpusID:280635520. [29] Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, and Chelsea Finn. 2023. Direct preference optimization: your language model is secretly a reward model. ArXiv , abs/2305.18290. https://api.s emanticscholar.org/CorpusID:258959321. [30] Matthew Richardson, Ewa Dominowska, and Robert J. Ragno. 2007. Predicting clicks: estimating the click-through rate for new ads. In The Web Conference .https://api.semanticscholar.org/CorpusID:14669618. [31] John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal policy optimization algorithms. ArXiv , abs/1707.06347. https: //api.semanticscholar.org/CorpusID:28695052. [32] Kefan Su, Yusen Huo, Zhilin Zhang, Shuai Dou, Chuan Yu, Jian Xu, Zongqing Lu, and Bo Zheng. 2024. Auctionnet: a novel benchmark for decision-making in large-scale games. ArXiv , abs/2412.10798. https://api.semanticscholar.org /CorpusID:274776455. [33] Richard S. Sutton and Andrew G. Barto. 1998. Reinforcement learning: an introduction. IEEE Trans. Neural Networks , 9, 1054–1054. https://api.semanticsc holar.org/CorpusID:60035920. [34] Faraz Torabi, Garrett Warnell, and Peter Stone. 2018. Behavioral cloning from observation. In International Joint Conference on Artificial Intelligence . https://a pi.semanticscholar.org/CorpusID:23206414. [35] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Neural Information Processing Systems . https://api.semanticscholar.org /CorpusID:13756489. [36] Jun Wang and Shuai Yuan. 2015. Real-time bidding: a new frontier of com-putational advertising research. Proceedings of the Eighth ACM International Conference on Web Search and Data Mining . https://api.semanticscholar.org/Co rpusID:207221034. [37] Di Wu, Xiujun Chen, Xun Yang, Hao Wang, Qing Tan, Xiaoxun Zhang, and Kun Gai. 2018. Budget constrained bidding by model-free reinforcement learning in display advertising. Proceedings of the 27th ACM International Conference on Information and Knowledge Management . https://api.semanticscholar.org/Corp usID:3514342. [38] Yujian Ye, Dawei Qiu, Mingyang Sun, Dimitrios Papadaskalopoulos, and Goran Strbac. 2020. Deep reinforcement learning for strategic bidding in electricity markets. IEEE Transactions on Smart Grid , 11, 1343–1355. https://api.semantics cholar.org/CorpusID:202092779. [39] Tianhe Yu, Garrett Thomas, Lantao Yu, Stefano Ermon, James Y. Zou, Sergey Levine, Chelsea Finn, and Tengyu Ma. 2020. Mopo: model-based offline policy optimization. ArXiv , abs/2005.13239. https://api.semanticscholar.org/CorpusID: 218900501. [40] Haoqi Zhang, Junqi Jin, Zhenzhe Zheng, Fan Wu, Haiyang Xu, and Jian Xu. 2022. Control-based bidding for mobile livestreaming ads with exposure guar-antee. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management , 2539–2548. [41] Weinan Zhang, Shuai Yuan, and Jun Wang. 2014. Optimal real-time bidding for display advertising. Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining . https://api.semanticschola r.org/CorpusID:13623004. [42] By J. G. Ziegler and Nathaniel B. Nichols. 1942. Optimum settings for automatic controllers. Journal of Fluids Engineering . https://api.semanticscholar.org/Corp usID:41336178.

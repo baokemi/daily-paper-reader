@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-04-12T09:11:13.523205+00:00",
-  "updated_date": "20260403-20260412",
+  "generated_at": "2026-04-13T11:48:59.473415+00:00",
+  "updated_date": "20260404-20260413",
   "carryover_days": 9,
   "tag_states": {
     "VisFed": {
@@ -15,6 +15,11 @@
     },
     "扩散模型": {
       "updated_date": "20260403-20260412",
+      "carryover_days": 9,
+      "items": []
+    },
+    "联邦激励": {
+      "updated_date": "20260404-20260413",
       "carryover_days": 9,
       "items": []
     }

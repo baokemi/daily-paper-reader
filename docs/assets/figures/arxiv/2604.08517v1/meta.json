@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08517v1/fig-001.webp",
+      "caption": "Figure 3: The functions 𝑈O(·), 𝑃O(·), 𝑃L(·), of the example of Section D (left) and the optimizer’s optimal value when she uses a single distribution of actions with a budget of 𝜌 (right).",
+      "page": 31,
+      "index": 1,
+      "width": 979,
+      "height": 388
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08517v1/fig-002.webp",
+      "caption": "Figure 4: The dual 𝑓 (𝜆,𝑔) function of the example of Section E, along with the induced 𝑔★(𝜆) function, for 𝛿 = 0.05. Plotted for small and large 𝜆. We note that 𝑔★(𝜆) goes to 0 at a very slow rate, indicating the optimizer’s ability to gain substantial utility as 𝜆 (𝑡 ) increases in the repeated game.",
+      "page": 33,
+      "index": 2,
+      "width": 966,
+      "height": 381
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08517v1/fig-003.webp",
+      "caption": "Figure 5: The experiments of Section E.1. For 10 5 ≤ 𝑇 ≤ 10 7 (x-axis) and different 𝛿 (different lines) we compare the optimizer’s reward when using strategy 1 (dotted lines that collapse to one line) and strategy 2 (solid lines).",
+      "page": 36,
+      "index": 3,
+      "width": 962,
+      "height": 360
+    }
+  ]
+}

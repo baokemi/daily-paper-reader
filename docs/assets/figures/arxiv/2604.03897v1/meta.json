@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-001.webp",
+      "caption": "Fig. 3: Empirical evaluation summary. (a,b) Fairness–latency frontier at n = 50 for Starlink and Internet:",
+      "page": 25,
+      "index": 1,
+      "width": 954,
+      "height": 583
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-002.webp",
+      "caption": "Table 8: Robustness of LIA (λ = 1 s−1) to bounded slack-estimation error at n = 50 (mean over Starlink and Internet).",
+      "page": 26,
+      "index": 2,
+      "width": 686,
+      "height": 204
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-003.webp",
+      "caption": "Table 1: Positioning LIA relative to other latency-fairness design classes.",
+      "page": 7,
+      "index": 3,
+      "width": 976,
+      "height": 801
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-004.webp",
+      "caption": "Table 5: Observed slack-spread summaries at n = 50 under the paper’s horizon policy (1,000 sampled instances per topology).",
+      "page": 22,
+      "index": 4,
+      "width": 923,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-005.webp",
+      "caption": "Table 6: Large-market (n = 1000) performance by topology. Entries are means with 95% bootstrap CIs over 1,000 instances per topology. Compute time is winner determination time on a single CPU core.",
+      "page": 23,
+      "index": 5,
+      "width": 974,
+      "height": 294
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-006.webp",
+      "caption": "Table 2: Notation summary.",
+      "page": 8,
+      "index": 6,
+      "width": 610,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-007.webp",
+      "caption": "Figure 1: Spacetime view of two bids. Dashed lines are light-cone boundaries under unit aspect (c=1). The shaded rectangle marks a causal slab where bids are incomparable; the red line is the frontier where horizon-discounted bids are compared (i.e., where θ1e −λδ1 = θ2e −λδ2). Its position depends on the values (θ1, θ2), the parameter λ, and how each bid’s horizon slack δi changes with emission time. Proper-time lapses δi (horizon slacks) are measured along each worldline from emission to the clearing horizon H , with δi ≡ ∆τi.",
+      "page": 4,
+      "index": 7,
+      "width": 440,
+      "height": 343
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03897v1/fig-008.webp",
+      "caption": "Table 4: Complexity decomposition for deployment.",
+      "page": 17,
+      "index": 8,
+      "width": 943,
+      "height": 218
+    }
+  ]
+}

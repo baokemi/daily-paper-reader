@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05845v1/fig-001.webp",
+      "caption": "Table 2: Comparison of TCPA/CPA ratios for different methods across periods. Values closer to 1 indicate better performance. The best results among baselines are underlined. The best results among our proposed methods are in bold. The table follows the same organization as Table 1.",
+      "page": 9,
+      "index": 1,
+      "width": 836,
+      "height": 421
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05845v1/fig-002.webp",
+      "caption": "Table 1: Performance comparison across different methods and periods. The best results among baselines are underlined. The best overall results are in bold. All values denote score, higher is better. The table presents: (1) Baselines; (2) Core component analysis of the JD-BP Framework; (3) The full model with DPO enhancement.",
+      "page": 8,
+      "index": 2,
+      "width": 836,
+      "height": 421
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05845v1/fig-003.webp",
+      "caption": "Figure 1: JD-BP framework with Energy-Based DPO Fine-tuning. (a) Dual-stream transformer: Bidding Stream (value maximization) and Pricing Stream (corrective actions). (b) GCA module fuses bidding information via learnable gating 𝜎 . (c) RTG variants: Memoryless (future efficiency) and Memory-based (historical constraint satisfaction). (d) Energy-Based Continuous DPO aligns model by energy distance optimization. (e) Complete offline training pipeline.",
+      "page": 5,
+      "index": 3,
+      "width": 948,
+      "height": 423
+    }
+  ]
+}
