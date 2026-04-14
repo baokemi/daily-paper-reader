@@ -1,0 +1,1785 @@
+Title: A Dual-Positive Monotone Parameterization for Multi-Segment Bids and a Validity Assessment Framework for Reinforcement Learning Agent-based Simulation of Electricity Markets
+
+URL Source: https://arxiv.org/pdf/2604.10252v1
+
+Published Time: Tue, 14 Apr 2026 00:46:05 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+# A Dual-Positive Monotone Parameterization for Multi-Segment Bids and a Validity Assessment Framework for Reinforcement Learning Agent-based Simulation of Electricity Markets 
+
+Zunnan Xu a, Zhaoxia Jing a, ∗, Zhanhua Pan b
+
+> aSchool of Electric Power Engineering, South China University of Technology, Guangzhou, 510640, Guangdong, China
+> bDepartment of Engineering, University of Exeter, Exeter EX4 4PY, U.K.
+
+Abstract 
+
+Reinforcement learning agent-based simulation (RL-ABS) has become an important tool for electricity market mech-anism analysis and evaluation. In the modeling of monotone, bounded, multi-segment stepwise bids, existing methods typically let the policy network first output an unconstrained action and then convert it into a feasible bid curve sat-isfying monotonicity and boundedness through post-processing mappings such as sorting, clipping, or projection. However, such post-processing mappings often fail to satisfy continuous di ff erentiability, injectivity, and invertibility at boundaries or kinks, thereby causing gradient distortion and leading to spurious convergence in simulation results. Meanwhile, most existing studies conduct mechanism analysis and evaluation mainly on the basis of training-curve convergence, without rigorously assessing the distance between the simulation outcomes and Nash equilibrium, which severely undermines the credibility of the results. To address these issues, this paper proposes: (i) three necessary conditions, NC1NC3, that post-processing mappings in RL-ABS should satisfy, in order to characterize what kinds of post-processing mappings will not distort the gradient signals associated with the actually executed actions; (ii) the Dual-Positive Monotone Parameterization (DPMP) method, which first lets the policy network output two positive vectors corresponding to generation output and price increments, and then constructs a continuously di ff erentiable, injective, and invertible mapping between the policy-network outputs and the feasible set of stepwise bid curves through normalized cumulative summation and cumulative summation of nonnegative increments, thereby avoiding distortion in gradient propagation; and (iii) a two-level Validity Assessment Framework for RL-ABS, in which the first level evaluates validity at the single-agent algorithm level by taking the theoretical optimal profit as the benchmark and constructing the optimality gap indicator, while the second level introduces the exploitability metric at the multi-agent simulation level to assess the distance between simulation outcomes and Nash equilibrium by freezing the opponents policies and training an approximate best response. Experimental results show that, in the single-agent setting, DPMP reduces the steady-state relative optimality gap to 3.26% ´ s 0.73%, significantly outperforming the baselines based on sorting, clipping, and projection. Moreover, DPMP can be consistently integrated with several mainstream algorithms, including A2C, TRPO, PPO, and DDPG. In the IEEE 39-bus network-constrained multi-agent simulation scenario, the multi-agent strategy profile based on DPMP-PPO achieves a maximum exploitability of 1.266% and an average of approximately 0.20%, exhibiting steady-state characteristics close to an -Nash equilibrium. Overall, the DPMP and Validity Assessment Framework proposed in this paper can provide substantially stronger support for conclusions drawn from RL-ABS-based electricity market mechanism analysis, thereby o ff ering more reliable decision support for future electricity market mechanism design and evaluation. 
+
+Keywords: electricity market simulation; deep reinforcement learning; multi-segment bids; Dual-Positive Monotone Parameterization; validity assessment.   
+
+> ∗Corresponding author.
+> Email address: zxjing@scut.edu.cn (Zhaoxia Jing)
+> arXiv:2604.10252v1 [cs.AI] 11 Apr 2026
+
+1. Introduction 
+
+In electricity markets, generators submit multi-segment bids composed of price–generation pairs. Such bids must satisfy monotonicity and price-cap requirements, and the associated bidding strategies directly a ff ect market-clearing outcomes and market equilibrium [1]. Therefore, an accurate representation of this bid structure is essential for market mechanism design and for evaluating how market rules shape participant behavior [2, 3].Reinforcement learning agent-based simulation (RL-ABS) has been widely used for this purpose. It can capture bounded rationality [4], agent heterogeneity, and dynamic learning processes [5]. It also complements optimization-based models [6, 7] and game-theoretic equilibrium models [8] in electricity market analysis and evaluation [9, 10]. However, most existing RL-ABS studies still rely on simplified bid models, such as single-segment bids or scalar markup coe ffi cients imposed on marginal cost curves [11]. These approaches cannot represent the full price–generation bid structure required in real-world markets. As a result, they reduce the fidelity of electricity market simulation and weaken the validity of the conclusions drawn from such studies. 
+
+1.1. Deficiencies of Bid Models in Current RL-ABS 
+
+As shown in Fig. 1(a), bid models in real-world electricity markets should satisfy three requirements [1]: (i) bids consist of multiple price–generation pairs and must be monotonically non-decreasing, thereby forming a stepwise bid curve; (ii) bid prices are bounded by a price floor and a price cap; (iii) both bid prices and generation output are defined on continuous domains. However, as summarized in Table 1, existing reinforcement learning agent-based simulation (RL-ABS) studies did not adopt this bid structure from the outset. Instead, the field evolved gradually from low-dimensional simplified representations to higher-dimensional continuous ones. Accordingly, the bid models used by agents can be broadly classified into three categories, as illustrated in Fig. 1(b)(c)(d). The first category is Curve-adjusted (Fig. 1(b)). In this category, agents do not directly determine the multi-segment pricegeneration pairs of a bid. Instead, they adjust a marginal cost curve, a utility function, or a predefined bid curve using a small number of discrete or continuous coe ffi cients, such as an overall markup coe ffi cient or an intercept term, and the adjusted curve is then submitted as the bid. Earlier studies in this category mainly relied on tabular reinforcement learning. Rahimiyan et al. [12] proposed a Q-learning-based bidding method with market power identification and fuzzy adaptive parameter tuning to improve the long-term profits of generators in dynamic electricity markets. Yu et al. [13] proposed a Hysteretic Q-learning method for settings with incomplete information and renewable-energy uncertainty, with the aim of improving market-clearing e ffi ciency and approaching Nash equi-librium. Later studies adopted deep reinforcement learning to address more complex market environments. Liang et al. [14] developed a DDPG-based reinforcement learning agent-based simulation (RL-ABS) approach to more stably approximate Nash equilibrium and characterize collusion under incomplete information. Chandrakala et al. [15] pro-posed a multi-agent cooperative bidding method based on Variant Roth–Erev learning to improve generator profits and congestion-pricing decisions in the day-ahead market. Rokhforoz et al. [16] introduced a multi-agent DDPG bidding method integrated with GCNs to improve generator profits and enhance generalization to changes in network topology. Yin et al. [17] proposed a PER-enhanced multi-agent continuous bidding method to simulate a centralized bilateral-auction electricity market and improve bidding performance in complex and uncertain environments. Weng et al. [18] combined GCNs and DDPG in a multi-agent bidding framework to model correlations among market par-ticipants and improve strategic bidding profits in bilateral electricity markets. Despite di ff erences in algorithms and application scenarios, these studies share one common feature: the agent adjusts the bid curve as a whole through a few coe ffi cients, rather than directly determining each segment price and generation output independently. Although such methods are convenient for modeling and training, their bidding expressiveness remains much weaker than that of the monotone multi-segment bids required in real-world electricity markets. 20 20 40 60 80 100                
+
+> Output / Capacity
+> 0
+> 25
+> 50
+> 75
+> 100
+> Bid price
+> Monotone
+> multi-segment steps
+> Continuous choice of breakpoints
+> Price cap
+> (a) Real-world admissible bid
+> 020 40 60 80 100
+> Output / Capacity
+> 0
+> 25
+> 50
+> 75
+> 100
+> Bid price
+> Parameterized by a few coefficients
+> (e.g., scale / intercept)
+> Price cap
+> (b) Curve-adjusted
+> Underlying marginal-cost / utility curve
+> Adjusted curve
+> 020 40 60 80 100
+> Output / Capacity
+> 0
+> 25
+> 50
+> 75
+> 100
+> Bid price
+> Single bid block
+> Fixed full capacity
+> Price cap
+> (c) Step-One
+> 020 40 60 80 100
+> Output / Capacity
+> 0
+> 25
+> 50
+> 75
+> 100
+> Bid price
+> Closest to the real-world
+> admissible bid format
+> Direct declaration of
+> price-quantity pairs
+> Price cap
+> (d) Step-Multi Figure 1: Conceptual sketches of real-world electricity-market bids and common RL-ABS bid models.
+
+The second category is Step-One (Fig. 1(c)). In this category, the agent submits only a single segment price, while the generation output is fixed at the units maximum capacity or at a scenario-specified constant. The price action space can be either discrete or continuous. Wu et al. [19] developed a MAS-DRL bidding framework and compared several value-based methods, including DQN, DDQN, and Async n-step Q-learning, under a single-segment pricing setting with fixed generation output. Zhang et al. [20] adopted a continuous single-segment bid model to study game-theoretic bidding and profit allocation for VPP participation in joint energy and ancillary service markets. Although these studies di ff er in whether the price action space is discrete or continuous, they share the same basic limitation: only the price dimension remains decision-dependent, whereas generation output is fixed ex ante. As a result, Step-One models cannot represent the full joint decision structure of price and generation-output breakpoints required in real-world electricity markets. The third category is Step-Multi (Fig. 1(d)). In this category, agents submit multi-segment price–generation pairs. The action spaces of both prices and generation output can be either discrete or continuous, and the submitted prices must satisfy monotonicity constraints and the price cap. Jiang et al. [21] studied the multi-period, multi-segment bidding strategy of a price-maker VPP in the day-ahead market, and characterized market equilibrium and profit op-timization through multi-agent reinforcement learning. Pan et al. [22] attempted to develop a GenCo bidding and cost-modeling method that more closely reflects real-world market rules, with the aim of supporting future electricity market mechanism design. Song et al. [1] proposed an optimal bidding framework for high-dimensional real-time markets, reducing the computational di ffi culty of high-dimensional bidding problems while improving profits. Com-pared with the first two categories, these studies are clearly closer to the bid format used in real-world electricity markets, because they incorporate monotonicity constraints and the price cap. Meanwhile, the type of action space in these three bid models is closely related to the choice of algorithmic implementation. Specifically, when the action space is discrete, model-based or value-based algorithms are typically adopted; when the action space is continuous, policy-based methods are more commonly employed[23][24]. 3Figure 2: Relationship between Agent Bid Models and Reinforcement Learning Methods.                                                                        
+
+> Table 1: Agent bid models of previous studies. Ref. Year Agent bid model Parameter type Whether satisfying real-world market bid requirements Algorithm Post-processing mapping (for Step-Multi continuous type) [1] 2025 Step-Multi Continuous Satisfying all DDPG projection [22] 2025 Step-Multi Continuous Not satisfying Constraint iv DRL (Actor–Critic framework) clipping [18] 2025 Curve-adjusted Continuous None satisfied DDPG-GCN –[21] 2024 Step-Multi Continuous Not satisfying Constraint iv TD3 (compared with DDPG and PPO) clipping [17] 2024 Curve-adjusted Continuous None satisfied DDPG-PER –[19] 2024 Step-One Discrete None satisfied DQN /DDQN /
+> Async n-step Q-learning –[20] 2023 Step-One Continuous None satisfied DDPG –[16] 2023 Curve-adjusted Continuous None satisfied DDPG-GCN –[13] 2023 Curve-adjusted Discrete None satisfied Hysteretic Q-learning –[15] 2023 Curve-adjusted Discrete None satisfied Variant Roth–Erev (VRE) –[14] 2020 Curve-adjusted Continuous None satisfied DDPG –[12] 2010 Curve-adjusted Discrete None satisfied Adaptive Q-learning –
+
+Given that real-world electricity market bidding rules follow the Step-Multi Continuous bid model [25], policy gradient methods are the most suitable choice for this setting, because they can directly handle multidimensional con-tinuous decisions. However, to generate bids that satisfy the requirements of multi-segment structure, monotonicity constraints, boundedness constraints, and continuous decision-making, the raw output of the policy network is usually transformed into a feasible bid through post-processing mappings such as sorting [26], clipping [22], or projection [1, 21]. Specifically, sorting rearranges the segment prices in nondecreasing order to enforce monotonicity constraints. Clipping truncates or recursively adjusts segment prices that violate boundedness or monotonicity constraints so that they fall back into the admissible range. Projection maps the entire raw output vector, under a specified distance cri-terion, onto the feasible set that satisfies both monotonicity and boundedness constraints. Although these methods are convenient in engineering implementation, they may destroy the continuously di ff erentiable, injective, and invertible relationship between policy outputs and executed actions. As a result, the policy gradient may no longer correspond strictly to the actually executed action, thereby causing gradient distortion, objective mismatch, and spurious conver-gence. 4In fact, this issue is not unique to RL-ABS. Similar problems also arise in other constrained-action settings, such as robotic continuous control and safe reinforcement learning, where post-processing is used mainly to enforce simple boundary constraints or safety constraints [27]. However, electricity market bidding is more challenging because multi-segment bids must satisfy monotonicity constraints, boundedness constraints, and multidimensional structural constraints at the same time. Therefore, the inconsistency between the executed action and the action implied by the gradient is more complex and more pronounced in electricity market settings. This is precisely the problem that the present work aims to address. 
+
+1.2. Insu ffi cient validity verification in current RL-ABS research 
+
+For electricity market mechanism analysis and evaluation, final conclusions often rest on a tacit premise: the strategic interactions generated by RL-ABS converge to a Nash equilibrium. Only under this premise can di ff erences in simulation outputs be interpreted as di ff erences in equilibrium outcomes induced by di ff erent market mechanisms [28]. This issue has received much broader attention in the literature on game learning and multi-agent reinforcement learning. For example, OpenSpiel, a general game-learning framework developed by DeepMind [29], uses tools such as exploitability and best response to assess whether a strategy profile is close to equilibrium. However, most existing RL-ABS studies in electricity markets focus on market mechanism design, the conver-gence of agent profit curves, or comparisons among algorithms. Much less attention has been paid to a more funda-mental issue: whether the simulation results are su ffi ciently valid to support mechanism comparison. In particular, there is still a lack of validity assessment for practical applications of reinforcement learning to electricity market simulation, especially quantitative measures of the distance between simulation outcomes and Nash equilibrium. As a result, directly using RL-ABS results to compare alternative market mechanisms may lead to conclusions with limited credibility. Moreover, a few recent studies have begun to examine Nash equilibrium more explicitly in electricity market simulation, but their scope remains narrow. For example, [28] analyzed whether strategies can converge to Nash equi-librium by combining reinforcement learning with a distributed clearing algorithm under a single-parameter supply-function framework. [13] incorporated incomplete information and renewable uncertainty into the bidding game, and examined whether Bayesian Nash equilibrium can be reached by combining Bayesian games with reinforcement learning. Overall, however, these studies either rely on highly simplified low-dimensional bid parameterizations, restrictive type assumptions, and specialized convergence-analysis frameworks, or remain focused on equilibrium reachability within specific theoretical models. They therefore do not answer the key question in more general and practically relevant RL-ABS settings: how far simulation outcomes remain from Nash equilibrium. 
+
+1.3. Main contributions of this work 
+
+To address two key limitations of existing reinforcement learning agent-based simulation (RL-ABS)continuous multi-segment bid representation and validity assessment of simulation resultsand to improve its fidelity, verifiability, and the credibility of conclusions in electricity market mechanism analysis and evaluation, this paper makes the following main contributions: (a) Motivated by the implementation requirements of monotone multi-segment bids in electricity markets, we formally derive the necessary conditions that post-processing mappings should satisfy under policy gradient methods, and show how common operations such as sorting, clipping, and projection can induce gradient distortion and learning bias. (b) We propose a Dual-Positive Monotone Parameterization (DPMP) method that enables joint continuous decision-making over segment prices and generation output. While satisfying monotonicity, boundedness, and feasibility con-straints, DPMP preserves a continuously di ff erentiable, injective, and invertible mapping from policy outputs to the feasible bid space. (c) We develop a two-level Validity Assessment Framework for RL-ABS. At the single-agent level, the optimal-ity gap is used to evaluate how close the learned strategy is to the theoretical optimum. At the multi-agent level, exploitability is used to measure how far a strategy profile deviates from an ε-Nash equilibrium. (d) We conduct systematic experiments in an IEEE 39-bus network-constrained market. The experiments cover di ff erent post-processing mappings, policy gradient methods, and multi-agent game settings. The results verify the applicability of the proposed method to electricity market mechanism research and support the credibility of the results. 5Overall, this paper contributes not only a new bid parameterization method, but also a quantitative framework for assessing equilibrium validity. Together, these contributions improve the interpretability of RL-ABS and the credibility of the results in electricity market mechanism research. They also provide a more reliable basis for future electricity market design, rule comparison, and policy evaluation. 
+
+2. Research Problem and Research Framework 
+
+2.1. The multi-segment bidding decision problem in electricity markets 
+
+In studies of electricity market mechanisms, the core behavior of a generation entity is to submit bid curves that satisfy both physical and institutional constraints under prescribed market rules. In day-ahead markets, or more generally in electricity energy markets characterized by centralized clearing, generation entities are typically required to submit stepwise bids composed of multiple price levels and their corresponding generation-output segments. Such bids must not only satisfy basic requirements such as the price cap and unit capacity constraints, but also often need to preserve an economically meaningful monotone structure, thereby reflecting the variation of unit marginal costs with output as well as the restrictions imposed by market bidding rules on admissible bid forms.˘ aIn electricity market simulation, if the multi-segment bids used in real-world markets are simplified into an overly coarse bidding format, the strategy space that market participants can express will be compressed, and the information on which market clearing is based will consequently be distorted. As a result, the locational marginal prices, generator profits, and even equilibrium outcomes obtained from the simulation may deviate from those that would arise under the real-world bidding rules, thereby biasing subsequent conclusions regarding market rules or di ff erences across market mechanisms[1]. Compared with simplified bid forms such as Curve-adjusted or Step-One, continuous multi-segment stepwise bids are closer to the bidding format used by generators in real-world electricity markets, because they preserve decision freedom in both segment prices and generation output breakpoints. This richer representation o ff ers greater expressive power, but also entails substantially higher modeling complexity: 
+
+ai = (qi, pi) ∈ A i,
+
+Ai = {(qi, pi) ∣∣∣ 0 ≤ qi,1 ≤ · · · ≤ qi,K ≤ ¯Qi, 0 ≤ pi,1 ≤ · · · ≤ pi,K ≤ ¯P} . (1) Here, qi = (qi,1, · · · , qi,K ) denotes the vector of generation output breakpoints for unit i, and pi = (pi,1, · · · , pi,K )denotes the corresponding vector of segment prices. ¯Qi and ¯ P represent the unit capacity limit and the market price cap, respectively. It is therefore evident that continuous multi-segment bids are, in essence, a high-dimensional continuous decision problem jointly constrained by capacity limits, price-cap limits, and monotonicity constraints. 
+
+2.2. Modeling challenges in learning constrained continuous bids 
+
+The modeling of continuous multi-segment bids first raises a method-selection problem. For this type of joint price-output decision task, a discrete-action formulation typically requires combinatorial discretization across multiple bidding segments, which not only causes the action space to expand rapidly, but also weakens the models ability to represent genuinely continuous bidding behavior. By contrast, policy gradient methods can characterize policy distributions directly in a continuous action space and are therefore better suited to the joint continuous decision problem involved in multi-segment bidding. Hence, in the Step-Multi: Continuous setting that more closely matches real-world bidding rules, adopting a policy-gradient paradigm is not merely an empirical preference; rather, it is a modeling choice that follows naturally from the continuity and structural properties of the problem itself. However, adopting policy gradient methods also brings important challenges. The raw outputs generated by the policy network do not, in general, naturally satisfy monotonicity constraints, boundedness constraints, or feasibility constraints. Existing studies therefore commonly rely on post-processing mappings, such as sorting, clipping, or projection, to transform raw actions into executable bids. 
+
+xt ∼ μθ(· | st),
+
+at = h(xt) ∈ A ,
+
+J(θ) = Eτ
+
+ 
+
+> T−1
+
+∑
+
+> t=0
+
+γtr(st, at)
+
+ .
+
+(2) 6Here, xt denotes the raw continuous output generated by the policy network under state st, and h(·) denotes the post-processing mapping that transforms the raw output into the feasible bid space A. The environmental reward and state transition are ultimately determined by the executed action at, rather than by the raw output xt. Although such a treatment is convenient in engineering implementation, it introduces a more fundamental modeling inconsistency: the object being optimized by the policy is the networks raw output, whereas the object to which the environment actually responds is the post-processed feasible bid. If h(·) does not possess satisfactory continuity, injectivity, or local invertibility, then the gradient signals received by the policy parameters may no longer accurately correspond to the actual executed actions, thereby leading to gradient distortion, objective mismatch, and spurious convergence. Against this backdrop, this paper first investigates the necessary conditions that a post-processing mapping should satisfy under the policy gradient framework, with the aim of answering the following question: in constrained continu-ous bid learning, what kind of action representation can avoid distorting the actual executed actions on which learning should be based? Building on this analysis, we propose DPMP, which enables policy outputs to be mapped into the feasible bid space in a continuously di ff erentiable and injective manner. In this way, the inconsistency between the learning object and the executed object can be eliminated at its source. 
+
+2.3. Validity concerns in RL-ABS-based electricity market simulation 
+
+Even if the representation problem of constrained continuous bids is resolved, the task of RL-ABS in electricity market research remains incomplete. The reason is that the purpose of electricity market simulation is not merely to obtain a high-profit agent, but to use simulation outcomes to analyze market rules, compare alternative market mechanisms, and discuss their equilibrium implications. In this context, improvements in profit curves or stability during training can at most indicate that an algorithm has achieved some form of numerical convergence under a given workflow; they do not automatically imply that the simulation results already possess the interpretability required for mechanism analysis. In the existing literature, one long-standing yet insu ffi ciently emphasized issue is that simulation results are often directly used for mechanism comparison once training appears to have converged, while little systematic examination is conducted as to whether they still remain far from the theoretically rational state. If the learned outcomes still deviate substantially from the theoretical optimum, or if the multi-agent policy profile has not yet approached a game-theoretic equilibrium, then the observed di ff erences across market mechanisms may in fact be confounded by algorithmic error, defects in action representation, or inadequate training, rather than being attributable solely to the market rules themselves. In other words, trainability does not imply suitability for mechanism analysis, and profit convergence does not imply credibility of the results. To address this issue, this paper further elevates validity to an explicit research object and develops a two-level validity assessment framework for RL-ABS. At the single-agent level, the key question is whether the adopted bid representation and learning algorithm can approach the theoretical optimal profit under a prescribed environment; otherwise, multi-agent mechanism analysis would lack the most basic foundation of learning correctness. At the multi-agent level, the key question is whether the stabilized policy profile is close to a state in which unilateral deviations cannot yield significant profit improvement, thereby indicating its distance from the equilibrium region. The former answers whether the model has learned correctly, whereas the latter answers whether the resulting policy profile is su ffi ciently reliable to support mechanism comparison. Only when both levels are satisfactorily addressed can RL-ABS be elevated from a runnable simulation tool to a reliable research instrument for electricity market mechanism analysis. 
+
+2.4. Research logic 
+
+Against the above background, this paper is organized around two fundamental issues in continuous multi-segment bid learning for electricity markets. The first is how to construct a bid representation that is consistent with policy-gradient optimization while satisfying market-rule constraints. The second is how to assess whether RL-ABS outputs already possess the validity required for mechanism analysis. The former corresponds to the representation problem in constrained continuous action learning, whereas the latter corresponds to the problem of result interpretation in elec-tricity market simulation. Together, these two issues constitute the central logic of this paper from the two perspectives of whether the learning object is correctly specified and whether the research conclusions are trustworthy. Along the first line of inquiry, this paper first analyzes the necessary conditions that a post-processing mapping should satisfy under the policy gradient framework, and then reveals the theoretical limitations of common constrained 7post-processing operations such as sorting, clipping, and projection. On this basis, DPMP is proposed to enable the continuous generation of feasible multi-segment bids. Along the second line of inquiry, this paper further estab-lishes a two-level validity assessment framework for RL-ABS, evaluating the validity of simulation results from two perspectives: proximity to the theoretical optimum in the single-agent setting and equilibrium stability in the multi-agent setting. Accordingly, the paper forms an integrated research chain of problem definition, theoretical diagnosis, parametric method design, validity assessment, and experimental verification. 
+
+3. Necessary Conditions for Post-Processing Mappings under Policy Gradient Methods and Theoretical Limi-tations of Common Constraint-Handling Approache 
+
+This section formally characterizes, within a unified framework, the relationship among the raw outputs of the policy network, the post-processing mapping, and the feasible bids ultimately submitted to the market. Since both the rewards and the state transitions of the environment are determined by the feasible bids that are actually executed in the market, rather than by the raw outputs of the policy network, the policy gradient update should remain consistent with the distribution induced by the executed actions. On this basis, this paper first derives the necessary conditions that a post-processing mapping must satisfy under the policy gradient framework, and then analyzes why common operations such as sorting, clipping, and projection may violate these conditions. 
+
+3.1. Necessary Conditions for Post-Processing Mappings under Policy Gradient Methods 3.1.1. Objective Function and Basic Gradient Form of Stochastic Policy Gradient Methods 
+
+In single-agent reinforcement learning, let the stochastic policy be denoted by μθ(· | s), and let the objective be to maximize the expected discounted return: 
+
+J(θ) B Eτ∼μθ
+
+∑
+
+> t≥0
+
+γtr(st, at)
+
+ (3) Under standard regularity conditions, the policy gradient theorem gives [23][24]: 
+
+∇θ J(θ) = Eτ∼μθ
+
+∑
+
+> t≥0
+
+∇θ log μθ(at | st) Gt
+
+ (4) where Gt denotes the return or an estimate of the advantage function. A key premise implicit in this expression is that the action variable appearing in the gradient must coincide with the action that is actually executed by the environment and generates the reward. 
+
+3.1.2. Executed-Action Distribution Induced by the Post-Processing Mapping under Stochastic Policy Gradient Meth-ods 
+
+In electricity market bidding problems, the policy network often does not directly output a feasible bid a ∈ A that satisfies all constraints. Instead, it first outputs an unconstrained (or weakly constrained) vector x ∈ Rd, which is then transformed into a feasible action through a deterministic post-processing mapping h : Rd → A , yielding 
+
+a = h(x) (5) Since the environment and the reward function depend only on the final submitted action a, rather than on x, the true optimization objective of policy learning must be defined on the basis of the trajectory distribution induced by the executed action a.Let μθ(· | s) denote the conditional distribution of the raw output x under state s. Then the executed-action distribution πθ(· | s) is defined as its pushforward distribution under the mapping h:
+
+πθ(· | s) = h#μθ(· | s) (6) We now embed the above one-step relation into a sequential decision process (an MDP, or equivalently a Markov game viewed from the perspective of a single agent). At each time step t, the process proceeds as follows: 8i. observe the state st;ii. sample a raw action xt ∼ μθ(· | st); iii. generate a feasible action at = h(xt) and submit it to the market; iv. the environment generates the next state st+1 according to P(· | st, at), and returns the reward r(st, at). Therefore, given an initial distribution ρ0, the trajectory distribution induced by this decision system can be written as 
+
+pθ(τ) = ρ0(s0)
+
+∏
+
+> t≥0
+
+[μθ(xt | st) · 1{at = h(xt)} · P(st+1 | st, at)] (7) Furthermore, 
+
+pθ(τa) = ρ0(s0)
+
+∏
+
+> t≥0
+
+[πθ(at | st) · P(st+1 | st, at)], πθ(· | s) = h#μθ(· | s) (8) where τa = (s0, a0, s1, a1, . . . ) denotes the trajectory actually experienced by the environment. Accordingly, the true optimization objective should be written as 
+
+J(θ) = Eτa∼pθ
+
+∑
+
+> t≥0
+
+γtr(st, at)
+
+ = E
+
+∑
+
+> t≥0
+
+γtr(st, h(xt)) (9) Therefore, any policy gradient update for optimizing J(θ) must, in principle, be constructed around πθ, rather than tacitly retaining the form of μθ.
+
+3.1.3. Necessary Conditions for Post-Processing Mappings under Stochastic Policy Gradient Methods 
+
+Since the update terms in stochastic policy gradient methods (e.g., REINFORCE, QAC, A2C, TRPO, and PPO) all require the computation of 
+
+∇θ log πθ(a | s) (10) where πθ(· | s) is the true executed-action distribution induced by a = h(x). In order for log πθ(a | s) and its gradient to be well-defined, estimable, and amenable to stable backpropagation, several necessary conditions must be satisfied. To better investigate these necessary conditions, we first introduce the concepts of a non-redundant action space and a non-redundant mapping. Definition 3.1 (Non-redundant action space and non-redundant mapping g). Let z = ϕ(x) ∈ Rdz denote the coordinate of the raw stochastic policy output x in a non-redundant action space with respect to the post-processing mapping h. If there exist mappings 
+
+ϕ : Rdx → Rdz , g : Rdz → A (11) such that, for the raw stochastic policy output x,
+
+h(x) = g(ϕ(x)) (12) Then g is called a non-redundant mapping. The motivation for introducing a non-redundant action space is that the output of the raw stochastic policy x is often redundant. For example, when a generating unit outputs the power quantities of K segments, any one segment can be recovered by subtracting the other K − 1 segment quantities from the total generation quantity. Hence, one dimension is redundant. In the subsequent discussion of NC2 and NC3, the main objects of interest are the non-redundant action space z and the non-redundant mapping g.The three necessary conditions for the post-processing mapping are given below, corresponding respectively to requirements at the distributional level, the global mapping level, and the local di ff erential level: NC1 excludes singular probability mass, NC2 excludes branch ambiguity, and NC3 excludes local gradient collapse. Detailed proofs are provided in Appendix A. 9i. Necessary Condition 1 (NC1): The post-processing action mapping h should satisfy 
+
+∀a0, P(h(X) = a0 | s) = 0 (13) This condition means that the true executed-action distribution must not assign positive probability mass to isolated points or low-dimensional constraint manifolds. ii. Necessary Condition 2 (NC2): The non-redundant mapping g of the post-processing action must be injective, i.e., 
+
+P(∃z′ , z : g(z′) = g(z) | s) = 0 (14) where s denotes the state space. This condition means that, on the non-redundant action space, the post-processing mapping cannot be globally many-to-one. iii. Necessary Condition 3 (NC3): The non-redundant mapping g of the post-processing action must be locally invertible on the non-redundant action space z, i.e., 
+
+P(det Jg(z) , 0 | s) = 1 (15) where Jg denotes the Jacobian matrix of the mapping g.
+
+3.1.4. Corresponding Conditions under Deterministic Policy Gradient Methods 
+
+Similarly, in electricity market bidding, a deterministic policy typically outputs a raw action x ∈ Rd through the policy network, which is then transformed into a feasible action through a deterministic post-processing mapping 
+
+h : Rd → A :
+
+a = h(x), x = fθ(s) (16) Therefore, the true executed policy is not fθ, but rather the composite mapping ˜μθ(s) = h( fθ(s)) (17) Here, ˜ μθ denotes the post-processed deterministic executed policy. Under standard regularity conditions, the deterministic policy gradient theorem gives[23][24], 
+
+∇θ J(θ) = Es∼ρ˜μθ
+
+[∇θ ˜μθ(s) ∇a Q˜μθ (s, a)∣∣∣a= ˜μθ (s)
+
+] (18) Since ˜ μθ = h ◦ fθ, the key chain-rule decomposition is 
+
+∇θ ˜μθ(s) = Jh(x)|x= fθ (s) ∇θ fθ(s) (19) where Jh denotes the Jacobian matrix of h. In algorithmic implementations, deterministic policies typically in-troduce exploration through behavior-policy noise or target-policy smoothing. More generally, this can be written as 
+
+x = fθ(s) + σε, ε ∼ φ(·), a = h(x), (20) Accordingly, for a given state s, let the conditional distribution of x be denoted by νθ,σ (· | s). Then the conditional distribution of the executed action is its pushforward distribution under h:
+
+πθ,σ (· | s) = h#νθ,σ (· | s) (21) As σ → 0, we have νθ,σ (· | s) ⇒ δ fθ (s), and hence πθ,σ (· | s) ⇒ δ˜μθ (s). This shows that a deterministic policy is the limiting case of a family of noisy randomized executed policies {πθ,σ }σ> 0. If one requires the algorithm to preserve consistency between the true execution objective and the gradient update for arbitrarily small σ, then the constraints imposed on h must be structurally identical to those imposed on the pushforward distribution in the stochastic policy gradient setting, namely, NC1–NC3. 10 3.2. Theoretical Limitations of Three Common Post-Processing Approaches under Policy Gradient Methods 
+
+The following subsections show, respectively, that sorting primarily destroys injectivity (NC2), clipping mainly introduces singular probability mass on the boundary or lower-dimensional constraint manifolds (NC1), and projection simultaneously induces many-to-one mappings and local degeneracy (NC2NC3). 
+
+3.2.1. Deficiencies of Sorting as a Post-Processing Operation under Policy Gradient Methods 0 1 2 3 4 5 6
+
+Component interval 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00      
+
+> Component value
+> x1x2x3x4x5x6
+
+(a) Unsorted representation x
+
+0 1 2 3 4 5 6
+
+Component interval 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00      
+
+> Component value
+> a1a2a3a4a5a6
+
+(b) Sorted representation a = sort( x)
+
+> Figure 3: Conceptual illustration of sorting.
+
+The sorting post-processing operation sorts the price output x ∈ RK of the raw policy network in ascending order, as illustrated in Figure 3: 
+
+a = h(x) = sort( x) (22) If x is a continuous random vector, then with probability one, xi , x j for i , j. For any such x, let a = sort( x). Then, for any permutation σ ∈ S K , we have sort( Pσ x) = a (23) Moreover, whenever all components xi are pairwise distinct, the permuted vectors Pσ x are mutually di ff erent. Therefore, for almost every reachable a, its preimage contains at least K! distinct points: 
+
+∣∣∣h−1(a)∣∣∣ ≥ K! (24) Therefore, the sorting post-processing mapping violates NC2, thereby causing an objective mismatch in stochastic policy gradient optimization. More specifically, the sorting operation compresses raw outputs with di ff erent segment identities into the same sorted result, so that the branch information linking the executed action to the raw output becomes irrecoverable. For multi-segment bids, this further implies that positional information with original economic meaningsuch as the price of the j-th segmentis erased. 
+
+3.2.2. Deficiencies of clipping-based post-processing under policy gradient methods 
+
+To satisfy interval constraints or monotonicity constraints, two common types of clipping-based post-processing mappings can be employed. (1) Constant-bound clipping applied to x:11 0 1 2 3 4 5 6
+
+Component interval 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00     
+
+> Component value
+> ui≤ℓi+ 1 ensures monotonicity
+
+(a) Non-overlapping fixed interval clipping      
+
+> raw xi
+> clipped ai= clip( xi;ℓi,ui)
+
+0 1 2 3 4 5 6
+
+Component interval 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00       
+
+> Component value
+> The lower bound is recursively given by ai− 1
+> Plateaus occur when xi<ai− 1
+
+(b) Recursive lower-bound clipping       
+
+> raw xi
+> lower bound from previous segment
+> recursive ai= clip( xi;ai− 1 ,ui)Figure 4: Conceptual illustrations of two clipping-based post-processing schemes.
+
+As illustrated in Fig. 4(a), if mutually compatible fixed lower and upper bounds are pre-specified for each segment, then the executed bids can be obtained by segment-wise constant-bound clipping so as to satisfy the bound constraints and, under particular settings, the monotonicity requirement: 
+
+ai = clip( xi; ℓi, ui) =
+
+
+
+ℓi, xi < ℓ i,
+
+xi, ℓi ≤ xi ≤ ui,
+
+ui, xi > ui.
+
+(25) If P(xi > ui | s) > 0 (or P(xi < ℓ i | s) > 0), then 
+
+P(ai = ui | s) = P(xi > ui | s) > 0 or P(ai = ℓi | s) > 0 (26) Hence, the executed-action distribution places positive probability mass on the boundary points and therefore cannot admit a purely continuous density, violating NC1. The issue is not merely that the values of xare truncated; rather, an entire region of the input space is collapsed onto the same boundary point. (2) Recursive-bound clipping applied to x:In many implementations, clipping is not performed against fixed constant bounds. Instead, outputs are generated sequentially, with the previous segment taken as the lower or upper bound so as to enforce monotonicity. For example, as illustrated in Fig. 4(b), under a monotone nondecreasing constraint, the output can be written as 
+
+a1 = x1, ai = max( ai−1, xi), (i ≥ 2) (27) More generally, 
+
+ai = clip( xi; ai−1, ui), (i ≥ 2) (28) Taking Eq. (27) as an example, by definition, 
+
+ai = ai−1 ⇐⇒ xi ≤ ai−1 (29) Therefore, for any given ai−1,
+
+P(ai = ai−1 | ai−1, s) = P(xi ≤ ai−1 | ai−1, s) (30) Under continuously distributed outputs, the right-hand side is typically strictly positive. Taking expectation with respect to ai−1 yields 
+
+P(ai = ai−1 | s) > 0 (31) 12 Therefore, the joint executed-action distribution πθ(a | s) assigns positive probability mass to the set {ai = ai−1},and thus is not a purely continuous density on RK , violating NC1. In summary, whether the clipping bounds are constant or recursively determined by the previous segment to enforce monotonicity, the common feature is that a continuous region of the input space is collapsed onto boundary points or equality-constraint surfaces, so that the executed-action distribution no longer satisfies the regular probability density function required by NC1. 
+
+3.2.3. Deficiencies of projection-based post-processing under policy gradient methods 0 1 2 3 4 5 6 7 8   
+
+> Component interval
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> Component value
+> Smooth unconstrained output
+> Projection-induced plateaus
+> raw smooth output x
+> projected output a= Π C(x)
+> Figure 5: Conceptual illustration of projection-induced staircase behavior.
+
+When the policy network outputs a continuous but irregular bid curve, projection-based post-processing is often considered to enforce the bid-curve constraints. As illustrated in Fig. 5, a common approach is to use Euclidean projection 
+
+a = Π C (x) : = arg min  
+
+> y∈C
+
+‖y − x‖22 (32) where C ⊂ Rd denotes the feasible set that is closed, convex, monotone, and subject to upper and lower bounds. Take any a ∈ ∂C at which active constraints are present. For Euclidean projection onto a closed convex set, if a lies on the boundary and active constraints exist, then within a su ffi ciently small neighborhood along an outward normal direction, all points are projected onto the same boundary point a. That is, there exist a nonzero direction n and some 
+
+τ0 > 0 such that, for all τ ∈ (0 , τ 0), 
+
+ΠC (a + τn) = a (33) Hence, infinitely many distinct x are mapped to the same a; that is, the projection is many-to-one at the boundary, violating NC2. In addition, Eq. (33) implies that the first-order variation of the output along direction n is zero. Therefore, in the di ff erentiable sense (or almost everywhere in the piecewise di ff erentiable sense), there exists a nonzero vector v such that 
+
+JΠC (x) v = 0 (34) which indicates that the Jacobian cannot be full rank, thereby violating NC3. 
+
+4. Dual-Positive Monotone Parameterization for Stepwise Bids 
+
+To avoid the disruption of policy-gradient consistency caused by post-processing operations such as sorting, clip-ping, and projection, this paper proposes the Dual-Positive Monotone Parameterization (DPMP). As shown in Fig-ure 6, the core idea is to let the policy network directly output two positive vectors, which respectively represent 13 the segment-wise generation-width and the price-increment, and then to construct, via a continuously di ff erentiable mapping, a multi-segment stepwise bid curve that satisfies the required constraints. 
+
+> Figure 6: DPMP-based framework for stepwise bid generation of a generator agent.
+
+4.1. Feasible Set of Stepwise Bid Curves 
+
+A K-segment stepwise bid curve is determined by the generation output breakpoints and the segment prices: 0 = Q0 < Q1 < · · · < QK−1 < QK = Qmax , p1 ≤ p2 ≤ · · · ≤ pK (35) where the constant bid price over the generation interval [ Qi−1, Qi] is denoted by pi. Let the set of all curves satisfying the above constraints be denoted by 
+
+BK = {(Q, p) | 0 = Q0 < Q1 < · · · < QK = Qmax , pmin ≤ p1 ≤ · · · ≤ pK ≤ pmax } (36) It should be noted that the closed feasible set BK allows plateaus between adjacent price segments, i.e., pi = pi+1.To achieve better di ff erentiability, injectivity, and local invertibility, this paper does not directly parameterize the entire feasible set; instead, it parameterizes its interior subset: 
+
+B◦ 
+
+> K
+
+= {(Q, p) | 0 = Q0 < Q1 < · · · < QK = Qmax , pmin < p1 < · · · < pK < pmax } (37) This interior feasible region corresponds to multi-segment bid curves that are strictly increasing and strictly bounded. From an engineering implementation perspective, B◦ 
+
+> K
+
+already covers the feasible action space required in continuous bidding learning. Meanwhile, every boundary point of BK can be approximated arbitrarily closely by a sequence in B◦ 
+
+> K
+
+. Therefore, this restriction does not weaken the model’s expressive capability with respect to bid sets observed in actual electricity markets. 14 4.2. Action space 
+
+Define the action space output by the policy network as: 
+
+a = (r1, . . . , rK , w1, . . . , wK ) ∈ R2K 
+
+> >0
+
+(38) where ri denotes the generation-output width parameter of segment i, and wi denotes the price-increment parameter of segment i. A feasible stepwise bid curve can then be obtained from this action vector through a one-step mapping. In addition, both ri and wi are required to satisfy the dual-positive condition. Here, dual-positive means that the action vector is divided into two parts: the generation-output component r = (r1, . . . , rK ), whose entries are all strictly positive, and the price component w = (w1, . . . , wK ), whose entries are likewise all strictly positive. Hence, the entire action vector lies in a positive orthant. This dual-positive design has two advantages. First, both the positive generation-output width parameters and the positive price-increment parameters can be generated stably by common activation functions such as Softplus, Exp, or Sigmoid, which facilitates practical implementation. Second, the positivity constraints are directly absorbed into the parameterization structure itself, thereby ruling out, at the source, illegal actions such as negative output widths, negative increments, and non-monotone prices. 
+
+4.3. Generation-output mapping 
+
+The generation-output mapping is carried out in two steps. First, the width parameters are normalized as λ = π(r): 
+
+λi = ri
+
+∑Kj=1 r j
+
+,
+
+> K
+
+∑
+
+> i=1
+
+λi = 1, λi > 0 (39) Next, define the lower-triangular accumulation operator L ∈ RK×K :
+
+L =
+
+
+
+1 0 · · · 01 1 . . . ...... . . . . . . 01 · · · 1 1
+
+
+
+(40) A further cumulative mapping then yields the generation output breakpoints: 
+
+Q = Qmax Lλ (41) that is, 
+
+Qi =
+
+
+
+> i
+
+∑
+
+> j=1
+
+λ j
+
+ Qmax , Q0 = 0 (42) Since λi > 0 and ∑Ki=1 λi = 1, it follows immediately that 0 = Q0 < Q1 < · · · < QK = Qmax (43) Therefore, the above mapping naturally guarantees that the generation output breakpoints are strictly increasing, with the terminal point fixed at the unit’s maximum generation output Qmax . Moreover, this mapping also has a clear inverse structure. Given any breakpoint vector Q satisfying the constraints, λ can be uniquely recovered by first-order di ff erencing: 
+
+λ1 = Q1
+
+Qmax 
+
+, λi = Qi − Qi−1
+
+Qmax 
+
+, i = 2, . . . , K (44) This provides the basis for the subsequent proof of injectivity and local invertibility of the mapping. 15 4.4. Price mapping 
+
+To simultaneously satisfy the requirements of strictly increasing prices and upperlower bound constraints, this paper does not adopt a simple linear cumulative form. Instead, we first define the cumulative increments: 
+
+si =
+
+> i
+
+∑
+
+> j=1
+
+w j, i = 1, . . . , K (45) that is, 
+
+s = Lw (46) We then map s into the price interval ( pmin , pmax ) by 
+
+p = pmin 1 + (pmax − pmin )(1 − e−s) (47) where the exponential function is applied elementwise. This mapping has the following three properties. First, since wi > 0, we have si > 0, and hence 0 < 1 − e−si < 1 (48) Therefore, 
+
+pmin < pi < pmax , i = 1, . . . , K (49) This shows that the prices are naturally confined within the prescribed bounds. Second, since wi > 0, it follows that 
+
+s1 < s2 < · · · < sK (50) Because the function x 7 → 1 − e−x is strictly increasing on (0 , +∞), we obtain 
+
+p1 < p2 < · · · < pK (51) That is, the price curve is strictly monotonically increasing. Third, this mapping is invertible. Given any price vector p ∈ (pmin , pmax )K , one may first recover 
+
+si = − ln 
+
+(
+
+1 − pi − pmin 
+
+pmax − pmin 
+
+)
+
+, i = 1, . . . , K (52) and then obtain, by di ff erencing, 
+
+w1 = s1, wi = si − si−1, i = 2, . . . , K (53) Hence, there exists a one-to-one correspondence between the price-increment parameter w and the feasible price vector p. Compared with post-processing approaches such as sorting, clipping, and projection, the above price map-ping neither compresses di ff erent inputs into the same output nor creates kinks or extended flat regions on the con-straint boundaries. It is therefore better aligned with the requirement of continuous di ff erentiability in action mappings for policy gradient methods. 16 4.5. DPMP mapping 
+
+Let A denote the action space, i.e., 
+
+A := R2K 
+
+> >0
+
+= RK
+
+> >0
+
+︸︷︷︸ 
+
+> r
+
+× RK
+
+> >0
+
+︸︷︷︸ 
+
+> w
+
+(54) The DPMP mapping Φ : A → B ◦ 
+
+> K
+
+is defined as 
+
+Q = Qmax Lλ(r), p = pmin 1 + (pmax − pmin )(1 − e−Lw ) (55) As established in the preceding two subsections, DPMP stably maps any action in the positive orthant to an interior-feasible monotone multi-segment bid curve. One further point deserves emphasis: the normalization mapping in the generation-output component depends only on the direction of r, but not on its positive scalar magnitude. That is, for any c > 0, 
+
+π(cr ) = π(r) (56) Therefore, the raw variable r contains a one-dimensional scale redundancy. After removing this redundancy, DPMP yields a smooth injective mapping from the non-redundant action space to the interior feasible bid domain, while retaining local invertibility. Appendix B further proves, in non-redundant coordinates, that DPMP satisfies the necessary conditions for post-processing operations proposed in this paper, namely NC1NC3. In other words, unlike the SORT /CLIP /PROJECT baselines, it does not introduce singular mass on the boundary, branch ambiguity, or local gradient collapse. 
+
+5. Validity Assessment Framework for Electricity Market RL-ABS 
+
+As discussed earlier, training convergence or profit improvement alone is insu ffi cient to demonstrate that RL-ABS results can be directly used for electricity market mechanism analysis and evaluation. This chapter therefore develops a two-level validity assessment framework for electricity market RL-ABS to verify the credibility of learned policies before conducting large-scale mechanism evaluation, as shown in Figure 7. Specifically, in a single-agent setting with a theoretical optimal profit benchmark, the optimality gap is used to assess how closely the RL policy approximates the optimal bidding behavior. Subsequently, in a multi-agent general-sum game, exploitability based on approximate best responses is employed to measure the robustness of a policy profile against unilateral deviations, thereby evaluating its proximity to the -Nash equilibrium. This framework provides quantifiable and reproducible validity evidence for applying RL-ABS to electricity market mechanism comparison. 17 Figure 7: Validity Assessment Framework for Electricity Market RL-ABS. 
+
+5.1. Single-Agent Algorithm Validity Assessment 
+
+This section addresses a fundamental yet often overlooked question: when reinforcement learning is applied to electricity market agent-based simulation (ABS), does it truly learn the optimal bidding strategy? To avoid mislead-ing conclusions drawn solely from convergence curves or higher profits, the validity assessment of RL strategies in electricity market ABS requires, at this stage, a benchmark setting in which the theoretical optimal bidding strategy is available. On this basis, the validity of single-agent learning outcomes is evaluated by comparing the profit gap between the RL-learned strategy and the theoretical optimal strategy. 
+
+(1) Benchmark market setting and bid structure 
+
+Consider a single-node day-ahead market with 96 time intervals under a uniform-price clearing mechanism, in-volving two generators: the learning generator A and the rival generator B. The system demand is denoted by d(t). At each time interval, after both participants submit their supply bids, the Independent System Operator (ISO) clears the market by accepting bids in ascending order until demand is satisfied, and determines the uniform clearing price 
+
+λ according to the marginal accepted bid. Generator B follows cost-based bidding behavior, i.e., its bid is constructed as a stepwise curve from its own marginal cost function. The learning generator A submits a ten-segment stepwise bid, a format widely adopted in real-world electricity markets. 
+
+(2) Total cost and marginal cost model [22] 
+
+To avoid the systematic bias introduced by linearized cost assumptions in the low-output operating region, the total cost of generator g is modeled using a polynomial function: 
+
+CTg (pg) = βg,0 +
+
+> d
+
+∑
+
+> j=1
+
+βg, j p jg , g ∈ { A, B} (57) Its marginal cost is obtained by di ff erentiation: 18 CMg (pg) = d C Tg (pg)
+
+dp g
+
+=
+
+> d
+
+∑
+
+> j=1
+
+j βg, j p j−1 
+
+> g
+
+(58) where d denotes the polynomial order. Prior studies have shown that polynomial functions, particularly with d = 2or 3, can better capture the nonlinear characteristics of marginal cost when a generating unit operates under low-load conditions. 
+
+(3) Theoretical optimal profit 
+
+Based on the supply curve submitted by generator B, for any given price λ, its supplied energy can be written as 
+
+S B(λ) = clip ((CMB )−1(λ), 0, ¯PB
+
+) (59) where ¯ PB denotes the upper bound of generation output for generator B, and clip( ·) denotes clipping onto the feasible interval [0 , ¯PB]. At a given time interval, let the demand be D. When the uniform clearing price is λ, the residual demand faced by generator A after deducting B’s supplied quantity is 
+
+R(λ) = clip (D − S B(λ), 0, ¯PA
+
+) (60) where ¯ PA is the upper bound of generation output for generator A. If demand uncertainty is taken into account, 
+
+D can be treated as a random variable and the following expressions can be evaluated in the expectation sense. Accordingly, the corresponding profit of generator A is 
+
+ΠA(λ) = λR(λ) − CTA
+
+(R(λ)) (61) Therefore, the theoretical optimal profit is given by the maximum value over the feasible price set: 
+
+Π∗ 
+
+> A
+
+= max 
+
+> λ∈Ω
+
+[λR(λ) − CTA
+
+(R(λ))] (62) 
+
+(4) Validity metric and statistical criterion 
+
+Define the optimality gap as 
+
+δ = Π∗ 
+
+> A
+
+− ΠRL A
+
+∣∣∣Π∗
+
+> A
+
+∣∣∣ (63) where ΠRL A denotes the profit achieved by the reinforcement learning policy. When the upper bound of the con-fidence interval of δ is below a prescribed threshold τ, the single-agent algorithm is considered to have passed the validity assessment under this verifiable benchmark. 
+
+5.2. Multi-agent validity assessment in RL-ABS 
+
+In multi-agent electricity markets, merely observing convergence of the training curves or improvements in profit does not demonstrate that the learned policies are stable in the game-theoretic sense, and therefore cannot serve as a credible basis for mechanism evaluation and policy analysis. To address this issue, this section introduces an exploitability-based validity assessment method. By explicitly constructing, for each agent, an approximate best response to a given strategy profile and quantifying the profit improvement induced by unilateral deviation, we assess whether the outcomes of the multi-agent simulation are close to a Nash equilibrium. 
+
+(1) Definition of strategy profile and payo ff 
+
+Consider a day-ahead uniform-price clearing market with N generators and a time horizon of T = 96 periods. Let 
+
+πi denote the policy of generator i, and let the strategy profile be denoted by π = (π1, . . . , π N ), with π−i representing the strategy profile of all agents except agent i. At each period, every agent submits a ten-segment stepwise bid. The Independent System Operator (ISO) clears the market by ranking bids in ascending order of price, and the marginal accepted bid determines the uniform clearing price λt.Given a strategy profile π, the daily payo ff (expected profit) of agent i is defined as 19 Vi(π) = E
+
+
+
+> T
+
+∑
+
+> t=1
+
+(λt pi,t − CTi (pi,t)) , i = 1, . . . , N (64) where pi,t denotes the cleared generation output at period t, and CTi (·) is the total cost function of generator i.
+
+(2) Exploitability 
+
+In a general-sum game, the central criterion for a Nash equilibrium is that, when the strategies of all other agents are fixed, no agent should be able to substantially improve its expected payo ff through unilateral deviation. To convert this criterion into a quantifiable validity metric, this section introduces the definitions of best response and exploitabil-ity. Given π−i, the best response of agent i is defined as 
+
+BR i(π−i) ∈ arg max 
+
+> πi
+
+Vi(πi, π −i) (65) Relative to the original policy πi, the payo ff improvement achieved by unilateral deviation to the best response is 
+
+∆i(π) ≜ Vi
+
+(BR i(π−i), π −i
+
+) − Vi(πi, π −i) (66) If any agent can still significantly improve its own payo ff through unilateral deviation while the other agents’ policies are fixed, then the current strategy profile remains exploitable. Accordingly, the exploitability of a strategy profile is defined as 
+
+E(π) ≜ max  
+
+> i
+
+∆i(π) (67) When E(π) is su ffi ciently small, the simulation outcome can be regarded as an ε-Nash equilibrium. 
+
+(3) Exploitability based on RL approximate best responses 
+
+In the electricity market RL-ABS setting with high-dimensional continuous states and segmented bidding action spaces, the analytical solution to Eq. (65) is often intractable. Therefore, this study employs an RL-based best-response search to obtain an approximate best response, which is then used to estimate ̂ ∆i(π) and ̂ E(π). The core idea is to “freeze” the multi-agent environment into a single-agent decision problem for agent i, and then retrain agent i to maximize its own payo ff .The specific procedure is as follows, carried out independently for each agent i:i. Freezing the opponents’ policies: Fix the policies of all other agents at the trained policy profile π−i, and turn o ff exploration noise during evaluation so that their behavior remains consistent throughout the simulation. Under this setting, the environment faced by agent i is transformed into a single-agent deep reinforcement learning decision process. ii. Training the approximate best response: Taking Vi(·, π −i) as the optimization objective, agent i is treated as the sole learner. Using the same RL algorithm and action representation as in the main experiment, agent i
+
+is retrained under the frozen-opponent setting to obtain a policy ̂ BR i(π−i). To reduce the risk of local optima, training may be repeated with multiple random initializations or multiple random seeds, and the policy with the highest evaluation payo ff is selected as ̂ BR i.iii. Consistency evaluation: Using the same batch of demand samples (or the same sequence of random seeds), evaluate both the baseline strategy profile π and the deviated strategy profile ( ̂ BR i(π−i), π −i), yielding ̂ Vi(π) and ̂
+
+Vi(̂ BR i(π−i), π −i), respectively. The estimated unilateral deviation gain is then given by ̂
+
+∆i(π) =̂ Vi
+
+(̂ BR i(π−i), π −i
+
+) −̂ Vi(πi, π −i),̂ E(π) = max 
+
+> i
+
+̂ ∆i(π) (68) If the resulting ̂ E(π) is su ffi ciently small, the simulation outcome may be regarded as an approximate ε-Nash equilibrium. Conversely, if ̂ E(π) is evidently large, this indicates that the current strategy profile still admits room for improvement through unilateral deviation, and thus cannot be regarded as an approximate ε-Nash equilibrium. 20 6. Validity Assessment of the DPMP 
+
+6.1. Single-Agent Optimality-Gap Assessment of DPMP 6.1.1. Research Questions and Experimental Design 
+
+To assess the e ff ectiveness of DPMP in single-agent electricity market bidding tasks, this study constructs a bench-mark environment in which the theoretical optimal profit Π∗ 
+
+> t
+
+can be computed explicitly. In this environment, the op-ponents’ stepwise bids, the market-clearing rules, the reward definition, and the state transition mechanism are all kept fixed, while the optimality gap is adopted as the unified evaluation criterion. Guided by this objective, this subsection focuses on the following two research questions: RQ1: Under a fixed reinforcement learning algorithm, does the post-processing mapping systematically a ff ect the learnability of the policy and its ability to approach the optimum, and does DPMP exhibit a clear advantage? To answer this question, DPMP is compared with three engineering baselines based on commonly used post-processing mappings, namely SORT, CLIP, and PROJECT. The core purpose of this comparison is to isolate the e ff ect of the reinforcement learning algorithm and determine whether DPMP can deliver a smaller optimality gap and higher sample e ffi ciency. RQ2: When DPMP is fixed, how do di ff erent reinforcement learning algorithms di ff er in their ability to approach the optimal policy and in training stability, and is DPMP compatible with mainstream reinforcement learning algo-rithms? To address this question, this subsection compares the performance of A2C, TRPO, PPO, and DDPG under the unified DPMP representation. To answer the above two research questions, this subsection adopts a controlled two-axis comparative design. The two axes refer to two experimental factor axes constructed to correspond to the two research questions, with only one core factor varied along each axis while all other conditions are held constant. The horizontal experiment (Axis A) is designed to identify the e ff ect of the post-processing mapping: the learning algorithm is fixed as PPO, and only the mapping from actions to bid curves is changed, with DPMP, SORT, PROJECT, and CLIP considered as four alternative implementations. Since the algorithm, environment, and training budget are all kept unchanged, performance di ff erences along this axis can be attributed primarily to the post-processing mapping itself. The vertical experiment (Axis B) is designed to identify the e ff ect of the reinforcement learning algorithm: the bid parameterization is fixed as DPMP, and only the optimization algorithm is varied, with A2C, TRPO, PPO, and DDPG compared. Under this setting, the observed di ff erences can be attributed mainly to variations in the search and optimization capabilities of di ff erent algorithms within the same feasible bid representation space. To ensure that the results obtained along the two identification axes are comparable under a common standard, all experiments in this study adopt the same evaluation metric system. First, the average daily optimality gap is used to measure the average proximity of a method to the theoretical optimal profit over the entire scheduling horizon. Second, the number of environment interaction steps required to reach a predefined optimality threshold is used to characterize sample e ffi ciency. Finally, the magnitude of fluctuations during training is used to characterize training stability. Based on this unified evaluation framework, Table 2 summarizes the settings of each experimental group and their corresponding identification objectives. 21 Table 2: Experiment grid                                  
+
+> Group ID Research Axis Objective RL Algorithm Type of Post-Processing Mapping Market /Opponent Setting A1 AAssess the optimality gap and training stability of DPMP PPO DPMP Section 6.1.2 market setting: fixed opponents’ stepwise bids A2 ABaseline 1: SORT-based post-processing for monotonicity enforcement; compared with DPMP PPO SORT Same as above A3 ABaseline 2: PROJECT-based post-processing; compared with DPMP PPO PROJECT Same as above A4 ABaseline 3: CLIP-based post-processing; compared with DPMP PPO CLIP Same as above B1 BPerformance of DPMP under A2C A2C DPMP Same as above B2 BPerformance of DPMP under TRPO TRPO DPMP Same as above B3 BPerformance of DPMP under PPO PPO DPMP Same as above B4 BPerformance of DPMP under DDPG DDPG DPMP Same as above
+
+To ensure that all experiments are compared under a common standard, the following evaluation metrics are defined: i. Average Daily Optimality Gap ¯δ = 1
+
+T
+
+> T
+
+∑
+
+> t=1
+
+Π∗ 
+
+> t
+
+− Πt
+
+∣∣∣Π∗
+
+> t
+
+∣∣∣ (69) ii. Sample E ffi ciency: the number of environment interaction steps required to reach the threshold ¯ δ ≤ 0.1. iii. Training Stability: the variance of the optimality gap. 
+
+6.1.2. Environment Setup 
+
+To obtain a computable theoretical optimal strategy and thereby quantify the optimality gap, this study constructs a multi-period electricity market environment involving a single generating unit. In this environment, the opponents bids are fixed and demand exhibits structured fluctuations, thus providing support for the subsequent measurement of the optimality gap. 
+
+(1) Market setup 
+
+The market is modeled as a sequential decision-making process of length T = 96. Each episode corresponds to a within-day clearing sequence. At each period t ∈ { 0, . . . , T −1}, the Agent and the opponent each submit a 10-segment stepwise bid curve. The price cap is set to 1000 CNY /MWh. The market clears against the prevailing demand using a uniform clearing price and returns the resulting profit as the reward signal. 
+
+(2) Demand setup 
+
+The demand at period t, denoted by Dt, is composed of an intraday periodic component and a Gaussian perturba-tion, and is clipped to the feasible interval: 22 Dt = clip(500 + 300 sin(2 πt/T − π/ 2) + εt, 0, 1000) , εt ∼ N (0 , 25 2) (70) This setting ensures that demand exhibits a pronounced peak–valley pattern within the day, which facilitates the observation of policy adaptability across di ff erent periods. Meanwhile, the noise term introduces a certain degree of randomness, preventing the learning process from degenerating into deterministic fitting. 
+
+(3) Opponent bid setup 
+
+The Opponent is assigned a fixed 10-segment stepwise bid, with each segment having a width of 100 MW and a total o ff ered quantity of 1000 MW. The segment prices are fixed at [20 , 25 , 30 , 35 , 40 , 45 , 50 , 55 , 60 , 65]. The rationale for fixing the opponent is that the market-clearing price can only take values from a finite set {p j},which lays the foundation for constructing the theoretical optimal profit in Section 6.1.3. 
+
+(4) Agent cost modeling 
+
+The marginal cost curve of the generating unit, MC (q), is discretized over q ∈ [0 , Qmax ] using 101 points. It is specified in the following power-function form: 
+
+MC (qi) = a + b
+
+( qi
+
+Qmax 
+
+)γ
+
+, γ ∼ Uniform(1 , 2) (71) where a = 20 and b = 300, and qi denotes equally spaced grid points. The total cost C(q) is then obtained through discrete accumulation using trapezoidal integration: 
+
+C(qi) =
+
+> i
+
+∑
+
+> k=1
+
+MC (qk) + MC (qk−1)2 (qk − qk−1) (72) This construction has two advantages: i. the cost curve is strictly increasing and convex, which is consistent with the typical characteristics of the marginal cost of a single generating unit; ii. C(q) can be computed numerically with high precision, thereby providing a basis for calculating the theoretical optimal profit. 
+
+6.1.3. Calculation of the Theoretical Optimal Profit 
+
+In the optimality-gap assessment of reinforcement learning algorithms, the core task is to construct a verifiable upper bound on optimality, which can serve as a benchmark for alternative bidding strategies. This section details how the theoretical optimal profit Π∗ 
+
+> t
+
+is computed on a period-by-period basis according to the environment settings and the market mechanism, so as to evaluate the learning performance of the agent. For fixed 10-segment stepwise bids on the supply side, there are 10 discrete price levels {p j}9
+
+> j=0
+
+, ordered from low to high. Under this structure, if the agent attains the optimal profit, the market-clearing price can only lie at or near these discrete levels. Therefore, the candidate clearing-price set is restricted to {p j}, thereby reducing the theoretical optimum to an enumeration problem over a finite set. The key is to characterize the feasible output of the unit at a given o ff er price p. If the unit’s marginal cost curve is monotonically increasing MC (q), we define 
+
+qMC (p) = sup {q ∈ [0 , Qmax ] : MC (q) ≤ p} (73) which represents the maximum output that does not incur a loss at price p. At a candidate price level p j, the total output available from lower price segments is j∆q. Therefore, when the price increases to p j, if the following feasibility condition is satisfied, 
+
+j∆q + qMC (p j) ≥ Dt (74) then this price level is capable of covering the demand Dt. The residual demand that must be supplied by the unit is then 
+
+q j(Dt) = Dt − j∆q (75) 23 Let the unit’s total cost function be C(q) = ∫ q 
+
+> 0
+
+MC (x) dx (estimated via discrete integration /interpolation). Then, the candidate profit at price level p j is 
+
+Πt(p j) = p j · q j(Dt) − C(q j(Dt)) (76) Finally, the theoretical optimal profit at period t is defined as 
+
+Π∗ 
+
+> t
+
+= max  
+
+> j∈{ 0,..., 9}
+
+Πt(p j) s.t. q j(Dt) > 0, j∆q + qMC (p j) ≥ Dt (77) The corresponding upper-bound realization ( p∗ 
+
+> t
+
+, q∗ 
+
+> t
+
+) is obtained simultaneously.The implementation is given in Algorithm 1. 
+
+Algorithm 1 Theoretical Optimal Profit (Single Period) 
+
+Input: demand Dt, price levels {pj}9
+
+> j=0
+
+, segment output ∆q, unit MC (·) and C(·)
+
+Output: Π∗ 
+
+> t
+
+and the corresponding ( p∗ 
+
+> t
+
+, q∗ 
+
+> t
+
+) 
+
+> 1:
+
+Initialize Π∗ 
+
+> t
+
+← −∞  
+
+> 2:
+
+for j = 0, . . . , 9 do  
+
+> 3:
+
+Compute qMC (pj) 
+
+> 4:
+
+if j∆q + qMC (pj) < Dt then  
+
+> 5:
+
+continue  
+
+> 6:
+
+end if  
+
+> 7:
+
+q ← Dt − j∆q 
+
+> 8:
+
+if q ≤ 0 then  
+
+> 9:
+
+continue  
+
+> 10:
+
+end if  
+
+> 11:
+
+Π ← pjq − C(q) 
+
+> 12:
+
+if Π > Π∗ 
+
+> t
+
+then  
+
+> 13:
+
+Π∗ 
+
+> t
+
+← Π 
+
+> 14:
+
+(p∗ 
+
+> t
+
+, q∗ 
+
+> t
+
+) ← (pj, q) 
+
+> 15:
+
+end if  
+
+> 16:
+
+end for  
+
+> 17:
+
+return Π∗ 
+
+> t
+
+and ( p∗ 
+
+> t
+
+, q∗ 
+
+> t
+
+)
+
+6.1.4. Implementation of DPMP and the SORT /CLIP /PROJECT Baselines 
+
+To ensure a controlled horizontal comparison, only the post-processing mapping from the policy-network output 
+
+u to the bid curve is varied, while the reinforcement learning algorithm (PPO) and the market-clearing structure are kept fixed. The four modelling approaches are unified under the same interface: (qedge , p) = hmode (u), u ∈ [0 , 1] 2K , K = 10 (78) where qedge = (q0, . . . , qK ) denotes the generation output breakpoints ( q0 = 0, qK = Qmax ), and p = (p1, . . . , pK )denotes the segment prices. These variables satisfy the common constraints in electricity markets: the generation output breakpoints must be strictly increasing, and the segment prices must be nondecreasing and bounded, i.e., pi ∈
+
+[0 , ¯p]. The implementation of DPMP has already been detailed in Section 5. We next describe the implementations of the SORT /CLIP /PROJECT baselines. 
+
+(1) SORT baseline 
+
+SORT is a common engineering practice. The generation output breakpoints are fixed as 10 equally spaced segments: 
+
+qi = i · Qmax 
+
+K , i = 0, . . . , K (79) The prices are first linearly mapped to [0 , ¯p], and then globally sorted to enforce monotonicity: ˜pi = ¯p u (p) 
+
+> i
+
+, p = sort( ˜ p) (80) 24 The advantage of this method is its extreme simplicity while guaranteeing monotonicity. However, mechanisti-cally, it is a many-to-one mapping: a large number of di ff erent ˜ p values are mapped to the same p. Therefore, it does not satisfy the injectivity and invertibility requirements imposed on the post-processing mapping under the policy gradient framework, thereby leading to objective mismatch (a rigorous analysis is provided in Appendix A). 
+
+(2) CLIP baseline 
+
+Like SORT, CLIP also fixes the generation output breakpoints to be equally spaced. However, instead of sorting the prices, it adopts a recursively defined minimal-modification projection: ˜pi = ¯p u (p) 
+
+> i
+
+, p1 = ˜p1, pi = max( pi−1, ˜pi) (i ≥ 2) (81) That is, p = cummax( ˜ p). This method guarantees monotonicity and compliance with the price cap. However, the above recursion compresses a continuous region of the input space onto the equivalence constraint faces {pi = pi−1},causing discontinuous density accumulation of the executed-action distribution on these faces and thereby violating the continuity conditions required for policy gradient implementation. 
+
+(3) PROJECT baseline 
+
+The PROJECT baseline projects the raw price sequence output by the network onto a feasible set satisfying the monotonicity and boundary constraints, thereby ensuring a feasible bid curve with the minimum perturbation in the 
+
+L2 sense. With the generation output divided into K equally spaced segments, the policy network outputs a raw K-dimensional vector u(p) ∈ RK . This vector is first mapped to a raw price sequence x ∈ [0 , ¯p]K . Let C denote the convex feasible set of bounded nondecreasing sequences: 
+
+C = {p ∈ RK ∣∣∣ 0 ≤ p1 ≤ p2 ≤ · · · ≤ pK ≤ ¯p} (82) The core of PROJECT is the Euclidean projection of x onto C, i.e., the nearest-point projection in the least-squares sense: 
+
+p = Π C(x) = arg min  
+
+> y∈C
+
+‖y − x‖22 = arg min 
+
+> y∈C
+> K
+
+∑
+
+> i=1
+
+(yi − xi)2 (83) The resulting p = (p1, . . . , pK ) naturally satisfies 0 ≤ p1 ≤ · · · ≤ pK ≤ ¯p. In this study, the projection is e ffi ciently implemented using the PAV (Pool-Adjacent-Violators) algorithm [30]. Based on the projected price sequence, the feasible stepwise bid curve is constructed as 
+
+ϕ(q) = pi, q ∈ (qi−1, qi], i = 1, . . . , K (84) thus yielding the final bid steps used for market clearing, {(( qi−1, qi], pi)}Ki=1.25 Algorithm 2 Post-processing mapping algorithm hmode (u)
+
+Input: 
+
+u = (u(q), u(p)) ∈ (0 , 1) 2K
+
+Qmax : maximum generation output; ¯ p: price cap mode ∈ { DPMP , SORT , CLIP , PROJECT }
+
+Hyperparameters: k, α, ε (ε ≈ 10 −6, used only for numerical stability) 
+
+Output: 
+
+Generation output breakpoints qedge = (q0, q1, . . . , qK ) ∈ RK+1, where q0 = 0, qK = Qmax 
+
+Segment prices p = (p1, . . . , pK ) ∈ RK , satisfying 0 ≤ p1 ≤ · · · ≤ pK ≤ ¯p
+
+1: if mode = DPMP then 
+
+2: w ← softmax( u(q))
+
+3: for i = 1, . . . , K do 
+
+4: ∆qi ← Qmax wi
+
+5: end for 
+
+6: q0 ← 0
+
+7: for i = 1, . . . , K do 
+
+8: qi ← qi−1 + ∆ qi
+
+9: end for 
+
+10: for i = 1, . . . , K do 
+
+11: raw i ← k ∑ij=1 u(p)
+
+> j
+
+12: end for 
+
+13: for i = 1, . . . , K do 
+
+14: pi ← ¯p(1 − exp( −α raw i))
+
+15: end for 
+
+16: return (qedge , p)
+
+17: else if mode = SORT then 
+
+18: for i = 0, . . . , K do 
+
+19: qi ← i · Qmax /K
+
+20: end for 
+
+21: for i = 1, . . . , K do 
+
+22: ˜pi ← ¯p u (p)
+
+> i
+
+23: end for 
+
+24: p ← sort( ˜ p)
+
+25: return (qedge , p)
+
+26: else if mode = CLIP then 
+
+27: for i = 0, . . . , K do 
+
+28: qi ← i · Qmax /K
+
+29: end for 
+
+30: for i = 1, . . . , K do 
+
+31: ˜pi ← ¯p u (p)
+
+> i
+
+32: end for 
+
+33: p1 ← ˜p1
+
+34: for i = 2, . . . , K do 
+
+35: pi ← max( pi−1, ˜pi)
+
+36: end for 
+
+37: return (qedge , p)
+
+38: else if mode = PROJECT then 
+
+39: for i = 0, . . . , K do 
+
+40: qi ← i · Qmax /K
+
+41: end for 
+
+42: for i = 1, . . . , K do 
+
+43: xi ← clip ( ¯p · g(u(p) 
+
+> i
+
+), 0, ¯p)
+
+44: end for 
+
+45: p ← ΠC(x)
+
+46: return (qedge , p)
+
+47: end if 
+
+26 6.1.5. Horizontal experiments and result analysis 
+
+To answer RQ1, this subsection conducts a comparative evaluation of the four post-processing mappingsDPMP, SORT, CLIP, and PROJECTunder the same reinforcement learning algorithm, the same training configuration, the same market environment, the same opponents stepwise bids, and the same reward definition. Since this subsection changes only the post-processing mapping from actions to bid curves while keeping all other conditions fixed, the observed performance di ff erences can be attributed primarily to the post-processing mapping itself, rather than to the learning algorithm or environmental perturbations. 
+
+(1) Evolution of stepwise bid-curve morphology 
+
+Figure 8 illustrates, for the four methods during training, the evolution of the stepwise bid curves at time t = 47 over episodes (with episode on the x-axis, generation output on the y-axis, and bid price on the z-axis). This figure not only visualizes the training process, but also directly reveals the morphology of the policy search trajectory in the feasible bid space under di ff erent post-processing mappings. If a method forms a stable stepwise structure relatively early in training and exhibits a continuous and smooth surface evolution across episodes, this usually indicates that its action representation and post-processing mapping are more amenable to optimization. By contrast, if the surface persistently exhibits large-scale boundary adhesion, abrupt discontinuities, or high-frequency oscillations, this often suggests substantial information compression, boundary concentration, or gradient distortion during training. Overall, DPMP gradually converges in the middle and late stages of training to a structurally stable and well-stratified stepwise surface. Its bid prices exhibit a consistent monotone structure as generation output increases, and the evolutionary trajectory across episodes remains relatively continuous, yielding an overall smooth surface with only limited local exploratory perturbations. Both SORT and CLIP exhibit pronounced boundary concentration. As can be seen from the figure, the bid surfaces rapidly approach the price cap over large ranges of generation output and episodes, while the low-generation-output region frequently adheres to the lower boundary, forming a clear two-layer structure concentrated near the upper and lower bounds, with a relatively thin e ff ective transition layer in between. This pattern indicates that, after post-processing, the policy outputs are compressed toward the boundary of the feasible set, thereby weakening the distinguishable structure in the interior. The boundary concentration in PROJECT is somewhat alleviated, but its surface still exhibits noticeable banded jumps and local spikes. Across episodes, the surface shows more frequent segment-wise discontinuities and plateau reconfigurations, indicating that although projection-based feasibility restoration can ensure constraint satisfaction, structural instability during training still persists. A closer inspection of the three-dimensional evolution of DPMP further shows that bid prices in the low-generation-output region stabilize relatively early across episodes, whereas those in the high-generation-output region still retain a certain degree of fluctuation in the later stages of training. This phenomenon does not imply that DPMP fails to converge in the high-generation-output region; rather, it reflects di ff erences in reward sensitivity across generation-output intervals under the market-clearing mechanism. Specifically, under fixed opponent bids and a given demand condition, the segments that truly a ff ect the market-clearing outcome and profit are usually those located near the marginal clearing position. For these low- and medium-generation-output segments, which are highly sensitive to clearing probability and transaction price, an inappropriate bid is immediately reflected in profit variation. Reinforce-ment learning can therefore obtain stronger and more stable feedback signals, driving faster parameter convergence in these segments. By contrast, some high-generation-output segments remain non-marginal in most episodes, meaning that even if their bid prices are adjusted, the actual market-clearing outcome does not change. Their influence on the immediate reward is therefore weaker, so the corresponding parameters receive e ff ective learning signals that are sparser and noisier. As a result, the surface appears more stable across episodes in the low-generation-output region, while a certain degree of exploratory fluctuation is still retained in the high-generation-output region. It is important to emphasize that, even under such conditions, DPMP still preserves the overall monotonicity of the stepwise structure and the continuity of the surface. This indicates that its parameterization is able to strike a favorable balance between continued local exploration and global structural stability: training resources are preferentially allocated to the critical generation-output intervals that genuinely a ff ect market clearing and profit, rather than being wasted on indiscriminate boundary oscillations over the entire generation-output range. 
+
+(2) Comparison of profit curves and optimality-gap curves 
+
+Figure 9 and Figure 11 present, respectively, the average profit per episode and the optimality-gap curves of the four methods during training, while Table 3 reports the corresponding statistics of the optimality gap. The results ex-27 Figure 8: Evolution of stepwise bid curves over episodes 0 300 600 900 1200 1500                    
+
+> Episode 0200
+> 400
+> 600
+> 800
+> 1000
+> Capacity (MW)
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Bid Price
+> 20
+> 40
+> 60
+> 80
+> Bid Price
+> (a) DPMP Staircase Bid Evolution, t=47 0300 600 900 1200 1500
+> Episode 0200
+> 400
+> 600
+> 800
+> 1000
+> Capacity (MW)
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> Bid Price
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> Bid Price
+> (b) SORT Staircase Bid Evolution, t=47 0300 600 900 1200 1500
+> Episode 0200
+> 400
+> 600
+> 800
+> 1000
+> Capacity (MW)
+> 0
+> 150
+> 300
+> 450
+> 600
+> 750
+> Bid Price
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> Bid Price
+> (c) PROJECT Staircase Bid Evolution, t=47 0300 600 900 1200 1500
+> Episode 0200
+> 400
+> 600
+> 800
+> 1000
+> Capacity (MW)
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> Bid Price
+> 0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> Bid Price
+> (d) CLIP Staircase Bid Evolution, t=47
+
+hibit two distinctly di ff erent learning trajectories: DPMP follows a “high exploration cost–rapid transition–high-level stabilization” pattern, whereas SORT, PROJECT, and CLIP exhibit an “early rapid profit increase–mid-to-late-stage suboptimal stagnation” pattern. This divergence is consistent with the qualitative findings from the morphological analysis of the stepwise bid curves in the previous subsection. In terms of steady-state performance (over the last 10% of episodes), the steady-state relative optimality gap of DPMP is only 3.26% ±0.73%, which is substantially lower than that of SORT (30.95% ±2.42%), PROJECT (33.12% ±3.31%), and CLIP (31.62% ±3.50%). In terms of steady-state mean values, the relative optimality gap of DPMP is lower than those of SORT, PROJECT, and CLIP by 27.69, 29.86, and 28.36 percentage points, respectively, corresponding to rel-ative reductions of 89.47%, 90.16%, and 89.69%. This further implies that, although the three baseline methods can achieve stable positive profits, their policies remain trapped in a suboptimal region that is approximately 30% away from the theoretical optimum over the long run. By contrast, DPMP has stably entered a near-optimal convergence regime. In terms of sample e ffi ciency, using a 10% optimality gap as the threshold, only DPMP reaches the target within the training horizon: it attains the 10% optimality-gap threshold at episode 328 and further reaches the 5% threshold at episode 398. By contrast, SORT, PROJECT, and CLIP all fail to reach the 10% threshold within 1000 episodes. Overall, the profit curves, optimality-gap curves, and the associated statistics consistently show that the core advantage of DPMP does not lie in achieving higher profits at the early stage of training, but in delivering higher steady-state profits, stronger approximation to the theoretical optimum, and better late-stage stability at an acceptable exploration cost. 28 0 200 400 600 800 1000 
+
+Episode 
+
+12500 
+
+10000 
+
+7500 
+
+5000 
+
+2500 
+
+0
+
+2500 
+
+5000 
+
+> Profit (unscaled)
+
+DPMP 
+
+SORT 
+
+PROJECT 
+
+CLIP 
+
+OPT (theoretical) Figure 9: Profit curves of the four methods (DPMP /SORT /PROJECT /CLIP). 0 200 400 600 800 1000   
+
+> Episode
+> 0.0%
+> 200.0%
+> 400.0%
+> 600.0%
+> 800.0%
+> Relative Optimality Gap (%)
+> 700 800 900
+> 0.0%
+> 20.0%
+> 40.0%
+> DPMP
+> SORT
+> PROJECT
+> CLIP
+
+Figure 10: Optimality-gap curves of the four methods (DPMP /SORT /PROJECT /CLIP). Table 3: Statistics of optimality-gap curves in the horizontal experiments 
+
+Method Final steady-state optimality gap (last 10%, mean ±std) Episode reaching the 10% gap Episode reaching the 5% gap Best gap (minimum MA over all episodes) Compliance rate in the last 10% (≤10%) DPMP 3.26% ± 0.73% 328 398 2.04% 100 .0% SORT 30 .95% ± 2.42% – – 14 .82% 0.0% PROJECT 33 .12% ± 3.31% – – 26 .83% 0.0% CLIP 31 .62% ± 3.50% – – 23 .55% 0.0% 
+
+29 6.1.6. Vertical experiments and analysis of results 
+
+To answer RQ2, this subsection continues to adopt a controlled-variable design: the bid parameterization is fixed as DPMP, the market environment and the opponents stepwise bids are kept unchanged, and the reward definition and training configuration are held constant, while only the reinforcement learning algorithm is varied (A2C, TRPO, PPO, and DDPG). Therefore, the observed performance di ff erences can be attributed primarily to the algorithms themselves, rather than to di ff erences in action representation or environmental perturbations. Figure 11 presents the relative optimality-gap curves of the four algorithms under DPMP, and Table 4 reports the corresponding statistics. Overall, all four algorithms exhibit a convergent pattern characterized by a rapid decline followed by entry into a steady-state plateau. Moreover, the pass rates in the last 10% of episodes ( δ ≤ 10%) all reach 100%, indicating that DPMP does not rely on any particular learning algorithm, but can instead provide a consistent and optimizable monotone feasible bid representation for mainstream reinforcement learning methods. In terms of steady-state performance (last 10% of episodes), the four algorithms can be divided into two cate-gories: PPO and DDPG exhibit a low-gap steady-state pattern, whereas A2C and TRPO exhibit a more conservative convergence pattern. Among them, DDPG achieves the lowest steady-state relative optimality gap in the last 10% of episodes, at 3.52% ± 0.18%; PPO follows with 4.25% ± 0.64%; and A2C and TRPO reach 6.05% ± 0.31% and 6.30% ± 0.17%, respectively. In terms of steady-state mean performance, DDPG reduces the optimality gap by 2.53, 2.78, and 0.73 percentage points relative to A2C, TRPO, and PPO, respectively, corresponding to relative reductions of 41.82%, 44.13%, and 17.18%. PPO also reduces the gap by 1.80 and 2.05 percentage points relative to A2C and TRPO, respectively, corresponding to relative reductions of 29.75% and 32.54%. In terms of sample e ffi ciency, taking δ = 10% as the threshold for the optimality gap, all four algorithms are able to reach the target, although with substantial di ff erences in convergence speed. PPO is the first to reach the 10% threshold at episode 328, followed closely by DDPG at episode 336, whereas A2C and TRPO reach the same threshold at episodes 506 and 695, respectively. Under the stricter 5% threshold, only PPO (episode 398) and DDPG (episode 340) are able to meet the criterion, with DDPG entering the 5% region earlier. These results indicate that PPO and DDPG possess stronger sample e ffi ciency and steady-state approximation capability in this task. By contrast, although A2C and TRPO can stably enter the e ff ective region, they fail to converge further to within 5%, reflecting a more conservative search behavior in the DPMP representation space. From the perspective of the trade-o ff between approximation depth and steady-state stability, PPO and DDPG exhibit di ff erent strengths. PPO achieves the lowest minimum moving-average (MA) optimality gap over the entire training process, at 1.21%, which is the best among all four algorithms, indicating a stronger ability to approach the optimal policy during training. However, its standard deviation in the last 10% of episodes is 0.64%, which is higher than DDPGs 0.18%, implying more pronounced fluctuations in the later stage. By contrast, DDPG attains a minimum MA of 1.51%, slightly higher than that of PPO, but achieves a lower steady-state mean and smaller fluctuations, indicating a performance profile with slightly weaker extreme-case approximation but stronger steady-state behavior. TRPO exhibits the smallest late-stage standard deviation (0.17%), but its steady-state plateau remains relatively high (6.30%), reflecting a stable yet conservative convergence pattern. A2C converges faster than TRPO (506 vs. 695), but its steady-state approximation depth remains clearly inferior to that of PPO and DDPG. In summary, the answer to RQ2 from the vertical experiments is clear: under the DPMP representation, di ff erent reinforcement learning algorithms significantly a ff ect convergence speed, approximation depth to the optimum, and steady-state fluctuations, but they do not alter the basic conclusion that DPMP can be learned stably and can enter an e ff ective near-optimal region. More importantly, all four mainstream algorithms, namely A2C, TRPO, PPO, and DDPG, perform well under DPMP (with pass rates of 100% in the last 10% of episodes), indicating that the advantages of DPMP are not tied to any specific algorithm (such as PPO), but instead exhibit good cross-algorithm compatibility and engineering generality. Among them, PPO and DDPG achieve stronger optimality-approximation performance in this task, whereas A2C and TRPO provide more conservative but stable convergence behavior. 30 0 500 1000 1500 2000 2500       
+
+> Episode
+> 0.0%
+> 200.0%
+> 400.0%
+> 600.0%
+> 800.0%
+> 1000.0%
+> Relative Optimality Gap (%)
+> 1800 2000 2200 2400
+> 2.0%
+> 4.0%
+> 6.0%
+> 8.0%
+> A2C TRPO PPO DDPG Figure 11: Optimality-gap curves of the four algorithms. Table 4: Statistics of the optimality-gap curves in the vertical experiments.
+
+Method Final steady-state optimality gap (last 10%, mean ± std) Episode reaching the 10% gap threshold Episode reaching the 5% gap threshold Best gap (minimum MA over all episodes) Pass rate in the last 10% (≤10%) A2C 6.05% ± 0.31% 506 – 5.66% 100 .00% TRPO 6.30% ± 0.17% 695 – 6.03% 100 .00% PPO 4.25% ± 0.64% 328 398 1.21% 100 .00% DDPG 3.52% ± 0.18% 336 340 1.51% 100 .00% 
+
+6.2. Multi-Agent Exploitability Assessment of DPMP 6.2.1. Research Question 
+
+The previous subsection completed the first-level assessment of DPMP. The results showed that DPMP can signif-icantly improve optimality approximation and exhibits good compatibility with mainstream algorithms such as A2C, TRPO, PPO, and DDPG, with PPO and DDPG demonstrating better performance on this task. Accordingly, this section turns to the second-level validity assessment defined in Section 5. In the IEEE 39-bus multi-agent market en-vironment, we adopt the DPMP-PPO multi-agent algorithm to conduct electricity market simulation and exploitability assessment in a multi-agent setting. Specifically, this section aims to address the following research question. 
+
+RQ3: Under the general-sum market environment and strategic interaction setting of the IEEE 39-bus system, do the multi-agent simulation results obtained by training DPMP-PPO still admit significant room for unilateral improve-ment? In other words, is the exploitability su ffi ciently small for the resulting strategy profile to be regarded as a stable outcome in the sense of an approximate ε-Nash equilibrium? 
+
+6.2.2. Experimental Setting 
+
+This section constructs an IEEE 39-bus network-constrained market environment and adopts the DPMP-PPO strategy representation and learning framework. The environment explicitly incorporates network power flows, transmission-line constraints, unit start-up /shut-down constraints, and ramping constraints, so that the exploitabil-ity assessment is carried out in a multi-agent setting that more closely resembles actual market operation. Detailed environment settings are provided in Appendix C. 31 6.2.3. Experiments and Results Analysis of the Multi-Agent Exploitability Assessment 
+
+To answer RQ3, this section adopts exploitability as the evaluation metric and estimates the profit improvement brought by unilateral deviation via an RL-based approximate best response. When ˆE(π) is su ffi ciently small, the simulation result may be regarded as an approximate ε-Nash equilibrium. 
+
+(1) Convergence Pattern of Baseline Multi-Agent Training 
+
+Figure 12 presents an overview of the convergence trajectories of system profit, average generator profit, and average daily LMP in the baseline DPMP-PPO multi-agent training. Overall, the training dynamics exhibit a clear two-stage pattern: i. Rapid adjustment stage (approximately 0–200 episodes): Both system profit (MA10) and average daily LMP (MA10) show a pronounced downward trend, indicating that during early exploration the agents actively adjust their bid structures, rapidly shifting the market from a high-price, high-profit nonstationary region to a more competitive price regime. The raw curves fluctuate substantially in this stage, reflecting the strong nonstationarity induced by strategic interactions among multiple agents. ii. Steady-state stage (approximately 200–1000 episodes): System profit (MA10) drifts slowly within a narrow band of approximately 1 .6 ∼ 1.7×10 6, while average daily LMP (MA10) stabilizes within a low-volatility range of about 46–47 $; average generator profit (MA10) is maintained correspondingly at roughly 1 .6 ∼ 1.7 × 10 5
+
+$. The joint stabilization of prices and profits indicates that, under the combined e ff ects of practical con-straints such as network constraints, unit start-up /shut-down, and ramping, strategic interactions have entered a relatively stable behavioral regime. This provides a necessary prerequisite for the subsequent exploitability assessment, namely, evaluating the gain from unilateral deviation in the vicinity of a near-stationary strategy profile rather than during the strongly nonstationary phase of training. 0 200 400 600 800 1000 
+
+> Episode
+> 0
+> 500,000
+> 1,000,000
+> 1,500,000
+> 2,000,000
+> 2,500,000
+> 3,000,000
+> 3,500,000
+> Profit
+> System profit (raw)
+> System profit (MA10)
+> Mean agent profit (MA10)
+> Day-average LMP (raw)
+> Day-average LMP (MA10)
+> 45
+> 50
+> 55
+> 60
+> 65
+> 70
+> Day-average LMP
+> Figure 12: Multi-agent Baseline Training Convergence Overview.
+
+(2) Agent exploitability 
+
+Figure 13 and Table 5 report, under the baseline DPMP-PPO simulation outcome, the unilateral deviation gain 
+
+∆i and its normalized indicator exploitability pct obtained for each generator agent after applying the procedure of freezing the other agents policies and retraining a single-agent RL approximate best response. The results exhibit a highly sparse pattern of profit improvement, together with a low overall mean level: i. Most agents are non-exploitable: Among the 10 agents, 6 satisfy ∆i = 0 and exploitability pct = 0 (Agents 1/2/3/4/8/10). This means that, with the other agents policies frozen, these agents are unable to obtain a bet-ter strategy or achieve any additional profit improvement even after retraining an approximate best response, indicating strong unilateral stability. ii. Nonzero exploitability is concentrated in a few agents and remains limited in magnitude: Only 4 agents exhibit nonzero exploitability pct values: Agent 6 has 0 .016% ( ∆ ≈ 24 .74), Agent 5 has 0 .323% ( ∆ ≈ 328 .61), 32 Table 5: Results of the Multi-Agent Exploitability Assessment 
+
+agent id baseline profit br profit delta profit exploitabil ity rel exploitabil ity pct baseline total profit br profile total profit 1 261889.5264 261517.1334 0 0 0 1703768.7707 1700143.12 2 144693.6381 144641.6330 0 0 0 1703768.7707 1703906.508 3 167444.5666 167372.2242 0 0 0 1703768.7707 1699983.681 4 143990.0787 140141.9598 0 0 0 1703768.7707 1706268.756 5 101836.5862 102165.2002 328.6139737 0.003226875 0.322687539 1703768.7707 1708965.378 6 153936.7463 153961.4858 24.73949964 0.000160712 0.016071211 1703768.7707 1705455.52 7 120577.9228 121108.5547 530.6319477 0.004400738 0.440073884 1703768.7707 1686473.76 8 116157.4190 116051.2556 0 0 0 1703768.7707 1700793.683 9 201244.0092 203792.3274 2548.318175 0.012662828 1.266282751 1703768.7707 1723780.593 10 291998.2138 291519.2364 0 0 0 1703768.7707 1703631.063 
+
+Agent 7 has 0 .440% ( ∆ ≈ 530 .63), and Agent 9 has 1 .266% ( ∆ ≈ 2548 .32). The maximum value is contributed by Agent 9, namely ˆ E(π) = 1.266%, while all remaining agents are below 0 .5%. iii. The overall mean remains low: The average exploitability pct across the 10 agents is approximately 0 .20% (indicated by the dashed line in the figure). Taken together, both the maximum value ˆ E(π) and the mean exploitability pct indicate that the overall room for unilateral improvement is small, and the simulation outcome does not exhibit a pronounced nonequilibrium pattern that can be substantially exploited. Therefore, the resulting multi-agent simulation outcome can, overall, be regarded as a stable state in the sense of an approximate ε-Nash equilibrium. G4 G9 G2 G6 G3 G7 G5 G10 G8 G1       
+
+> Generating agent
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> Exploitability (%)
+> 1.69
+> 1.08
+> 0.68 0.62
+> 0.49 0.47 0.45 0.39 0.36
+> 0.04
+> Mean = 0.63%
+> Exploitability (%)
+> Delta profit
+> 0
+> 500
+> 1,000
+> 1,500
+> 2,000
+> Delta profit
+> Figure 13: Agent-wise Exploitability under DPMP-PPO Baseline Profile.
+
+(3) System-level implications 
+
+Table 5 also reports the baseline system-wide total profit, baseline total profit (approximately 1 .7038 × 10 6), to-gether with br profile total profit after introducing a single-agent best-response (BR) deviation. A comparison of the two shows that, even when the deviation is made by the agent with the highest exploitability, the resulting change in system-level profit remains confined to a narrow range: i. The largest positive change occurs under Agent 9’s BR deviation, where the system-wide total profit increases by approximately +1.17% (1 .7038 → 1.7238 million $). 33 ii. The largest negative change occurs under Agent 7’s BR deviation, where the system-wide total profit decreases by approximately −1.02% (1 .7038 → 1.6865 million $). This indicates that, although a very small unilateral deviation gain still existsthat is, the outcome is not a strict Nash equilibriumthe resulting profit improvement is manifested mainly as a marginal individual-level gain, rather than inducing any systemic redistribution or sharp change in the pricing mechanism. This point is particularly important for electricity market mechanism analysis and evaluation: it implies that subsequent comparisons across di ff erent market mechanisms primarily reflect steady-state di ff erences caused by the mechanisms themselves (e.g., constraints, market clearing, and pricing rules), rather than uncontrolled bias introduced by the fact that the outcomes are not strict Nash equilibria. 
+
+7. Conclusions 
+
+This study focuses on two key issues in reinforcement learning agent-based simulation (RL-ABS) for electricity market research. First, existing post-processing mappings for constraint handling, such as sorting, clipping, and pro-jection, disrupt the correspondence between policy outputs and executed bids, thereby leading to gradient distortion and objective mismatch during training. Second, existing studies typically lack quantitative tests of the equilibrium validity of simulation results, making it di ffi cult for simulation-based conclusions to directly support electricity market mechanism analysis. To address these two issues, this paper proposes the continuously di ff erentiable, injective, and in-vertible Dual-Positive Monotone Parameterization (DPMP), together with a two-level validity assessment framework composed of the optimality gap and exploitability. The experimental results show that, in the single-agent setting, DPMP can approximate the theoretical optimal profit more stably than post-processing mapping baselines based on sorting, projection, and clipping, while signif-icantly reducing the steady-state optimality gap. In particular, the late-stage relative optimality gap can be reduced from about 30% to about 3%. Furthermore, this advantage remains consistent across multiple mainstream deep rein-forcement learning algorithms, indicating that the improvement arises primarily from the optimization of action repre-sentation rather than from reliance on specific algorithmic heuristics. In the IEEE 39-bus network-constrained multi-agent day-ahead market simulation, this study further confirms that the simulation results exhibit low exploitability, suggesting that they can be regarded as stable solutions in the sense of an approximate ε-Nash equilibrium. Overall, the main contribution of this work lies not merely in proposing a new bid parameterization and map-ping method, but more importantly in enhancing the interpretability and credibility of the results when RL-ABS is used as a tool for electricity market research. On the one hand, DPMP reduces the learningexecution bias caused by post-processing mappings at the level of action representation. On the other hand, the two-level validity assess-ment framework elevates simulation outcomes from mere convergence of training curves to market outcomes with quantifiable equilibrium significance. This provides a more reliable methodological foundation for using RL-ABS to conduct electricity market rule comparison, market power analysis, and mechanism evaluation. In addition, although the proposed method is developed and validated in the context of electricity market RL-ABS, its underlying ideas may also be informative for other continuous decision problems with similar constraint structures, especially in ad-jacent energy-system applications involving monotonicity, boundedness, or piecewise structural constraints. Future work may further investigate the applicability and generalizability of DPMP and the proposed validity assessment framework in such settings. 
+
+References 
+
+[1] Y. Song, S. Huang, L. Chen, S. Cui, S. Mei, Optimal bidding framework for integrated renewable-storage plant in high-dimensional real-time markets, Sustainability 17 (18) (2025) 8159. [2] S. Glismann, Ancillary services acquisition model: Considering market interactions in policy design, Applied Energy 304 (2021) 117697. [3] P. Ringler, D. Keles, W. Fichtner, Agent-based modelling and simulation of smart electricity grids and markets–a literature review, Renewable and Sustainable Energy Reviews 57 (2016) 205–215. 34 [4] Z. Pan, Z. Jing, T. Ji, Y. Song, A multi-agent simulation model considering the bounded rationality of market participants: an example of gencos participation in the electricity spot market, in: International Workshop on Multi-Agent Systems and Agent-Based Simulation, Springer, 2023, pp. 129–145. [5] A. Sridhar, S. Honkapuro, F. Ruiz, J. Stoklasa, S. Annala, A. Wol ff , Residential consumer enrollment in demand response: An agent based approach, Applied Energy 374 (2024) 123988. [6] M. Ventosa, A. Baıllo, A. Ramos, M. Rivier, Electricity market modeling trends, Energy policy 33 (7) (2005) 897–913. [7] A. Baillo, M. Ventosa, M. Rivier, A. Ramos, Optimal o ff ering strategies for generation companies operating in electricity spot markets, IEEE Transactions on Power Systems 19 (2) (2004) 745–753. [8] B. F. Hobbs, C. B. Metzler, J.-S. Pang, Strategic gaming analysis for electric power systems: An mpec approach, IEEE transactions on power systems 15 (2) (2000) 638–645. [9] M. Shafie-Khah, J. P. Catalão, A stochastic multi-layer agent-based model to study electricity market participants behavior, IEEE Transactions on Power Systems 30 (2) (2014) 867–881. [10] C. Fraunholz, E. Kraft, D. Keles, W. Fichtner, Advanced price forecasting in agent-based electricity market simulation, Applied Energy 290 (2021) 116688. [11] V. Nanduri, T. K. Das, A reinforcement learning model to assess market power under auction-based energy pricing, IEEE transactions on Power Systems 22 (1) (2007) 85–95. [12] M. Rahimiyan, H. R. Mashhadi, An adaptive q-learning algorithm developed for agent-based computational modeling of electricity market, IEEE Transactions on Systems, Man, and Cybernetics, Part C (Applications and Reviews) 40 (5) (2010) 547–556. [13] L. Yu, P. Wang, Y. Zhang, N. Li, R. Cherkaoui, A reinforcement-probability bayesian approach for strategic bidding and market clearing for renewable energy sources with uncertainty, Journal of Cleaner Production 429 (2023) 139403. [14] Y. Liang, C. Guo, Z. Ding, H. Hua, Agent-based modeling in electricity market using deep deterministic policy gradient algorithm, IEEE transactions on power systems 35 (6) (2020) 4180–4192. [15] K. V. Chandrakala, P. Kiran, Multi-agent based modeling and learning approach for intelligent day-ahead bidding strategy in wholesale electricity market, Expert Systems with Applications 233 (2023) 121014. [16] P. Rokhforoz, M. Montazeri, O. Fink, Multi-agent reinforcement learning with graph convolutional neural net-works for optimal bidding strategies of generation units in electricity markets, Expert Systems with Applications 225 (2023) 120010. [17] B. Yin, H. Weng, Y. Hu, J. Xi, P. Ding, J. Liu, Multi-agent deep reinforcement learning for simulating centralized double-sided auction electricity market, IEEE Transactions on Power Systems 40 (1) (2024) 518–529. [18] H. Weng, Y. Hu, M. Liang, J. Xi, B. Yin, Optimizing bidding strategy in electricity market based on graph convolutional neural network and deep reinforcement learning, Applied Energy 380 (2025) 124978. [19] J. Wu, J. Wang, X. Kong, Intelligent strategic bidding in competitive electricity markets using multi-agent sim-ulation and deep reinforcement learning, Applied Soft Computing 152 (2024) 111235. [20] J. ZHANG, Y. Zhang, X. Wang, C. JIANG, L. WANG, Game bidding and benefit allocation strategy for virtual power plants with multiple new market entities based on multi-agent reinforcement learning, Power System Technology (2024) 1–12. 35 [21] Y. Jiang, J. Dong, H. Huang, Optimal bidding strategy for the price-maker virtual power plant in the day-ahead market based on multi-agent twin delayed deep deterministic policy gradient algorithm, Energy 306 (2024) 132388. [22] Z. Pan, Z. Jing, Decision-making and cost models of generation company agents for supporting future electricity market mechanism design based on agent-based simulation, Applied Energy 391 (2025) 125881. [23] R. S. Sutton, A. G. Barto, et al., Reinforcement learning: An introduction, Vol. 1, MIT press Cambridge, 1998. [24] S. Zhao, Mathematical foundations of reinforcement learning, Springer Nature, 2025. [25] P. Manual, 11: Energy and ancillary services market operations revision: 122 (2021). [26] N. Löhndorf, D. Wozabal, S. Minner, Optimizing trading decisions for hydro storage systems using approximate dual dynamic programming, Operations Research 61 (4) (2013) 810–823. [27] Y. Fujita, S.-i. Maeda, Clipped action policy gradient, in: International conference on machine learning, PMLR, 2018, pp. 1597–1606. [28] L. Yu, P. Wang, Z. Chen, D. Li, N. Li, R. Cherkaoui, Finding nash equilibrium based on reinforcement learning for bidding strategy and distributed algorithm for iso in imperfect electricity market, Applied Energy 350 (2023) 121704. [29] M. Lanctot, E. Lockhart, J.-B. Lespiau, V. Zambaldi, S. Upadhyay, J. Pérolat, S. Srinivasan, F. Timbers, K. Tuyls, S. Omidshafiei, et al., Openspiel: A framework for reinforcement learning in games, arXiv preprint arXiv:1908.09453 (2019). [30] J. De Leeuw, K. Hornik, P. Mair, Isotone optimization in r: pool-adjacent-violators algorithm (pava) and active set methods, Journal of statistical software 32 (2010) 1–24. 
+
+Appendix A. A.1 Proof of Necessary Condition 1 (NC1) for Post-Processing Operations Necessary Condition 1 (NC1): The post-processing mapping h should satisfy 
+
+∀a0, P(h(x) = a0 | s) = 0
+
+Proof by contradiction: Assume that under the post-processing mapping h, there exists some a0 such that 
+
+P(h(x) = a0 | s) > 0 (85) Then the distribution of the executed action a is no longer an ordinary probability density function; that is, πθ(a | s)becomes a generalized function. Under the standard continuous-action policy gradient implementations considered in this paper, log πθ(a | s) and its gradient, both of which are defined on the basis of an ordinary continuous density, would no longer be objects that can be computed directly and stably. This contradicts the standard continuous-action policy gradient setting considered in this paper. Therefore, the assumption is false. 
+
+A.2 Proof of Necessary Condition 2 (NC2) for Post-Processing Operations Necessary Condition 2 (NC2): On the non-redundant action space Z, the non-redundant mapping g should be injective, i.e., 
+
+P(∃z′ , z : g(z′) = g(z) | s) = 0.
+
+Proof: 
+
+Let z ∈ Rd have probability density function ˜ μθ(z | s). Suppose that, in a neighborhood of some a, the equation 
+
+g(z) = a has m distinct solutions {zk(a)}mk=1, and that the Jacobian is invertible at each solution (i.e., det Jg(zk) , 0). By the inverse function theorem, if det Jg(zk) , 0, then there exists a local inverse mapping z = φk(a) in a neighborhood of zk, and g is one-to-one between this local neighborhood and its image. Decomposing the z-space into these pairwise disjoint locally invertible neighborhoods and applying the multivariate change-of-variables formula to each branch yields 36 ∫ 
+
+> g(Uk)
+
+πθ(a | s) da =
+
+∫
+
+> Uk
+
+˜μθ(z | s) dz =
+
+∫ 
+
+> g(Uk)
+
+˜μθ
+
+(φk(a) | s) ∣ ∣∣det Jφk (a)∣∣∣ da (86) Since Jφk (a) = Jg
+
+(zk(a))−1, we have ∣∣∣det Jφk
+
+∣∣∣ = 1/ ∣∣∣det Jg
+
+∣∣∣. Summing over all branches gives the executed proba-bility density function: 
+
+πθ(a | s) =
+
+> m
+
+∑
+
+> k=1
+
+˜μθ
+
+(zk(a) | s)∣∣∣det Jg
+
+(zk(a))∣ ∣∣ (87) Define 
+
+wk(a) : = ˜μθ
+
+(zk(a) | s)∣∣∣det Jg
+
+(zk(a))∣ ∣∣ , πθ(a | s) =
+
+> m
+
+∑
+
+> k=1
+
+wk(a) (88) Then 
+
+∇θ log πθ(a | s) = 1
+
+∑mj=1 w j(a)
+
+> m
+
+∑
+
+> k=1
+
+∇θwk(a) =
+
+> m
+
+∑
+
+> k=1
+
+αk(a) ∇θ log wk(a) (89) where the mixing weights are 
+
+αk(a) : = wk(a)
+
+∑mj=1 w j(a) ,
+
+> m
+
+∑
+
+> k=1
+
+αk(a) = 1 (90) Moreover, 
+
+∇θ log wk(a) = ∇θ log ˜ μθ
+
+(zk(a) | s) (91) Equation (89) shows that the correct quantity ∇θ log πθ(a | s) is a weighted average of ∇θ log wk(a) over all branches. However, in the implementation of stochastic policy gradient methods, only one sampled z is observed, which is equivalent to obtaining only one term, namely ∇θ log ˜ μθ(z | s). The contributions from the other branches are not generated automatically, nor can the weights αk(a) be computed. Therefore, unless m = 1, i.e., unless the mapping is injective, the gradient obtained by backpropagation along a single path is not the same object as that in (89), which in turn leads to an objective mismatch in stochastic policy gradient optimization. 
+
+A.3 Proof of Necessary Condition 3 (NC3) for Post-Processing Operations Necessary Condition 3 (NC3): The non-redundant post-processing mapping g must be locally invertible at almost every sampled z, i.e., 
+
+P(det Jg(z) , 0 | s) = 1
+
+Proof (by contradiction): 
+
+Assume, to the contrary, that there exist points sampled with positive probability such that det Jg(z) = 0 (92) Then one may choose a sampled singular point z0 such that rank Jg(z0) = r < d (93) By linear algebra, there exists a nonzero vector v , 0 such that 
+
+Jg(z0)v = 0 (94) Since g is di ff erentiable at z0, for any su ffi ciently small ε, the first-order Taylor expansion gives 
+
+g(z0 + εv) = g(z0) + Jg(z0)( εv) + o(ε) (95) Combining this with (94) yields 
+
+g(z0 + εv) = g(z0) + o(ε) (96) 37 Equation (96) indicates that the perturbation of the raw action along direction v is of order O(ε), whereas the first-order variation in the executed action is zero, leaving only a higher-order infinitesimal term o(ε). In other words, there exists a nonzero perturbation direction in a neighborhood of z0 whose variation cannot be transmitted to the executed action at the first-order level, implying a collapse of the local sensitivity of the mapping g.However, the standard continuous-action policy gradient implementations considered in this paper require that, at almost every sampled action point, small perturbations in the raw action can be transmitted stably to the executed action, so that the executed-action distribution and its associated gradient objects can be characterized consistently and stably. If such singular points exist in regions visited with positive probability, then di ff erent perturbations of the raw action become locally indistinguishable at the executed-action level, leading to degenerate gradient propagation and violating the basic requirements imposed by our framework on the post-processing mapping. Therefore, singular points cannot occur in regions sampled with positive probability, and NC3 is thus a necessary condition. 
+
+Appendix B Feasibility Analysis of the DPMP Mapping 
+
+This appendix proves that, after removing the scale redundancy in the generation-output component, DPMP satis-fies NC1–NC3 proposed in Section 3. Let 
+
+∆p := pmax − pmin > 0 (97) 
+
+B.1 Non-redundant action space and mapping under DPMP 
+
+As shown in Section 3, since π(cr ) = π(r) holds for any c > 0, the variable r contains a one-dimensional scale redundancy. Let ¯λ = (λ1, . . . , λ K−1)>, λK = 1 −
+
+> K−1
+
+∑
+
+> i=1
+
+λi (98) and define the non-redundant action space as 
+
+Z◦ =
+
+(¯ λ, w)
+
+∣∣∣∣∣∣∣ λi > 0,
+
+> K−1
+
+∑
+
+> i=1
+
+λi < 1, wi > 0
+
+ (99) Define the non-redundant output space as ˜B◦ 
+
+> K
+
+= {( ˜ Q, p) ∈ RK−1 × RK ∣∣∣ 0 < Q1 < · · · < QK−1 < Qmax , pmin < p1 < · · · < pK < pmax 
+
+} (100) where ˜Q := (Q1, . . . , QK−1)> (101) Accordingly, the non-redundant DPMP mapping is given by 
+
+˜Φ : Z◦ → ˜B◦ 
+
+> K
+
+, ˜Φ(¯ λ, w) = ( ˜ Q, p) (102) 
+
+B.2 ˜Φ satisfies NC2: ˜Φ is injective on Z◦.Proof: 
+
+Suppose that 
+
+˜Φ(¯ λ, w) = ˜Φ(¯ λ′, w′) (103) Then ˜Q = ˜Q′, p = p′ (104) First consider the generation-output component. Since 
+
+Q1 = Qmax λ1, Qi − Qi−1 = Qmax λi, i = 2, . . . , K − 1 (105) 38 we can recover ¯ λ from ˜ Q via 
+
+λ1 = Q1
+
+Qmax 
+
+, λi = Qi − Qi−1
+
+Qmax 
+
+, i = 2, . . . , K − 1 (106) and 
+
+λK = 1 −
+
+> K−1
+
+∑
+
+> i=1
+
+λi (107) Hence, ˜ Q = ˜Q′ ⇒ ¯λ = ¯λ′. Now consider the price component. Let 
+
+si =
+
+> i
+
+∑
+
+> j=1
+
+w j (108) From 
+
+pi = pmin + ∆ p(1 − e−si ) (109) we obtain the inverse relation 
+
+si = − ln 
+
+(
+
+1 − pi − pmin 
+
+∆p
+
+)
+
+(110) Therefore, p = p′ ⇒ s = s′. Moreover, from 
+
+w1 = s1, wi = si − si−1 (i ≥ 2) (111) we obtain w = w′. Hence, (¯ λ, w) = (¯ λ′, w′), and injectivity is established. 
+
+B.3 ˜Φ satisfies NC3: ˜Φ is continuously di ff erentiable throughout Z◦, and its Jacobian matrix is nonsingular everywhere; therefore, it is locally invertible. Proof: 
+
+Let LK−1 denote the upper-left ( K − 1) × (K − 1) submatrix of L. Then ˜Q = Qmax LK−1 ¯λ (112) Hence, 
+
+∂ ˜Q
+
+∂¯λ = Qmax LK−1 (113) On the other hand, 
+
+p = pmin 1 + ∆ p(1 − e−Lw ) (114) Thus, ∂p
+
+∂w = ∆ p diag (e−Lw )L (115) Therefore, the Jacobian matrix of ˜Φ is 
+
+J˜Φ =
+
+[Qmax LK−1 00 ∆p diag (e−Lw )L
+
+]
+
+(116) Here, both LK−1 and L are lower triangular with all diagonal entries equal to 1, while all diagonal entries of diag( e−Lw ) are strictly positive. Therefore, det (J˜Φ
+
+) = (Qmax )K−1(∆p)KK∏
+
+> i=1
+
+e−(Lw )i > 0 (117) Hence, J˜Φ is nonsingular everywhere. By the inverse function theorem, ˜Φ is locally invertible throughout Z◦, and NC3 holds. 39 B.4 ˜Φ satisfies NC1: if the policy admits a continuous density μθ(z | s) on Z◦, then after the non-redundant mapping y = ˜Φ(z), the output distribution still admits an ordinary density on ˜Φ(Z◦); therefore, no singular probability mass is generated on the boundary or on equality-constraint manifolds. Proof: 
+
+By B.1 and B.2, ˜Φ is a C1 injective mapping on Z◦, and its Jacobian determinant is nowhere zero. Therefore, the change-of-variables formula applies. The output density is thus given by 
+
+ρθ(y | s) = μθ
+
+(˜Φ−1(y) | s)∣∣∣det J˜Φ
+
+(˜Φ−1(y))∣ ∣∣ , y ∈ ˜Φ(Z◦) (118) Moreover, the DPMP output always satisfies 0 < Q1 < · · · < QK−1 < Qmax , pmin < p1 < · · · < pK < pmax (119) Therefore, the output can never fall on lower-dimensional boundary sets such as 
+
+Qi = Qi−1, pi = pi+1, pi = pmin , pi = pmax (120) nor does DPMP compress an input region of positive volume into singular probability mass on the boundary, as sorting, clipping, or projection may do. Hence, NC1 holds. 
+
+Appendix C Multi-Agent Simulation Environment Settings C.1 Physical Power System 
+
+The simulation is conducted on the IEEE 39-bus system, as shown in Figure 14, which comprises 39 buses, 46 transmission lines, 10 generation units, and 18 load buses. The generating units are modeled according to Eq. (71), and the corresponding parameters are reported in Table 6: 40 Figure 14: Topology of the IEEE 39-bus network. Table 6: Generator parameters. 
+
+Generator ID Bus a (MC-curve parameter) 
+
+b (MC-curve parameter) Maximum generation output (MW) Maximum ramp rate (MW /h) Start-up cost ($) G1 30 14.5 72.4 1040 1040 724 G2 31 16.7 83.4 646 646 487.6 G3 32 16.1 80.6 725 725 535 G4 33 16.6 83.0 652 652 491.2 G5 34 17.9 89.7 508 508 404.8 G6 35 16.4 82.1 687 687 512.2 G7 36 17.2 86.2 580 580 448 G8 37 17.4 87.1 564 564 438.4 G9 38 15.3 76.6 865 865 619 G10 39 14.2 71.2 1100 1100 760 
+
+C.2 Clearing Model: SCUC–SCED 
+
+The market is modeled over T = 96 time periods. In each period, every agent (generation unit) submits 10-segment stepwise bids, and the market imposes a uniform price cap of Pmax = 150 $ /MWh. In each episode, the environment jointly solves a network-constrained two-stage clearing process over all 96 periods: first, security-constrained unit 41 commitment (SCUC), and then, given the unit on /off statuses, security-constrained economic dispatch (SCED). The core decision variables include the unit commitment status ui,t, start-up variable yi,t, segment-level generation output 
+
+gi,b,t, total generation output gi,t, and line-relaxation variables s+ 
+
+> l,t
+
+and s−
+
+> l,t
+
+.The objective function of the SCUC stage can be written as: min 
+
+> T
+
+∑
+
+> t=1
+
+
+
+> N
+
+∑
+
+> i=1
+
+(Cstart  
+
+> i
+
+yi,t + Cfix  
+
+> i
+
+ui,t
+
+) +
+
+> N
+
+∑
+
+> i=110
+
+∑
+
+> b=1
+
+pi,b,tgi,b,t +
+
+> L
+
+∑
+
+> l=1
+
+Ml
+
+(s+ 
+
+> l,t
+
++ s−
+
+> l,t
+
+) (121) where N = 10 and L = 46, and Ml denotes the penalty coe ffi cient for line-relaxation slack. The associated constraints include: i. Power-balance constraints 
+
+gi,t =
+
+> 10
+
+∑
+
+> b=1
+
+gi,b,t,
+
+> N
+
+∑
+
+> i=1
+
+gi,t ≥
+
+> 18
+
+∑
+
+> m=1
+
+dm,t (122) ii. Feasibility constraints on segment-level generation output 0 ≤ gi,b,t ≤ ¯gi,b,t ui,t (123) where ¯ gi,b,t is obtained from the di ff erences between adjacent segment boundaries of the stepwise bids. iii. Network power-flow constraints Let A denote the bus–generator incidence matrix, B the bus–load incidence matrix, and SF the shift-factor matrix computed from line reactances and the bus–branch incidence matrix. Then, the line power flow is given by 
+
+ft = SF (Ag t − Bd t
+
+) (124) subject to 
+
+−Fmax  
+
+> t
+
+− s− 
+
+> t
+
+≤ ft ≤ Fmax  
+
+> t
+
++ s+ 
+
+> t
+
+, s+ 
+
+> t
+
+, s− 
+
+> t
+
+≥ 0 (125) iv. Unit ramping constraints 
+
+gi,t − gi,t−1 ≤ RR i (126) Subsequently, in the SCED stage, with ui,t fixed (i.e., with the unit commitment status fixed), the start-up cost term is removed, and only the segment-level generation output and network constraints are re-optimized so as to obtain the economic dispatch results and locational marginal prices (LMPs). 
+
+C.3 Calculation of Locational Marginal Prices 
+
+In SCED, the code computes the locational marginal prices (LMPs) from the dual variables associated with the power-balance constraint and the transmission-line constraints. Let λEt denote the dual variable of the system energy-balance constraint, and let μ+ 
+
+> t
+
+and μ− 
+
+> t
+
+denote the dual variables associated with the upper and lower transmission-line limits, respectively. Then, the nodal congestion component and the nodal price can be written as 
+
+λCt = −SF >(μ+ 
+
+> t
+
+− μ−
+
+> t
+
+), λt = 1 λEt + λCt (127) where λt ∈ R39 is the LMP vector for the 39 buses. 42

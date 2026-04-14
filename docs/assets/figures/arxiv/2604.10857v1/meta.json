@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10857v1/fig-001.webp",
+      "caption": "Figure 1: Informative window on the hypercube warm-up family (ρ = 0.2). The signal concentrates near a single smoothing scale and narrows as d grows; the width scales as 1/ √ d, confirming the predicted d−1/2 rate. See Appendix E for the precise definition of the proxy.",
+      "page": 7,
+      "index": 1,
+      "width": 970,
+      "height": 429
+    }
+  ]
+}

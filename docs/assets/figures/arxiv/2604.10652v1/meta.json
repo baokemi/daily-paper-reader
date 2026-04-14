@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10652v1/fig-001.webp",
+      "caption": "Figure 3: Our “Multi-problem Pre-train, then Single-problem Fine-tune” framework with Federated Learning (MPSF-FL) for VRPs, taking MVMoE as a model example. The G and {E1, E2, E3, E4} in the figure represent the gating network and expert network in the mixture-ofexpert moudle of MVMoE, which handles different problem features.",
+      "page": 4,
+      "index": 1,
+      "width": 802,
+      "height": 612
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10652v1/fig-002.webp",
+      "caption": "Table 3: Client-side performance comparison in data-scarce scenario.",
+      "page": 7,
+      "index": 2,
+      "width": 1052,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10652v1/fig-003.webp",
+      "caption": "Table 2: Client-side adaptation performance comparison for Cada on 1K test instances. The best performance is highlighted in bold, and the second-best is underlined.",
+      "page": 7,
+      "index": 3,
+      "width": 1052,
+      "height": 345
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10652v1/fig-004.webp",
+      "caption": "Table 1: Client-side performance comparison for MVMoE on 1K test instances. The best performance is highlighted in bold, and the second-best is underlined.",
+      "page": 6,
+      "index": 4,
+      "width": 1050,
+      "height": 358
+    }
+  ]
+}

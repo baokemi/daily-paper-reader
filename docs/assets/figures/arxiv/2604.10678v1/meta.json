@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-001.webp",
+      "caption": "Table III COMPARISON OF THE AVERAGE MAXIMUM ACCURACY OF DIFFERENT METHODS FOR SOCIAL BOT DETECTION ON DATASET TWIBOT-20 (%).",
+      "page": 11,
+      "index": 1,
+      "width": 1054,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-002.webp",
+      "caption": "Table II COMPARISON OF THE AVERAGE MAXIMUM ACCURACY OF DIFFERENT METHODS FOR SOCIAL BOT DETECTION ON DATASET VENDOR-19 (%).",
+      "page": 11,
+      "index": 2,
+      "width": 1046,
+      "height": 295
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-003.webp",
+      "caption": "Figure 2. Visualization of data heterogeneity. The darker color means more training samples with a label available to the client.",
+      "page": 10,
+      "index": 3,
+      "width": 1053,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-004.webp",
+      "caption": "Figure 4. Hyperparameter Sensitivity (𝛾, 𝜏, 𝜇) of FedACK on Vendor-19 under diferent data heterogeneity settings (𝛼).",
+      "page": 13,
+      "index": 4,
+      "width": 1048,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-005.webp",
+      "caption": "Figure 5. Learning Curve of (a-b) Vendor-19 and (c-d) TwiBot-20 in 100 communication rounds in different 𝛼 settings.",
+      "page": 13,
+      "index": 5,
+      "width": 1054,
+      "height": 251
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-006.webp",
+      "caption": "Figure 1. The proposed FEDRIO framework.",
+      "page": 4,
+      "index": 6,
+      "width": 1076,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10678v1/fig-007.webp",
+      "caption": "Figure 3. Loss dynamics during training under different data consistency parameters and loss functions.",
+      "page": 12,
+      "index": 7,
+      "width": 1057,
+      "height": 435
+    }
+  ]
+}

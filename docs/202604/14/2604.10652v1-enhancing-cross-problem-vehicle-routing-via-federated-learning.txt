@@ -1,0 +1,479 @@
+Title: Enhancing Cross-Problem Vehicle Routing via Federated Learning
+
+URL Source: https://arxiv.org/pdf/2604.10652v1
+
+Published Time: Tue, 14 Apr 2026 01:16:54 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+## Enhancing Cross-Problem Vehicle Routing via Federated Learning 
+
+Xiangchi Meng 1∗ , Jianan Zhou 2∗ , Jie Gao 3 , Yifan Lu 1
+
+Yaoxin Wu 4 , Gonglin Yuan 1 , Yaqing Hou 11Dalian University of Technology 
+
+> 2
+
+Nanyang Technological University 
+
+> 3
+
+Delft University of Technology 
+
+> 4
+
+Eindhoven University of Technology 
+
+Abstract 
+
+Vehicle routing problems (VRPs) constitute a core optimization challenge in modern logistics and sup-ply chain management. The recent neural combi-natorial optimization (NCO) has demonstrated su-perior efficiency over some traditional algorithms. While serving as a primary NCO approach for solv-ing general VRPs, current cross-problem learning paradigms are still subject to performance degrada-tion and generalizability decay, when transferring from simple VRP variants to those involving dif-ferent and complex constraints. To strengthen the paradigms, this paper offers an innovative “Multi-problem Pre-train, then Single-problem Fine-tune” framework with Federated Learning (MPSF-FL). This framework exploits the common knowledge of a federated global model to foster efficient cross-problem knowledge sharing and transfer among lo-cal models for single-problem fine-tuning. In this way, local models effectively retain common VRP knowledge from up-to-date global model, while be-ing efficiently adapted to downstream VRPs with heterogeneous complex constraints. Experimental results demonstrate that our framework not only en-hances the performance in diverse VRPs, but also improves the generalizability in unseen problems. 
+
+1 Introduction 
+
+Vehicle Routing Problems (VRPs) serve as a cornerstone of combinatorial optimization, exerting a profound influence on the efficiency of modern logistics, e-commerce, and supply chain management [Cattaruzza et al. , 2017; Konstantakopou-los et al. , 2022]. In recent years, Neural Combinatorial Op-timization (NCO) has emerged as a transformative paradigm for addressing VRPs. Deep learning-based neural solvers are capable of generating near-optimal solutions at a computa-tional cost significantly lower than that of traditional heuris-tics or exact algorithms, while possessing competitive solu-tions [Kwon et al. , 2020; Li et al. , 2021; Kim et al. , 2022; Luo et al. , 2023; Gao et al. , 2024; Ma et al. , 2025]. 
+
+> ∗Equal contribution.
+
+Notwithstanding these remarkable achievements, exist-ing methodologies typically train neural solvers for specific VRPs in isolation, necessitating training a new model from scratch for every problem type. Consequently, neural solvers learned for one VRP are often discarded when confronted with new variants, leading to scarce transferable knowledge and unnecessarily high training costs. In response, a re-cent Cross-Problem Learning (CPL) paradigm has been pro-posed to facilitate parameter transfer using generic compo-nents (a.k.a. the backbone) of Transformer networks [Lin et al. , 2024]. The backbone trained on the Traveling Salesman Problem (TSP) captures transferable knowledge that, when fine-tuned on other VRPs, yields improved convergence and performance relative to training from scratch. However, the aforementioned CPL postulates knowledge transfer from a single simple VRP (e.g. TSP, CVRP), thus constraining its transferability to similar problem variants and hindering its few-shot performance. More specifically, the efficacy of CPL deteriorates significantly when transferring from simple VRPs to those with multiple constraints. As illustrated in Figure 1, when a neural solver is transferred from CVRP to more complex variants such as VRPLTW, OVRPLTW, OVRPBTW, VRPBLTW and OVRPBLTW via CPL, its performance is similar to that of solvers trained from scratch with randomly initialized parameters. In con-trast, neural solvers trained on 6 different VRPs consistently yield much lower objective gaps. Hence some unified neu-ral solvers trained on multiple VRPs have applied fine-tuning to enhance their few-shot results [Zhou et al. , 2024a; Berto 
+
+et al. , 2025]. On the other hand, fine-tuning on VRP vari-ants under traditional CPL paradigms may risk overfitting to variant-specific constraints, which erodes the backbone’s shared knowledge and impairs generalization. Figure 2 il-lustrates that after fine-tuning a (pre-trained) unified neural solver on OVRPB, its ability to generalize to other VRP vari-ants deteriorates, leading to inferior zero-shot performance compared to the original unified solver. To further strengthen CPL of unified neural solvers, this work aims to leverage the common knowledge from a global model as implicit guidance to simultaneously enhance the fine-tuning of neural solvers for different VRPs. As such, each neural solver can gain better performance for the corre-sponding VRP and retain good generalizability across other VRP variants. We propose a “Multi-problem Pre-train, then      
+
+> arXiv:2604.10652v1 [cs.AI] 12 Apr 2026 VRPLTW OVRPLTW OVRPBTW VRPBLTW OVRPBLTW
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> Gap (%)
+> 4.55
+> 5.63
+> 11.64
+> 10.25
+> 11.52
+> 3.24
+> 4.61
+> 10.33
+> 9.88
+> 10.48
+> 2.41
+> 3.00
+> 8.30 7.89
+> 8.53
+> Learn from scratch
+> Learn from CVRP model
+> Learn from 6VRPs model
+
+Figure 1: Performance comparison of CPL. Neural solvers (with identical neural architectures) trained on CVRP and 6 VRPs are fine-tuned on VRPLTW, OVRPLTW, OVRPBTW, VRPBLTW, OVRP-BLTW, respectively. These VRP variants are described in Section 3.1. CVRP 
+
+> OVRP
+> VRPB
+> VRPL
+> VRPTW
+> OVRPTW
+> OVRPB
+> OVRPL
+> VRPBL
+> VRPBTW
+> VRPLTW
+> OVRPBL
+> OVRPBTW
+> OVRPLTW
+> VRPBLTW
+> OVRPBLTW
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> Gap (%)
+> Pretrained Unified Model
+> CPL on OVRPB from Pretrained Unified Model
+
+Figure 2: Generalization performance decay when a pre-trained uni-fied model is fine-tuned by CPL on OVRPB. 
+
+Single-problem Fine-tune” with Federated Learning (MPSF-FL), a novel CPL framework that relies on a federated global model to enhance the fine-tuning of local neural solvers, even without explicit data sharing between clients (i.e. lo-cal VRPs). The ties-merging strategy is further adopted to addresses the parameter confliction caused by multi-task ag-gregation, thereby comprehensively raising the performance of local neural solvers. Our contributions are summarized as follows: 1) We propose MPSF-FL, a federated learning-based CPL framework, by which local neural solvers are simultane-ously fine-tuned by employing knowledge from a feder-ated global model updated via aggregating local solvers. 2) We adopt a ties-merging strategy to facilitate the aggre-gation of the federated global model , and therefore fur-ther enhances the performance of local neural solvers. 3) We apply MPSF-FL to two unified neural solvers (MV-MoE and CaDA), which demonstrates improved perfor-mance and generalizability in 10 diverse VRPs. It shows advantage over traditional CPL fine-tuning for each lo-cal VRP and the fine-tuning on all VRPs. 
+
+2 Related Work 
+
+2.1 Neural VRP solvers 
+
+A predominant NCO paradigm for solving VRPs is construc-tive neural solvers that focus on learning solution generation policies in an end-to-end manner. Vinyals et al. [2015] pio-neered the pointer network to construct TSP solutions via an autoregressive way. Bello et al. [2017] introduced reinforce-ment learning (RL) to explore superior approximate solutions for TSP. Nazari et al. [2018] extended this method to CVRP. Afterward, Kool et al. [2019] proposed the attention model (AM), adapting the Transformer architecture to solve vari-ous VRP variants independently. Exploiting solution symme-tries, Kwon et al. [2020] proposed policy optimization with multiple optima (POMO), which improved AM performance on TSP and CVRP. Most following constructive solvers have been developed upon POMO [Kwon et al. , 2021; Grinsztajn 
+
+et al. , 2023; Bi et al. , 2024; Hottung et al. , 2025; Huang et al. , 2025; Liao et al. , 2025]. However, these methods re-quire training a model from scratch for each specific problem, leading to limited knowledge transfer and unnecessarily high training costs. Lin et al. [2024] proposed the CPL paradigm to reuse knowledge captured by a backbone trained on TSP, but overlooked the fact that unified models exhibit stronger transfer learning capabilities, as discussed in the Introduction. 
+
+2.2 Unified Models for VRPs 
+
+A unified model aims to solve diverse problems by jointly learning multiple VRP variants, thereby avoiding unneces-sary separate training efforts. Zhou et al. [2024a] proposed MVMoE, a multi-task model with mixture-of-experts that im-proves solution accuracy on heterogeneous tasks through the decoupling and collaboration of expert modules. Goh et al. 
+
+[2025] proposed SHIELD, a model integrating sparsity and hierarchy principles on top of MVMoE to boost both effi-ciency and generalization. Berto et al. [2025] utilized Trans-former encoder and global attribute embeddings to enhance VRP representation capabilities. Pan et al. [2015] introduced a state-decomposable Markov decision process (SDMDP) alongside a mixture-of-specialized-experts solver (MoSES). Differently, Li et al. [2025] introduced the constraint-aware dual-attention (CaDA) model for overcoming the limitations of constraint-agnostic approaches. Despite their promising performance, unified neural solvers still exhibit limited ef-fectiveness when fine-tuned on an unseen VRP variant using CPL [Zhou et al. , 2024b; Li et al. , 2025]. This paper aims to enhance CPL performance via federated learning that simul-taneously trains neural solvers across multiple VRP variants. 
+
+2.3 Federated Learning 
+
+To address data privacy concerns, McMahan et al. [2017] es-tablished the federated learning paradigm, enabling decen-tralized clients to collaboratively train a global model without sharing their own data. However, in real-world, data distribu-tions across clients are often Non-IID. To address this chal-lenge, Smith et al. [2017] introduced the federated multi-task learning (FMTL) framework, which treats each client as a dis-tinct task. Li et al. [2020] proposed adding a proximal term to the local objective function to constrain the deviation of local updates from the global model, thereby addressing both sta-tistical and system heterogeneity. Follow-up works mainly address Non-IID client data distributions, enabling hetero-geneous individual clients to leverage global knowledge for meeting specific task requirements [Fallah et al. , 2020; Sat-tler et al. , 2020; Morafah et al. , 2023; Wang et al. , 2023; Zhou 
+
+et al. , 2024b; Wang et al. , 2024; Hu et al. , 2025]. 3 Preliminaries 
+
+3.1 VRP Formulation and Variants 
+
+A basic capacitated vehicle routing problem (CVRP) is de-fined on a graph G = ( V, E), comprising a depot node v0 and 
+
+n customer nodes {v1, . . . , v n}. Each node is associated with a Euclidean coordinate vector, and each customer vi features a demand δi. The objective is to minimize the total trajec-tory distance of all vehicles with capacity c. A feasible so-lution π consists of K routes that start and end at the depot, visit each customer exactly once while satisfying the capac-ity constraint such that the total demand within each route of vehicle k does not exceed c, i.e., P  
+
+> vj∈πk
+
+δj ≤ c. Based on CVRP, this paper explores 4 additional constraints commonly involved in recent unified models [Liu et al. , 2024; Zhou et al. , 2024a; Li et al. , 2025]. Combinations of these constraints lead to 6 simple VRP variants and 10 complex variants. The constraints are defined as follows: • Open VRP (O-VRP): Unlike CVRP, vehicles do not re-turn to the depot after serving the last customer on the route, upon which their routes terminate immediately. • VRP with Backhauls (VRP-B): Customer nodes are classified as linehaul customers, with demand δi > 0,requiring deliveries from the depot, and backhaul cus-tomers, with demand δi < 0, requiring the collection of 
+
+|δi| goods to be returned to the depot. • VRP with Duration Limit (VRP-L): The total trajec-tory distance of every vehicle must adhere to a preset maximum limit L.• VRP with Time Windows (VRP-TW): Arrival at each customer vi must be within a time window [ei, l i], where 
+
+ei and li are the earliest and latest start time. Besides, serving a customer requires a duration si.
+
+3.2 Basics for Unified Neural Solvers 
+
+Constructing VRP solutions follows a Markov decision pro-cess (MDP). In the NCO field, the policy is typically parame-terized by a Transformer with parameters θ. During solution construction, it infers the probability distribution over nodes based on the current state, including static features of the VRP instance and dynamic features of the current partial solution. The probability of generating a route π is formulated by: 
+
+pθ (π|G ) = 
+
+> T
+
+Y
+
+> t=1
+
+pθ (πt|G , π <t ) (1) where πt denotes the node selected at time step t, and π<t 
+
+denotes the partial route constructed up to time step t. The REINFORCE algorithm [Williams, 1992] is often employed to optimize the policy, with gradients defined below: 
+
+∇θ L(θ|G ) = Epθ (π|G ) [( L(π) − b(G)) ∇θ log pθ (π|G )] (2) where L(π) represents the distance of the generated route π
+
+for instance G, and b(G) is a baseline function used to reduce the variance of the gradient estimation. Current unified neu-ral solvers employ the above basics to train the Transformer across multiple VRPs. E.g., MVMoE trains a unified neu-ral solver on six VRPs by extending the Transformer with mixture-of-experts [Zhou et al. , 2024b]. 
+
+4 Methodology 
+
+4.1 Overall MPSF-FL Framework 
+
+As illustrated in Figure 3, the “Multi-problem Pre-train, then Single-problem Fine-tune” framework with Federated Learn-ing (MPSF-FL) represents a distributed collaborative system composed of a central server and multiple clients. Specifi-cally, N local clients, indexed by N = {1, . . . , N }, represent different local VRP variants (e.g., arising from practical de-livery scenarios) participating in the federated learning. Each client i possesses a private dataset local Di following a spe-cific distribution for a local VRP, with a data size |D i|. A uni-fied neural solver is distributed to each client for fine-tuning it on local VRPs, respectively. After fine-tuning, the central server, responsible for aggregating local neural solvers and thus extracting common knowledge to a global model, aims to collaboratively minimize a global loss function: 
+
+min  
+
+> θ
+
+F (θ) = 
+
+> N
+
+X
+
+> i=1
+
+piLi(θ) (3) where θ signifies parameters of the global model, pi indi-cating the importance weight for client i, typically set to    
+
+> |D i|
+> PNj=1 |D j|
+
+, and Li(θ) is the loss function of client i used for fine-tuning on its local dataset Di. By distributing global model, collecting local gradients and aggregating parame-ters of local solvers, the server optimizes the objective to ac-quire cross-problem general knowledge. More specifically, the MPSF-FL process is divided into two phases: Multi-problem Pre-train and Single-problem Fine-tune , elabo-rated below. 
+
+4.2 Multi-problem Pre-train 
+
+As discussed in Introduction, the traditional CPL postu-lates knowledge transfer from a single simple VRP (TSP or CVRP) [Lin et al. , 2024], which performs inferior to CPL using a unified neural solver. Therefore, we instanti-ate the global model by a unified neural solver such as MV-MoE [Zhou et al. , 2024a] with parameters θ0. The learn-ing objective of this phase is to capture general VRP repre-sentations by training the global model on M simple VRPs 
+
+Tpre = {T1, . . . , T M }. The server centrally minimizes the expected loss across the VRPs: 
+
+θ0 = arg min 
+
+> θM
+
+X
+
+> m=1
+
+EG∼P m [L(θ|G )] (4) where Pm denotes the instance distribution of the m-th VRP. Given a unified neural solver, we employ the REINFORCE algorithm to minimize the loss and simultaneously involves associated techniques to enhance the performance, such as the balancing loss for the mixture of experts in MVMoE. Af-ter multi-problem pre-training, the global model is updated to obtain a unified solver capable of solving the trained VRPs as well as unseen VRPs with combinations of constraints drawn from the trained problems. The pre-trained global model po-tentially captures common knowledge such as local structure and route connectivity, offering an effective inductive bias for subsequent fine-tuning on VRPs of clients. Simple Task Training 
+
+> （e.g. CVRP, OVRP... ）
+> Phase 2 ：Federated Learning
+> Initialization
+
+Server 
+
+> Multi-task Model Merging
+> Server Model
+
+Clients 
+
+> Client 1: Task A (e.g. OVRPB,...) Phase 1 ：Pre-training
+> Generalist Experts
+> Client Model
+> Specialist Experts
+> Client Models Set
+> Local Finetune
+> Private Local Data
+> Broadcast Parameters Upload Model Updates
+
+# ...  
+
+> Client k: Task B (e.g. VRPBTW,...)
+> Client Model
+> Specialist Experts
+> Local Finetune
+> Private Local Data linehaul backhaul
+> Broadcast Parameters
+> time window
+> linehaul backhaul
+> Trim
+> Disjoint Merge
+> Elect Sign Get Pre-trained Model
+> with Common Knowledge
+
+Figure 3: Our “Multi-problem Pre-train, then Single-problem Fine-tune” framework with Federated Learning (MPSF-FL) for VRPs, taking MVMoE as a model example. The G and {E1, E 2, E 3, E 4} in the figure represent the gating network and expert network in the mixture-of-expert moudle of MVMoE, which handles different problem features. 
+
+4.3 Single-problem Fine-tune 
+
+This phase serves not only as a mechanism for distributed training but also as a critical implicit regularizer. Its objective is to coordinate the fine-tuning on respective VRPs of clients, while protecting data privacy, while preventing generalizabil-ity decay and potential overfitting to every specific VRP. The training process of this phase consists of three main steps: 1) Global Initialization: The central server distributes the global model’s parameters θ0 to all N clients, which share common knowledge obtained from pre-training phase. As such, all clients start their fine-tuning from a well pre-trained backbone. 2) Local CPL: In each communication round t, server se-lect K clients to obtain the set of clients St participating in this round. Then the selected clients St receive the global parameters θt from the server. Then, each client 
+
+k performs fine-tuning on its local VRPs with private dataset Dk for a total of E epochs: 
+
+θt,e +1  
+
+> k
+
+← θt,e k − η∇L k(θt,e k |D k) (5) where e is the current epoch, η is the local learning rate, and Lk denotes the loss function for the local VRP. 3) Global Aggregation: The server collects updated model parameters from all clients. An aggregation oper-ator Agg (·) is performed to update the global model: 
+
+θt+1 ← Agg ({θt+1  
+
+> k
+
+}k∈St ) (6) Given the parameter conflicts and redundancy issues that may arise from simple federated averaging in multi-task federated learning scenarios [Yadav et al. , 2023; Yu et al. , 2024], we specialize Agg (·) for local neural solvers of VRPs in Section 4.4. The algorithm for this phase is presented in Algorithm 1. 
+
+4.4 Model Merging for Global Aggregation 
+
+Simple model merging strategies, such as parameter averag-ing, can produce task-specific gradients that cancel each other out, causing the global model to stagnate along conflicting dimensions. This, in turn, weakens its capability to adapt to complex, task-specific constraints and dilutes the truly effec-tive shared knowledge. To address these issues, we extend ties-merging [Yadav et al. , 2023] strategy that relies on a core hypothesis: During multi-task fine-tuning, only a small frac-tion of parameters undergo significant and effective changes, and the update directions of different tasks on the same pa-rameter dimension should remain consistent to avoid destruc-tive interference. Following [Ilharco et al. , 2023], we define the problem vector of client k as τk = θt+1  
+
+> k
+
+− θt. We perform global aggregation by three sequential steps: Algorithm 1 Multi-Task Federated Learning on VRPs 
+
+Input : Pre-trained server model θ0; Set of N clients with private datasets {D 1, . . . , DN }
+
+Parameter : Client selection ratio C; Local training epochs 
+
+E; Local learning rate η; Balancing loss parameter α; Total communication rounds T
+
+Output : Set of client models {θT 
+
+> 1
+
+, . . . , θ TN } 
+
+> 1:
+
+Initialize global model with pre-trained parameters θ0. 
+
+> 2:
+
+for t = 0 , 1, . . . , T − 1 do  
+
+> 3:
+
+Server:  
+
+> 4:
+
+K ← max( C · N, 1)  
+
+> 5:
+
+St ← Randomly select K clients  
+
+> 6:
+
+Broadcast global model parameters θt to all selected clients St 
+
+> 7:
+
+for each client k ∈ St in parallel do  
+
+> 8:
+
+Client k: 
+
+> 9:
+
+Initialize local model θtk ← θt 
+
+> 10:
+
+for e = 1 , . . . , E do  
+
+> 11:
+
+Compute gradient g ← ∇ θ L(θtk; Dk) 
+
+> 12:
+
+θt,e +1  
+
+> k
+
+← θt,e k − ηg  
+
+> 13:
+
+end for  
+
+> 14:
+
+Send θt+1  
+
+> k
+
+to Server  
+
+> 15:
+
+end for  
+
+> 16:
+
+Server:  
+
+> 17:
+
+θt+1 ← Aggregate ({θt+1  
+
+> k
+
+}k∈St ) 
+
+> 18:
+
+end for  
+
+> 19:
+
+return {θT 
+
+> 1
+
+, . . . , θ TN }
+
+1) Trim: To address parameter redundancy, we first spar-sify the update vector of each client. For vector τk, we retain the top κ% parameters with the largest absolute values and set the remaining parameters to zero, result-ing in ˆτk. In this regard, we filter out random noise dur-ing fine-tuning and underscore parameter adjustments that are most critical to the specific VRP of client k.2) Sign Voting: Due to parameter conflicts, it is neces-sary to determine the dominant direction for updating the global model. Given each parameter dimension j,we aggregate directions of update vectors ˆτ jk from all participating clients. The final sign γj is defined by: 
+
+γj = sgn X
+
+> k∈St
+
+ˆτ jk
+
+!
+
+(7) where sgn (·) is the sign function with sgn (x) · | x| = x.This step ensures that the global update direction com-plies with the majority of local update directions. 3) Disjoint Merge: For each dimension j, we calculate the mean only for clients whose update direction is consis-tent with the selected sign γj . Updates contrary to the dominant direction are considered interference and set to zero. Formally, we define Aj = {k ∈ St | sgn (ˆ τ jk ) = 
+
+γj } and the merged vector dimension j is calculated as: 
+
+τ j = 1
+
+|A j |
+
+X
+
+> k∈A j
+
+ˆτ jk (8) Given the merged problem vector τ , it is added back to the initial parameter values scaled by a hyperparameter λ, result-ing in the final model parameters: θt+1 = θt + λ · τ .
+
+5 Experiments 
+
+We conduct empirical evaluations to verify the superiority of our proposed MPSF-FL framework. First, we perform global pre-training on 6 simple VRPs, including CVRP, OVRP, VRPB, VRPL, VRPTW, and OVRPTW. Subsequently, we carry out fine-tuning on 10 VRP variants characterized by complex constraints, including OVRPB, OVRPL, VRPBL, VRPBTW, VRPLTW, OVRPBL, OVRPBTW, OVRPLTW, VRPBLTW, and OVRPBLTW. In other words, each client performs fine-tuning on one of the 10 problem variants. In Section 5.1, we applied MPSF-FL by taking MVMoE as the global model with its data generation approach [Zhou et al. ,2024a], while in Section 5.2, we applied using CaDA with its generated data [Li et al. , 2025]. All experiments were conducted on a computing platform equipped with Intel(R) Xeon(R) Gold 5120 CPUs @ 2.20GHz and NVIDIA Tesla V100-SXM2-32GB GPUs. 
+
+Baselines. We employed PyVRP solver [Wouda et al. ,2024] based on HGS-CVRP [Vidal, 2022] and the Google OR-Tools [Furnon and Perron, 2023] for benchmarking. For problem scales n = 50 and n = 100 , we set time limits of 20 seconds and 40 seconds, respectively. We also applied 200 and 400 seconds in OR-Tools, denoted as OR-Tools (x10). To validate the effectiveness of MPSF-FL, we compared with 
+
+MVMoE-CPL /CaDA-CaDA that applied CPL on each sin-gle VRP of client using the pre-trained global model. Be-sides, we also compared a centralized multi-task fine-tuned model MVMoE-MTF to validate the performance of MPSF-FL on trained problem. It was fine-tuned the pre-trained global model on a mixture of datasets from all 10 complex VRP variants, though access to all datasets is often imprac-tical in real-world settings due to data privacy concerns. All baselines undergo the same pre-training on 6 VRPs. 
+
+Training. During the pre-training phase, we follow all ex-perimental settings and configurations of the unified neural solver used as the global model. For MVMoE, all mod-els undergo 5,000 epochs of global pre-training on a simple task set; while for CaDA, the training epoch is set to 300. During the fine-tuning phase, for MVMoE, the Adam pti-mizer [Loshchilov and Hutter, 2017] is used with a learning rate of 1e−5, according to the MVMoE’s training parameters in the final stage and avoid overfitting in the training process, a weight decay of 1e − 6, a batch size of 128 and 20,000 instances for each epoch. The training process involves two problem scales, N ∈ { 50 , 100 }. For MVMoE-CPL, we fine-tuned the pre-trained model with 100 epochs on each complex task, ultimately obtaining 10 models tailored to specific com-plex tasks respectively. For MVMoE-MTF, we selected the total number of rounds used by all 10 clients in our MPSF-FL, which equals 1,000 ( 100 × 10 ). In the fine-tuning phase of MPSF-FL, we set the number of communication rounds to 20, with each client performing 5 local epochs per round. This results in a total of 100 local training epochs, ensuring consistency with the independent fine-tuning baseline. The Table 1: Client-side performance comparison for MVMoE on 1K test instances. The best performance is highlighted in bold, and the second-best is underlined. Method n = 50 n = 100 Method n = 50 n = 100                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+> Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap OVRPB  OR-Tools 5.764 0.332% 10.155 1.020% 8.522 1.852% 16.931 2.279% OVRPL  OR-Tools 6.522 0.480% 10.071 1.003% 9.966 1.783% 16.770 2.286% OR-Tools (x10) 5.745 *10.036 *8.365 *16.542 *OR-Tools (x10) 6.490 *9.953 *9.790 *16.383 *MVMoE-pretrain 6.092 5.999% 10.640 5.788% 8.959 7.088% 17.465 5.706% MVMoE-pretrain 6.650 2.454% 10.578 6.181% 10.097 3.148% 17.338 6.143% MVMoE-CPL 5.998 4.358% 10.656 5.833% 8.788 5.048% 17.541 6.008% MVMoE-CPL 6.633 2.192% 10.578 6.116% 10.061 2.780% 17.372 6.236% MVMoE-MTF 6.011 4.588% --8.802 5.211% --MVMoE-MTF 6.640 2.295% --10.069 2.854% --MVMoE-FL 6.008 4.545% 10.623 5.528% 8.802 5.211% 17.475 5.572% MVMoE-FL 6.637 2.251% 10.560 5.922% 10.074 2.909% 17.350 5.959%
+> VRPBL  OR-Tools 8.131 1.254% 9.892 0.917% 12.095 2.586% 16.534 2.197% VRPBTW  OR-Tools 15.053 1.857% 9.123 0.850% 26.217 2.858% 14.965 2.167% OR-Tools (x10) 8.029 *9.782 *11.790 *16.161 *OR-Tools (x10) 14.771 *9.033 *25.496 *14.638 *MVMoE-pretrain 8.172 1.777% 10.409 6.257% 11.945 1.346% 17.133 6.344% MVMoE-pretrain 16.022 8.600% 9.536 5.499% 27.236 7.078% 15.434 5.707%
+> MVMoE-CPL 8.168 1.732% 10.438 6.576% 11.939 1.298% 17.174 6.638% MVMoE-CPL 15.921 7.936% 9.600 6.406% 26.965 6.030% 15.579 7.065% MVMoE-MTF 8.181 1.893% --11.971 1.563% --MVMoE-MTF 15.900 7.789% --26.932 5.892% --MVMoE-FL 8.172 1.775% 10.412 6.205% 11.957 1.446% 17.167 6.444% MVMoE-FL 15.925 7.948% 9.533 5.406% 27.006 6.185% 15.447 5.731% VRPLTW  OR-Tools 14.815 1.432% 9.150 0.898% 25.823 2.534% 15.009 2.203% OVRPBL  OR-Tools 5.771 0.549% 10.155 0.996% 8.555 2.459% 16.927 2.211% OR-Tools (x10) 14.598 *9.052 *25.195 *14.672 *OR-Tools (x10) 5.739 *10.036 *8.348 *16.543 *MVMoE-pretrain 14.937 2.421% 9.657 6.185% 25.514 1.471% 15.625 6.330% MVMoE-pretrain 6.076 5.843% 10.641 5.805% 8.942 7.115% 17.467 5.702% MVMoE-CPL 14.924 2.328% 9.685 6.554% 25.474 1.325% 15.730 7.168% MVMoE-CPL 5.991 4.357% 10.658 5.853% 8.767 5.020% 17.545 6.007% MVMoE-MTF 14.946 2.482% --25.525 1.526% --MVMoE-MTF 6.000 4.517% --8.784 5.231% --MVMoE-FL 14.933 2.405% 9.636 5.935% 25.511 1.464% 15.600 6.098% MVMoE-FL 6.000 4.517% 10.625 5.534% 8.784 5.230% 17.477 5.565%
+> OVRPBTW  OR-Tools 8.758 0.927% 9.823 0.954% 14.713 2.268% 16.243 2.233% OVRPLTW  OR-Tools 8.728 0.656% 9.826 0.984% 14.535 1.779% 16.263 2.287% OR-Tools (x10) 8.675 *9.710 *14.384 *15.873 *OR-Tools (x10) 8.669 *9.711 *14.279 *15.884 *MVMoE-pretrain 9.486 9.308% 10.263 5.420% 15.808 9.948% 16.704 5.388% MVMoE-pretrain 8.966 3.396% 10.32 6.077% 14.828 3.903% 16.813 6.059% MVMoE-CPL 9.423 8.598% 10.315 5.967% 15.650 8.869% 16.831 6.105% MVMoE-CPL 8.937 3.067% 10.370 6.441% 14.757 3.404% 16.938 6.526% MVMoE-MTF 9.426 8.641% --15.665 8.969% --MVMoE-MTF 8.971 3.459% --14.828 3.899% --MVMoE-FL 9.428 8.650% 10.256 5.165% 15.669 9.001% 16.724 5.187% MVMoE-FL 8.951 3.226% 10.316 5.834% 14.796 3.672% 16.841 5.853%
+> VRPBLTW  OR-Tools 14.890 1.402% 9.141 0.901% 25.979 2.518% 14.991 2.205% OVRPBLTW  OR-Tools 8.729 0.624% 9.826 0.987% 14.496 1.724% 16.267 2.293% OR-Tools (x10) 14.677 *9.043 *25.342 *14.655 *OR-Tools (x10) 8.673 *9.710 *14.250 *15.888 *MVMoE-pretrain 15.945 8.775% 9.545 5.479% 27.142 7.332% 15.444 5.678% MVMoE-pretrain 9.503 9.516% 10.261 5.397% 15.671 10.009% 16.719 5.381% MVMoE-CPL 15.842 8.077% 9.606 6.363% 26.885 6.326% 15.595 7.083% MVMoE-CPL 9.451 8.925% 10.316 5.986% 15.509 8.895% 16.853 6.163% MVMoE-MTF 15.832 8.007% --26.849 6.166% --MVMoE-MTF 9.446 8.879% --15.525 8.996% --MVMoE-FL 15.852 8.149% 9.540 5.378% 26.922 6.472% 15.457 5.706% MVMoE-FL 9.445 8.868% 10.255 5.158% 15.537 9.091% 16.743 5.202%
+
+number of clients corresponds to the number of fine-tuning problems, with each client dedicated to a specific VRP, and full client participation is maintained in each round. For the ties-merging strategy, the parameter mask rate (100 − κ)% is set to 0.8, and the scaling parameter λ is fixed at 1.0.For CaDA, we fine-tune CaDA using the batch size 256 and 100,000 instances for each epoch with a learning rate of 3e −
+
+5 for two problem scales, N ∈ { 50 , 100 }. For the CaDA’s federated learning process, we maintain most of the above MPSF-FL settings, but with each client performing one local epoch per round, maintaining a training intensity similar to that used during MVMoE training. Consequently, the fine-tuning epoch of CaDA-CPL is set to 20. 
+
+Inference. To evaluate the effectiveness of MPSF-FL in balancing local specialization and global generalization, we analyze the performance of various models on specific VRPs of clients. For every client, we define two key metrics: • Trained VRPs Obj.&Gap: The performance evaluated on the VRP that a neural solver was fine-tuned on. • Unseen VRPs Obj.&Gap: The average performance evaluated on the other 9 complex VRPs that the neu-ral solver was not fine-tuned. For MVMoE-MTF, it is fine-tuned on all VRPs, so there are no unseen problems, which is indicated by “-” in Table 1. For all neural solvers, we use greedy rollout with ×8 aug-mentation following POMO [Kwon et al. , 2020]. We report average results over 1K instances per VRP. Gaps are gauged against the best results from traditional VRP solvers. 
+
+5.1 Performance Comparison 
+
+In this section, we present the results of applying MPSF-FL to MVMoE. We denote the client model of MPSF-FL as 
+
+MVMoE-FL . As shown in Table 1, our MVMoE-FL out-performed MVMoE-CPL on all unseen tasks, demonstrat-ing its significant enhancement of the local client’s general-ization capability for unseen problems. Although MVMoE-FL exhibits inferior performance to the MVMoE-CPL which is task-specialized on the trained problem, it demonstrates problem-solving capabilities comparable to the multi-task fine-tuned model MVMoE-MTF on trained problems. Across a total of 20 problem scenarios, MPSF-FL performed compa-rably to or even better than MVMoE-MTF in 12 cases. Anotable example emerges in VRPLTW ( N = 100 ), where MVMoE-FL achieves a trained gap of 1.464% and an un-seen gap of 6.098%. Compared to MVMoE-MTF’s 1.526% trained gap, this represents a 0.062% improvement, and in comparison to MVMoE-CPL’s 7.168% unseen gap, it achieves a 1.07% improvement. The above experimental results demonstrate that our MPSF-FL enables local clients to obtain models with strong multi-task generalization capabilities while achieving per-formance comparable to the multi-task fine-tuning method, while significantly safeguarding data privacy. 
+
+5.2 Versatility 
+
+Our MPSF-FL is versatile to differet unified models for VRPs. We further deploy it with CaDA [Li et al. , 2025], which achieves state-of-the-art performance in solving multi-task VRPs. Table 2 details the performance of the CaDA model under different learning paradigms. Across all VRP variants and problem scales, CaDA-FL consistently achieves a significantly lower optimality gap on unseen instances com-pared to CaDA-CPL. For instance, in VRPBL ( N = 50 ), CaDA-FL reduces the unseen gap from CaDA-CPL’s 6.238% to 1.765%, and in VRPLTW ( N = 100 ), it drops from 8.021% to 3.289%. This demonstrates that the MPSF-FL framework possesses sufficient versatility for deployments with different unified neural solvers. Moreover, CaDA-FL also excels in training adaptation, outperforming CaDA-CPL on the trained gap metric in multiple scenarios. Specifically, CaDA-FL achieves lower trained gaps in OVRPL ( N = 50 ), VRPBLTW ( N = 50 ) and OVRPBTW (both N = 50 
+
+and N = 100 ). This evidence suggests that for complex constraint-aware architectures like CaDA, the collaborative learning mechanism of FL is capable of yielding a solver that is not only more robust but also more precise in handling known constraints. Table 2: Client-side adaptation performance comparison for Cada on 1K test instances. The best performance is highlighted in bold, and the second-best is underlined. Method n = 50 n = 100 Method n = 50 n = 100 
+
+Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap OVRPB  HGS-PyVRP 6.898 * 12.297 * 10.335 * 19.457 *OVRPL  HGS-PyVRP 6.507 * 12.341 * 9.724 * 19.525 *OR-Tools 6.928 0.412% 12.322 0.418% 10.577 2.315% 19.742 2.001% OR-Tools 6.552 0.668% 12.364 0.389% 10.001 2.791% 19.806 1.948% CaDA-pretrained 7.660 10.953% 12.921 5.885% 11.237 8.659% 20.793 6.886% CaDA-pretrained 7.497 15.054% 12.940 5.429% 10.365 6.621% 20.890 7.113% CaDA-CPL 7.049 2.152% 12.871 5.206% 10.750 3.988% 20.912 6.943% CaDA-CPL 6.662 2.353% 12.949 5.452% 10.095 3.776% 20.886 6.834% CaDA-FL 7.053 2.213% 12.532 1.950% 10.767 4.148% 20.041 3.148% CaDA-FL 6.656 2.255% 12.576 1.938% 10.109 3.923% 20.126 3.271% 
+
+> VRPBL
+
+HGS-PyVRP 10.186 * 11.932 * 14.779 * 18.963 *VRPBTW  HGS-PyVRP 18.292 * 11.031 * 29.467 * 17.331 *OR-Tools 10.331 1.390% 11.944 0.309% 15.426 4.338% 19.203 1.776% OR-Tools 18.366 0.383% 11.051 0.421% 29.945 1.597% 17.590 2.081% CaDA-pretrained 10.704 4.948% 12.583 6.552% 15.625 5.644% 20.306 7.221% CaDA-pretrained 19.165 4.751% 11.643 6.574% 31.909 8.268% 18.497 6.930% CaDA-CPL 10.532 3.342% 12.573 6.238% 15.488 4.758% 20.403 7.975% CaDA-CPL 18.526 1.265% 11.565 6.148% 30.161 2.346% 18.342 6.988% CaDA-FL 10.542 3.438% 12.130 1.765% 15.509 4.897% 19.524 3.213% CaDA-FL 18.526 1.264% 11.252 2.041% 30.161 2.345% 17.875 3.335% 
+
+> VRPLTW
+
+HGS-PyVRP 16.356 * 11.247 * 25.757 * 17.743 *OVRPBL  HGS-PyVRP 6.899 * 12.297 * 10.335 * 19.457 *OR-Tools 16.441 0.499% 11.265 0.408% 26.259 1.899% 17.999 2.047% OR-Tools 6.927 0.386% 12.322 0.421% 10.582 2.363% 19.741 1.996% CaDA-pretrained 16.772 2.471% 11.909 6.827% 26.749 3.785% 19.070 7.428% CaDA-pretrained 7.709 11.641% 12.916 5.809% 11.568 11.834% 20.757 6.533% CaDA-CPL 16.669 1.892% 11.923 7.231% 26.560 3.075% 19.128 8.021% CaDA-CPL 7.052 2.190% 12.804 3.899% 10.754 4.024% 21.030 7.365% CaDA-FL 16.678 1.935% 11.456 1.948% 26.572 3.129% 18.287 3.289% CaDA-FL 7.061 2.315% 12.539 2.022% 10.766 4.142% 20.057 3.234% 
+
+> OVRPBTW
+
+HGS-PyVRP 11.669 * 11.767 * 19.156 * 19.156 *OVRPLTW  HGS-PyVRP 10.510 * 11.896 * 16.926 * 18.725 *OR-Tools 11.682 0.109% 11.794 0.451% 19.303 0.757% 18.772 2.174%, OR-Tools 10.497 -0.114% 11.926 0.476% 17.023 0.728% 19.025 2.177% CaDA-pretrained 12.145 4.026% 12.423 6.655% 20.556 7.235% 19.758 7.044% CaDA-pretrained 10.620 1.034% 12.593 6.987% 17.326 2.341% 20.117 7.588% CaDA-CPL 11.772 0.867% 12.340 6.344% 19.495 1.751% 19.325 5.517% CaDA-CPL 10.616 0.994% 12.561 6.361% 17.232 1.785% 20.111 7.273% CaDA-FL 11.769 0.848% 12.006 2.089% 19.494 1.745% 19.061 3.396% CaDA-FL 10.616 0.982% 12.153 2.192% 17.239 1.827% 19.336 3.467% 
+
+> VRPBLTW
+
+HGS-PyVRP 18.361 * 10.998 * 29.026 * 17.293 *OVRPBLTW  HGS-PyVRP 11.668 * 11.767 * 19.156 * 18.477 *OR-Tools 18.422 0.332% 11.045 0.427% 29.830 2.770% 17.602 1.951% OR-Tools 11.681 0.106% 11.794 0.452% 19.305 0.767% 18.772 2.173% CaDA-pretrained 19.554 5.163% 11.600 6.528% 32.450 8.812% 18.436 6.869% CaDA-pretrained 12.127 3.878% 12.425 6.671% 20.591 7.436% 19.754 7.022% CaDA-CPL 18.878 1.540% 11.566 6.687% 30.627 2.719% 18.468 8.259% CaDA-CPL 11.770 0.860% 12.246 5.226% 19.497 1.756% 19.297 5.151% CaDA-FL 18.870 1.494% 11.201 1.929% 30.633 2.733% 17.826 3.324% CaDA-FL 11.771 0.867% 12.013 2.152% 19.494 1.745% 19.061 3.382% 
+
+Table 3: Client-side performance comparison in data-scarce scenario. Method n = 50 n = 100 Method n = 50 n = 100 
+
+Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap Trained Obj. Trained Gap Unseen Obj. Unseen Gap OVRPB  MVMoE-CPL 6.018 4.719% 10.751 6.670% 8.783 4.986% 17.533 5.969% OVRPL  MVMoE-CPL 6.647 2.408% 10.674 6.983% 10.065 2.820% 17.373 6.251% MVMoE-FL 6.011 4.596% 10.623 5.527% 8.804 5.243% 17.467 5.547% MVMoE-FL 6.636 2.237% 10.564 5.908% 10.071 2.881% 17.340 5.919% 
+
+CaDA-CPL 7.052 2.205% 12.869 5.204% 10.764 4.119% 20.823 6.613% CaDA-CPL 6.660 2.318% 12.938 5.373% 10.100 3.829% 20.885 6.882% CaDA-FL 7.053 2.213% 12.528 1.931% 10.772 4.198% 20.058 3.246% CaDA-FL 6.665 2.397% 12.574 1.945% 10.111 3.942% 20.136 3.323% 
+
+> VRPBL
+
+MVMoE-CPL 8.178 1.865% 10.569 7.937% 11.947 1.362% 17.182 6.685% VRPBTW  MVMoE-CPL 15.935 8.049% 9.674 7.481% 27.015 6.219% 15.583 7.081% MVMoE-FL 8.174 1.809% 10.410 6.191% 11.952 1.403% 17.158 6.421% MVMoE-FL 15.929 7.974% 9.531 5.383% 27.025 6.267% 15.443 5.706% 
+
+CaDA-CPL 10.539 3.399% 12.557 6.064% 15.502 4.841% 20.411 8.416% CaDA-CPL 18.554 1.410% 11.546 6.048% 30.246 2.636% 18.341 6.974% CaDA-FL 10.546 3.470% 12.131 1.764% 15.521 4.964% 19.528 3.242% CaDA-FL 18.527 1.267% 11.247 2.004% 30.178 2.402% 17.889 3.382% 
+
+> VRPLTW
+
+MVMoE-CPL 14.924 2.339% 9.763 7.677% 25.500 1.416% 15.744 7.277% OVRPBL  MVMoE-CPL 6.008 4.652% 10.760 6.734% 8.772 5.077% 17.536 5.966% MVMoE-FL 14.942 2.460% 9.630 5.869% 25.527 1.529% 15.603 6.135% MVMoE-FL 6.000 4.521% 10.623 5.524% 8.783 5.216% 17.468 5.535% 
+
+CaDA-CPL 16.664 1.849% 11.926 7.208% 26.581 3.158% 19.271 8.897% CaDA-CPL 7.054 2.206% 12.814 4.044% 10.764 4.121% 20.920 6.856% CaDA-FL 16.674 1.917% 11.458 1.979% 26.574 3.137% 18.296 3.345% CaDA-FL 7.054 2.213% 12.535 1.987% 10.771 4.188% 20.060 3.244% 
+
+> OVRPBTW
+
+MVMoE-CPL 9.442 8.810% 10.335 6.338% 15.686 9.111% 16.816 6.069% OVRPLTW  MVMoE-CPL 8.946 3.165% 10.417 7.119% 14.775 3.534% 16.941 6.607% MVMoE-FL 9.434 8.727% 10.252 5.143% 15.678 9.064% 16.714 5.165% MVMoE-FL 8.953 3.248% 10.313 5.809% 14.802 3.706% 16.827 5.807% 
+
+CaDA-CPL 11.781 0.952% 12.301 6.073% 19.546 2.012% 19.392 5.943% CaDA-CPL 10.612 0.953% 12.577 6.366% 17.238 1.816% 20.190 7.660% CaDA-FL 11.771 0.862% 12.012 2.131% 19.500 1.777% 19.080 3.498% CaDA-FL 10.614 0.971% 12.158 2.218% 19.547 2.020% 19.094 3.518% 
+
+> VRPBLTW
+
+MVMoE-CPL 15.864 8.250% 9.672 7.320% 26.946 6.567% 15.585 6.939% OVRPBLTW  MVMoE-CPL 9.451 8.932% 10.333 6.321% 15.542 9.123% 16.831 6.027% MVMoE-FL 15.858 8.184% 9.539 5.355% 26.935 6.530% 15.453 5.677% MVMoE-FL 9.448 8.903% 10.252 5.138% 15.542 9.122% 16.726 5.140% 
+
+CaDA-CPL 18.906 1.683% 11.517 6.194% 30.759 3.151% 18.307 7.146% CaDA-CPL 11.783 0.959% 12.229 5.075% 19.547 2.013% 19.331 5.358% CaDA-FL 18.878 1.536% 11.207 1.989% 30.659 2.820% 17.832 3.345% CaDA-FL 11.772 0.876% 12.005 2.092% 19.503 1.789% 19.082 3.485% 
+
+5.3 Robustness to Data Scarcity 
+
+In many real-world scenarios, edge clients have access to only a limited number of training instances or employ only lim-ited data due to business privacy consideration. To investi-gate whether the benefits of federated learning persist under such practical constraints, we conduct experiments in a data scarcity situation where each client is restricted to 20,000 training instances. While this volume might allow for ba-sic convergence, it is significantly lower than the millions of samples typically required for full-scale VRP solver train-ing. We compare MVMoE-FL /CaDA-FL against MVMoE-CPL /CaDA-CPL baseline, respectively, to evaluate the ef-fectiveness of MTSF-FL framework. Table 3 presents the results under the data scarcity setting. Our MTSF-FL framework maintains obvious advantage. It consistently outperforms the CPL baseline on unseen gener-alization across all problem variants. More importantly, we observe a significant performance degradation in MVMoE-CPL on many trained problems with N = 50 , which fails to fit the training distribution as effectively as MVMoE-FL. This phenomenon suggests that in data scarcity setting, traditional CPL paradigm may carry the risk of getting stuck in local op-tima. In contrast, the collaborative aggregation in MVMoE-FL acts as an effective regularizer, enabling the client model to learn more generalizable common knowledge even from limited static data. 
+
+6 Conclusion and Future Work 
+
+We present a “Multi-problem Pre-train, then Single-problem Fine-tune” framework with Federated Learning, applying federated learning to address the deficiencies of traditional CPL paradigm in knowledge transfer among complex con-straints. We conducted experiments on 10 complex VRP vari-ants using state-of-the-art multi-task solvers and performed comparative evaluations under simulated data-scarcity condi-tions typical of real-world applications. Results show that our framework successfully enhances CPL ability to generalize to unseen variants, demonstrating excellent versatility and prac-ticality. Our future work will optimize the federated learning framework by conducting in-depth analysis of model param-eter distribution changes among different problems. We also intend to leverage more appropriate model merging strategy for enhancing client-side performance on trained problems and generating powerful global model in the central serve. References 
+
+Irwan Bello, Hieu Pham, Quoc V. Le, Mohammad Norouzi, and Samy Bengio. Neural combinatorial optimization with reinforcement learning. In International Conference on Learning Representations , 2017. Federico Berto, Chuanbo Hua, Nayeli Gast Zepeda, Andr´ eHottung, Niels Wouda, Leon Lan, Junyoung Park, Kevin Tierney, and Jinkyoo Park. RouteFinder: Towards Founda-tion Models for Vehicle Routing Problems. Transactions on Machine Learning Research , 2025. Jieyi Bi, Yining Ma, Jianan Zhou, Wen Song, Zhiguang Cao, Yaoxin Wu, and Jie Zhang. Learning to handle complex constraints for vehicle routing problems. In Advances in Neural Information Processing Systems , 2024. Diego Cattaruzza, Nabil Absi, Dominique Feillet, and Jes´ us Gonz´ alez-Feliu. Vehicle routing problems for city lo-gistics. EURO Journal on Transportation and Logistics ,6(1):51–79, 2017. Alireza Fallah, Aryan Mokhtari, and Asuman Ozdaglar. Per-sonalized federated learning with theoretical guarantees: A model-agnostic meta-learning approach. Advances in neu-ral information processing systems , 33:3557–3568, 2020. Vincent Furnon and Laurent Perron. Or-tools routing library, 2023. Chengrui Gao, Haopu Shang, Ke Xue, Dong Li, and Chao Qian. Towards generalizable neural solvers for vehicle routing problems via ensemble with transferrable local pol-icy. In Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence , pages 6914–6922, 2024. Yong Liang Goh, Zhiguang Cao, Yining Ma, Jianan Zhou, Mohammed Haroon Dupty, and Wee Sun Lee. Shield: Multi-task multi-distribution vehicle routing solver with sparsity and hierarchy. In Aarti Singh, Maryam Fazel, Daniel Hsu, Simon Lacoste-Julien, Felix Berkenkamp, Tegan Maharaj, Kiri Wagstaff, and Jerry Zhu, editors, Pro-ceedings of the 42nd International Conference on Ma-chine Learning , volume 267 of Proceedings of Machine Learning Research , pages 19679–19711. PMLR, 13–19 Jul 2025. Nathan Grinsztajn, Daniel Furelos-Blanco, Shikha Surana, Cl´ ement Bonnet, and Tom Barrett. Winner takes it all: Training performant rl populations for combinatorial opti-mization. Advances in Neural Information Processing Sys-tems , 36:48485–48509, 2023. Andr´ e Hottung, Mridul Mahajan, and Kevin Tierney. Polynet: Learning diverse solution strategies for neural combinato-rial optimization. In The Thirteenth International Confer-ence on Learning Representations , 2025. Gang Hu, Yinglei Teng, Pengfei Wu, and Nan Wang. Fft-moe: Efficient federated fine-tuning for foundation mod-els via large-scale sparse moe under heterogeneous edge. 
+
+arXiv preprint arXiv:2508.18663 , 2025. Ziwei Huang, Jianan Zhou, Zhiguang Cao, and Yixin Xu. Rethinking light decoder-based solvers for vehicle routing problems. In International Conference on Learning Rep-resentations , 2025. Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Wortsman, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali Farhadi. Editing models with task arithmetic. In The Eleventh Inter-national Conference on Learning Representations , 2023. Minsu Kim, Junyoung Park, and Jinkyoo Park. Sym-nco: Leveraging symmetricity for neural combinatorial opti-mization. Advances in Neural Information Processing Sys-tems , 35:1936–1949, 2022. Grigorios D Konstantakopoulos, Sotiris P Gayialis, and Evri-pidis P Kechagias. Vehicle routing problem and related al-gorithms for logistics distribution: A literature review and classification. Operational research , 22(3):2033–2062, 2022. Wouter Kool, Herke van Hoof, and Max Welling. Attention, learn to solve routing problems! In International Confer-ence on Learning Representations , 2019. Yeong-Dae Kwon, Jinho Choo, Byoungjip Kim, Iljoo Yoon, Youngjune Gwon, and Seungjai Min. Pomo: Policy op-timization with multiple optima for reinforcement learn-ing. Advances in Neural Information Processing Systems ,33:21188–21198, 2020. Yeong-Dae Kwon, Jinho Choo, Iljoo Yoon, Minah Park, Duwon Park, and Youngjune Gwon. Matrix encod-ing networks for neural combinatorial optimization. In A. Beygelzimer, Y. Dauphin, P. Liang, and J. Wortman Vaughan, editors, Advances in Neural Information Pro-cessing Systems , 2021. Tian Li, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, and Virginia Smith. Federated opti-mization in heterogeneous networks. In I. Dhillon, D. Pa-pailiopoulos, and V. Sze, editors, Proceedings of Machine Learning and Systems , volume 2, pages 429–450, 2020. Sirui Li, Zhongxia Yan, and Cathy Wu. Learning to delegate for large-scale vehicle routing. Advances in Neural Infor-mation Processing Systems , 34:26198–26211, 2021. Han Li, Fei Liu, Zhi Zheng, Yu Zhang, and Zhenkun Wang. CaDA: Cross-problem routing solver with constraint-aware dual-attention. In Forty-second International Con-ference on Machine Learning , 2025. Zijun Liao, Jinbiao Chen, Debing Wang, Zizhen Zhang, and Jiahai Wang. Bopo: Neural combinatorial optimization via best-anchored and objective-guided preference optimiza-tion. In International Conference on Machine Learning ,2025. Zhuoyi Lin, Yaoxin Wu, Bangjian Zhou, Zhiguang Cao, Wen Song, Yingqian Zhang, and Senthilnath Jayavelu. Cross-problem learning for solving vehicle routing problems. In 
+
+Proceedings of the Thirty-Third International Joint Con-ference on Artificial Intelligence , pages 6958–6966, 2024. Fei Liu, Xi Lin, Zhenkun Wang, Qingfu Zhang, Tong Xi-aliang, and Mingxuan Yuan. Multi-task learning for rout-ing problem with cross-problem zero-shot generalization. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , pages 1898–1908, 2024. Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. In International Conference on Learning Representations , 2017. Fu Luo, Xi Lin, Fei Liu, Qingfu Zhang, and Zhenkun Wang. Neural combinatorial optimization with heavy decoder: Toward large scale generalization. Advances in Neural In-formation Processing Systems , 36:8845–8864, 2023. Jiale Ma, Wenzheng Pan, Yang Li, and Junchi Yan. COEx-pander: Adaptive solution expansion for combinatorial op-timization. In Forty-second International Conference on Machine Learning , 2025. Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics , pages 1273– 1282. PMLR, 2017. Mahdi Morafah, Saeed Vahidian, Weijia Wang, and Bill Lin. Flis: Clustered federated learning via inference similarity for non-iid data distribution. IEEE Open Journal of the Computer Society , 4:109–120, 2023. Mohammadreza Nazari, Afshin Oroojlooy, Lawrence Snyder, and Martin Tak´ ac. Reinforcement learning for solving the vehicle routing problem. In Advances in Neural Informa-tion Processing Systems , page 9861–9871, 2018. Yuxin Pan, Zhiguang Cao, Liu Liu, Peilin Zhao, Yize Chen, Fangzhen Lin, et al. Multi-task vehicle routing solver via mixture of specialized experts under state-decomposable mdp. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2015. Felix Sattler, Klaus-Robert M¨ uller, and Wojciech Samek. Clustered federated learning: Model-agnostic distributed multitask optimization under privacy constraints. IEEE transactions on neural networks and learning systems ,32(8):3710–3722, 2020. Virginia Smith, Chao-Kai Chiang, Maziar Sanjabi, and Ameet S Talwalkar. Federated multi-task learning. Ad-vances in neural information processing systems , 30, 2017. Thibaut Vidal. Hybrid genetic search for the cvrp: Open-source implementation and swap* neighborhood. Comput-ers & Operations Research , 140:105643, 2022. Oriol Vinyals, Meire Fortunato, and Navdeep Jaitly. Pointer networks. Advances in neural information processing sys-tems , 28, 2015. Yansong Wang, Hui Xu, Waqar Ali, Miaobo Li, Xiangmin Zhou, and Jie Shao. Fedftha: A fine-tuning and head ag-gregation method in federated learning. IEEE Internet of Things Journal , 10(14):12749–12762, 2023. Ziyao Wang, Zheyu Shen, Yexiao He, Guoheng Sun, Hongyi Wang, Lingjuan Lyu, and Ang Li. Flora: Federated fine-tuning large language models with heterogeneous low-rank adaptations. Advances in Neural Information Processing Systems , 37:22513–22533, 2024. Ronald J Williams. Simple statistical gradient-following al-gorithms for connectionist reinforcement learning. Ma-chine learning , 8(3):229–256, 1992. Niels A Wouda, Leon Lan, and Wouter Kool. Pyvrp: A high-performance vrp solver package. INFORMS Journal on Computing , 36(4):943–955, 2024. Prateek Yadav, Derek Tam, Leshem Choshen, Colin Raffel, and Mohit Bansal. TIES-merging: Resolving interference when merging models. In Thirty-seventh Conference on Neural Information Processing Systems , 2023. Le Yu, Bowen Yu, Haiyang Yu, Fei Huang, and Yongbin Li. Language models are super mario: Absorbing abili-ties from homologous models as a free lunch. In Forty-first International Conference on Machine Learning , 2024. Jianan Zhou, Zhiguang Cao, Yaoxin Wu, Wen Song, Yining Ma, Jie Zhang, and Chi Xu. Mvmoe: Multi-task vehicle routing solver with mixture-of-experts. In International Conference on Machine Learning , 2024. Yuhao Zhou, Minjia Shi, Yuxin Tian, Yuanxi Li, Qing Ye, and Jiancheng Lv. Federated cinn clustering for accurate clustered federated learning. In ICASSP 2024-2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pages 5590–5594. IEEE, 2024.

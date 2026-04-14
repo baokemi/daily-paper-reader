@@ -1,0 +1,166 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-001.webp",
+      "caption": "Figure 3: Conceptual illustration of sorting.",
+      "page": 11,
+      "index": 1,
+      "width": 897,
+      "height": 320
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-002.webp",
+      "caption": "Table 3: Statistics of optimality-gap curves in the horizontal experiments",
+      "page": 29,
+      "index": 2,
+      "width": 975,
+      "height": 260
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-003.webp",
+      "caption": "Figure 9: Profit curves of the four methods (DPMP/SORT/PROJECT/CLIP).",
+      "page": 29,
+      "index": 3,
+      "width": 508,
+      "height": 378
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-004.webp",
+      "caption": "Figure 10: Optimality-gap curves of the four methods (DPMP/SORT/PROJECT/CLIP).",
+      "page": 29,
+      "index": 4,
+      "width": 623,
+      "height": 357
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-005.webp",
+      "caption": "Table 2: Experiment grid",
+      "page": 22,
+      "index": 5,
+      "width": 975,
+      "height": 617
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-006.webp",
+      "caption": "Figure 6: DPMP-based framework for stepwise bid generation of a generator agent.",
+      "page": 14,
+      "index": 6,
+      "width": 733,
+      "height": 554
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-007.webp",
+      "caption": "Figure 1: Conceptual sketches of real-world electricity-market bids and common RL-ABS bid models.",
+      "page": 3,
+      "index": 7,
+      "width": 959,
+      "height": 599
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-008.webp",
+      "caption": "Table 5: Results of the Multi-Agent Exploitability Assessment",
+      "page": 33,
+      "index": 8,
+      "width": 970,
+      "height": 508
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-009.webp",
+      "caption": "Figure 13: Agent-wise Exploitability under DPMP-PPO Baseline Profile.",
+      "page": 33,
+      "index": 9,
+      "width": 620,
+      "height": 337
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-010.webp",
+      "caption": "Figure 7: Validity Assessment Framework for Electricity Market RL-ABS.",
+      "page": 18,
+      "index": 10,
+      "width": 733,
+      "height": 645
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-011.webp",
+      "caption": "Figure 8: Evolution of stepwise bid curves over episodes",
+      "page": 28,
+      "index": 11,
+      "width": 958,
+      "height": 733
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-012.webp",
+      "caption": "Figure 5: Conceptual illustration of projection-induced staircase behavior.",
+      "page": 13,
+      "index": 12,
+      "width": 523,
+      "height": 292
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-013.webp",
+      "caption": "Table 1: Agent bid models of previous studies.",
+      "page": 4,
+      "index": 13,
+      "width": 975,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-014.webp",
+      "caption": "Figure 2: Relationship between Agent Bid Models and Reinforcement Learning Methods.",
+      "page": 4,
+      "index": 14,
+      "width": 975,
+      "height": 266
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-015.webp",
+      "caption": "Figure 12: Multi-agent Baseline Training Convergence Overview.",
+      "page": 32,
+      "index": 15,
+      "width": 620,
+      "height": 335
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-016.webp",
+      "caption": "Figure 4: Conceptual illustrations of two clipping-based post-processing schemes.",
+      "page": 12,
+      "index": 16,
+      "width": 900,
+      "height": 328
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-017.webp",
+      "caption": "Figure 14: Topology of the IEEE 39-bus network.",
+      "page": 41,
+      "index": 17,
+      "width": 604,
+      "height": 598
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-018.webp",
+      "caption": "Table 6: Generator parameters.",
+      "page": 41,
+      "index": 18,
+      "width": 817,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-019.webp",
+      "caption": "Table 4: Statistics of the optimality-gap curves in the vertical experiments.",
+      "page": 31,
+      "index": 19,
+      "width": 975,
+      "height": 259
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10252v1/fig-020.webp",
+      "caption": "Figure 11: Optimality-gap curves of the four algorithms.",
+      "page": 31,
+      "index": 20,
+      "width": 617,
+      "height": 333
+    }
+  ]
+}

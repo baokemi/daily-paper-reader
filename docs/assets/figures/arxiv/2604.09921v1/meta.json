@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-001.webp",
+      "caption": "Figure 2: Pass@k for TLC (Tpos = 1) on LLaDA-8B-Instruct and Dream-7B-Instruct across four benchmarks. TLC closely tracks the AR baseline, recovering almost all of the diversity lost by low-confidence remasking.",
+      "page": 6,
+      "index": 1,
+      "width": 809,
+      "height": 433
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-002.webp",
+      "caption": "Figure 3: Pass@k (top) and pass@NFE (bottom) for TCT on LLaDA-8B-Instruct. Both rows plot the same data; only the metric changes (pass@k vs pass@NFE). TCT slightly underperforms AR in pass@k, but substantially outperforms it when the cost of each sample is taken into account. TCT also outperforms deterministic confidence-thresholding (FastdLLM; Wu et al. 2025) thanks to its additional source of randomness via Tpos.",
+      "page": 7,
+      "index": 2,
+      "width": 809,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-003.webp",
+      "caption": "Figure 6: TLC Tpos ablation on HumanEval with LLaDA-8B-Instruct with Ttoken = 0.8. Too little tempering (Tpos = 0.1 ) remains close to low-confidence remasking, while too much (Tpos = 2) approaches random remasking and degrades quality. Intermediate values (Tpos ∈ {0.5, 1}) strike the best balance, matching or exceeding the autoregressive baseline at high k.",
+      "page": 22,
+      "index": 3,
+      "width": 395,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-004.webp",
+      "caption": "Figure 7: Varying Ttoken for LLaDa-8B-Instruct on HumanEval.Autoregressive generation favors low temperatures, obtaining its best pass@64 at Ttoken = 0.6. Meanwhile, lowconfidence remasking scales very poorly at low token temperatures due to its greedy position selection. TLC consistently shows strong scaling and most robustness to the exact choice of Ttoken, matching or exceeding the best of autoregressive and low-confidence remasking in pass@64 at all temperatures. Moreover, it exhibits stronger scaling compared to low-confidence across all considered Ttoken, suggesting it achieves diversity through an alternative mechanism.",
+      "page": 22,
+      "index": 4,
+      "width": 809,
+      "height": 436
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-005.webp",
+      "caption": "Figure 8: Pass@k (top) and pass@NFE (bottom) for TCT on Dream-7B-Instruct. Note that both rows plot the same data, we just vary the x-axis measure (k vs NFEs). While TCT slightly underperforms AR in pass@k, it outperforms AR when the cost of each rollout is taken into account.",
+      "page": 23,
+      "index": 5,
+      "width": 809,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-006.webp",
+      "caption": "Figure 9: Test-time scaling for LLaDA-8B-Instruct in terms of Best@k (top) and Best@NFE (bottom) when using either self-consistency or an ORM for final answer selection. TCT performs worse compared to AR at higher NFEs when using self-consistency; however, when using an ORM, TCT improves the pareto frontier compared to autoregressive rollouts.",
+      "page": 23,
+      "index": 6,
+      "width": 809,
+      "height": 454
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-007.webp",
+      "caption": "Figure 4: Test-time scaling for LLaDA-8B-Instruct in terms of Best@NFE when using either self-consistency or an ORM for final answer selection. TCT performs worse compared to AR at higher NFEs when using self-consistency; however, when using an ORM, TCT improves the pareto frontier compared to autoregressive rollouts. See Figure 9 for Best@k results.",
+      "page": 8,
+      "index": 7,
+      "width": 809,
+      "height": 226
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-008.webp",
+      "caption": "Figure 1: An example illustrating our model of entropy degradation. The fork token (Definition 1) has high marginal uncertainty under the dLLM, indicating that both the numpy and statistic solutions are plausible. However, the dLLM is simultaneously overly confident in its prediction at the anchor tokens in the function body, biasing low-confidence remasking towards one solution as it reveals those tokens first. Tempered remasking allows the fork to still be revealed first, increasing semantic diversity without sacrificing parallelism. Note that while both paths lead to generations that match the prompt ( ), they have subtly different semantics ( ); sampling both is important to achieve good coverage.",
+      "page": 4,
+      "index": 8,
+      "width": 826,
+      "height": 344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-009.webp",
+      "caption": "Figure 11: Per-question answer distributions over k = 64 samples for three GSM8K questions, comparing autoregressive, Fast-dLLM, and TCT sampling. Correct answers are marked with an asterisk (*). We observe that TCT sometimes spreads mass across a wider set of candidates (left). This illustrates the higher-entropy behavior observed in Figure 10: TCT produces more diverse answers, which benefits pass@k and ORM-based selection but can hurt majority voting when the correct answer no longer dominates the distribution.",
+      "page": 24,
+      "index": 9,
+      "width": 798,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-010.webp",
+      "caption": "Figure 10: Mean empirical entropy of the per-question answer distributions (see Figure 11) as a function of the group size k. TCT consistently yields higher-entropy answer distributions than autoregressive and confidence thresholding, particularly on GSM8k.",
+      "page": 24,
+      "index": 10,
+      "width": 591,
+      "height": 209
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09921v1/fig-011.webp",
+      "caption": "Figure 5: GRPO post-training results for LLaDA-8B-Instruct on GSM8k (top) and MATH (bottom). Left: Group mean training reward. Middle: Group standard deviation of the reward. Right: evaluation accuracy under greedy decoding with confidence thresholding at varying λ. All models are trained for a fixed wall-clock budget of 72 hours; vertical dashed lines indicate the number of completed training steps for each sampler. TCT completes around twice as many training steps compared to AR due to its adaptive parallelism, maintains the highest reward diversity throughout training due to Tpos > 0, and yields evaluation performance comparable to or better than both AR and Fast-dLLM baselines.",
+      "page": 9,
+      "index": 11,
+      "width": 809,
+      "height": 346
+    }
+  ]
+}

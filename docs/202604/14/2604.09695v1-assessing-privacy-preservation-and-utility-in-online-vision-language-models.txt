@@ -1,0 +1,169 @@
+Title: Assessing Privacy Preservation and Utility in Online Vision-Language Models
+
+URL Source: https://arxiv.org/pdf/2604.09695v1
+
+Published Time: Tue, 14 Apr 2026 00:04:54 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Assessing Privacy Preservation and Utility in Online Vision-Language Models 
+
+Karmesh Siddharam Chaudhari, Youxiang Zhu, Amy Feng, Xiaohui Liang, and Honggang Zhang 
+
+Department of Computer Science University of Massachusetts Boston, MA, USA Email: {K.Chaudhari004, Youxiang.Zhu001, Xiaohui.Liang, Honggang.Zhang }@umb.edu, amyjfeng1@gmail.com 
+
+Accepted for publication in IEEE ICC 2026. © IEEE. The final version will appear in IEEE Xplore. 
+
+Abstract —The increasing use of Online Vision Language Mod-els (OVLMs) for processing images has introduced significant privacy risks, as individuals frequently upload images for var-ious utilities, unaware of the potential for privacy violations. Images contain relationships that relate to Personally Identifiable Information (PII), where even seemingly harmless details can indirectly reveal sensitive information through surrounding clues. This paper explores the critical issue of PII disclosure in images uploaded to OVLMs and its implications for user privacy. We investigate how the extraction of contextual relationships from images can lead to direct (explicit) or indirect (implicit) exposure of PII, significantly compromising personal privacy. Furthermore, we propose methods to protect privacy while preserving the intended utility of the images in Vision Language Model (VLM)-based applications. Our evaluation demonstrates the efficacy of these techniques, highlighting the delicate balance between maintaining utility and protecting privacy in online image processing environments. 
+
+Index Terms —Personally Identifiable Information (PII), Pri-vacy, Utility, privacy concerns, sensitive information 
+
+I. I NTRODUCTION 
+
+With the rapid advancement of Online Vision-Language Models (OVLMs), users increasingly upload images to these models for a wide range of tasks, including content gener-ation, visual analysis, and decision support. Prior research has shown that the widespread deployment of vision-language models in real-world domains such as education, healthcare, and communication significantly increases the surface area for potential privacy violations [1], [2]. At the same time, the best-performing OVLMs are predominantly proprietary, cloud-hosted platforms accessible only through web interfaces or APIs (e.g., GPT-5, Claude 3.5, Gemini 2.5 Pro), which limits transparency and user control. This growing reliance on OVLMs introduces substantial privacy risks, as uploaded images may inadvertently disclose Personally Identifiable In-formation (PII). Prior studies also demonstrate that modern vision-language models can infer sensitive attributes such as occupation, location, or affiliations even from seemingly innocuous images [3], [4]. Crucially, these privacy risks extend beyond explicitly identifiable elements such as faces or textual content. Sensitive information may also be inferred implicitly through contextual relationships among objects, locations, and background details within an image. Such implicit privacy leakage underscores the complexity of privacy threats in image-based interactions with VLMs, as sensitive user in-formation is often not directly observable but emerges from contextual visual cues [4], [5]. Therefore, simple objects within images, when considered in context, can reveal sensitive details that compromise pri-vacy. This phenomenon has been further validated in image-to-text privacy analysis benchmarks like WildVision, which highlight the inference risks from image context [4]. In this paper, we propose and discuss strategies, such as the removal and masking of privacy-sensitive objects, to mitigate the privacy risks in an image. While effective to some extent, these approaches introduce a fundamental trade-off: reducing the potential for PII disclosure often comes at the cost of degrading the utility of the image for its intended purpose in VLM applications. The challenge becomes even more pronounced in practical scenarios. Images are inherently complex, contain numerous objects with varied and sometimes subtle relationships to PII. Users often struggle to manually assess the privacy implica-tions of each element or understand how modifications affect utility. This lack of granularity and guidance leaves users with limited options, making it difficult for them to make informed decisions about the privacy-utility trade-off. In this paper, we propose a system that enables enhanced user control over image privacy while preserving utility. The system consists of three modules that jointly quantify privacy and utility, supporting informed trade-offs when applying removal and masking strategies. First, we leverage VLMs to analyze and measure the re-lationship between an image and PII. This method identifies not only explicitly (directly) recognizable objects/information but also implicit (indirect) patterns that may reveal sensitive information indirectly. Second, we introduce a local model that infers the utility impact of VLMs by comparing original and modified images along with their descriptions, allowing users to estimate the usefulness of images after applying privacy modifications. Finally, we develop an intuitive user interface that visualizes privacy gains and utility impacts, allowing users to make informed decisions when interacting with online VLMs. By integrating these modules, our system provides a practi-cal and user-friendly approach to balancing privacy and utility in image-based VLM applications, addressing critical gaps in 
+
+> arXiv:2604.09695v1 [cs.CV] 6 Apr 2026
+
+existing solutions. II. R ELATED WORK 
+
+Recent advancements in OVLMs have expanded their capa-bilities in understanding images, but they have also amplified concerns regarding privacy. As users upload images for various tasks, it reveals PIIs, both explicit and implicit. Privacy infer-ence research by Tmeke et al. [3] provides compelling evi-dence that vision-language models can infer sensitive attributes such as location, occupation, and interests from seemingly innocuous images, even in the absence of human subjects. Their study reports inference accuracies as high as 77.6%, and demonstrates that standard VLM safety filters can be bypassed through prompt engineering and image manipulation techniques. Similarly, Lu et al.’s WildVision benchmark [4] reveals how VLMs are prone to hallucinations and privacy leakage in real-world image settings. These findings underscore the growing concern that modern VLMsdespite their advanced capabilitiescan expose sensitive information not just from training data, but also through inference on user-generated inputs [6]–[9]. Prior approaches have explored structured privacy control through differential privacy in image feature space [7], GAN-based visual de-identification [8], and semi-adversarial methods for attribute masking [9]. This motivates the need for our proposed system, which addresses both explicit and implicit privacy risks by masking or removing potentially sensitive objects prior to uploading images to OVLMs. LLMs also present similar challenges: prior work by Carlini et al. [10], [11] has shown that these models can memorize and regenerate verbatim training data. Moreover, Mireshghallah et al. [2] highlight that even casual prompts to ChatGPT can lead to unintended PII disclosures, further emphasizing the importance of privacy-preserving mechanisms. Zhu et al. proposed a Local Privacy-Preserving Prompt Assistant (LPPA), showing that prompt rewriting and masking could significantly reduce leakage with minimal loss in utility [5]. Their approach is closely aligned with our obfuscation-based image modification technique. Li et al. proposed PAPILLON, a hybrid delegation system combining local and remote LLMs for privacy-preserving reasoning. It highlights the trade-offs in privacy and utility when the partial delegation is required for task completion [1]. More advanced approaches include DP-Image, which ap-plies differential privacy to image feature vectors [7], and Pri-vacyNet, which allows selective suppression of soft-biometric attributes in face images while preserving recognition utility [9]. These go beyond nave obfuscation and enable structured privacy control. The amplifying reliance on online VLMs for image and data processing has increased significant privacy concerns. Previous research and work has explored various aspects of privacy risks in digital images, focusing on PII exposure, mitigation strategies, and the trade-off between privacy and utility. However, existing solutions do not emphasize implicit privacy risks and often struggle to address explicit privacy risks accurately. III. S YSTEM MODEL 
+
+We propose a Privacy Preserving Assistant (PPA), a local system that runs on a user’s device. The users original prompt and uploaded image stay locally, while the modified images and prompts are sent to the OVLMs. The modified images do not contain selected objects with respect to the computed pri-vacy score based on explicit or implicit sensitive information, thus preserving privacy. However, using the modified prompt may result in a different OVLM output. To help the user choose the modified image and the prompt the PPA generates a set of metrics associated with each prompt, including privacy techniques, privacy gain, and utility impact. As shown in Fig. 1, the PPA consists of an Object Detection Module (ODM), an Analysis Module, and an User Interface Module (UIM). The object detection module aims to identify and generate multiple modified images based on user’s input task prompt and input image denoted as Iu and Ii respectively, using different modification techniques. 
+
+Explicit Privacy Risks : These occur when sensitive infor-mation is directly accessible or extractable from the PIIs in the OVLMs outputs. For each ′obj ′ identified, ODM assesses and quantifies the likelihood that it contains sensitive information which is directly extractable from the provided input image (e.g. PIIs like location) with a privacy risk score Pexp obj .
+
+Implicit Privacy Risks : These occur when sensitive infor-mation is indirectly derived or extracted from the combination of existing/available PIIs in the OVLM output. Also, these can be the result of the explicit privacy leaks, i.e. a combination of the explicit privacy leaks. The ODM module takes an input image, Ii, and an input task prompt, Iu. It detects all objects present in the image, denoted as ′obj ′. Let ′n′ represent the total number of objects detected in Ii. The object detection module is responsible for generating multiple modified images, denoted Imod i. To achieve this, the system first uses an object recognition model to detect sensitive objects in Ii based on a predefined set of privacy-sensitive categories {Imod i|1 ≤ i ≤ nsen } (e.g. location, education, occupation) and the privacy module as 
+
+fp( Ii) = {Imod i|1 ≤ i ≤ nsen }. These categories are informed by prior privacy as such as those introduced in PUPA and WildChat and advanced object-relation modeling from scene graphbased reasoning approaches like G2(visual commonsense reasoning generation method) [1], [2], [12]. The analysis module evaluates each modified image Imod i
+
+compared to the original image Ii to generate a set of metrics 
+
+{mi,j |1 ≤ j ≤ k}, where k represents the number of metrics used to analyze each prompt. The UIM provides an intuitive visualization of the modified images {Imod i|1 ≤ i ≤ nsen } and their associated metrics 
+
+{mi,j |1 ≤ j ≤ k}. Users can rank the modified prompts according to the privacy Gp or the utility impact Ui. This allows users to easily compare and select a modified image that offers the best balance between privacy preservation and utility retention. Fig. 1: PPA system IV. PPA IMPLEMENTATION 
+
+This section presents a detailed implementation of the ODM, Analysis Module, and UIM. 
+
+A. Object Detection Module 
+
+In the object detection module, we propose two modification techniques to generate modified images from the user’s origi-nal image, as shown in Fig. 2. First, we define the set of Csen 
+
+pre-defined privacy-sensitive categories {Ci|1 ≤ i ≤ Csen },including but not limited to PIIs(location, occupation, etc.) so that users can flexibly select and incorporate new sensitive categories relevant to their application of the system using the UIM. Then, based on these categories, we detect privacy-sensitive objects in the user’s original image Ii using an 
+
+object recognition model . The detected objects, belonging to category Ci, are denoted as Sobj . Finally, we apply one of the following modification techniques to mitigate privacy risks while generating a modified image Imod : 
+
+> •
+
+Remove Technique : A sensitive object Sobj is com-pletely removed from Ii. The modified image becomes: 
+
+Imod = Ii − Sobj . 
+
+> •
+
+Mask Technique : The sensitive object Sobj is visually replaced with a placeholder representing its category Ci
+
+within the image, resulting in the modified image 
+
+Imod = Ii − Sobj + Ci.
+
+In practice, object removal is implemented via region blurring to preserve visual coherence; accordingly, we treat blurring as a realizable form of object removal in our evaluation. The object detection module outputs modified images, covering the various modifications across one or all detected sensitive objects. These are aligned with traditional methods but differ from GAN-based frameworks that seek to reconstruct images with de-identified features [7], [8], which may provide higher utility in controlled settings. In this paper, we mainly focus on hiding sensitive objects to an extent where we could demonstrate the implicit privacy risk, which is not easily distinguished by humans but is measurable by a tool. 1) By using the remove technique a sensitive object from the input image Ii to reduce identifiable visual cues 
+
+Fig. 2: Object Detection Module (e.g. location indicators). While this enhances privacy, the resulting image may cause the OVLM to generate incomplete or contextually inaccurate responses due to missing content. 2) By using the mask technique a sensitive object in Ii
+
+is replaced with a neutral placeholder from category 
+
+Ci, preserving the image’s structure but concealing specific details. This can lead the OVLM to produce vague or misinterpreted outputs, as masked features may introduce ambiguity into the visual context. 
+
+B. Analysis Module 
+
+The analysis module aims to analyze the impact of mod-ifications by comparing the original and respective modified responses. The module performs the following analyses, as shown in Fig. 3: 
+
+Fig. 3: Analysis component 1) Prompt Difference : The module calculates the seman-tic/embedded similarity and the number of changes between the original prompt response denoted as Rorig 
+
+and each modified prompt response denoted as Rmod 
+
+with respect to the removal/masking of sensitive objects to show the extent of the modification. This metric echoes the prompt-level utility evaluations in LPPA [5] and delegation-based quality assessments in PAPILLON [1]. This is essential for users to understand the impact of the modification. 2) Privacy Gain: Privacy gain quantifies the reduction in sensitive information in a modified response relative to the original. It is defined as: 
+
+Gp(Rmod ) = P (Rorig ) − P (Rmod )
+
+where P (R) ∈ [0 , 1] denotes the normalized privacy leakage score of response R, computed based on the presence of PII-related content. Rorig is the response generated from the original image, and Rmod is the re-sponse after applying privacy-preserving modifications. A higher privacy gain indicates an effective privacy reduction. 3) Utility Impact: Utility impact measures the loss in response usefulness due to modification and is defined as: 
+
+Ui(Rmod ) = 1 − U (Rmod )
+
+where U (Rmod ) ∈ [0 , 1] is the embedding-based se-mantic similarity (cosine similarity between sentence embeddings) of Rorig and Rmod . Since the original re-sponse serves as the reference, its baseline similarity is defined as 1. Thus, a higher Ui(Rmod ) indicates greater degradation of the original intent or response relevance. Privacy and utility are measured using distinct metrics. These two measurements are independent but jointly characterize the privacyutility trade-off. 
+
+C. User-Interface Module: 
+
+The UIM presents key outputs from the analysis module to assist users in making informed privacyutility decisions. It visualizes the trade-offs between privacy gain and utility impact for each modified output. The original image Ii re-mains local and is never shared externally. Instead, privacy-preserving modified versions {Imod i | 1 ≤ i ≤ nsen }
+
+are generated and evaluated through the analysis module. The interface displays embedding-based semantic similarity (computed as cosine similarity between sentence embeddings) and corresponding privacy scores, enabling users to assess privacy gain, utility impact, and prompt differences. 
+
+PPA Workflow and Algorithm: 
+
+1) Input Stage: The user provides an original image Ii
+
+and a task prompt Iu. The privacy module detects nsen 
+
+sensitive objects {Sobj u,i | 1 ≤ i ≤ nsen } in Ii based on predefined privacy-sensitive categories Ci.2) Modification Stage: For each detected object, two modification techniques are applied, generating 2nsen 
+
+modified images {Imod i | 1 ≤ i ≤ 2nsen }. These modified images are forwarded to the analysis module. 3) Analysis Stage: For each modified image, the OVLM produces a response Rmod , while Rorig denotes the response from the original image. The analysis module computes embedding-based semantic similarity between 
+
+Rorig and Rmod to quantify prompt differences. Privacy gain is defined as: 
+
+Gp(Rmod ) = P (Rorig ) − P (Rmod ),
+
+and utility impact is defined as: 
+
+Ui(Rmod ) = 1 − U (Rmod )
+
+4) User Decision Stage: The UIM ranks modified outputs based on privacy gain ( Gp) and utility impact ( Ui). The user selects the preferred modification according to their privacyutility preference, and the chosen version is submitted to the OVLM for final processing. V. E VALUATION 
+
+In this section, we describe the dataset, experimental setup, and evaluation results in terms of privacy gain and utility impact. We use the same set of prompts to evaluate both privacy and utility: privacy gain measures the reduction of PII-bearing content in the response, while utility impact measures how well the response to the same prompt is preserved after obfuscation. Experiments are conducted using the open-source LLaVA-1.5 vision-language model due to its accessibility and reproducibility for proof-of-concept analysis. As the proposed Privacy Preserving Assistant (PPA) applies privacy-preserving modifications at the image level prior to inference, the ap-proach remains model-agnostic and applicable to both open-source and proprietary OVLMs. 
+
+A. Dataset and implementation 
+
+We constructed a dataset of 736 images featuring 11 well-known landmarks and focused on a subset containing location-related Personally Identifiable Information (PII). This choice is motivated by prior findings showing that location attributes are among the most consistently inferred forms of implicit privacy leakage in image-based reasoning, even in the absence of explicit identifiers [3], [4]. While PII includes other attributes such as facial identity and documents, large-scale, openly annotated datasets for these categories remain limited, making systematic evaluation challenging under reproducibility con-straints. Focusing on location-based PII therefore enables a transparent and rigorous analysis of privacy and utility trade-offs. For each image, we generated responses to eight PII-related question prompts across three image versions i.e. original, blurred, and masked yielding 24 responses per image. Al-though not all images contained clear PII, our goal was to as-sess how well privacy could be preserved without significantly reducing utility. We focus on evaluating both privacy gain and utility impact, primarily in relation to location-based PII (in our case, mostly location). Each of our question prompts included at least one keyword related to a PII, like for location: 
+
+”Where is this image located?” , for occupation: ”What type of job does the person in this image have?” and so on. We applied two image modification techniques i.e. blurring and masking, to hide sensitive elements. Then, we used the LLaVA-1.5 models (7B and 13B versions) to generate answers to the 8 PII-related questions for each version of the image. This helped us evaluate how well the modifications reduced the model’s ability to extract sensitive information, while still maintaining useful image content. Fig. 4: Responses to “Where is this image located?” show how obfuscation alters location-specific PII inference.    
+
+> (a) Prompt Similarity: Blur vs Mask (b) Privacy Gain: Blur vs. Mask (c) Utility Impact: Blur vs. Mask
+> (d) Privacy Gain vs. PII-based Question (e) Utility Impact vs. PII-based Question
+
+Fig. 5: Impact of privacy-preserving techniques on privacy gain, utility impact and VLM outputs. 
+
+B. Performance Analysis 
+
+1) Prompt Similarity: Blur vs. Mask: Fig. 5(a) shows the semantic similarity between model responses from original and obfuscated images (blurred and masked). Cosine similarity between response embeddings indicates that both techniques retain high semantic alignment: blurred inputs yield an aver-age similarity of 75%, and masked inputs follow closely at 74%. This suggests that despite visual obfuscation, the model maintains core semantics in its language generation. 
+
+2) Privacy Gain: Blur vs. Mask : As shown in Fig. 5(b), the y-axis represents the percentage of imageprompt pairs whose privacy leakage score P (Rmod ) falls within the specified bin (e.g., ≤ 10% ). Percentages are computed over the full evaluation set. The majority of samples fall in the lowest privacy leakage bucket ( ≤ 10% ) for both techniques. Blurring outperforms masking slightly, with 90% of responses in the lowest-risk group versus 86% for masking. However, a few masked instances exceed 20% leakage, suggesting occasional lapses in privacy effectiveness. 
+
+3) Utility Impact: Blur vs. Mask: Fig. 5(c) illustrates that both techniques lead to some utility degradation, with 70% of responses exhibiting low utility loss ( Ui ≤ 0.4), indicating that most modifications preserve core semantic intent. Blurring preserves slightly more context, evidenced by a greater proportion of responses in the high-utility bracket (> 0.6). This implies that while both approaches obscure sensitive content, blurring is less destructive to non-sensitive scene understanding. 
+
+4) Privacy Gain vs. PII-based Question: In Fig. 5(d), we analyze average privacy gain across PII-related question types. Most questions show modest to positive gains, confirming that obfuscation reduces extractable private information. Notably, the question “What is the users marital status? yields a neg-ative gain, meaning obfuscation sometimes increases riskpos-sibly due to hallucination or misinterpretation. In contrast, questions like “What is the probable gender of the user? show strong positive gains, indicating visual obfuscation effectively masks gender cues. 
+
+5) Utility Impact vs. PII-based Question: Fig. 5(e) high-lights how different questions are impacted in terms of utility. Location-based questions (e.g., “Where is this image located? )maintain higher utility, as geographic or structural cues remain. Conversely, abstract personal traits (e.g., gender , interests )suffer greater utility loss, aligning with the removal of nuanced visual context during obfuscation. Fig. 4 qualitatively demon-strates this effect, where blurring preserves general location context, and masking introduces greater ambiguity. 
+
+C. Observations  
+
+> •
+
+Blurring provides a better balance between privacy gain and utility retention, making it suitable for general-purpose obfuscation, whereas masking offers stronger privacy at the cost of greater utility loss, particularly for abstract PII such as gender and marital status.  
+
+> •
+
+Location-based prompts retain the most utility, raising concerns about context leakage despite transformations.  
+
+> •
+
+These trade-offs align with PAPILLONs pipeline-based privacy frameworks [1]. Future assessments may benefit from VLM-based Image Quality Assessment (IQA) ap-proaches like DepictQA-Wild, which quantify perceptual degradation via multi-task reasoning [13]. VI. DISCUSSION Our evaluation demonstrates that the proposed Privacy Preserving Assistant (PPA) effectively balances privacy risk reduction with utility preservation in OVLM outputs. Both blurring and masking significantly reduce PII exposure, though the privacyutility trade-off remains a key design consideration, consistent with prior prompt-level obfuscation approaches such as LPPA [5]. In real-world deployments, including social platforms and physical security systems, privacy mechanisms must also account for multi-object complexity and adversarial robustness. While feature-space differential privacy [7] and GAN-based reconstruction methods [8] address these chal-lenges, segmentation-based obfuscation may introduce addi-tional risks, as sensitive regions can potentially be recon-structed by adversarial models. Based on our results, we propose two deployment scenarios:  
+
+> •
+
+When performance is high, full-scale adoption of PPA into OVLM pipelines is viable, enabling automated pri-vacy protection under ethical oversight.  
+
+> •
+
+When limitations are observed, PPA can function as a standalone privacy filter, intercepting sensitive content be-fore submission. This modular approach supports iterative refinement and context-aware risk mitigation. These scenarios underscore the importance of flexibility in design, allowing the system to adapt based on real-world performance and to evolve with emerging privacy concerns. VII. CONCLUSION In this paper, we propose a Privacy-Preserving Assistant (PPA) that enables image-level privacy control for OVLMs by explicitly quantifying the trade-off between privacy protection and task utility. PPA applies targeted obfuscation strategies, including object removal and masking, to mitigate both explicit and implicit PII leakage prior to model inference. Through systematic evaluation, we show that these techniques can sub-stantially reduce privacy risks while preserving downstream utility. The proposed framework is model-agnostic and can be deployed either as an integrated component within OVLM pipelines or as a standalone modular privacy filter. Future work will focus on refining these techniques fur-ther by extending the approach to handle complex multi-word cases, comprehensive training data, additional PIIs and exploring additional strategies to optimize the privacy-utility trade-off. Ultimately, the PPA framework represents a signif-icant step forward in developing secure, privacy-preserving technologies that can be seamlessly integrated into evolving online platforms. VIII. A CKNOWLEDGEMENT 
+
+The authors gratefully acknowledge the late Dr. Marc Pomplun for his mentorship, encouragement, and insights that continue to guide their work. REFERENCES [1] S. Li, V. C. Raghuram, O. Khattab, J. Hirschberg, and Z. Yu, “Papillon: Privacy preservation from internet-based and local language model ensembles,” arXiv preprint arXiv:2410.17127 , 2024. [2] F. Mireshghallah et al. , “Privacy implications of user prompts: The wildchat benchmark,” arXiv preprint arXiv:2401.00212 , 2024. [3] B. Tmeke, M. Vero, R. Staab, and M. Vechev, “Private attribute inference from images with vision-language models,” arXiv preprint arXiv:2404.10618 , 2024. [4] Y. Lu, D. Jiang, W. Chen, W. Y. Wang, Y. Choi, and B. Y. Lin, “Wildvision: Evaluating vision-language models in the wild with human preferences,” arXiv preprint arXiv:2406.11069 , 2024. [5] Y. Zhu, N. Gao, X. Liang, and H. Zhang, “Exploiting privacy preserving prompt techniques for online large language model usage,” in IEEE Conference on Privacy in AI , 2024. [6] V. Smith, A. Shamsabadi, C. Ashurst, and A. Weller, “Identifying and mitigating privacy risks stemming from language models,” arXiv preprint arXiv:2310.01424 , 2024. [7] H. Xue, B. Liu, M. Ding et al. , “Dp-image: Differential privacy for image data in feature space,” arXiv preprint arXiv:2103.07073 , 2023. [8] J. Yu, H. Xue, B. Liu, Y. Wang et al. , “Gan-based differential private image privacy protection framework for the internet of multimedia things,” Sensors , vol. 21, no. 1, p. 58, 2021. [9] V. Mirjalili, S. Raschka, and A. Ross, “Privacynet: Semi-adversarial net-works for multi-attribute face privacy,” arXiv preprint arXiv:2001.00561 ,2020. [10] N. Carlini, F. Tramer, E. Wallace, M. Jagielski, A. Herbert-Voss, K. Lee, A. Roberts, T. Brown, D. Song, C. Raffel et al. , “Extracting training data from large language models,” in USENIX Security Symposium , 2021. [11] N. Carlini, C. Liu, . Erlingsson, D. Song, and F. Lee, “Quantifying memorization across neural language models,” in IEEE Symposium on Security and Privacy , 2023. [12] F. Yuan, X. Fang, R. Quan, J. Li, W. Bi, X. Xu, and P. Li, “Generative visual commonsense answering and explaining with generative scene graph constructing,” Conference25 , 2025, arXiv:2501.09041. [Online]. Available: https://arxiv.org/abs/2501.09041 [13] Z. You, J. Gu, Z. Li et al. , “Descriptive image quality assessment in the wild,” arXiv preprint arXiv:2405.18842 , 2024.

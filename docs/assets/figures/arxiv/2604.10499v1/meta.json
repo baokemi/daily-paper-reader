@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10499v1/fig-001.webp",
+      "caption": "Fig. 1: Illustration of movement trajectory for mean-field estimator ϕt, the cloud server’s strategy Rt, edge node k’ strategy (Bt k, ε t k) and virtual queues Qt k, Z t k over the time horizon.",
+      "page": 6,
+      "index": 1,
+      "width": 1054,
+      "height": 218
+    }
+  ]
+}

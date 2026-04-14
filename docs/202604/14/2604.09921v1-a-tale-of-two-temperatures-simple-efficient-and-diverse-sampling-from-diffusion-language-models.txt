@@ -1,0 +1,1657 @@
+Title: A Tale of Two Temperatures: Simple, Efficient, and Diverse Sampling from Diffusion Language Models
+
+URL Source: https://arxiv.org/pdf/2604.09921v1
+
+Published Time: Tue, 14 Apr 2026 00:22:44 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+Preprint. Under review. 
+
+# A Tale of Two Temperatures: Simple, Efficient, and Diverse Sampling from Diffusion Language Models 
+
+Theo X. Olausson 1∗ Metod Jazbec 2∗ Xi Wang 3 Armando Solar-Lezama 1
+
+Christian A. Naesseth 2 Stephan Mandt 4 Eric Nalisnick 31Massachusetts Institute of Technology 2UvA-Bosch Delta Lab, University of Amsterdam 
+
+> 3
+
+Johns Hopkins University 4University of California, Irvine 
+
+## Abstract 
+
+Much work has been done on designing fast and accurate sampling for diffusion language models (dLLMs). However, these efforts have largely fo-cused on the tradeoff between speed and quality of individual samples; how to additionally ensure diversity across samples remains less well understood. In this work, we show that diversity can be increased by using softened, tempered versions of familiar confidence-based remasking heuristics, re-taining their computational benefits and offering simple implementations. We motivate this approach by introducing an idealized formal model of fork tokens and studying the impact of remasking on the expected entropy at the forks. Empirically, the proposed tempered heuristics close the exploration gap (pass@ k) between existing confidence-based and autoregressive sam-pling, hence outperforming both when controlling for cost (pass@NFE). We further study how the increase in diversity translates to downstream post-training and test-time compute scaling. Overall, our findings demonstrate that simple, efficient, and diverse sampling from dLLMs is possible. 
+
+## 1 Introduction 
+
+Diffusion language models (dLLMs) have recently seen significant uptake, offering native bidirectional context and the ability to generate multiple tokens in parallel (Nie et al. 2025b; Ye et al. 2025; Yang et al. 2025; Bethune et al. 2026; inter alia ). Unlike in the autoregressive (AR) setting, dLLMs require a remasking strategy that determines the order in which tokens are sampled. Because this choice significantly affects sample quality, much prior work has focused on optimizing the speed–quality tradeoff for individual samples (Chang et al. 2022; Nie et al. 2025b; Kim et al. 2025a; Ben-Hamu et al. 2025; Jazbec et al. 2025; inter alia ). While this line of work has helped make dLLMs more competitive with AR LLMs, efficiently obtaining a single high-quality sample is not always sufficient: post-training, test-time compute scaling, and A/B testing all require diversity across samples in order to be effective. Surprisingly, Ni et al. (2026) found that confidence-based heuristics yielding high single-sample accuracy lead to worse diversity than left-to-right autoregressive generation. By delaying uncertain tokens, such heuristics avoid genuine branching points in the reasoning process. Autoregressive generation does not suffer from this problem, but comes at a significant cost as it forgoes parallel generation of multiple tokens altogether. In this work, we argue that the diversity problem can be addressed with a simple fix, without abandoning parallel generation or adopting complex sampling schemes. Our key observation is that it is the greedy nature of existing heuristics, not parallel generation in itself, that limits diversity. By replacing them with softened, tempered approximations thereof—for example, sampling positions proportional to their tempered confidence instead of selecting them greedily based on the highest confidence—we demonstrate that the diversity can be recovered while preserving speed and simplicity. In summary, our contributions are as follows: 
+
+> ∗
+
+Equal contribution. Correspondence to m.jazbec@uva.nl , theoxo@csail.mit.edu .
+
+1
+
+> arXiv:2604.09921v1 [cs.LG] 10 Apr 2026
+
+Preprint. Under review. • We introduce Tempered Low-Confidence (TLC) and Tempered Confidence Thresholding 
+
+(TCT) remasking, stochastic relaxations of two widely used remasking heuristics (Nie et al., 2025b; Wu et al., 2025) controlled by a position temperature Tpos (Sec-tion 3.2). This provides a knob complementary to the standard token-level tempera-ture Ttoken : Ttoken governs the entropy of what token is predicted at each position, while Tpos governs how stochastic the order in which positions are committed to is. • We give an operational definition of the fork tokens , high-entropy positions that prior work has empirically found to be important for effective post-training, and show that, under an idealized model, increasing Tpos provably increases the expected entropy at these forks for TLC (Section 3.1). • We empirically validate that TLC recovers pass@ k scaling comparable to AR rollouts across multiple benchmarks and models, confirming that tempering the remasking strategy is sufficient to restore diversity (Section 4.1, Figure 2). TCT goes further by retaining the adaptive speed of confidence thresholding; when the cost of each rollout is accounted for, TCT often scales better than either untempered heuristics or AR generation (Section 4.1, Figure 3). • We study how pass@k improvements translate downstream: when used for GRPO rollout generation in dLLM post-training (Zhao et al., 2025) at matched computa-tional budgets, TCT yields stronger policies than AR generation (Section 4.3). In the context of test-time compute, we find that while the increased diversity of TCT can overwhelm simple strategies such as majority voting, this gap is largely closed when using outcome reward models for answer selection (Section 4.2). 
+
+## 2 Background 
+
+We use the notation [L] to represent the set {1, . . . , L}. We denote a sequence of tokens by 
+
+x = ( x1, . . . , xL) ∈ V L, where V := [ V] is the vocabulary and L is the sequence length. 
+
+2.1 From Masked Diffusion Models to Diffusion Language Models 
+
+Masked Diffusion Models (MDMs) are a form of absorbing discrete diffusion (Sohl-Dickstein et al., 2015; Austin et al., 2021a) in which the target (noise) distribution places all its mass on a single token, [MASK] , and the forward process gradually corrupts each token towards the absorbing mask state by transitioning tokens independently through a Markov chain. For-mally, in the continuous-time formulation of Campbell et al. (2022), this can be characterized compactly as follows: 
+
+x0 ∼ pdata x1 ∼ δ⊗L 
+
+> [MASK]
+
+(1) 
+
+xt | x0 ∼ pt(xt | x0) ≜
+
+> L
+
+# ∏
+
+> l=1
+
+α(t)1
+
+
+
+xlt = [MASK] 
+
+
+
++ ( 1 − α(t)) 1
+
+
+
+xlt = xl
+
+> 0
+
+
+
+(2) where 0 ≤ t ≤ 1 denotes the time, α : t → [0, 1 ] is a monotonically non-decreasing function in t with endpoints α(0) = 0, α(1) = 1, and δ⊗L 
+
+> [MASK]
+
+is a product of L Dirac measures placing all of their mass on [MASK] . The generative (i.e., reverse) process can be modeled either by learning to predict the time-dependent reverse transition ratios (Campbell et al., 2022; Meng et al., 2022; Lou et al., 2024), or by training a model qθ to directly approximate the conditional distribution p0|t. The latter strategy has typically been the choice of language-modeling practitioners, as later work (Sahoo et al., 2024; Ou et al., 2025) showed that its evidence lower bound (ELBO) simplifies to: 
+
+−L (θ) ≜ Et∼U[0,1 ],x0∼pdata ,xt ∼pt (·| x0)
+
+"
+
+w(t)
+
+> L
+
+# ∑
+
+> k=1
+
+1
+
+
+
+xkt = [MASK] 
+
+
+
+log qk 
+
+> θ
+
+(xk 
+
+> 0
+
+| xt)
+
+#
+
+(3) where w(·) is a weighting term determined by the noise schedule α(·), and qk 
+
+> θ
+
+(·| xt) is the model’s predicted marginal distribution over possible tokens at the k-th position. This formulation eliminates explicit conditioning on t, connecting MDM training to masked 2Preprint. Under review. language modeling (Devlin et al., 2019; Hoogeboom et al., 2021). Combined with empirically validated scaling laws for MDMs (Nie et al., 2025a; Bethune et al., 2026), this has enabled the open-source community to train multi-billion parameter MDMs on textual data, which we refer to as diffusion (large) language models (dLLMs). 
+
+2.2 Remasking strategies and sampling from dLLMs 
+
+Early work on MDMs obtained samples by discretizing the reverse process and simulating the Markov chain (Campbell et al., 2022; Austin et al., 2021a; Lou et al., 2024). As observed by Zheng et al. (2025), this is potentially wasteful as each individual token transitions exactly once in Equation (2). They instead proposed a first-hit sampling scheme, which when the time-agnostic objective of Equation (3) is used simplifies to what Nie et al. (2025b) call 
+
+random remasking . Concretely, denoting the current generation as xt ∈ V L with still-masked positions Mt := {k ∈ [L] | xkt = [MASK] }, the next generation xt′ is obtained via 
+
+xkt′ :=
+
+x ∼ qk 
+
+> θ
+
+(· | xt ; Ttoken ), if k ∈ U Kt ,
+
+xkt , otherwise. where the unmasking set U Kt of K ≥ 1 positions is sampled uniformly at random (without replacement) from Mt. As in the autoregressive setting, Ttoken tempers the final softmax of qk 
+
+> θ
+
+: intuitively, higher temperatures yield more diverse (but possibly lower quality) generations. This process continues until reaching a time where Mt = ∅.Later work revealed that in practice, test-time performance can often be improved by using heuristic remasking strategies that select Ut based on distributional information about the model’s predictions. Two particularly popular choices use the model’s per-position confidence ckt ≜ max v qk 
+
+> θ
+
+(v | xt):1 low-confidence (LC; Chang et al. 2022; Nie et al. 2025b) remasking unmasks the K most confident positions, while confidence thresholding (CT; Wu et al. 2025) unmasks all positions exceeding a fixed threshold λ ∈ [0, 1 ]:LC: U Kt :=
+
+n
+
+arg max  
+
+> I⊆M t,|I|=K
+
+# ∑
+
+> k∈I
+
+ckt
+
+o
+
+(4) CT: U λ 
+
+> t
+
+:= {k ∈ M t | ckt > λ} (5) The key distinction is that low-confidence remasking unmasks a fixed number of tokens per step ( K), while confidence thresholding is adaptive : |U λ
+
+> M
+
+| varies with the model’s confidence, allowing sampling to proceed quickly when the model is certain and slowly when it is not. 
+
+2.3 Sample diversity and the role of remasking 
+
+The remasking strategies discussed above are typically compared in terms of accuracy at a given computational budget under greedy, Ttoken = 0, decoding (Nie et al., 2025b; Wu et al., 2025; Ben-Hamu et al., 2025). However, many practical applications require diverse 
+
+sets of samples; in this case the more important metric becomes pass@ k, the probability that at least one of k independent samples solves a given problem (Kulal et al., 2019; Chen et al., 2021). Ni et al. (2026) investigated pass@ k scaling for dLLMs and found that low-confidence remasking, despite its strong greedy performance, exhibits notably flatter pass@ k curves than autoregressive (left-to-right) decoding. They attribute this to a phenomenon they dub 
+
+entropy degradation , where low-confidence systematically defers high-entropy branching positions until surrounding context has already been established, collapsing the entropy that would otherwise enable qualitatively diverse samples. Autoregressive decoding, Ni et al. (2026) argue, sidesteps this by resolving tokens in a fixed positional order agnostic to confidence, forcing the model to commit to branching points as they arise. 3Preprint. Under review. Prompt:  "Write a function that takes a list of floats parsed as strings and returns the standard deviation."                                                                         
+
+> Fork token (high model entropy, both choices plausible) Anchor token (model biased towards one choice, then constrains fork) Other tokens
+> Solution skeleton
+> import
+> def strs_to_std(xs):
+> xs =[float(x) for xin xs]
+> return .(xs)
+> Solution A
+> import numpy
+> def strs_to_std(xs): xs =[float(x) for xin xs]
+> return numpy .std (xs)
+> ✅Matches the prompt
+> ⚠Population std (divides by N)
+> ⚠Returns nan on empty input
+> Solution B
+> import statistics
+> def strs_to_std(xs): xs =[float(x) for xin xs]
+> return statistics .stdev (xs)
+> ✅Matches the prompt
+> ⚠Sample std (divides by N−1)
+> ⚠Raises error if len(xs) < 2
+> Remasking strategy Token sampling order Semantically diverse samples Parallel generation
+> Deterministic Confidence-based import def ··· numpy std ··· numpy [...] ··· ✗✓
+> Autoregressive (Left-to-Right) import statistics ··· statistics .stdev (xs) ✓✗
+> Tempered Confidence-based (ours) import def ··· statistics [...] ··· statistics stdev ··· ✓✓
+> ?????
+> ????? ????
+
+Figure 1: An example illustrating our model of entropy degradation. The fork token 
+
+(Definition 1) has high marginal uncertainty under the dLLM, indicating that both the 
+
+numpy and statistic solutions are plausible. However, the dLLM is simultaneously overly confident in its prediction at the anchor tokens in the function body, biasing low-confidence remasking towards one solution as it reveals those tokens first. Tempered remasking allows the fork to still be revealed first, increasing semantic diversity without sacrificing parallelism. Note that while both paths lead to generations that match the prompt ( ), they have subtly different semantics ( ); sampling both is important to achieve good coverage. 
+
+## 3 Methods 
+
+We now introduce our approach for generating diverse and efficient samples with dLLMs. We first study Ni et al. (2026)’s empirical findings through the lens of a formal model of fork tokens and their relationship to semantic sample diversity. (Section 3.1). Motivated by our observations, we then propose to temper confidence-based heuristics via a new position temperature Tpos , and discuss two concrete instantiations of this strategy (Section 3.2). Figure 1 shows an overview of our modeling framework and methodology. 
+
+3.1 Fork tokens and the anchor-fork degeneracy 
+
+Ni et al. (2026)’s empirical study of entropy degradation is grounded in the observational definition of forking tokens given by prior work (see Section A). These works identify forks as positions in the sequence that have exceptionally high entropy, and observe that maintaining diversity at these positions translates to effective post-training (for autoregressive models). To allow us to reason more precisely about this phenomenon, we develop a formal model in Appendix C. Key to our analysis is an operational definition of fork tokens as positions in the sequence whose value sharply bounds the set of possible semantic outcomes under the data distribution (Definition 1), allowing us to formally connect their uncertainty to the semantic sample diversity (Equation (6)). To connect this machinery to Ni et al. (2026)’s observations of the sampling distribution induced by pairing qθ with low-confidence or autoregressive remasking, we build on their intuition that the root cause of entropy degradation is that contextual tokens surrounding the fork tend to dominate it in confidence, and that revealing them collapses the fork’s entropy before it is ever sampled. We capture this intuition in what we call the anchor-fork degeneracy model (Assumption 1), where the sampling distribution’s uncertainty about the fork token is determined by the set of high-confidence anchor tokens 
+
+that have been revealed so far. This phenomenon is visualized in the upper half of Figure 1. This simple model recovers all three of Ni et al. (2026)’s empirical observations: (i) LC yields minimal fork entropy; (ii) adjusting Ttoken does not help with preserving entropy at forks, 
+
+1For non-greedy sampling we define the confidence as ckt ≜ qk
+
+θ (x | xt), x ∼ qk
+
+θ (· | xt ; Ttoken ).
+
+4Preprint. Under review. since it does not change the unmasking order (Proposition 2); and (iii) left-to-right generation yields strictly higher fork entropy than LC whenever at least one anchor follows the fork in positional order (Proposition 3). Additionally, however, it also yields a new prediction: autoregressive generation is not special, and any strategy that increases the probability of resolving a fork before its anchors will retain higher fork entropy than LC. This suggests that semantic diversity can be improved without sacrificing the efficiency of parallel generation. 
+
+3.2 Tempered remasking heuristics 
+
+The formal analysis of Appendix C suggests a simple fix for confidence-based heuristics: rather than deterministically selecting positions to unmask, sample them in proportion to a softened distribution determined by their confidences. This distribution can then be controlled through a position temperature Tpos that provides a complementary knob to Ttoken :
+
+Ttoken governs how greedily we determined what is sampled at each position, while Tpos 
+
+governs how greedily we determined the order in which to do so. We now describe concrete instantiations corresponding to each heuristic from Section 2.2. 
+
+Tempered low-confidence (TLC) remasking (Algorithm 2). Rather than deterministically selecting U Kt as in Equation (4), TLC samples K positions (without replacement) from a tempered distribution induced by the confidences: 
+
+U K,Tpos 
+
+> t
+> w/o repl.
+
+∼ Cat ( ˜ct), ˜ckt ∝ (ckt )1/ Tpos · 1 (k ∈ M t)
+
+where Tpos > 0 is a free parameter. As Tpos ↓ 0, TLC recovers deterministic low-confidence remasking; as Tpos ↑ ∞, it approaches uniform (random) remasking. In Appendix C we prove that TLC resolves the anchor-fork degeneracy: under the idealized model, sufficiently large increases of Tpos provably increase the expected fork-token entropy (Proposition 1); combined with an assumption that qθ captures the data distribution well enough to preserve the fork structure (Assumption 2), this yields a direct increase in semantic diversity, and thus pass@ k, whenever the fork-entropy gain is large enough (Corollary 1). 2
+
+While TLC offers a mechanism to recover sample diversity, it does not yield the adaptive 
+
+speed-ups that make confidence-based heuristics particularly attractive. This motivates applying the same tempering idea to confidence thresholding. 
+
+Tempered confidence thresholding (TCT) remasking (Algorithm 4). TCT replaces the hard threshold in Equation (5) with stochastic inclusion: 
+
+U λ,Tpos  
+
+> t
+
+= {k ∈ M t | bkt = 1}, bkt ∼ Ber 
+
+
+
+σ
+
+
+
+(ckt − λ)/Tpos 
+
+ 
+
+where σ(x) = 1 /(1 + e−x ) is the sigmoid function. This recovers the hard threshold at λ as 
+
+Tpos ↓ 0, while yielding increasingly stochastic (and λ-agnostic) behavior as Tpos increases. Intuitively, at moderate temperatures, λ controls the speed of generation while Tpos controls the degree of diversity: under hard thresholding, a fork token whose confidence falls below 
+
+λ is deterministically deferred; under TCT, the sigmoid gives it nonzero probability of being unmasked at every step, breaking the systematic deferral. TCT thus retains the adaptive efficiency of confidence thresholding while introducing the same diversity benefits as TLC. 
+
+## 4 Experiments 
+
+We begin our experiments by verifying that our proposed tempered samplers can close the gap to autoregressive sampling in terms of pass@ k and also outperform it when the cost of generation is taken into account (Section 4.1). Next, we investigate whether the improvements in diversity translate to improved downstream performance for test-time compute (Section 4.2). Finally, we examine the implications of tempering when generating rollouts during RL post-training of dLLMs (Section 4.3).      
+
+> 2In practice, excessively increasing Tpos risks revealing positions with less context than is needed to yield coherent generations (same as random unmasking), so for smaller values of kthe optimal Tpos
+> needs to be chosen to balance the diversity gain against this loss of quality (see Figure 6).
+
+5Preprint. Under review. 1 2 4 8 16 32 64                                                 
+
+> k
+> 60
+> 70
+> 80
+> 90
+> 100
+> Pass@ k (%)
+> LLaDA-8B GSM8K
+> Autoregressive Low Confidence ( Tpos =0) Random ( Tpos =∞)TLC ( Tpos =1)
+> 124816 32 64
+> k
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> MATH
+> 124816 32 64
+> k
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> HumanEval
+> 124816 32 64
+> k
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> MBPP
+> 124816 32 64
+> k
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> 100
+> Pass@ k (%)
+> Dream-7B
+> 124816 32 64
+> k
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 124816 32 64
+> k
+> 20
+> 40
+> 60
+> 80
+> 124816 32 64
+> k
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+
+Figure 2: Pass@ k for TLC ( Tpos = 1) on LLaDA-8B-Instruct and Dream-7B-Instruct across four benchmarks. TLC closely tracks the AR baseline, recovering almost all of the diversity lost by low-confidence remasking. 
+
+4.1 Tempered heuristics recover pass@ k scaling 
+
+We start by investigating the core hypothesis that tempering the heuristics can recover pass@ k scaling compared to autoregressive sampling proposed in Ni et al. (2026). 
+
+Experimental setting. We evaluate our proposed remasking strategies on two open-source dLLMs: LLaDA-8B-Instruct (Nie et al., 2025b) and Dream-v0-Instruct-7B (Ye et al., 2025). We evaluate on four standard benchmarks: GSM8k (Cobbe et al., 2021), MATH-500 (Hendrycks et al., 2021), HumanEval (Chen et al., 2021), and MBPP (Austin et al., 2021b). For GSM8k we evaluate on a subset of Ntest = 300 test samples to reduce computational cost. Following prior work (Zhao et al., 2025), we use Ttoken = 0.8 as well as semi-AR/block-wise decoding with blocks of 32 tokens (Arriola et al., 2025; Nie et al., 2025b), at a sequence length of 
+
+L = 256. Due to cost, and to avoid overfitting the position temperature to any one particular setting, we fix Tpos = 1 for TLC and Tpos = 0.1 for TCT. We report pass@ k, the standard measure of whether at least one of k samples solves a given problem (Kulal et al., 2019; Chen et al., 2021). When evaluating the adaptive remasking functions, we also report pass@NFE —the pass rate as a function of the cumulative NFEs required. This metric was also used in recent work by Shen et al. (2026), and avoids pass@ k’s bias towards methods that use more compute per sample (Olausson et al., 2024). 
+
+TLC recovers diversity at high sample counts. Figure 2 shows pass@ k for TLC across all four benchmarks, as well as for autoregressive, low-confidence and random baselines. We first note that our results echo the findings of Ni et al. (2026), as the low-confidence baseline underperforms autoregressive generation for both models, on all four datasets. In contrast, despite the lack of task- or model-specific tuning of Tpos , TLC closely tracks the AR baseline in all settings other than for Dream on HumanEval. These findings confirm that tempering the remasking heuristic can restore rollout diversity. Moreover, while random baseline catches up to TLC and AR on math datasets, it exhibits a large gap on coding datasets (HumanEval, MBPP), indicating that too much randomness in sampling unmasking positions (i.e., Tpos = ∞) can hurt the performance. In Figure 7, we additionally study how robust these findings are across different token temperatures, finding TLC to be the least dependent on the exact choice of Ttoken . Con-cretely, performance under AR sampling degrades severely when using Ttoken > 1, while 6Preprint. Under review. 1 2 4 8 16 32 64 96                                       
+
+> k
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> 95
+> 100
+> Pass@ k (%)
+> GSM8K
+> Autoregressive Fast-dLLM TCT ( Tpos =0.1)
+> 124816 32 64 96
+> k
+> 30
+> 40
+> 50
+> 60
+> 70
+> MATH
+> 124816 32 64 96
+> k
+> 30
+> 40
+> 50
+> 60
+> 70
+> HumanEval
+> 124816 32 64 96
+> k
+> 30
+> 40
+> 50
+> 60
+> 70
+> MBPP
+> 02000 4000 6000
+> NFEs
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> 95
+> 100
+> Pass@k (%)
+> 02000 4000 6000 8000
+> NFEs
+> 30
+> 40
+> 50
+> 60
+> 70
+> 02000 4000 6000 8000
+> NFEs
+> 30
+> 40
+> 50
+> 60
+> 70
+> 01000 2000 3000 4000
+> NFEs
+> 30
+> 40
+> 50
+> 60
+> 70
+
+Figure 3: Pass@ k (top) and pass@NFE (bottom) for TCT on LLaDA-8B-Instruct. Both rows plot the same data; only the metric changes (pass@ k vs pass@NFE). TCT slightly underperforms AR in pass@ k, but substantially outperforms it when the cost of each sample is taken into account. TCT also outperforms deterministic confidence-thresholding (Fast-dLLM; Wu et al. 2025) thanks to its additional source of randomness via Tpos .low-confidence experiences a stronger drop in performance for Ttoken < 1 compared to the proposed TLC. Importantly, TLC exhibits larger performance improvements when increasing k compared to low-confidence sampling across all considered Ttoken , confirming the benefits of additional randomness (via Tpos > 0) on sampling diversity. 
+
+TCT: lower pass@ k, but higher pass@NFE. We depict TCT sampling results for LLaDA in Figure 3 (see Figure 8 for Dream results). Looking only at pass@ k (top row), TCT ( Tpos = 0.1, 
+
+λ = 0.6) slightly underperforms the AR baseline on all benchmarks, although it still beats out the deterministic confidence-thresholding ( λ = 0.6; Wu et al. (2025)). However, when cost is taken into account (bottom row), TCT starts to shine, substantially outperforming both baselines. As a concrete example, on MATH dataset, TCT requires around 4000 NFEs to achieve performance above 70%: a 2 x speed-up compared to AR which requires around 8000 NFEs. 3 Notably, deterministic confidence-thresholding alone is not sufficient to outperform autoregressive rollouts at higher NFE values, as it underperforms AR on HumanEval and MBPP; only TCT consistently comes out on top, highlighting the importance of tempering confidence-based heuristics to preserve diversity. 
+
+4.2 TCT for Test-time compute 
+
+We next turn our attention to test-time compute to check whether the observed improved diversity of our proposed TCT sampler translates to better downstream performance. 
+
+Experimental setting. We focus on evaluating LLaDA-8B-Instruct on GSM8k (same subset of Ntest = 300 samples) and MATH-500. We study these datasets as they require the use of heuristic answer selection strategies, unlike in coding where pass@ k already directly captures scaling with respect to a fixed test suite. We consider two widely used such strategies: (i) self-consistency , where the most common answer is selected (Wang et al., 2023), and (ii) ORM , where an (output) reward model is used to score each generation, and the one with the highest score is returned. For the ORM, we use AceMath-7B (Liu et al., 2024). 
+
+> 3
+
+When measuring the NFEs for AR sampling, we count the number of tokens generated before 
+
+〈eos 〉. For TCT/CT, we count NFEs until all L positions are unmasked. 
+
+7Preprint. Under review. 0 2000 4000 6000             
+
+> NFEs
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Best@ k (%)
+> GSM8K
+> Autoregressive Fast-dLLM TCT ( Tpos =0.1)
+> 02500 5000 7500
+> NFEs
+> 25
+> 30
+> 35
+> 40
+> MATH
+> 02000 4000 6000
+> NFEs
+> 70
+> 80
+> 90
+> Best@ k (%)
+> GSM8K
+> 02500 5000 7500
+> NFEs
+> 30
+> 40
+> 50
+> MATH Self-Consistency ORM
+
+Figure 4: Test-time scaling for LLaDA-8B-Instruct in terms of Best@NFE when using either self-consistency or an ORM for final answer selection. TCT performs worse compared to AR at higher NFEs when using self-consistency; however, when using an ORM, TCT improves the pareto frontier compared to autoregressive rollouts. See Figure 9 for Best@ k results. 
+
+Results We report Best@NFE results in Figure 4. Focusing first on the self-consistency results, we observe that while TCT outperforms the AR baseline at lower NFE counts, it plateaus sooner and thus achieves a lower top performance. As depicted in Figure 10, we attribute this to TCT producing less peaked, higher-entropy predictive distributions when aggregating over k samples (see Figure 11 for concrete examples of such predictive distributions). However, when an outcome reward model (ORM) is used to select the sample, the performance trends from pass@NFE in the previous section are largely recovered, and both TCT and confidence-thresholding outperform AR baseline in terms of Best@NFE. 
+
+4.3 TCT for GRPO rollouts 
+
+Recall that our interest in pass@ k (and pass@NFE) stems from it being a useful indicator of the performance gains that can obtained through policy optimization post-training (Yue et al., 2025). In this section, we thus investigate whether the pass@NFE improvements of TCT translate to better post-training results, when controlling for training cost. 
+
+Experimental setting. We focus on post-training LLaDA-8B-Instruct (Nie et al., 2025b) on mathematical datasets (GSM8k, MATH-500). We adopt the d1 reinforcement learning frame-work (Zhao et al., 2025), as it is widely used for post-training dLLMs and provides efficient (albeit biased) policy likelihood estimation requiring only a single NFE. For generating GRPO rollouts, we use either TCT (with Tpos = 0.1, λ = 0.6), deterministic confidence-thresholding (with λ = 0.6), or autoregressive rollouts. Since the considered samplers differ in generation speed, we ensure a fair comparison by training for a fixed duration rather than a fixed number of training steps or epochs. Specifically, all models are trained for 72 hours on a single node with 4×A100 GPUs. After training, we evaluate the resulting RL-trained models under greedy decoding ( Ttoken = 0) with confidence-thresholding, varying the threshold λ ∈ { 0.6, 0.8, 1.0 } to obtain accurary-NFEs pareto frontiers for each trained policy. 
+
+Results. In Figure 5, we show training rewards (left), the standard deviation of rewards within a group during training (middle), and evaluation results (right). In the training plots, we indicate the number of completed steps (within a fixed compute budget) using vertical dashed lines. We observe that TCT completes the most GRPO training steps. For example, on GSM8K, TCT completes around 44K steps compared to only around 21K steps for AR. This is a direct consequence of adaptive nature of samplers TCT and Fast-dLLM which generate multiple tokens in-parallel, hence leading to much faster generation of GRPO rollouts compared to one-token-at-a-time, left-to-right autoregressive sampling. Next, we observe that TCT exhibits lower training rewards compared to both AR and confidence-thresholding (Fast-dLLM). Note, however, that training rewards are not directly comparable, as different sampling strategies are used for rollout generation. Hence, the lower training reward of TCT can be directly attributed to its slightly lower pass@1 rates (Figure 3). More important than the average reward for RL is the diversity of rewards within a group of rollouts used to compute GRPO advantages. In the extreme case where all samples receive the same reward, all advantages are equal to zero, and there is no learning signal for RL to 8Preprint. Under review. 0 10000 20000 30000 40000                   
+
+> Training step
+> 0
+> 1
+> 2
+> Reward
+> Train
+> 010000 20000 30000 40000
+> Training step
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> Reward Std
+> Train
+> 50 100 150 200 250
+> NFEs
+> 70
+> 75
+> 80
+> Accuracy (%)
+> Eval
+> 010000 20000 30000
+> Training step
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> Reward
+> 010000 20000 30000
+> Training step
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> Reward Std
+> 50 100 150 200 250
+> NFEs
+> 30.0
+> 32.5
+> 35.0
+> 37.5
+> Accuracy (%)
+> AR Fast-dLLM TCT No RL
+> GSM8k MATH
+
+Figure 5: GRPO post-training results for LLaDA-8B-Instruct on GSM8k (top) and MATH (bottom). Left : Group mean training reward. Middle : Group standard deviation of the reward. Right : evaluation accuracy under greedy decoding with confidence thresholding at varying λ. All models are trained for a fixed wall-clock budget of 72 hours; vertical dashed lines indicate the number of completed training steps for each sampler. TCT completes around twice as many training steps compared to AR due to its adaptive parallelism, maintains the highest reward diversity throughout training due to Tpos > 0, and yields evaluation performance comparable to or better than both AR and Fast-dLLM baselines. exploit. Encouragingly, we find that TCT helps preserve high rollout diversity, as it exhibits the highest standard deviation of rewards throughout training. Lastly, at test time, we observe that the policies obtained under TCT or Fast-dLLM sampling yield better evaluation performance compared to AR-trained policies. This complements recent findings in the literature (Ni et al., 2026) by demonstrating that when training cost is taken into account, there is no clear advantage to using autoregressive rollouts for GRPO, at least when using the efficient likelihood estimator from Zhao et al. (2025). We leave for future work the investigation of whether our findings also hold when using unbiased, yet more computationally expensive, likelihood estimators (Turok et al., 2026; Ni et al., 2026). 
+
+## 5 Related Work 
+
+While sample diversity is well-studied in the autoregressive setting, it has received com-paratively little attention in the context of dLLMs. Ni et al. (2026) and Shen et al. (2026) both study how the generation order impacts the reachable solution space, finding that confidence-based heuristics collapse diversity; however, neither proposes a sampling strat-egy that recovers diversity while retaining the efficiency of parallel generation. Concurrent to our work, Wu et al. (2026) propose TAPS, which injects time-dependent noise into the conditioning signal to encourage semantic branching in early denoising steps, and Lamont et al. (2026) repel samples in feature space during generation to penalize within-batch redun-dancy. Both are training-free and effective, but operate on different axes than our approach where we modify the remasking order itself. The three approaches are thus complementary. We discuss further related work in Appendix A. 
+
+## 6 Conclusion 
+
+We have introduced tempered remasking heuristics for dLLMs, showing that simple, stochas-tic relaxations controlled by a single temperature Tpos can recover the rollout diversity needed for effective post-training without sacrificing the advantages of parallel generation. 
+
+Limitations and future work. Our work does not provide a mechanism for how to tune 
+
+Tpos to optimally balance sample quality and diversity, and except for Figure 6 we do not empirically analyze our method’s sensitivity to the parameter. Moreover, we observe that 9Preprint. Under review. although TCT strongly outperforms Fast-dLLM sampling (Wu et al., 2025) in our pass@NFE experiments (Figure 3), we find that the two often perform comparably on downstream tasks such as test-time compute (Figure 4) and RL post-training (Figure 5). Given that prior work has shown a connection between pass@ k and success in these settings, it would be valuable for future work to investigate why this is not reflected in d1-style (Zhao et al., 2025) GRPO for dLLMs. Finally, our formal results rest on idealized assumptions (Appendix C), notably that fork-token entropy degrades linearly in revealed anchors (Assumption 1) and that 
+
+qθ perfectly preserves the data distribution’s fork structure (Assumption 2); furthermore, we only theoretically study TLC at K = 1, leaving a theoretical gap to parallel generation, which has been studied elsewhere (Wu et al., 2025; Ben-Hamu et al., 2025). 
+
+## Acknowledgments 
+
+A. S-L. and TX. O. were supported by NSF grant number CCF-1918839. This project was generously supported by the Bosch Center for Artificial Intelligence. 
+
+## Use of AI assistance 
+
+We acknowledge the use of AI tools in the preparation of this manuscript. Specifically, we utilized language models (LMs) to assist with grammar and style editing, preparation of figures, general coding assistance, drafting and checking proofs, and other tasks. We have reviewed and edited the content to ensure accuracy and clarity, and we take full responsibility for the final version of the manuscript. 
+
+## References 
+
+Marianne Arriola, Aaron Gokaslan, Justin T Chiu, Zhihan Yang, Zhixuan Qi, Jiaqi Han, Subham Sekhar Sahoo, and Volodymyr Kuleshov. Block diffusion: Interpolating between autoregressive and diffusion language models. In The Thirteenth International Conference on Learning Representations , 2025. URL https://arxiv.org/abs/2503.09573 .Jacob Austin, Daniel D. Johnson, Jonathan Ho, Daniel Tarlow, and Rianne van den Berg. Structured denoising diffusion models in discrete state-spaces. In M. Ranzato, A. Beygelzimer, Y. Dauphin, P.S. Liang, and J. Wortman Vaughan (eds.), Advances in Neural Information Processing Systems , volume 34, pp. 17981–17993. Curran Asso-ciates, Inc., 2021a. URL https://proceedings.neurips.cc/paper files/paper/2021/ file/958c530554f78bcd8e97125b70e6973d-Paper.pdf .Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, and Charles Sutton. Program synthesis with large language models, 2021b. URL https://arxiv.org/abs/2108.07732 .Heli Ben-Hamu, Itai Gat, Daniel Severo, Niklas Nolte, and Brian Karrer. Accelerated Sampling from Masked Diffusion Models via Entropy Bounded Unmasking, May 2025. Louis Bethune, Victor Turrisi, Bruno Kacper Mlodozeniec, Pau Rodriguez Lopez, Lokesh Boominathan, Nikhil Bhendawade, Amitis Shidani, Joris Pelemans, Theo X. Olausson, Devon Hjelm, Paul Dixon, Joao Monteiro, Pierre Ablin, Vishnu Banna, Arno Blaas, Nick Henderson, Kari Noriy, Dan Busbridge, Josh Susskind, Marco Cuturi, Irina Belousova, Luca Zappella, Russ Webb, and Jason Ramapuram. The design space of tri-modal masked diffusion models, 2026. URL https://arxiv.org/abs/2602.21472 .Eric Bigelow, Ari Holtzman, Hidenori Tanaka, and Tomer Ullman. Forking paths in neural text generation. arXiv preprint arXiv:2412.07961 , 2024. Andrew Campbell, Joe Benton, Valentin De Bortoli, Thomas Rainforth, George Deligian-nidis, and Arnaud Doucet. A continuous time framework for discrete denoising mod-els. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (eds.), 
+
+Advances in Neural Information Processing Systems , volume 35, pp. 28266–28279. Curran 10 Preprint. Under review. Associates, Inc., 2022. URL https://proceedings.neurips.cc/paper files/paper/2022/ file/b5b528767aa35f5b1a60fe0aaeca0563-Paper-Conference.pdf .Huiwen Chang, Han Zhang, Lu Jiang, Ce Liu, and William T. Freeman. Maskgit: Masked generative image transformer. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , June 2022. Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mo-hammad Bavarian, Clemens Winter, Philippe Tillet, Felipe Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew N. Carr, Jan Leike, Josh Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba. Evaluating large language models trained on code, 2021. URL https://arxiv.org/abs/2107.03374 .Shirui Chen, Jiantao Jiao, Lillian J. Ratliff, and Banghua Zhu. dultra: Ultra-fast diffusion language models via reinforcement learning, 2025. URL https://arxiv.org/abs/2512. 21446 .Daixuan Cheng, Shaohan Huang, Xuekai Zhu, Bo Dai, Xin Zhao, Zhenliang Zhang, and Furu Wei. Reasoning with exploration: An entropy perspective. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, pp. 30377–30385, 2026. Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 , 2021. Ganqu Cui, Yuchen Zhang, Jiacheng Chen, Lifan Yuan, Zhi Wang, Yuxin Zuo, Haozhan Li, Yuchen Fan, Huayu Chen, Weize Chen, Zhiyuan Liu, Hao Peng, Lei Bai, Wanli Ouyang, Yu Cheng, Bowen Zhou, and Ning Ding. The entropy mechanism of reinforcement learning for reasoning language models, 2025. URL https://arxiv.org/abs/2505.22617 .Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of deep bidirectional transformers for language understanding. In Jill Burstein, Christy Doran, and Thamar Solorio (eds.), Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pp. 4171–4186, Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. doi: 10.18653/v1/N19-1423. URL https://aclanthology. org/N19-1423/ .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset. NeurIPS , 2021. Emiel Hoogeboom, Didrik Nielsen, Priyank Jaini, Patrick Forr ´e, and Max Welling. Argmax flows and multinomial diffusion: Learning categorical distributions. In M. Ran-zato, A. Beygelzimer, Y. Dauphin, P.S. Liang, and J. Wortman Vaughan (eds.), Ad-vances in Neural Information Processing Systems , volume 34, pp. 12454–12465. Curran Associates, Inc., 2021. URL https://proceedings.neurips.cc/paper files/paper/2021/ file/67d96d458abdef21792e6d8e590244e7-Paper.pdf .Guanhua Huang, Tingqiang Xu, Mingze Wang, Qi Yi, Xue Gong, Siheng Li, Ruibin Xiong, Kejiao Li, Yuhao Jiang, and Bo Zhou. Low-probability tokens sustain exploration in reinforcement learning with verifiable reward. arXiv preprint arXiv:2510.03222 , 2025a. 11 Preprint. Under review. Zemin Huang, Zhiyang Chen, Zijun Wang, Tiancheng Li, and Guo-Jun Qi. Reinforcing the diffusion chain of lateral thought with diffusion language models. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2025b. Metod Jazbec, Theo X. Olausson, Louis B ´ethune, Pierre Ablin, Michael Kirchhof, Jo ˜ao Monteiro, Victor Turrisi, Jason Ramapuram, and Marco Cuturi. Learning unmasking policies for diffusion language models, 2025. URL https://arxiv.org/abs/2512.09106 .Jaeyeon Kim, Kulin Shah, Vasilis Kontonis, Sham M. Kakade, and Sitan Chen. Train for the worst, plan for the best: Understanding token ordering in masked diffusions. In 
+
+Forty-second International Conference on Machine Learning , 2025a. URL https://openreview. net/forum?id=DjJmre5IkP .Seo Hyun Kim, Sunwoo Hong, Hojung Jung, Youngrok Park, and Se-Young Yun. KLASS: KL-guided fast inference in masked diffusion models. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2025b. URL https://openreview.net/forum?id= gOG9Zoyn4R .Sumith Kulal, Panupong Pasupat, Kartik Chandra, Mina Lee, Oded Padon, Alex Aiken, and Percy S Liang. Spoc: Search-based pseudocode to code. In H. Wal-lach, H. Larochelle, A. Beygelzimer, F. d'Alch ´e-Buc, E. Fox, and R. Garnett (eds.), 
+
+Advances in Neural Information Processing Systems , volume 32. Curran Associates, Inc., 2019. URL https://proceedings.neurips.cc/paper files/paper/2019/file/ 7298332f04ac004a0ca44cc69ecf6f6b-Paper.pdf .Sean Lamont, Christian Walder, Paul Montague, Amir Dezfouli, and Michael Norrish. Free lunch for pass@ k? low cost diverse sampling for diffusion language models. arXiv preprint arXiv:2603.04893 , 2026. Zihan Liu, Yang Chen, Mohammad Shoeybi, Bryan Catanzaro, and Wei Ping. Acemath: Advancing frontier math reasoning with post-training and reward modeling. arXiv preprint , 2024. Aaron Lou, Chenlin Meng, and Stefano Ermon. Discrete diffusion modeling by estimating the ratios of the data distribution. In Ruslan Salakhutdinov, Zico Kolter, Katherine Heller, Adrian Weller, Nuria Oliver, Jonathan Scarlett, and Felix Berkenkamp (eds.), Proceedings of the 41st International Conference on Machine Learning , volume 235 of Proceedings of Machine Learning Research , pp. 32819–32848. PMLR, 21–27 Jul 2024. URL https://proceedings. mlr.press/v235/lou24a.html .Chenlin Meng, Kristy Choi, Jiaming Song, and Stefano Ermon. Concrete score matching: Generalized score matching for discrete data. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (eds.), Advances in Neural Information Processing Systems ,volume 35, pp. 34532–34545. Curran Associates, Inc., 2022. Zanlin Ni, Shenzhi Wang, Yang Yue, Tianyu Yu, Weilin Zhao, Yeguo Hua, Tianyi Chen, Jun Song, Cheng Yu, Bo Zheng, and Gao Huang. The flexibility trap: Why arbitrary order limits reasoning potential in diffusion language models. arXiv preprint arXiv:2601.15165 ,2026. Shen Nie, Fengqi Zhu, Chao Du, Tianyu Pang, Qian Liu, Guangtao Zeng, Min Lin, and Chongxuan Li. Scaling up masked diffusion models on text. In Y. Yue, A. Garg, N. Peng, F. Sha, and R. Yu (eds.), International Conference on Learning Representations , volume 2025, pp. 82974–82997, 2025a. URL https://proceedings.iclr.cc/paper files/paper/2025/ file/ce1c1ff5d94079dea348a2317a889281-Paper-Conference.pdf .Shen Nie, Fengqi Zhu, Zebin You, Xiaolu Zhang, Jingyang Ou, Jun Hu, Jun Zhou, Yankai Lin, Ji-Rong Wen, and Chongxuan Li. Large language diffusion models. arXiv preprint arXiv:2502.09992 , 2025b. Theo X. Olausson, Jeevana Priya Inala, Chenglong Wang, Jianfeng Gao, and Armando Solar-Lezama. Is self-repair a silver bullet for code generation? In International Conference on Learning Representations (ICLR) , 2024. 12 Preprint. Under review. Jingyang Ou, Shen Nie, Kaiwen Xue, Fengqi Zhu, Jiacheng Sun, Zhenguo Li, and Chongxuan Li. Your absorbing discrete diffusion secretly models the condi-tional distributions of clean data. In Y. Yue, A. Garg, N. Peng, F. Sha, and R. Yu (eds.), International Conference on Learning Representations , volume 2025, pp. 64972–65009, 2025. URL https://proceedings.iclr.cc/paper files/paper/2025/file/ a365e37c18fb91af547a2f0012a89e98-Paper-Conference.pdf .Aleksei Petrenko, Ben Lipkin, Kevin Chen, Erik Wijmans, Marco Francis Cusumano-Towner, Raja Giryes, and Philipp Kraehenbuehl. Entropy-preserving reinforcement learning. In The Fourteenth International Conference on Learning Representations , 2026. URL https: //openreview.net/forum?id=E8MR8jgEeZ .Kevin Rojas, Jiahe Lin, Kashif Rasul, Anderson Schneider, Yuriy Nevmyvaka, Molei Tao, and Wei Deng. Improving reasoning for diffusion language models via group diffusion policy optimization. arXiv preprint arXiv:2510.08554 , 2025. Subham Sekhar Sahoo, Marianne Arriola, Aaron Gokaslan, Edgar Mariano Marroquin, Alexander M Rush, Yair Schiff, Justin T Chiu, and Volodymyr Kuleshov. Simple and effective masked diffusion language models. In ICML 2024 Workshop on Efficient and Accessible Foundation Models for Biological Discovery , 2024. URL https://openreview.net/ forum?id=DdU9gP4EXW .Yangyi Shen, Tianjian Feng, Jiaqi Han, Wen Wang, Tianlang Chen, Chunhua Shen, Jure Leskovec, and Stefano Ermon. Improving diffusion language model decoding through joint search in generation order and token space, 2026. URL https://arxiv.org/abs/ 2601.20339 .Charlie Victor Snell, Jaehoon Lee, Kelvin Xu, and Aviral Kumar. Scaling LLM test-time compute optimally can be more effective than scaling parameters for reasoning. In 
+
+The Thirteenth International Conference on Learning Representations , 2025. URL https:// openreview.net/forum?id=4FWAwZtd2n .Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In Francis Bach and David Blei (eds.), Proceedings of the 32nd International Conference on Machine Learning ,volume 37 of Proceedings of Machine Learning Research , pp. 2256–2265, Lille, France, 07–09 Jul 2015. PMLR. URL https://proceedings.mlr.press/v37/sohl-dickstein15.html .Gilad Turok, Chris De Sa, and Volodymyr Kuleshov. DUEL: Exact likelihood for masked diffusion via deterministic unmasking, 2026. URL https://arxiv.org/abs/2603.01367 .Chenyu Wang, Paria Rashidinejad, DiJia Su, Song Jiang, Sid Wang, Siyan Zhao, Cai Zhou, Shannon Zejiang Shen, Feiyu Chen, Tommi Jaakkola, et al. Spg: Sandwiched policy gradient for masked diffusion language models. arXiv preprint arXiv:2510.09541 , 2025a. Guanghan Wang, Gilad Turok, Yair Schiff, Marianne Arriola, and Volodymyr Kuleshov. d2: Improved techniques for training reasoning diffusion language models, 2026. URL 
+
+https://arxiv.org/abs/2509.21474 .Shenzhi Wang, Le Yu, Chang Gao, Chujie Zheng, Shixuan Liu, Rui Lu, Kai Dang, Xionghui Chen, Jianxin Yang, Zhenru Zhang, et al. Beyond the 80/20 rule: High-entropy mi-nority tokens drive effective reinforcement learning for llm reasoning. arXiv preprint arXiv:2506.01939 , 2025b. Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc Le, Ed Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. Self-consistency improves chain of thought reasoning in language models, 2023. URL https://arxiv.org/abs/2203.11171 .Yinjie Wang, Ling Yang, Bowen Li, Ye Tian, Ke Shen, and Mengdi Wang. Revolutionizing reinforcement learning framework for diffusion large language models. arXiv preprint arXiv:2509.06949 , 2025c. 13 Preprint. Under review. Chengyue Wu, Hao Zhang, Shuchen Xue, Zhijian Liu, Shizhe Diao, Ligeng Zhu, Ping Luo, Song Han, and Enze Xie. Fast-dllm: Training-free acceleration of diffusion llm by enabling kv cache and parallel decoding, 2025. URL https://arxiv.org/abs/2505.22618 .Jingxuan Wu, Zhenglin Wan, Xingrui Yu, Yuzhe Yang, Yiqiao Huang, Ivor Tsang, and Yang You. Time-annealed perturbation sampling: Diverse generation for diffusion language models. arXiv preprint arXiv:2601.22629 , 2026. Ling Yang, Ye Tian, Bowen Li, Xinchen Zhang, Ke Shen, Yunhai Tong, and Mengdi Wang. Mmada: Multimodal large diffusion language models. arXiv preprint arXiv:2505.15809 ,2025. Jiacheng Ye, Zhihui Xie, Lin Zheng, Jiahui Gao, Zirui Wu, Xin Jiang, Zhenguo Li, and Ling-peng Kong. Dream 7b: Diffusion large language models. arXiv preprint arXiv:2508.15487 ,2025. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, Xin Liu, Haibin Lin, Zhiqi Lin, Bole Ma, Guang-ming Sheng, Yuxuan Tong, Chi Zhang, Mofan Zhang, Wang Zhang, Hang Zhu, Jinhua Zhu, Jiaze Chen, Jiangjie Chen, Chengyi Wang, Hongli Yu, Yuxuan Song, Xiangpeng Wei, Hao Zhou, Jingjing Liu, Wei-Ying Ma, Ya-Qin Zhang, Lin Yan, Mu Qiao, Yonghui Wu, and Mingxuan Wang. Dapo: An open-source llm reinforcement learning system at scale, 2025. URL https://arxiv.org/abs/2503.14476 .Yang Yue, Zhiqi Chen, Rui Lu, Andrew Zhao, Zhaokai Wang, Yang Yue, Shiji Song, and Gao Huang. Does reinforcement learning really incentivize reasoning capacity in llms beyond the base model? arXiv preprint arXiv:2504.13837 , 2025. Hanyang Zhao, Dawen Liang, Wenpin Tang, David Yao, and Nathan Kallus. DiFFPO: Training diffusion llms to reason fast and furious via reinforcement learning, 2026. URL 
+
+https://arxiv.org/abs/2510.02212 .Siyan Zhao, Devaansh Gupta, Qinqing Zheng, and Aditya Grover. d1: Scaling rea-soning in diffusion large language models via reinforcement learning. arXiv preprint arXiv:2504.12216 , 2025. Kaiwen Zheng, Yongxin Chen, Hanzi Mao, Ming-Yu Liu, Jun Zhu, and Qinsheng Zhang. Masked Diffusion Models are Secretly Time-Agnostic Masked Models and Exploit Inaccu-rate Categorical Sampling, April 2025. 14 Preprint. Under review. 
+
+## A Extended Related Work 
+
+Post-training dLLMs. Most work on adapting policy optimization to dLLMs has focused on tackling the intractability of dLLM’s likelihood (Zhao et al. 2025; Rojas et al. 2025; Wang et al. 2025c;a; 2026; Turok et al. 2026; inter alia ), while the impact of remasking strategy on policy exploration has received less attention thus far. Most closely related to our work, Ni et al. (2026) observed a tension between efficiency and diversity in deterministic confidence-based samplers, and instead proposed using AR sampling to encourage exploration in dLLMs. Crystallizing their observation into a formal model directly led to the alternative solution of tempered samplers we propose in this work, which improve sample diversity without sacrificing generation speed. 
+
+Remasking strategies for dLLMs. Building on the simplicity of the first-hit sampler pro-posed by Zheng et al. (2025), a variety of heuristic remasking strategies have been proposed. Fixed-budget methods choose a pre-determined number of positions after ranking candi-dates by confidence (Chang et al., 2022; Nie et al., 2025b), prediction margin (Kim et al., 2025a), or KL stability across steps (Kim et al., 2025b), while adaptive methods unmask variable-size sets via confidence thresholds (Wu et al., 2025) or entropy bounds (Ben-Hamu et al., 2025). Orthogonally, some works have sought to learn remasking strategies (Huang et al., 2025b; Jazbec et al., 2025; Chen et al., 2025; Zhao et al., 2026). Common to all of the above is their focus on the accuracy–speed tradeoff for individual samples under greedy decoding, in contrast to our focus on diversity. 
+
+The role of sample diversity in language modeling. Sample diversity has been found to be a critical component in multiple stages of the LLM scaling pipeline: Yue et al. (2025) showed that RL accuracy gains are bounded by base-model pass@ k, and test-time scaling requires meaningfully distinct candidates for strategies such as self-consistency (Wang et al., 2023) and Best-of-N (Snell et al., 2025). In autoregressive models, maintaining diversity during post-training has required indirect interventions such as entropy regularization (Yu et al., 2025; Cui et al., 2025; Petrenko et al., 2026), entropy-based advantage shaping (Cheng et al., 2026), or selective regularization of low-probability exploratory tokens (Huang et al., 2025a); we show that in the case of dLLMs, the flexible generation order itself provides an alternative lever. 
+
+Fork tokens. Bigelow et al. (2024) studied forking tokens in neural text generation, show-ing that resampling a small set of high-impact tokens can induce qualitatively different continuations. More recently, Wang et al. (2025b) popularized the term forking tokens to describe high-entropy tokens that steer reasoning, and demonstrated their crucial role for effective RLVR of autoregressive LLMs. Ni et al. (2026) investigated forks in dLLMs and empirically showed that their entropy degrades under popular confidence-based samplers. In our work, we formalize these fork tokens operationally to better understand how the choice of remasking strategy impacts sample diversity for dLLMs. 15 Preprint. Under review. 
+
+## B Algorithms 
+
+Algorithm 1 Low-Confidence (LC) Sam-pling 
+
+1: Input: xt, qθ , K, Ttoken 
+
+2: Output: xt−1
+
+3: Mt ← { k ∈ [L] | xkt = [MASK] }
+
+4: xk 
+
+> 0
+
+∼ qk 
+
+> θ
+
+(· | xt; Ttoken )
+
+5: ckt ← qk 
+
+> θ
+
+(xk 
+
+> 0
+
+| xt)
+
+6: Ut ← argtop-K k∈M t ckt
+
+7: xkt−1 :=
+
+xt 
+
+> 0
+
+, k ∈ U t
+
+xkt , else 
+
+Algorithm 2 Tempered Low-Confidence (TLC) Sampling 
+
+1: Input: xt, qθ , K, Ttoken , Tpos 
+
+2: Output: xt−1
+
+3: Mt ← { k ∈ [L] | xkt = [MASK] }
+
+4: xk 
+
+> 0
+
+∼ qk 
+
+> θ
+
+(· | xt; Ttoken )
+
+5: ckt ← qk 
+
+> θ
+
+(xk 
+
+> 0
+
+| xt)
+
+6: ˜ckt ∝ (ckt )1/ Tpos · 1 (k ∈ M t)
+
+7: Ut ∼ Cat ( ˜ct) w/o repl., |U t| = K
+
+8: xkt−1 :=
+
+xt 
+
+> 0
+
+, k ∈ U t
+
+xkt , else 
+
+Algorithm 3 Confidence Thresholding (CT) Sampling ; Fast-dLLM (Wu et al., 2025) 
+
+1: Input: xt, qθ , λ, Ttoken 
+
+2: Output: xt−1
+
+3: Mt ← { k ∈ [L] | xkt = [MASK] }
+
+4: xk 
+
+> 0
+
+∼ qk 
+
+> θ
+
+(· | xt; Ttoken )
+
+5: ckt ← qk 
+
+> θ
+
+(xt 
+
+> 0
+
+| xt)
+
+6: Ut ← { k ∈ M t : ckt > λ}
+
+7: xkt−1 :=
+
+xt 
+
+> 0
+
+, k ∈ U t
+
+xkt , else 
+
+Algorithm 4 Tempered Confidence Thresh-olding (TCT) Sampling 
+
+1: Input: xt, qθ , λ, Ttoken , Tpos 
+
+2: Output: xt−1
+
+3: Mt ← { k ∈ [L] | xkt = [MASK] }
+
+4: xk 
+
+> 0
+
+∼ qk 
+
+> θ
+
+(· | xt; Ttoken )
+
+5: ckt ← qk 
+
+> θ
+
+(xt 
+
+> 0
+
+| xt)
+
+6: bkt ∼ Ber 
+
+
+
+σ
+
+
+
+(ckt − λ)/Tpos 
+
+ 
+
+7: Ut ← { k ∈ M t : bkt = 1}
+
+8: xkt−1 :=
+
+xt 
+
+> 0
+
+, k ∈ U t
+
+xkt , else 16 Preprint. Under review. 
+
+## C Formal Statements and Proofs 
+
+In this appendix we develop the formal machinery described in Section 3.1. 
+
+Roadmap. We begin by giving an operational definition of fork tokens (Definition 1) and state the main assumption underlying our analysis (Assumption 1). We then establish a pairwise ordering lemma between anchors and forks (Lemma 1) and use it to prove our main result: increasing Tpos increases fork-token entropy (Proposition 1). Next, Corollary 1 ties this to the semantic sample entropy through an additional assumption on the model quality (Assumption 2). Finally, we show that under a mild additional assumption token temperature does not help preserve fork token entropy (Proposition 2) while autoregressive generation provably does, compared to low-confidence remasking (Proposition 3). 
+
+Notation. 
+
+• xt: a (possibly partially masked) string of length L at time t.• Mt = {k ∈ [L] | xkt = [MASK] }: the set of masked positions in xt.• qθ : the dLLM used. • qk 
+
+> θ
+
+(·| xt): its predicted marginal distribution over tokens at position k, when prompted with xt.• ckt or ct,k: the confidence of the model qθ at position k in state xt (see Section 2.2). When using the superscript for other purposes (such as taking powers), we use the double subscript notation. • Tpos : position temperature, controlling the stochasticity of the remasking order for TLC. • Pπ,θ or PTpos : the joint distribution over generation trajectories induced by pairing 
+
+qθ with remasking strategy π. The shorthand PTpos is used when π is TLC with position temperature Tpos .• T(j) or Tπ (j): the step at which position j is unmasked. Since this is a random quantity in Pπ,θ , the subscript π is included when the remasking strategy used needs to be made explicit. • J·K : V L → S : a function mapping strings to semantic outcomes (e.g., final answers for mathematics problems, or program outputs with respect to a fixed test suite). With this notation in hand, we can now give an operational definition of fork tokens. 
+
+Definition 1 ((ϵ, δ)-fork token) . Let xt be a partially masked string with masked positions Mt. A position ℓ ∈ M t is an (ϵ, δ)-fork token with respect to p data and xt if: 1. H pdata (xℓ 
+
+> 0
+
+| xt, Jx0K) ≤ ϵ ;2. H pdata (Jx0K | xt, xℓ
+
+> 0
+
+) ≤ δ .
+
+That is, the fork token’s value and the semantic outcome are tightly coupled: knowing one constrains the other to a high degree of certainty. Repeatedly applying the chain rule, it follows immediately that 
+
+Hpdata (xℓ 
+
+> 0
+
+| xt) − ϵ ≤ Hpdata (Jx0K | xt) ≤ Hpdata (xℓ 
+
+> 0
+
+| xt) + δ . (6) This aligns with the intuition in prior work (Wang et al., 2025b; Ni et al., 2026) that fork-token entropy largely dictates the semantic diversity of samples. To relate this definition to Ni et al. (2026)’s empirical observations, we need a model of 
+
+how the distribution Pπ,θ induced by pairing qθ with a remasking function π interacts with such fork tokens. Based on their findings, we posit a simple model in which a fork token’s predictive entropy is governed by a small set of high-confidence anchor positions whose confidences dominate that of the fork. 17 Preprint. Under review. 
+
+Assumption 1 (Anchor-fork degeneracy) . Let ℓ be an (ϵ, δ)-fork token with respect to pdata , J·K,and xt. We say that Pπ,θ suffers from an anchor-fork degeneracy at ℓ in xt if there exist anchor positions A ⊂ M t \ { ℓ} with constants ηa > 0 such that for every state xt′ reachable through Pπ,θ (· | xt) with ℓ ∈ M t′ :1. There is a persistent anchor-fork confidence gap: cat′ > cℓ 
+
+> t′
+
+for every remaining anchor a ∈ A ∩ M t′ .2. Revealing anchors linearly degrades the fork entropy: 
+
+Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt′ ) = Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) − ∑
+
+> a∈A\M t′
+
+ηa (7) 
+
+where H qℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) > ∑a∈A ηa > 0.
+
+As mentioned in Section 3.1, this model is directly inspired by (and consistent with) the empirical findings of Ni et al. (2026): (i) LC deterministically reveals all anchors before the fork, yielding minimal entropy; (ii) Ttoken will not affect the unmasking order unless it flips the confidences, and hence often leaves the expectation over π unchanged (Appendix C.3); and (iii) left-to-right generation yields strictly higher fork entropy than LC whenever at least one anchor follows the fork in positional order (Appendix C.4). We now give formal evidence for each of these claims, beginning with a pairwise ordering bound that underlies the main proposition. 
+
+C.1 A pairwise anchor-fork ordering bound Lemma 1 (Pairwise anchor-fork ordering bound) . Let ℓ be a fork token subject to an anchor-fork degeneracy (Assumption 1), and let a ∈ A be one of its anchors. Under TLC with K = 1 at position temperature Tpos > 0, let T(ℓ) and T(a) denote the steps at which ℓ and a are unmasked, respectively. Define 
+
+δa ≜ inf 
+
+> xt′
+
+ln ct′,a
+
+ct′,ℓ
+
+and ∆a ≜ sup 
+
+> xt′
+
+ln ct′,a
+
+ct′,ℓ
+
+where both extrema are taken over all states xt′ reachable from xt with {ℓ, a} ⊂ M t′ . Then 
+
+σ
+
+ δa
+
+Tpos 
+
+
+
+≤ PTpos (T(a) < T(ℓ)) ≤ σ
+
+ ∆a
+
+Tpos 
+
+
+
+where σ(x) = 1/ (1 + e−x ) is the sigmoid function. Proof. Note first that 0 < δa ≤ ∆a < ∞: the lower bound follows from the confidence gap (Assumption 1, condition 1), and the upper bound from the fact that ct′,a ≤ 1 and ct′,ℓ > 0 in every reachable state. The statement is thus well-posed. Now, under TLC with K = 1, each step selects a single masked position j with probability proportional to c1/ Tpos  
+
+> t,j
+
+. Let t∗ = min (T(a), T(ℓ)) be the first step at which either a or ℓ is unmasked. At step t∗, conditioning on the event that the selected position lies in {a, ℓ} and marginalizing out all other masked positions, we obtain 
+
+PTpos (T(a) < T(ℓ)) = c1/ Tpos 
+
+> t∗,a
+
+c1/ Tpos  
+
+> t∗,a
+
++ c1/ Tpos 
+
+> t∗,ℓ
+
+= (ct∗,a/ct∗,ℓ)1/ Tpos 
+
+1 + ( ct∗,a/ct∗,ℓ)1/ Tpos = σ
+
+ ln (ct∗,a/ct∗,ℓ)
+
+Tpos 
+
+
+
+.Since δa ≤ ln (ct∗,a/ct∗,ℓ) ≤ ∆a and σ is strictly increasing, the result follows. 
+
+C.2 Increasing Tpos increases fork-token entropy Proposition 1 (Increasing Tpos increases fork-token entropy) . Let Tpos , T′ 
+
+> pos
+
+> 0 be two position temperatures for TLC at K = 1. Let ℓ be a fork token in state xt subject to an anchor-fork degeneracy 
+
+18 Preprint. Under review. 
+
+(Assumption 1) under both P Tpos and P T′ 
+
+> pos
+
+. Let δa, ∆a be as in Lemma 1, and define 
+
+δ ≜ min  
+
+> a∈A
+
+δa, ∆ ≜ max  
+
+> a∈A
+
+∆a.
+
+Then if T ′ 
+
+> pos
+
+> Tpos · ∆/δ,HPTpos (xℓ 
+
+> 0
+
+| xt) < HPT′
+
+> pos
+
+(xℓ 
+
+> 0
+
+| xt).
+
+Proof. By the linear entropy reduction condition (Assumption 1, condition 2) as well as standard results about E (the tower rule and the linearity of expectation), we have for 
+
+τ ∈ { Tpos , T′
+
+> pos
+
+} that 
+
+HPτ,θ (xℓ 
+
+> 0
+
+| xt) = ExTτ (ℓ)−1∼Pτ,θ
+
+h
+
+Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xTτ (ℓ)−1)
+
+i
+
+(tower rule) 
+
+= ExTτ (ℓ)−1∼Pτ,θ
+
+Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) − ∑ 
+
+> a∈A\M Tτ(ℓ)−1
+
+ηa
+
+ (Assumption 1) 
+
+= Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) − ExTτ (ℓ)−1∼Pτ,θ
+
+ ∑ 
+
+> a∈A\M Tτ(ℓ)−1
+
+ηa
+
+
+
+= Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) − ∑
+
+> a∈A
+
+Pτ (T(a) < T(ℓ)) · ηa
+
+where Tτ (ℓ) denotes the unmasking time of the fork. Since each η > 0, it thus suffices to show that PT′ 
+
+> pos
+
+(T(a) < T(ℓ)) < PTpos (T(a) < T(ℓ)) for every a ∈ A . Per Lemma 1 and the definitions of δ, ∆:
+
+PT′ 
+
+> pos
+
+(T(a) < T(ℓ)) ≤ σ ∆
+
+T′
+
+> pos
+
+!
+
+< σ
+
+ δ
+
+Tpos 
+
+
+
+≤ PTpos (T(a) < T(ℓ)) ,where the strict inequality follows from the gap condition T′ 
+
+> pos
+
+> Tpos · ∆/δ, which gives 
+
+∆/T′ 
+
+> pos
+
+< δ/Tpos , combined with σ being strictly increasing. The result follows. 
+
+Remark 1. Lemma 1 only applies when Tpos , T′ 
+
+> pos
+
+> 0, so this proof does not allow us to compare TLC (at some Tpos > 0) vs LC. However, note that this case is trivial: Under LC, all anchors are revealed before the fork with probability 1 by the confidence gap (Assumption 1, condition 1), so HP0, θ (xℓ 
+
+> 0
+
+| xt) = Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) − ∑
+
+> a∈A
+
+ηa,
+
+the minimal fork entropy achievable under the anchor-fork degeneracy model. Since any Tpos > 0
+
+yields P Tpos (T(a) < T(ℓ)) < 1 for every anchor a (that is, σ(x) < 1 for all finite x), it follows that HPTpos ,θ (xℓ 
+
+> 0
+
+| xt) > HPLC ,θ (xℓ 
+
+> 0
+
+| xt) for any Tpos > 0. That is, any amount of tempering strictly improves fork-token entropy over deterministic LC. 
+
+In order to tie this proposition back to Definition 1 and conclude that the semantic entropy of the final generation will increase (Corollary 1), we need one more assumption: that 
+
+qθ captures the data distribution well enough that no matter what π is (within the set of strategies under consideration), it will not stop ℓ from also being a fork token with respect to Pπ,θ .
+
+Assumption 2 (Model quality) . Let ℓ be an (ϵ, δ)-fork token with respect to pdata and xt. We say that qθ preserves the fork structure at ℓ if ℓ is also an (ϵ, δ)-fork token with respect to Pπ,θ for all remasking strategies π.
+
+That is, if the data distribution has a fork at position ℓ, then qθ ’s sampling distribution preserves that property regardless of the remasking strategy, so that the sandwich bound (6) also holds under Pπ,θ .We are now ready to finally make a statement about how HPπ,θ (Jx0K | xt) varies with Tpos :that is, how changing the position temperature affects the semantic entropy of our samples. 19 Preprint. Under review. 
+
+Corollary 1 (Semantic entropy increases with Tpos ). Under the conditions of Proposition 1, suppose further that q θ preserves the fork structure at ℓ (Assumption 2). If HPT′
+
+> pos
+
+(xℓ 
+
+> 0
+
+| xt) − HPT pos (xℓ 
+
+> 0
+
+| xt) > ϵ + δ,
+
+then HPT′
+
+> pos
+
+(Jx0K | xt) > HPTpos (Jx0K | xt).
+
+Proof. Applying the sandwich bound (6) under PT′ 
+
+> pos ,θ
+
+and PTpos ,θ respectively (which is valid by Assumption 2): 
+
+HPT′
+
+> pos
+
+(Jx0K | xt) ≥ HPT′
+
+> pos
+
+(xℓ 
+
+> 0
+
+| xt) − ϵ
+
+> HPTpos (xℓ 
+
+> 0
+
+| xt) + δ
+
+≥ HPTpos (Jx0K | xt)
+
+where the strict inequality uses the assumed gap. 
+
+C.3 Token temperature does not affect fork-token entropy under deterministic remasking 
+
+As shown in Appendix B, the confidences ckt do not depend on Ttoken as typically imple-mented 4 in confidence-based heuristics. One may speculate that allowing Ttoken to affect the confidences and then increasing it would yield similar diversity gains to adjusting Tpos .We here show that, under a strengthened version of the confidence-gap from Assumption 1, this is provably not the case: the unmasking order under deterministic LC is invariant to 
+
+Ttoken regardless, so adjusting Ttoken does not help with preserving entropy at forks. 
+
+Proposition 2 (Token temperature invariance under deterministic LC) . Let ℓ be a fork token subject to an anchor-fork degeneracy (Assumption 1), and suppose sampling is performed using deterministic low-confidence remasking at K = 1, with confidences taken post-tempering with Ttoken .Suppose further that for all reachable states xt′ with ℓ ∈ M t′ , every remaining anchor a ∈ A ∩ M t′
+
+satisfies a strengthened gap condition: za 
+
+> (1)
+
+− za 
+
+> (i)
+
+≥ zℓ 
+
+> (1)
+
+− zℓ 
+
+> (i)
+
+for all i ≥ 2, with at least one inequality strict where zj 
+
+> (1)
+
+≥ zj 
+
+> (2)
+
+≥ · · · denotes the logit vector at position j sorted in descending order. Then all anchors are revealed before ℓ regardless of T token .Proof. Under this version of deterministic LC, the unmasking order is determined by arg max j∈M t cjt(Ttoken ), where cj(T) = max v[softmax (zj/T)] v. It suffices to show that 
+
+ca(T) > cℓ(T) for all T > 0. Let V = |V | and let z be any logit vector with sorted entries z(1) ≥ z(2) ≥ · · · ≥ z(V). Then 
+
+c(T) = ez(1) /T
+
+∑Vi=1 ez(i) /T = 11 + ∑Vi=2 e(z(i) −z(1) )/T .By the assumption that za 
+
+> (1)
+
+− za 
+
+> (i)
+
+≥ zℓ 
+
+> (1)
+
+− zℓ 
+
+> (i)
+
+for all i ≥ 2, we have za 
+
+> (i)
+
+− za 
+
+> (1)
+
+≤ zℓ 
+
+> (i)
+
+− zℓ
+
+> (1)
+
+and hence e(za   
+
+> (i)−za
+> (1))/T
+
+≤ e(zℓ   
+
+> (i)−zℓ
+> (1))/T
+
+for each i and all T > 0. Summing over i ≥ 2 and using the assumption that at least one inequality is strict (which we note follows anyway from the confidence-gap condition of Assumption 1), we have that: 
+
+ca(T) = 11 + ∑Vi=2 e(za   
+
+> (i)−za
+> (1))/T
+
+> 11 + ∑Vi=2 e(zℓ   
+
+> (i)−zℓ
+> (1))/T
+
+= cℓ(T).The unmasking order is thus preserved for all T > 0, so all anchors are revealed before ℓ
+
+regardless of Ttoken .
+
+> 4
+
+See, e.g., the source code for LLaDA’s low-confidence remasking or Fast-dLLM’s reference imple-mentation for confidence-thresholding. 
+
+20 Preprint. Under review. 
+
+C.4 Autoregressive generation increases fork-token entropy 
+
+Finally, we observe that autoregressive (left-to-right) generation yields higher fork-token entropy than deterministic low-confidence remasking, since it does not systematically defer the fork. 
+
+Proposition 3 (Autoregressive generation improves fork-token entropy) . Let ℓ be a fork token subject to an anchor-fork degeneracy (Assumption 1) with respect to both LC and AR, and suppose at least one anchor appears after ℓ in left-to-right order. Then HPLC, θ (xℓ 
+
+> 0
+
+| xt) < HPAR, θ (xℓ 
+
+> 0
+
+| xt).
+
+Proof. Under both strategies the remasking order is deterministic, so Rπ = {a ∈ A : T(a) <
+
+T(ℓ)} is a fixed set for each. Under LC, the confidence gap ensures RLC = A. Under AR, RAR = {a ∈ A : a < ℓ } ⊊ A by assumption. By the tower rule (as in the proof of Proposition 1), 
+
+HPπ,θ (xℓ 
+
+> 0
+
+| xt) = ExTπ (ℓ)−1
+
+h
+
+Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xTπ (ℓ)−1)
+
+i
+
+= Hqℓ
+
+> θ
+
+(xℓ 
+
+> 0
+
+| xt) − ∑
+
+> a∈Rπ
+
+ηa ,where the second equality applies condition 2 of Assumption 1, noting that A \ M Tπ (ℓ)−1 =
+
+Rπ . Since RAR ⊊ RLC = A and each ηa > 0, we thus conclude that 
+
+HPAR, θ (xℓ 
+
+> 0
+
+| xt) > HPLC, θ (xℓ 
+
+> 0
+
+| xt).21 Preprint. Under review. 
+
+## D Additional Figures 1 2 4 8 16 32 64 
+
+k
+
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> Pass@ k (%)
+
+HumanEval — LLaDA-8B             
+
+> Autoregressive Low Confidence ( Tpos =0) Random ( Tpos =∞)TLC ( Tpos =2) TLC ( Tpos =1) TLC ( Tpos =0.5) TLC ( Tpos =0.1)
+
+Figure 6: TLC Tpos ablation on HumanEval with LLaDA-8B-Instruct with Ttoken = 0.8. Too little tempering ( Tpos = 0.1 ) remains close to low-confidence remasking, while too much ( Tpos = 2) approaches random remasking and degrades quality. Intermediate values (Tpos ∈ { 0.5, 1 }) strike the best balance, matching or exceeding the autoregressive baseline at high k.1 2 4 8 16 32 64 
+
+> k
+> 0
+> 20
+> 40
+> 60
+> 80
+> Pass@ k (%)
+
+Ttoken = 0.3           
+
+> Autoregressive Low Confidence ( Tpos =0) TLC ( Tpos =1)
+> 124816 32 64
+> k
+
+Ttoken = 0.6       
+
+> 124816 32 64
+> k
+
+Ttoken = 0.8       
+
+> 124816 32 64
+> k
+> 0
+> 20
+> 40
+> 60
+> 80
+> Pass@ k (%)
+
+Ttoken = 1.0       
+
+> 124816 32 64
+> k
+
+Ttoken = 1.2       
+
+> 124816 32 64
+> k
+
+Ttoken = 1.5 
+
+Figure 7: Varying Ttoken for LLaDa-8B-Instruct on HumanEval.Autoregressive generation favors low temperatures, obtaining its best pass@64 at Ttoken = 0.6. Meanwhile, low-confidence remasking scales very poorly at low token temperatures due to its greedy position selection. TLC consistently shows strong scaling and most robustness to the exact choice of Ttoken , matching or exceeding the best of autoregressive and low-confidence remasking in pass@64 at all temperatures. Moreover, it exhibits stronger scaling compared to low-confidence across all considered Ttoken , suggesting it achieves diversity through an alternative mechanism. 22 Preprint. Under review. 1 2 4 8 16 32 64 96 
+
+k
+
+> 60
+> 70
+> 80
+> 90
+> 100
+> Pass@ k (%)
+
+GSM8K          
+
+> Autoregressive Fast-dLLM TCT ( Tpos =0.1)
+> 124816 32 64 96
+
+k
+
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+
+MATH        
+
+> 124816 32 64 96
+
+k
+
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+
+HumanEval        
+
+> 124816 32 64 96
+
+k
+
+> 40
+> 50
+> 60
+> 70
+> 80
+
+MBPP    
+
+> 02000 4000 6000
+
+NFEs    
+
+> 60
+> 70
+> 80
+> 90
+> 100
+> Pass@k (%)
+> 02000 4000 6000
+
+NFEs     
+
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 01000 2000 3000 4000
+
+NFEs     
+
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> 0500 1000 1500 2000
+
+NFEs 
+
+> 40
+> 50
+> 60
+> 70
+> 80
+
+Figure 8: Pass@ k (top) and pass@NFE (bottom) for TCT on Dream-7B-Instruct. Note that both rows plot the same data, we just vary the x-axis measure ( k vs NFEs). While TCT slightly underperforms AR in pass@ k, it outperforms AR when the cost of each rollout is taken into account. 1 2 4 8 16 32 64 96 
+
+k
+
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Best@ k (%)
+
+GSM8K        
+
+> 124816 32 64 96
+
+k
+
+> 25
+> 30
+> 35
+> 40
+
+MATH        
+
+> 124816 32 64 96
+
+k
+
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Best@ k (%)
+
+GSM8K        
+
+> 124816 32 64 96
+
+k
+
+> 25
+> 30
+> 35
+> 40
+> 45
+> 50
+> 55
+
+MATH    
+
+> 02000 4000 6000
+
+NFEs      
+
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Best@ k (%)
+> Autoregressive Fast-dLLM TCT ( Tpos =0.1)
+> 02500 5000 7500
+
+NFEs    
+
+> 25
+> 30
+> 35
+> 40
+> 02000 4000 6000
+
+NFEs    
+
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Best@ k (%)
+> 02500 5000 7500
+
+NFEs 
+
+> 25
+> 30
+> 35
+> 40
+> 45
+> 50
+> 55
+
+Self-Consistency ORM 
+
+Figure 9: Test-time scaling for LLaDA-8B-Instruct in terms of Best@ k (top) and Best@NFE (bottom) when using either self-consistency or an ORM for final answer selection. TCT performs worse compared to AR at higher NFEs when using self-consistency; however, when using an ORM, TCT improves the pareto frontier compared to autoregressive rollouts. 23 Preprint. Under review. 1 2 4 8 16 32 64 
+
+> k
+> 0.0
+> 0.5
+> 1.0
+> Entropy@k (nats)
+
+GSM8K         
+
+> Autoregressive Fast-dLLM TCT ( Tpos =0.1)
+> 124816 32 64
+> k
+> 0
+> 1
+> 2
+
+MATH 
+
+Figure 10: Mean empirical entropy of the per-question answer distributions (see Figure 11) as a function of the group size k. TCT consistently yields higher-entropy answer distributions than autoregressive and confidence thresholding, particularly on GSM8k. 2* 
+
+> 2.5
+> 7
+> 27
+> 16
+> 9
+> invalid
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> P(answer)
+
+Question 1   
+
+> Autoregressive Fast-dLLM TCT ( Tpos =0.1)
+> 8*
+> 10
+> 00
+> 100
+> 14
+> invalid
+
+Question 2 
+
+> 16*
+> 8
+> 24
+> 4
+> 240
+> 66
+> 0.27
+> invalid
+
+Question 3 
+
+Figure 11: Per-question answer distributions over k = 64 samples for three GSM8K ques-tions, comparing autoregressive, Fast-dLLM, and TCT sampling. Correct answers are marked with an asterisk (*). We observe that TCT sometimes spreads mass across a wider set of candidates (left). This illustrates the higher-entropy behavior observed in Figure 10: TCT produces more diverse answers, which benefits pass@ k and ORM-based selection but can hurt majority voting when the correct answer no longer dominates the distribution. 24

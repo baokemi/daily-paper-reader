@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06105v1/fig-001.webp",
+      "caption": "Figure 1: Asymptotic inefficiency under properly robust mechanism (θh = 1, θℓ = 0, and γ = 1 2).",
+      "page": 38,
+      "index": 1,
+      "width": 767,
+      "height": 465
+    }
+  ]
+}
