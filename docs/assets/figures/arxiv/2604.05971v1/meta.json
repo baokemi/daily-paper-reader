@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-001.webp",
+      "caption": "Figure 4: Comparison of top-weighted concepts from CLIP when the dog is placed at the center (left) versus off-center (right). When centered, CLIP assigns meaningful weights to “dog”-related concepts, whereas these concepts disappear when the dog is placed off-center",
+      "page": 6,
+      "index": 1,
+      "width": 826,
+      "height": 183
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-002.webp",
+      "caption": "Figure 1: A representative example from WhatsUp. When both objects are centrally aligned (left), CLIP correctly assigns high probability to the “a pot and a chair”. However, when the pot is moved off-center (right), CLIP disproportionately focuses on the central chair, leading to a sharp drop in probability for the correct answer and a preference for “a chair.”",
+      "page": 2,
+      "index": 2,
+      "width": 826,
+      "height": 181
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-003.webp",
+      "caption": "Figure 5: Attention maps for the [CLS] token and other visual tokens in the final layer. Brighter pixels indicate higher attention. While the [CLS] token focuses mainly on the table, patch tokens capture information from other important objects (the bottle and the socket). This suggests that center bias arises not from a lack of available information, but from information loss during pooling.",
+      "page": 7,
+      "index": 3,
+      "width": 829,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-004.webp",
+      "caption": "Table 2: Performance comparison of visual prompting (VP) and attention redistribution (AR) across various CLIP variants on WhatsUp. VP generally improves off-center performance but exhibits inconsistent effects across models. In contrast, AR improves off-center performance and overall accuracy more consistently.",
+      "page": 8,
+      "index": 4,
+      "width": 826,
+      "height": 786
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-005.webp",
+      "caption": "Figure 2: Examples of center and off-center configurations in the GRID dataset.",
+      "page": 4,
+      "index": 5,
+      "width": 826,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-006.webp",
+      "caption": "Figure 7: Additional examples of concept vanishing under different object positions.",
+      "page": 12,
+      "index": 6,
+      "width": 826,
+      "height": 371
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-007.webp",
+      "caption": "Table 3: Mean performance across CIFAR10, FashionMNIST, and Food101 comparing visual prompting (VP) and attention redistribution (AR) on the synthetic 7 × 7 GRID with s = 1. AR improves both off-center performance and overall accuracy.",
+      "page": 9,
+      "index": 7,
+      "width": 826,
+      "height": 548
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-008.webp",
+      "caption": "Table 1: Performance of CLIP-based models on the center and off-center subsets of WhatsUp. Despite strong performance on centrally located objects, all models show significantly lower accuracy on off-center examples, indicating a systematic center bias.",
+      "page": 5,
+      "index": 8,
+      "width": 826,
+      "height": 530
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05971v1/fig-009.webp",
+      "caption": "Figure 3: Mean top-1 accuracy vs. object size on a 7 × 7 GRID. Left: OpenCLIP ViT-B/32. Right: OpenCLIP ViT-L/14. Despite improvements with increasing object size, a persistent center–off-center performance gap remains.",
+      "page": 5,
+      "index": 9,
+      "width": 802,
+      "height": 302
+    }
+  ]
+}

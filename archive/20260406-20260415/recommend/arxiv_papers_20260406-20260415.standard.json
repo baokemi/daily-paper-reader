@@ -1,0 +1,1052 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-15T03:53:13.683612+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 35,
+    "deep_cap": 6,
+    "deep_selected": 15,
+    "quick_candidates": 26,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2604.11496v1",
+      "source": "arxiv",
+      "title": "Revisiting Compositionality in Dual-Encoder Vision-Language Models: The Role of Inference",
+      "abstract": "Dual-encoder Vision-Language Models (VLMs) such as CLIP are often characterized as bag-of-words systems due to their poor performance on compositional benchmarks. We argue that this limitation may stem less from deficient representations than from the standard inference protocol based on global cosine similarity. First, through controlled diagnostic experiments, we show that explicitly enforcing fine-grained region-segment alignment at inference dramatically improves compositional performance without updating pretrained encoders. We then introduce a lightweight transformer that learns such alignments directly from frozen patch and token embeddings. Comparing against full fine-tuning and prior end-to-end compositional training methods, we find that although these approaches improve in-domain retrieval, their gains do not consistently transfer under distribution shift. In contrast, learning localized alignment over frozen representations matches full fine-tuning on in-domain retrieval while yielding substantial improvements on controlled out-of-domain compositional benchmarks. These results identify global embedding matching as a key bottleneck in dual-encoder VLMs and highlight the importance of alignment mechanisms for robust compositional generalization.",
+      "authors": [
+        "Imanol Miranda",
+        "Ander Salaberria",
+        "Eneko Agirre",
+        "Gorka Azkune"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-04-13T14:03:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.11496v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.5,
+      "llm_evidence_en": "revisiting compositionality in CLIP and improving alignment at inference",
+      "llm_evidence_cn": "重新审视CLIP的组合性并通过推理改进对齐",
+      "llm_evidence": "重新审视CLIP的组合性并通过推理改进对齐",
+      "canonical_evidence": "重新审视CLIP的组合性并通过推理改进对齐",
+      "llm_tldr_en": "Improves CLIP's compositional reasoning via fine-grained region-segment alignment during inference.",
+      "llm_tldr_cn": "通过在推理阶段引入细粒度的区域-片段对齐，提升了CLIP模型的组合推理能力。",
+      "llm_tldr": "通过在推理阶段引入细粒度的区域-片段对齐，提升了CLIP模型的组合推理能力。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04357v1",
+      "source": "arxiv",
+      "title": "Spatially-Weighted CLIP for Street-View Geo-localization",
+      "abstract": "This paper proposes Spatially-Weighted CLIP (SW-CLIP), a novel framework for street-view geo-localization that explicitly incorporates spatial autocorrelation into vision-language contrastive learning. Unlike conventional CLIP-based methods that treat all non-matching samples as equally negative, SW-CLIP leverages Tobler's First Law of Geography to model geographic relationships through distance-aware soft supervision. Specifically, we introduce a location-as-text representation to encode geographic positions and replace one-hot InfoNCE targets with spatially weighted soft labels derived from geodesic distance. Additionally, a neighborhood-consistency regularization is employed to preserve local spatial structure in the embedding space. Experiments on a multi-city dataset demonstrate that SW-CLIP significantly improves geo-localization accuracy, reduces long-tail errors, and enhances spatial coherence compared to standard CLIP. The results highlight the importance of shifting from semantic alignment to geographic alignment for robust geo-localization and provide a general paradigm for integrating spatial principles into multimodal representation learning.",
+      "authors": [
+        "Ting Han",
+        "Fengjiao Li",
+        "Chunsong Chen",
+        "Haoling Huang",
+        "Yiping Chen",
+        "Meiliu Wu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T02:10:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.04357v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Novel framework incorporating spatial autocorrelation into CLIP contrastive learning",
+      "llm_evidence_cn": "将空间自相关融入 CLIP 对比学习的新型框架",
+      "llm_evidence": "将空间自相关融入 CLIP 对比学习的新型框架",
+      "canonical_evidence": "将空间自相关融入 CLIP 对比学习的新型框架",
+      "llm_tldr_en": "Introduces SW-CLIP to improve geo-localization by incorporating spatial relationships into contrastive learning.",
+      "llm_tldr_cn": "引入 SW-CLIP，通过将地理空间关系融入对比学习来改进街景地标定位。",
+      "llm_tldr": "引入 SW-CLIP，通过将地理空间关系融入对比学习来改进街景地标定位。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04579v1",
+      "source": "arxiv",
+      "title": "Firebolt-VL: Efficient Vision-Language Understanding with Cross-Modality Modulation",
+      "abstract": "Recent advances in multimodal large language models (MLLMs) have enabled impressive progress in vision-language understanding, yet their high computational cost limits deployment in resource-constrained scenarios such as personal assistants, document understanding, and smart cameras. Most existing methods rely on Transformer-based cross-attention, whose quadratic complexity hinders efficiency. Moreover, small vision-language models often struggle to precisely capture fine-grained, task-relevant visual regions, leading to degraded performance on fine-grained reasoning tasks that limit their effectiveness in the real world. To address these issues, we introduce Firebolt-VL, an efficient vision-language model that replaces the Transformer-based decoder with a Liquid Foundation Model (LFM) decoder. To further enhance visual grounding, we propose a Token-Grid Correlation Module, which computes lightweight correlations between text tokens and image patches and modulates via the state-space model with FiLM conditioning. This enables the model to selectively emphasize visual regions relevant to the textual prompt while maintaining linear-time inference. Experimental results across multiple benchmarks demonstrate that Firebolt-VL achieves accurate, fine-grained understanding with significantly improved efficiency. Our model and code are available at: https://fireboltvl.github.io",
+      "authors": [
+        "Quoc-Huy Trinh",
+        "Mustapha Abdullahi",
+        "Bo Zhao",
+        "Debesh Jha"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T10:25:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.04579v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "efficient vision-language model replacing Transformer-based cross-attention",
+      "llm_evidence_cn": "替换Transformer交叉注意力的效率型视觉语言模型",
+      "llm_evidence": "替换Transformer交叉注意力的效率型视觉语言模型",
+      "canonical_evidence": "替换Transformer交叉注意力的效率型视觉语言模型",
+      "llm_tldr_en": "Introduces Firebolt-VL, an efficient VLM designed for resource-constrained scenarios by optimizing modulation.",
+      "llm_tldr_cn": "推出Firebolt-VL，通过优化模态调制，为资源受限场景提供高效的视觉语言模型。",
+      "llm_tldr": "推出Firebolt-VL，通过优化模态调制，为资源受限场景提供高效的视觉语言模型。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04579v2",
+      "source": "arxiv",
+      "title": "Firebolt-VL: Efficient Vision-Language Understanding with Cross-Modality Modulation",
+      "abstract": "Recent advances in multimodal large language models (MLLMs) have enabled impressive progress in vision-language understanding, yet their high computational cost limits deployment in resource-constrained scenarios such as personal assistants, document understanding, and smart cameras. Most existing methods rely on Transformer-based cross-attention, whose quadratic complexity hinders efficiency. Moreover, small vision-language models often struggle to precisely capture fine-grained, task-relevant visual regions, leading to degraded performance on fine-grained reasoning tasks that limit their effectiveness in the real world. To address these issues, we introduce Firebolt-VL, an efficient vision-language model that replaces the Transformer-based decoder with a Liquid Foundation Model (LFM) decoder. To further enhance visual grounding, we propose a Token-Grid Correlation Module, which computes lightweight correlations between text tokens and image patches and modulates via the state-space model with FiLM conditioning. This enables the model to selectively emphasize visual regions relevant to the textual prompt while maintaining linear-time inference. Experimental results across multiple benchmarks demonstrate that Firebolt-VL achieves accurate, fine-grained understanding with significantly improved efficiency. Our model and code are available at: https://fireboltvl.github.io",
+      "authors": [
+        "Quoc-Huy Trinh",
+        "Mustapha Abdullahi",
+        "Bo Zhao",
+        "Debesh Jha"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T10:25:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.04579v2",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "efficient vision-language model replacing Transformer-based cross-attention",
+      "llm_evidence_cn": "替换Transformer交叉注意力的效率型视觉语言模型",
+      "llm_evidence": "替换Transformer交叉注意力的效率型视觉语言模型",
+      "canonical_evidence": "替换Transformer交叉注意力的效率型视觉语言模型",
+      "llm_tldr_en": "Introduces Firebolt-VL, an efficient VLM designed for resource-constrained scenarios by optimizing modulation.",
+      "llm_tldr_cn": "推出Firebolt-VL，通过优化模态调制，为资源受限场景提供高效的视觉语言模型。",
+      "llm_tldr": "推出Firebolt-VL，通过优化模态调制，为资源受限场景提供高效的视觉语言模型。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05546v1",
+      "source": "arxiv",
+      "title": "Efficient Inference for Large Vision-Language Models: Bottlenecks, Techniques, and Prospects",
+      "abstract": "Large Vision-Language Models (LVLMs) enable sophisticated reasoning over images and videos, yet their inference is hindered by a systemic efficiency barrier known as visual token dominance. This overhead is driven by a multi-regime interplay between high-resolution feature extraction, quadratic attention scaling, and memory bandwidth constraints. We present a systematic taxonomy of efficiency techniques structured around the inference lifecycle, consisting of encoding, prefilling, and decoding. Unlike prior reviews focused on isolated optimizations, we analyze the end-to-end pipeline to reveal how upstream decisions dictate downstream bottlenecks, covering compute-bound visual encoding, the intensive prefilling of massive contexts, and the ''visual memory wall'' in bandwidth-bound decoding. By decoupling the efficiency landscape into the axes of shaping information density, managing long-context attention, and overcoming memory limits, this work provides a structured analysis of how isolated optimizations compose to navigate the trade-off between visual fidelity and system efficiency. The survey concludes by outlining four future frontiers supported by pilot empirical insights, including hybrid compression based on functional unit sensitivity, modality-aware decoding with relaxed verification, progressive state management for streaming continuity, and stage-disaggregated serving through hardware-algorithm co-design. The submitted software contains a snapshot of our literature repository, which is designed to be maintained as a living resource for the community.",
+      "authors": [
+        "Jun Zhang",
+        "Yicheng Ji",
+        "Feiyang Ren",
+        "Yihang Li",
+        "Bowen Zeng",
+        "Zonghao Chen",
+        "Ke Chen",
+        "Lidan Shou",
+        "Gang Chen",
+        "Huan Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-07T07:44:11+00:00",
+      "link": "https://arxiv.org/pdf/2604.05546v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "systematic taxonomy of efficiency techniques for large vision-language models",
+      "llm_evidence_cn": "大型视觉语言模型效率技术的系统分类",
+      "llm_evidence": "大型视觉语言模型效率技术的系统分类",
+      "canonical_evidence": "大型视觉语言模型效率技术的系统分类",
+      "llm_tldr_en": "Provides a comprehensive review of efficiency bottlenecks and optimization techniques for LVLM inference.",
+      "llm_tldr_cn": "对大型视觉语言模型推理的效率瓶颈和优化技术进行了全面综述。",
+      "llm_tldr": "对大型视觉语言模型推理的效率瓶颈和优化技术进行了全面综述。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05971v1",
+      "source": "arxiv",
+      "title": "Is CLIP Cross-Eyed? Revealing and Mitigating Center Bias in the CLIP Family",
+      "abstract": "Recent research has shown that contrastive vision-language models such as CLIP often lack fine-grained understanding of visual content. While a growing body of work has sought to address this limitation, we identify a distinct failure mode in the CLIP family, which we term center bias, that persists even in recent model variants. Specifically, CLIP tends to disproportionately focus on the central region of an image, overlooking important objects located near the boundaries. This limitation is fundamental as failure to recognize relevant objects makes it difficult to perform any sophisticated tasks that depend on those objects. To understand the underlying causes of the limitation, we conduct analyses from both representation and attention perspectives. Using interpretability methods, i.e., embedding decomposition and attention map analysis, we find that relevant concepts especially those associated with off-center objects vanish from the model's embedding in the final representation due to information loss during the aggregation of visual embeddings, particularly the reliance on pooling mechanisms. Finally, we show that this bias can be alleviated with training-free strategies such as visual prompting and attention redistribution by redirecting models' attention to off-center regions.",
+      "authors": [
+        "Oscar Chew",
+        "Hsiao-Ying Huang",
+        "Kunal Jain",
+        "Tai-I Chen",
+        "Khoa D Doan",
+        "Kuan-Hao Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-04-07T15:04:33+00:00",
+      "link": "https://arxiv.org/pdf/2604.05971v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Revealing and mitigating center bias in the CLIP family for fine-grained understanding",
+      "llm_evidence_cn": "揭示并缓解 CLIP 系列模型中的中心偏差以实现细粒度理解",
+      "llm_evidence": "揭示并缓解 CLIP 系列模型中的中心偏差以实现细粒度理解",
+      "canonical_evidence": "揭示并缓解 CLIP 系列模型中的中心偏差以实现细粒度理解",
+      "llm_tldr_en": "Identifies and analyzes center bias in CLIP models, proposing ways to improve recognition of boundary objects.",
+      "llm_tldr_cn": "识别并分析 CLIP 模型中的中心偏差，提出改进边缘物体识别能力的方法。",
+      "llm_tldr": "识别并分析 CLIP 模型中的中心偏差，提出改进边缘物体识别能力的方法。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06502v1",
+      "source": "arxiv",
+      "title": "VLMShield: Efficient and Robust Defense of Vision-Language Models against Malicious Prompts",
+      "abstract": "Vision-Language Models (VLMs) face significant safety vulnerabilities from malicious prompt attacks due to weakened alignment during visual integration. Existing defenses suffer from efficiency and robustness. To address these challenges, we first propose the Multimodal Aggregated Feature Extraction (MAFE) framework that enables CLIP to handle long text and fuse multimodal information into unified representations. Through empirical analysis of MAFE-extracted features, we discover distinct distributional patterns between benign and malicious prompts. Building upon this finding, we develop VLMShield, a lightweight safety detector that efficiently identifies multimodal malicious attacks as a plug-and-play solution. Extensive experiments demonstrate superior performance across multiple dimensions, including robustness, efficiency, and utility. Through our work, we hope to pave the way for more secure multimodal AI deployment. Code is available at [this https URL](https://github.com/pgqihere/VLMShield).",
+      "authors": [
+        "Peigui Qi",
+        "Kunsheng Tang",
+        "Yanpu Yu",
+        "Jialin Wu",
+        "Yide Song",
+        "Wenbo Zhou",
+        "Zhicong Huang",
+        "Cheng Hong",
+        "Weiming Zhang",
+        "Nenghai Yu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-07T22:18:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.06502v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Enabling CLIP to handle long text and fuse multimodal information for defense",
+      "llm_evidence_cn": "使 CLIP 能够处理长文本并融合多模态信息以进行防御",
+      "llm_evidence": "使 CLIP 能够处理长文本并融合多模态信息以进行防御",
+      "canonical_evidence": "使 CLIP 能够处理长文本并融合多模态信息以进行防御",
+      "llm_tldr_en": "Proposes MAFE and VLMShield to improve CLIP's multimodal integration and defend against malicious prompts.",
+      "llm_tldr_cn": "提出 MAFE 和 VLMShield 以改进 CLIP 的多模态融合并防御恶意提示攻击。",
+      "llm_tldr": "提出 MAFE 和 VLMShield 以改进 CLIP 的多模态融合并防御恶意提示攻击。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07419v1",
+      "source": "arxiv",
+      "title": "ReAlign: Optimizing the Visual Document Retriever with Reasoning-Guided Fine-Grained Alignment",
+      "abstract": "Visual document retrieval aims to retrieve a set of document pages relevant to a query from visually rich collections. Existing methods often employ Vision-Language Models (VLMs) to encode queries and visual pages into a shared embedding space, which is then optimized via contrastive training. However, during visual document representation, localized evidence is usually scattered across complex document layouts, making it difficult for retrieval models to capture crucial cues for effective embedding learning. In this paper, we propose Reasoning-Guided Alignment (ReAlign), a method that enhances visual document retrieval by leveraging the reasoning capability of VLMs to provide fine-grained visual document descriptions as supervision signals for training. Specifically, ReAlign employs a superior VLM to identify query-related regions on a page and then generates a query-aware description grounding the cropped visual regions. The retriever is then trained using these region-focused descriptions to align the semantics between queries and visual documents by encouraging the document ranking distribution induced by the region-focused descriptions to match that induced by the original query. Experiments on diverse visually rich document retrieval benchmarks demonstrate that ReAlign consistently improves visual document retrieval performance on both in-domain and out-of-domain datasets, achieving up to 2% relative improvements. Moreover, the advantages of ReAlign generalize across different VLM backbones by guiding models to better focus their attention on critical visual cues for document representation. All code and datasets are available at https://github.com/NEUIR/ReAlign.",
+      "authors": [
+        "Hao Yang",
+        "Yifan Ji",
+        "Zhipeng Xu",
+        "Zhenghao Liu",
+        "Yukun Yan",
+        "Zulong Chen",
+        "Shuo Wang",
+        "Yu Gu",
+        "Ge Yu"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-04-08T14:47:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.07419v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "optimizes visual document retrieval via fine-grained cross-modal alignment",
+      "llm_evidence_cn": "通过细粒度跨模态对齐优化视觉文档检索",
+      "llm_evidence": "通过细粒度跨模态对齐优化视觉文档检索",
+      "canonical_evidence": "通过细粒度跨模态对齐优化视觉文档检索",
+      "llm_tldr_en": "ReAlign improves visual document retrieval by using VLM reasoning to generate fine-grained alignment supervision.",
+      "llm_tldr_cn": "ReAlign通过利用VLM推理生成细粒度对齐监督，改进了视觉文档检索。",
+      "llm_tldr": "ReAlign通过利用VLM推理生成细粒度对齐监督，改进了视觉文档检索。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07740v1",
+      "source": "arxiv",
+      "title": "Beyond Pedestrians: Caption-Guided CLIP Framework for High-Difficulty Video-based Person Re-Identification",
+      "abstract": "In recent years, video-based person Re-Identification (ReID) has gained attention for its ability to leverage spatiotemporal cues to match individuals across non-overlapping cameras. However, current methods struggle with high-difficulty scenarios, such as sports and dance performances, where multiple individuals wear similar clothing while performing dynamic movements. To overcome these challenges, we propose CG-CLIP, a novel caption-guided CLIP framework that leverages explicit textual descriptions and learnable tokens. Our method introduces two key components: Caption-guided Memory Refinement (CMR) and Token-based Feature Extraction (TFE). CMR utilizes captions generated by Multi-modal Large Language Models (MLLMs) to refine identity-specific features, capturing fine-grained details. TFE employs a cross-attention mechanism with fixed-length learnable tokens to efficiently aggregate spatiotemporal features, reducing computational overhead. We evaluate our approach on two standard datasets (MARS and iLIDS-VID) and two newly constructed high-difficulty datasets (SportsVReID and DanceVReID). Experimental results demonstrate that our method outperforms current state-of-the-art approaches, achieving significant improvements across all benchmarks.",
+      "authors": [
+        "Shogo Hamano",
+        "Shunya Wakasugi",
+        "Tatsuhito Sato",
+        "Sayaka Nakamura"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T02:55:51+00:00",
+      "link": "https://arxiv.org/pdf/2604.07740v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "caption-guided CLIP framework for high-difficulty video-based re-identification",
+      "llm_evidence_cn": "用于高难度视频重识别的字幕引导 CLIP 框架",
+      "llm_evidence": "用于高难度视频重识别的字幕引导 CLIP 框架",
+      "canonical_evidence": "用于高难度视频重识别的字幕引导 CLIP 框架",
+      "llm_tldr_en": "Develops CG-CLIP, a framework using textual captions to improve CLIP's performance in complex video ReID tasks.",
+      "llm_tldr_cn": "开发了 CG-CLIP，一个利用文本字幕提升 CLIP 在复杂视频重识别任务中表现的框架。",
+      "llm_tldr": "开发了 CG-CLIP，一个利用文本字幕提升 CLIP 在复杂视频重识别任务中表现的框架。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.10000v1",
+      "source": "arxiv",
+      "title": "SwinTextUNet: Integrating CLIP-Based Text Guidance into Swin Transformer U-Nets for Medical Image Segmentation",
+      "abstract": "Precise medical image segmentation is fundamental for enabling computer aided diagnosis and effective treatment planning. Traditional models that rely solely on visual features often struggle when confronted with ambiguous or low contrast patterns. To overcome these limitations, we introduce SwinTextUNet, a multimodal segmentation framework that incorporates Contrastive Language Image Pretraining (CLIP), derived textual embeddings into a Swin Transformer UNet backbone. By integrating cross attention and convolutional fusion, the model effectively aligns semantic text guidance with hierarchical visual representations, enhancing robustness and accuracy. We evaluate our approach on the QaTaCOV19 dataset, where the proposed four stage variant achieves an optimal balance between performance and complexity, yielding Dice and IoU scores of 86.47% and 78.2%, respectively. Ablation studies further validate the importance of text guidance and multimodal fusion. These findings underscore the promise of vision language integration in advancing medical image segmentation and supporting clinically meaningful diagnostic tools.",
+      "authors": [
+        "Ashfak Yeafi",
+        "Parthaw Goswami",
+        "Md Khairul Islam",
+        "Ashifa Islam Shamme"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-11T03:16:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.10000v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "integrates CLIP-based text guidance for cross-modal alignment in medical segmentation",
+      "llm_evidence_cn": "将基于CLIP的文本引导集成到医学分割中以实现跨模态对齐",
+      "llm_evidence": "将基于CLIP的文本引导集成到医学分割中以实现跨模态对齐",
+      "canonical_evidence": "将基于CLIP的文本引导集成到医学分割中以实现跨模态对齐",
+      "llm_tldr_en": "SwinTextUNet uses CLIP embeddings to provide semantic text guidance for more accurate medical image segmentation.",
+      "llm_tldr_cn": "SwinTextUNet利用CLIP嵌入提供语义文本引导，从而实现更准确的医学图像分割。",
+      "llm_tldr": "SwinTextUNet利用CLIP嵌入提供语义文本引导，从而实现更准确的医学图像分割。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.10064v1",
+      "source": "arxiv",
+      "title": "On The Application of Linear Attention in Multimodal Transformers",
+      "abstract": "Multimodal Transformers serve as the backbone for state-of-the-art vision-language models, yet their quadratic attention complexity remains a critical barrier to scalability. In this work, we investigate the viability of Linear Attention (LA) as a high-efficiency alternative within multimodal frameworks. By integrating LA, we reduce the computational overhead from quadratic to linear relative to sequence length while preserving competitive performance. We evaluate our approach across ViT-S/16, ViT-B/16, and ViT-L/16 architectures trained on the LAION-400M dataset, with validation focused on ImageNet-21K zero-shot accuracy. Our systematic evaluation demonstrates that Linear Attention not only yields significant computational savings but also adheres to the same scaling laws as standard softmax attention. These findings position Linear Attention as a robust, scalable solution for next-generation multimodal Transformers tasked with processing increasingly large and complex datasets.",
+      "authors": [
+        "Armin Gerami",
+        "Seyedehanita Madani",
+        "Ramani Duraiswami"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-11T07:06:33+00:00",
+      "link": "https://arxiv.org/pdf/2604.10064v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "linear attention for high-efficiency multimodal transformers and vision-language models",
+      "llm_evidence_cn": "用于高效多模态 Transformer 和视觉语言模型的线性注意力机制",
+      "llm_evidence": "用于高效多模态 Transformer 和视觉语言模型的线性注意力机制",
+      "canonical_evidence": "用于高效多模态 Transformer 和视觉语言模型的线性注意力机制",
+      "llm_tldr_en": "Evaluates Linear Attention as a scalable, efficient alternative to quadratic attention in multimodal frameworks.",
+      "llm_tldr_cn": "评估线性注意力作为多模态框架中二次注意力的可扩展、高效替代方案的可行性。",
+      "llm_tldr": "评估线性注意力作为多模态框架中二次注意力的可扩展、高效替代方案的可行性。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.11197v1",
+      "source": "arxiv",
+      "title": "MedP-CLIP: Medical CLIP with Region-Aware Prompt Integration",
+      "abstract": "Contrastive Language-Image Pre-training (CLIP) has demonstrated outstanding performance in global image understanding and zero-shot transfer through large-scale text-image alignment. However, the core of medical image analysis often lies in the fine-grained understanding of specific anatomical structures or lesion regions. Therefore, precisely comprehending region-of-interest (RoI) information provided by medical professionals or perception models becomes crucial. To address this need, we propose MedP-CLIP, a region-aware medical vision-language model (VLM). MedP-CLIP innovatively integrates medical prior knowledge and designs a feature-level region prompt integration mechanism, enabling it to flexibly respond to various prompt forms (e.g., points, bounding boxes, masks) while maintaining global contextual awareness when focusing on local regions. We pre-train the model on a meticulously constructed large-scale dataset (containing over 6.4 million medical images and 97.3 million region-level annotations), equipping it with cross-disease and cross-modality fine-grained spatial semantic understanding capabilities. Experiments demonstrate that MedP-CLIP significantly outperforms baseline methods in various medical tasks, including zero-shot recognition, interactive segmentation, and empowering multimodal large language models. This model provides a scalable, plug-and-play visual backbone for medical AI, combining holistic image understanding with precise regional analysis.",
+      "authors": [
+        "Jiahui Peng",
+        "He Yao",
+        "Jingwen Li",
+        "Yanzhou Su",
+        "Sibo Ju",
+        "Yujie Lu",
+        "Jin Ye",
+        "Hongchun Lu",
+        "Xue Li",
+        "Lincheng Jiang",
+        "Min Zhu",
+        "Junlong Cheng"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-13T08:53:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.11197v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "medical CLIP with region-aware prompt integration for fine-grained alignment",
+      "llm_evidence_cn": "具有区域感知提示集成的医疗CLIP模型，用于细粒度对齐",
+      "llm_evidence": "具有区域感知提示集成的医疗CLIP模型，用于细粒度对齐",
+      "canonical_evidence": "具有区域感知提示集成的医疗CLIP模型，用于细粒度对齐",
+      "llm_tldr_en": "Develops MedP-CLIP, a region-aware medical VLM that integrates prior knowledge for fine-grained analysis.",
+      "llm_tldr_cn": "开发了MedP-CLIP，一种集成医疗先验知识并支持区域感知提示的细粒度医疗视觉语言模型。",
+      "llm_tldr": "开发了MedP-CLIP，一种集成医疗先验知识并支持区域感知提示的细粒度医疗视觉语言模型。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.11240v1",
+      "source": "arxiv",
+      "title": "Decoupled Similarity for Task-Aware Token Pruning in Large Vision-Language Models",
+      "abstract": "Token pruning has emerged as an effective approach to reduce the substantial computational overhead of Large Vision-Language Models (LVLMs) by discarding less informative visual tokens while preserving performance. However, existing methods typically rely on individual attention sources from different LVLM components, resulting in incomplete and suboptimal pruning decisions due to biased attention distributions. To address this problem, we propose DeSAP, a novel Decoupled Similarity-Aware Pruning method for precise, task-aware token pruning within the visual encoder. Specifically, DeSAP introduces a decoupled similarity to capture fine-grained cross-modal relevance between visual features and text tokens, providing explicit task-related guidance for pruning. By integrating decoupled similarity with visual saliency signals derived from visual attention, DeSAP performs token pruning under the guidance of both task-related and visual cues, enabling robust pruning even under aggressive pruning ratios. Extensive experiments across diverse benchmarks and architectures show that DeSAP consistently outperforms SOTA methods in both accuracy and efficiency. On LLaVA-1.5-7B, DeSAP achieves a 10 times FLOPs reduction and a 2.3 times prefill speedup by retaining only 11.1% of visual tokens, while maintaining 98.1% of the original performance.",
+      "authors": [
+        "Kexin Ma",
+        "Jing Xiao",
+        "Chaofeng Chen",
+        "Geyong Min",
+        "Guibo Zhu",
+        "Jinqiao Wang",
+        "Liang Liao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-13T09:44:52+00:00",
+      "link": "https://arxiv.org/pdf/2604.11240v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "task-aware token pruning for efficiency in vision-language models",
+      "llm_evidence_cn": "视觉语言模型中用于提高效率的任务感知令牌剪枝",
+      "llm_evidence": "视觉语言模型中用于提高效率的任务感知令牌剪枝",
+      "canonical_evidence": "视觉语言模型中用于提高效率的任务感知令牌剪枝",
+      "llm_tldr_en": "DeSAP uses decoupled similarity to prune redundant visual tokens, improving efficiency in large VLMs.",
+      "llm_tldr_cn": "DeSAP利用解耦相似度剪枝冗余视觉令牌，提高了大型视觉语言模型的效率。",
+      "llm_tldr": "DeSAP利用解耦相似度剪枝冗余视觉令牌，提高了大型视觉语言模型的效率。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.11530v1",
+      "source": "arxiv",
+      "title": "SVD-Prune: Training-Free Token Pruning For Efficient Vision-Language Models",
+      "abstract": "Vision-Language Models (VLM) have revolutionized multimodal learning by jointly processing visual and textual information. Yet, they face significant challenges due to the high computational and memory demands of processing long sequences of vision tokens. Many existing methods rely on local heuristics, such as attention scores or token norms. However, these criteria suffer from positional bias and information dispersion, limiting their ability to preserve essential content at high pruning ratios and leading to performance degradation on visually detailed images. To address these issues, we propose SVD-Prune, a trainingfree, plug-and-play token pruning method based on Singular Value Decomposition. It decomposes the vision token feature matrix and selects the top-K tokens using statistical leverage scores, ensuring only tokens contributing most to the dominant global variance are preserved. Experiments show that SVD-Prune consistently outperforms prior pruning methods under extreme vision token budgets, maintaining strong performance even with 32 and 16 vision tokens.",
+      "authors": [
+        "Yvon Apedo",
+        "Martyna Poreba",
+        "Michal Szczepanski",
+        "Samia Bouchafa"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-13T14:30:13+00:00",
+      "link": "https://arxiv.org/pdf/2604.11530v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "training-free token pruning for efficient vision-language models",
+      "llm_evidence_cn": "用于提高视觉语言模型效率的免训练令牌剪枝方法",
+      "llm_evidence": "用于提高视觉语言模型效率的免训练令牌剪枝方法",
+      "canonical_evidence": "用于提高视觉语言模型效率的免训练令牌剪枝方法",
+      "llm_tldr_en": "Introduces SVD-Prune, a training-free method to improve VLM efficiency by pruning redundant vision tokens.",
+      "llm_tldr_cn": "提出 SVD-Prune，一种通过剪枝冗余视觉令牌来提高视觉语言模型效率的免训练方法。",
+      "llm_tldr": "提出 SVD-Prune，一种通过剪枝冗余视觉令牌来提高视觉语言模型效率的免训练方法。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.11576v1",
+      "source": "arxiv",
+      "title": "Finetune Like You Pretrain: Boosting Zero-shot Adversarial Robustness in Vision-language Models",
+      "abstract": "Despite their impressive zero-shot abilities, vision-language models such as CLIP have been shown to be susceptible to adversarial attacks. To enhance its adversarial robustness, recent studies finetune the pretrained vision encoder of CLIP with adversarial examples on a proxy dataset such as ImageNet by aligning adversarial images with correct class labels. However, these methods overlook the important roles of training data distributions and learning objectives, resulting in reduced zero-shot capabilities and limited transferability of robustness across domains and datasets. In this work, we propose a simple yet effective paradigm AdvFLYP, which follows the training recipe of CLIP's pretraining process when performing adversarial finetuning to the model. Specifically, AdvFLYP finetunes CLIP with adversarial images created based on image-text pairs collected from the web, and match them with their corresponding texts via a contrastive loss. To alleviate distortion of adversarial image embeddings of noisy web images, we further propose to regularise AdvFLYP by penalising deviation of adversarial image features. We show that logit- and feature-level regularisation terms benefit robustness and clean accuracy, respectively. Extensive experiments on 14 downstream datasets spanning various domains show the superiority of our paradigm over mainstream practices. Our code and model weights are released at https://github.com/Sxing2/AdvFLYP.",
+      "authors": [
+        "Songlong Xing",
+        "Weijie Wang",
+        "Zhengyu Zhao",
+        "Jindong Gu",
+        "Philip Torr",
+        "Nicu Sebe"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-13T14:54:25+00:00",
+      "link": "https://arxiv.org/pdf/2604.11576v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "boosts zero-shot adversarial robustness in CLIP-like models",
+      "llm_evidence_cn": "提升类CLIP模型的零样本对抗鲁棒性",
+      "llm_evidence": "提升类CLIP模型的零样本对抗鲁棒性",
+      "canonical_evidence": "提升类CLIP模型的零样本对抗鲁棒性",
+      "llm_tldr_en": "AdvFLYP enhances CLIP's adversarial robustness while preserving zero-shot capabilities by mimicking pretraining.",
+      "llm_tldr_cn": "AdvFLYP通过模仿预训练过程，在保持零样本能力的同时增强了CLIP的对抗鲁棒性。",
+      "llm_tldr": "AdvFLYP通过模仿预训练过程，在保持零样本能力的同时增强了CLIP的对抗鲁棒性。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.08337v1",
+      "source": "arxiv",
+      "title": "InstAP: Instance-Aware Vision-Language Pre-Train for Spatial-Temporal Understanding",
+      "abstract": "Current vision-language pre-training (VLP) paradigms excel at global scene understanding but struggle with instance-level reasoning due to global-only supervision. We introduce InstAP, an Instance-Aware Pre-training framework that jointly optimizes global vision-text alignment and fine-grained, instance-level contrastive alignment by grounding textual mentions to specific spatial-temporal regions. To support this, we present InstVL, a large-scale dataset (2 million images, 50,000 videos) with dual-granularity annotations: holistic scene captions and dense, grounded instance descriptions. On the InstVL benchmark, InstAP substantially outperforms existing VLP models on instance-level retrieval, and also surpasses a strong VLP baseline trained on the exact same data corpus, isolating the benefit of our instance-aware objective. Moreover, instance-centric pre-training improves global understanding: InstAP achieves competitive zero-shot performance on multiple video benchmarks, including MSR-VTT and DiDeMo. Qualitative visualizations further show that InstAP localizes textual mentions to the correct instances, while global-only models exhibit more diffuse, scene-level attention.",
+      "authors": [
+        "Ashutosh Kumar",
+        "Rajat Saini",
+        "Jingjing Pan",
+        "Mustafa Erdogan",
+        "Mingfang Zhang",
+        "Betty Le Dem",
+        "Norimasa Kobori",
+        "Quan Kong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T15:10:25+00:00",
+      "link": "https://arxiv.org/pdf/2604.08337v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.5,
+      "llm_evidence_en": "instance-aware vision-language pre-training for spatial-temporal alignment",
+      "llm_evidence_cn": "用于时空对齐的实例感知视觉语言预训练",
+      "llm_evidence": "用于时空对齐的实例感知视觉语言预训练",
+      "canonical_evidence": "用于时空对齐的实例感知视觉语言预训练",
+      "llm_tldr_en": "Proposes InstAP for fine-grained instance-level alignment in vision-language pre-training.",
+      "llm_tldr_cn": "提出InstAP框架，通过实例感知预训练实现视觉语言模型在细粒度层面的对齐。",
+      "llm_tldr": "提出InstAP框架，通过实例感知预训练实现视觉语言模型在细粒度层面的对齐。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.05818v1",
+      "source": "arxiv",
+      "title": "WikiSeeker: Rethinking the Role of Vision-Language Models in Knowledge-Based Visual Question Answering",
+      "abstract": "Multi-modal Retrieval-Augmented Generation (RAG) has emerged as a highly effective paradigm for Knowledge-Based Visual Question Answering (KB-VQA). Despite recent advancements, prevailing methods still primarily depend on images as the retrieval key, and often overlook or misplace the role of Vision-Language Models (VLMs), thereby failing to leverage their potential fully. In this paper, we introduce WikiSeeker, a novel multi-modal RAG framework that bridges these gaps by proposing a multi-modal retriever and redefining the role of VLMs. Rather than serving merely as answer generators, we assign VLMs two specialized agents: a Refiner and an Inspector. The Refiner utilizes the capability of VLMs to rewrite the textual query according to the input image, significantly improving the performance of the multimodal retriever. The Inspector facilitates a decoupled generation strategy by selectively routing reliable retrieved context to another LLM for answer generation, while relying on the VLM's internal knowledge when retrieval is unreliable. Extensive experiments on EVQA, InfoSeek, and M2KR demonstrate that WikiSeeker achieves state-of-the-art performance, with substantial improvements in both retrieval accuracy and answer quality. Our code will be released on https://github.com/zhuyjan/WikiSeeker.",
+      "authors": [
+        "Yingjian Zhu",
+        "Xinming Wang",
+        "Kun Ding",
+        "Ying Wang",
+        "Bin Fan",
+        "Shiming Xiang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-04-07T12:52:38+00:00",
+      "link": "https://arxiv.org/pdf/2604.05818v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 7.5,
+      "llm_evidence_en": "redefining the role of VLMs in multi-modal retrieval-augmented generation",
+      "llm_evidence_cn": "重新定义视觉语言模型在多模态检索增强生成中的角色",
+      "llm_evidence": "重新定义视觉语言模型在多模态检索增强生成中的角色",
+      "canonical_evidence": "重新定义视觉语言模型在多模态检索增强生成中的角色",
+      "llm_tldr_en": "Introduces WikiSeeker, using VLMs as Refiner and Inspector agents for better knowledge-based VQA.",
+      "llm_tldr_cn": "提出WikiSeeker框架，将VLM作为精炼器和检查器代理，优化基于知识的视觉问答。",
+      "llm_tldr": "提出WikiSeeker框架，将VLM作为精炼器和检查器代理，优化基于知识的视觉问答。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "research on vision-language models integrating visual and textual information",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.09532v1",
+      "source": "arxiv",
+      "title": "Seeing is Believing: Robust Vision-Guided Cross-Modal Prompt Learning under Label Noise",
+      "abstract": "Prompt learning is a parameter-efficient approach for vision-language models, yet its robustness under label noise is less investigated. Visual content contains richer and more reliable semantic information, which remains more robust under label noise. However, the prompt itself is highly susceptible to label noise. Motivated by this intuition, we propose VisPrompt, a lightweight and robust vision-guided prompt learning framework for noisy-label settings. Specifically, we exploit a cross-modal attention mechanism to reversely inject visual semantics into prompt representations. This enables the prompt tokens to selectively aggregate visual information relevant to the current sample, thereby improving robustness by anchoring prompt learning to stable instance-level visual evidence and reducing the influence of noisy supervision. To address the instability caused by using the same way of injecting visual information for all samples, despite differences in the quality of their visual cues, we further introduce a lightweight conditional modulation mechanism to adaptively control the strength of visual information injection, which strikes a more robust balance between text-side semantic priors and image-side instance evidence. The proposed framework effectively suppresses the noise-induced disturbances, reduce instability in prompt updates, and alleviate memorization of mislabeled samples. VisPrompt significantly improves robustness while keeping the pretrained VLM backbone frozen and introducing only a small amount of additional trainable parameters. Extensive experiments under synthetic and real-world label noise demonstrate that VisPrompt generally outperforms existing baselines on seven benchmark datasets and achieves stronger robustness. Our code is publicly available at https://github.com/gezbww/Vis_Prompt.",
+      "authors": [
+        "Zibin Geng",
+        "Xuefeng Jiang",
+        "Jia Li",
+        "Zheng Li",
+        "Tian Wen",
+        "Lvhua Wu",
+        "Sheng Sun",
+        "Yuwei Wang",
+        "Min Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-10T17:48:56+00:00",
+      "link": "https://arxiv.org/pdf/2604.09532v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.5,
+      "llm_evidence_en": "robust vision-guided cross-modal prompt learning under label noise",
+      "llm_evidence_cn": "标签噪声下鲁棒的视觉引导跨模态提示学习",
+      "llm_evidence": "标签噪声下鲁棒的视觉引导跨模态提示学习",
+      "canonical_evidence": "标签噪声下鲁棒的视觉引导跨模态提示学习",
+      "llm_tldr_en": "Proposes VisPrompt to improve VLM robustness against label noise using cross-modal attention.",
+      "llm_tldr_cn": "提出VisPrompt框架，利用跨模态注意力机制提高视觉语言模型在标签噪声下的鲁棒性。",
+      "llm_tldr": "提出VisPrompt框架，利用跨模态注意力机制提高视觉语言模型在标签噪声下的鲁棒性。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "research on vision-language models integrating visual and textual information",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.05323v1",
+      "source": "arxiv",
+      "title": "VLA-InfoEntropy: A Training-Free Vision-Attention Information Entropy Approach for Vision-Language-Action Models Inference Acceleration and Success",
+      "abstract": "Vision-Language-Action (VLA) models integrate visual perception, language understanding, and action decision-making for cross-modal semantic alignment, exhibiting broad application potential. However, the joint processing of high-dimensional visual features, complex linguistic inputs, and continuous action sequences incurs significant computational overhead and low inference efficiency, thereby hindering real-time deployment and reliability. To address this issue, we use image entropy to quantify the grayscale distribution characteristics of each visual token and introduce attention entropy to capture the distribution of attention scores over task-related text. Visual entropy identifies texture-rich or structurally informative regions, while attention entropy pinpoints semantically relevant tokens. Combined with timestep information, these metrics enable a dynamic transition strategy that shifts the model's focus from global visual features to attention-guided local informative regions. Thus, the resulting VLA-InfoEntropy method integrates spatial, semantic, and temporal cues to reduce redundancy while preserving critical content. Extensive experiments show that our method reduces inference parameters, accelerates inference speed, and outperforms existing approaches.",
+      "authors": [
+        "Chuhang Liu",
+        "Yayun He",
+        "Zuheng Kang",
+        "Xiaoyang Qu",
+        "Jianzong Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-04-07T01:52:42+00:00",
+      "link": "https://arxiv.org/pdf/2604.05323v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "inference acceleration for vision-language-action models",
+      "llm_evidence_cn": "视觉-语言-动作模型的推理加速",
+      "llm_evidence": "视觉-语言-动作模型的推理加速",
+      "canonical_evidence": "视觉-语言-动作模型的推理加速",
+      "llm_tldr_en": "VLA-InfoEntropy uses information entropy to accelerate inference in multimodal vision-language-action models.",
+      "llm_tldr_cn": "VLA-InfoEntropy利用信息熵加速多模态视觉-语言-动作模型的推理过程。",
+      "llm_tldr": "VLA-InfoEntropy利用信息熵加速多模态视觉-语言-动作模型的推理过程。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.11043v1",
+      "source": "arxiv",
+      "title": "EmergentBridge: Improving Zero-Shot Cross-Modal Transfer in Unified Multimodal Embedding Models",
+      "abstract": "Unified multimodal embedding spaces underpin practical applications such as cross-modal retrieval and zero-shot recognition. In many real deployments, however, supervision is available only for a small subset of modality pairs (e.g., image--text), leaving \\emph{unpaired} modality pairs (e.g., audio$\\leftrightarrow$depth, infrared$\\leftrightarrow$audio) weakly connected and thus performing poorly on zero-shot transfer. Addressing this sparse-pairing regime is therefore essential for scaling unified embedding systems to new tasks without curating exhaustive pairwise data. We propose \\textbf{EmergentBridge}, an embedding-level bridging framework that improves performance on these unpaired pairs \\emph{without requiring exhaustive pairwise supervision}. Our key observation is that naively aligning a new modality to a synthesized proxy embedding can introduce \\emph{gradient interference}, degrading the anchor-alignment structure that existing retrieval/classification relies on. EmergentBridge addresses this by (i) learning a mapping that produces a \\emph{noisy bridge anchor} (a proxy embedding of an already-aligned modality) from an anchor embedding, and (ii) enforcing proxy alignment only in the subspace orthogonal to the anchor-alignment direction, preserving anchor alignment while strengthening non-anchor connectivity. Across nine datasets spanning multiple modalities, EmergentBridge consistently outperforms prior binding baselines on zero-shot classification and retrieval, demonstrating strong emergent alignment.",
+      "authors": [
+        "Jincheng Xie",
+        "Xingchen Xiao",
+        "Runheng Liu",
+        "Zhongyi Huang",
+        "Yu Zheng",
+        "Heyan Huang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-13T06:15:11+00:00",
+      "link": "https://arxiv.org/pdf/2604.11043v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.5,
+      "llm_evidence_en": "improving zero-shot cross-modal transfer in unified embedding models",
+      "llm_evidence_cn": "改进统一嵌入模型中的零样本跨模态迁移",
+      "llm_evidence": "改进统一嵌入模型中的零样本跨模态迁移",
+      "canonical_evidence": "改进统一嵌入模型中的零样本跨模态迁移",
+      "llm_tldr_en": "Proposes EmergentBridge to improve zero-shot transfer for unpaired modalities in unified embedding spaces.",
+      "llm_tldr_cn": "提出EmergentBridge框架，旨在改进统一嵌入空间中未配对模态的零样本迁移性能。",
+      "llm_tldr": "提出EmergentBridge框架，旨在改进统一嵌入空间中未配对模态的零样本迁移性能。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.08324v1",
+      "source": "arxiv",
+      "title": "Multi-Modal Learning meets Genetic Programming: Analyzing Alignment in Latent Space Optimization",
+      "abstract": "Symbolic regression (SR) aims to discover mathematical expressions from data, a task traditionally tackled using Genetic Programming (GP) through combinatorial search over symbolic structures. Latent Space Optimization (LSO) methods use neural encoders to map symbolic expressions into continuous spaces, transforming the combinatorial search into continuous optimization. SNIP (Meidani et al., 2024), a contrastive pre-training model inspired by CLIP, advances LSO by introducing a multi-modal approach: aligning symbolic and numeric encoders in a shared latent space to learn the phenotype-genotype mapping, enabling optimization in the numeric space to implicitly guide symbolic search. However, this relies on fine-grained cross-modal alignment, whereas literature on similar models like CLIP reveals that such an alignment is typically coarse-grained. In this paper, we investigate whether SNIP delivers on its promise of effective bi-modal optimization for SR. Our experiments show that: (1) cross-modal alignment does not improve during optimization, even as fitness increases, and (2) the alignment learned by SNIP is too coarse to efficiently conduct principled search in the symbolic space. These findings reveal that while multi-modal LSO holds significant potential for SR, effective alignment-guided optimization remains unrealized in practice, highlighting fine-grained alignment as a critical direction for future work.",
+      "authors": [
+        "Benjamin Léger",
+        "Kazem Meidani",
+        "Christian Gagné"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T14:55:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.08324v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Contrastive pre-training inspired by CLIP for aligning symbolic and numeric encoders",
+      "llm_evidence_cn": "受 CLIP 启发的对比预训练，用于对齐符号和数值编码器",
+      "llm_evidence": "受 CLIP 启发的对比预训练，用于对齐符号和数值编码器",
+      "canonical_evidence": "受 CLIP 启发的对比预训练，用于对齐符号和数值编码器",
+      "llm_tldr_en": "Uses CLIP-inspired contrastive learning to align symbolic and numeric spaces for latent space optimization.",
+      "llm_tldr_cn": "利用受 CLIP 启发的对比学习对齐符号和数值空间，以优化潜空间搜索。",
+      "llm_tldr": "利用受 CLIP 启发的对比学习对齐符号和数值空间，以优化潜空间搜索。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "methods improving cross modal alignment and efficiency in CLIP like models",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04473v1",
+      "source": "arxiv",
+      "title": "Beyond Standard Benchmarks: A Systematic Audit of Vision-Language Model's Robustness to Natural Semantic Variation Across Diverse Tasks",
+      "abstract": "Recent advances in vision-language models (VLMs) trained on web-scale image-text pairs have enabled impressive zero-shot transfer across a diverse range of visual tasks. However, comprehensive and independent evaluation beyond standard benchmarks is essential to understand their robustness, limitations, and real-world applicability. This paper presents a systematic evaluation framework for VLMs under natural adversarial scenarios for diverse downstream tasks, which has been overlooked in previous evaluation works. We evaluate a wide range of VLMs (CLIP, robust CLIP, BLIP2, and SigLIP2) on curated adversarial datasets (typographic attacks, ImageNet-A, and natural language-induced adversarial examples). We measure the natural adversarial performance of selected VLMs for zero-shot image classification, semantic segmentation, and visual question answering. Our analysis reveals that robust CLIP models can amplify natural adversarial vulnerabilities, and CLIP models significantly reduce performance for natural language-induced adversarial examples. Additionally, we provide interpretable analyses to identify failure modes. We hope our findings inspire future research in robust and fair multimodal pattern recognition.",
+      "authors": [
+        "Jia Chengyu",
+        "AprilPyone MaungMaung",
+        "Huy H. Nguyen",
+        "Jinyin Chen",
+        "Isao Echizen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T06:48:32+00:00",
+      "link": "https://arxiv.org/pdf/2604.04473v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Systematic audit of VLM robustness across diverse tasks including CLIP and SigLIP2",
+      "llm_evidence_cn": "对包括 CLIP 和 SigLIP2 在内的视觉语言模型在多样化任务下的鲁棒性进行系统审计",
+      "llm_evidence": "对包括 CLIP 和 SigLIP2 在内的视觉语言模型在多样化任务下的鲁棒性进行系统审计",
+      "canonical_evidence": "对包括 CLIP 和 SigLIP2 在内的视觉语言模型在多样化任务下的鲁棒性进行系统审计",
+      "llm_tldr_en": "Evaluates VLM robustness against natural semantic variations and adversarial scenarios across diverse tasks.",
+      "llm_tldr_cn": "评估视觉语言模型在自然语义变化和对抗场景下的鲁棒性及现实应用限制。",
+      "llm_tldr": "评估视觉语言模型在自然语义变化和对抗场景下的鲁棒性及现实应用限制。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "recent innovations and research trends in CLIP and vision language models",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.08324v2",
+      "source": "arxiv",
+      "title": "Multi-Modal Learning meets Genetic Programming: Analyzing Alignment in Latent Space Optimization",
+      "abstract": "Symbolic regression (SR) aims to discover mathematical expressions from data, a task traditionally tackled using Genetic Programming (GP) through combinatorial search over symbolic structures. Latent Space Optimization (LSO) methods use neural encoders to map symbolic expressions into continuous spaces, transforming the combinatorial search into continuous optimization. SNIP (Meidani et al., 2024), a contrastive pre-training model inspired by CLIP, advances LSO by introducing a multi-modal approach: aligning symbolic and numeric encoders in a shared latent space to learn the phenotype-genotype mapping, enabling optimization in the numeric space to implicitly guide symbolic search. However, this relies on fine-grained cross-modal alignment, whereas literature on similar models like CLIP reveals that such an alignment is typically coarse-grained. In this paper, we investigate whether SNIP delivers on its promise of effective bi-modal optimization for SR. Our experiments show that: (1) cross-modal alignment does not improve during optimization, even as fitness increases, and (2) the alignment learned by SNIP is too coarse to efficiently conduct principled search in the symbolic space. These findings reveal that while multi-modal LSO holds significant potential for SR, effective alignment-guided optimization remains unrealized in practice, highlighting fine-grained alignment as a critical direction for future work.",
+      "authors": [
+        "Benjamin Léger",
+        "Kazem Meidani",
+        "Christian Gagné"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T14:55:36+00:00",
+      "link": "https://arxiv.org/pdf/2604.08324v2",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Uses CLIP-inspired contrastive pre-training for multi-modal alignment in latent space optimization",
+      "llm_evidence_cn": "使用受CLIP启发的对比预训练方法在潜在空间优化中进行多模态对齐",
+      "llm_evidence": "使用受CLIP启发的对比预训练方法在潜在空间优化中进行多模态对齐",
+      "canonical_evidence": "使用受CLIP启发的对比预训练方法在潜在空间优化中进行多模态对齐",
+      "llm_tldr_en": "This paper analyzes SNIP, a CLIP-inspired multi-modal model that aligns symbolic and numeric data for symbolic regression.",
+      "llm_tldr_cn": "该研究分析了受CLIP启发的SNIP模型，通过对齐符号和数值数据来优化符号回归任务。",
+      "llm_tldr": "该研究分析了受CLIP启发的SNIP模型，通过对齐符号和数值数据来优化符号回归任务。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04500v1",
+      "source": "arxiv",
+      "title": "Saliency-R1: Enforcing Interpretable and Faithful Vision-language Reasoning via Saliency-map Alignment Reward",
+      "abstract": "Vision-language models (VLMs) have achieved remarkable success across diverse tasks. However, concerns about their trustworthiness persist, particularly regarding tendencies to lean more on textual cues than visual evidence and the risk of producing ungrounded or fabricated responses. To address these issues, we propose Saliency-R1, a framework for improving the interpretability and faithfulness of VLMs reasoning. Specifically, we introduce a novel saliency map technique that efficiently highlights critical image regions contributing to generated tokens without additional computational overhead. This can further be extended to trace how visual information flows through the reasoning process to the final answers, revealing the alignment between the thinking process and the visual context. We use the overlap between the saliency maps and human-annotated bounding boxes as the reward function, and apply Group Relative Policy Optimization (GRPO) to align the salient parts and critical regions, encouraging models to focus on relevant areas when conduct reasoning. Experiments show Saliency-R1 improves reasoning faithfulness, interpretability, and overall task performance.",
+      "authors": [
+        "Shizhan Gong",
+        "Minda Hu",
+        "Qiyuan Zhang",
+        "Chen Ma",
+        "Qi Dou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-06T07:51:59+00:00",
+      "link": "https://arxiv.org/pdf/2604.04500v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "improves vision-language reasoning faithfulness and interpretability",
+      "llm_evidence_cn": "提高视觉语言推理的忠实度和可解释性",
+      "llm_evidence": "提高视觉语言推理的忠实度和可解释性",
+      "canonical_evidence": "提高视觉语言推理的忠实度和可解释性",
+      "llm_tldr_en": "Saliency-R1 uses a saliency-map alignment reward to ensure VLMs rely on visual evidence during reasoning.",
+      "llm_tldr_cn": "Saliency-R1使用显著图对齐奖励，确保视觉语言模型在推理过程中依赖视觉证据。",
+      "llm_tldr": "Saliency-R1使用显著图对齐奖励，确保视觉语言模型在推理过程中依赖视觉证据。",
+      "llm_tags": [
+        "query:vlm-clip"
+      ],
+      "matched_query_tag": "query:vlm-clip",
+      "matched_query_text": "research on vision-language models integrating visual and textual information",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.04733v1",
+      "source": "arxiv",
+      "title": "Discovering Failure Modes in Vision-Language Models using RL",
+      "abstract": "Vision-language Models (VLMs), despite achieving strong performance on multimodal benchmarks, often misinterpret straightforward visual concepts that humans identify effortlessly, such as counting, spatial reasoning, and viewpoint understanding. Previous studies manually identified these weaknesses and found that they often stem from deficits in specific skills. However, such manual efforts are costly, unscalable, and subject to human bias, which often overlooks subtle details in favor of salient objects, resulting in an incomplete understanding of a model's vulnerabilities. To address these limitations, we propose a Reinforcement Learning (RL)-based framework to automatically discover the failure modes or blind spots of any candidate VLM on a given data distribution without human intervention. Our framework trains a questioner agent that adaptively generates queries based on the candidate VLM's responses to elicit incorrect answers. Our approach increases question complexity by focusing on fine-grained visual details and distinct skill compositions as training progresses, consequently identifying 36 novel failure modes in which VLMs struggle. We demonstrate the broad applicability of our framework by showcasing its generalizability across various model combinations.",
+      "authors": [
+        "Kanishk Jain",
+        "Qian Yang",
+        "Shravan Nayak",
+        "Parisa Kordjamshidi",
+        "Nishanth Anand",
+        "Aishwarya Agrawal"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T15:00:54+00:00",
+      "link": "https://arxiv.org/pdf/2604.04733v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reinforcement learning framework to discover failure modes in vision-language models",
+      "llm_evidence_cn": "利用强化学习框架发现视觉语言模型的失效模式",
+      "llm_evidence": "利用强化学习框架发现视觉语言模型的失效模式",
+      "canonical_evidence": "利用强化学习框架发现视觉语言模型的失效模式",
+      "llm_tldr_en": "Uses reinforcement learning to automatically identify blind spots and failure modes in vision-language models.",
+      "llm_tldr_cn": "利用强化学习自动识别视觉语言模型中的盲点和失效模式。",
+      "llm_tldr": "利用强化学习自动识别视觉语言模型中的盲点和失效模式。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.05724v1",
+      "source": "arxiv",
+      "title": "Beyond Semantics: Disentangling Information Scope in Sparse Autoencoders for CLIP",
+      "abstract": "Sparse Autoencoders (SAEs) have emerged as a powerful tool for interpreting the internal representations of CLIP vision encoders, yet existing analyses largely focus on the semantic meaning of individual features. We introduce information scope as a complementary dimension of interpretability that characterizes how broadly an SAE feature aggregates visual evidence, ranging from localized, patch-specific cues to global, image-level signals. We observe that some SAE features respond consistently across spatial perturbations, while others shift unpredictably with minor input changes, indicating a fundamental distinction in their underlying scope. To quantify this, we propose the Contextual Dependency Score (CDS), which separates positionally stable local scope features from positionally variant global scope features. Our experiments show that features of different information scopes exert systematically different influences on CLIP's predictions and confidence. These findings establish information scope as a critical new axis for understanding CLIP representations and provide a deeper diagnostic view of SAE-derived features.",
+      "authors": [
+        "Yusung Ro",
+        "Jaehyun Choi",
+        "Junmo Kim"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-07T11:28:07+00:00",
+      "link": "https://arxiv.org/pdf/2604.05724v1",
+      "tags": [
+        "keyword:VLM CLIP",
+        "query:VLM CLIP"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Interpreting internal representations of CLIP vision encoders using Sparse Autoencoders",
+      "llm_evidence_cn": "使用稀疏自编码器解释 CLIP 视觉编码器的内部表示",
+      "llm_evidence": "使用稀疏自编码器解释 CLIP 视觉编码器的内部表示",
+      "canonical_evidence": "使用稀疏自编码器解释 CLIP 视觉编码器的内部表示",
+      "llm_tldr_en": "Uses Sparse Autoencoders to disentangle information scope and interpret features in CLIP vision encoders.",
+      "llm_tldr_cn": "利用稀疏自编码器解构信息范围，并解释 CLIP 视觉编码器中的特征表示。",
+      "llm_tldr": "利用稀疏自编码器解构信息范围，并解释 CLIP 视觉编码器中的特征表示。",
+      "llm_tags": [
+        "query:vlm-clip:composite"
+      ],
+      "matched_query_tag": "query:vlm-clip:composite",
+      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
+      "matched_requirement_id": "req-composite-vlm-clip",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

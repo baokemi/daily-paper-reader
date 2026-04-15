@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04357v1/fig-001.webp",
+      "caption": "Figure 1. Motivation and overview of SW-CLIP. Standard CLIP training treats all non-matching samples in a mini-batch as equally negative, which can incorrectly penalize geographically nearby observations that share similar scene context. Guided by Tobler’s First Law of Geography and spatial autocorrelation, SW-CLIP replaces the hard one-hot supervision with a distance-aware spatial soft label: nearby locations receive higher similarity targets while distant locations are down-weighted. This geographic weighting reduces false-negative conflicts in contrastive learning and encourages embeddings to be both retrieval-friendly and spatially coherent for street-view geo-localization.",
+      "page": 2,
+      "index": 1,
+      "width": 955,
+      "height": 535
+    }
+  ]
+}
