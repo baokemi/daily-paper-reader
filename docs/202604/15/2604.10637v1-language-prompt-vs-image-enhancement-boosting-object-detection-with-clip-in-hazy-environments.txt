@@ -1,0 +1,609 @@
+Title: Language Prompt vs. Image Enhancement: Boosting Object Detection With CLIP in Hazy Environments
+
+URL Source: https://arxiv.org/pdf/2604.10637v1
+
+Published Time: Tue, 14 Apr 2026 01:32:31 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+> 1
+
+# Language Prompt vs. Image Enhancement: Boosting Object Detection With CLIP in Hazy Environments 
+
+Jian Pang, Bingfeng Zhang, Jin Wang, Baodi Liu, Dapeng Tao, Weifeng Liu, 
+
+Abstract —Object detection in hazy environments is challenging because degraded objects are nearly invisible and their semantics are weakened by environmental noise, making it difficult for detec-tors to identify. Common approaches involve image enhancement to boost weakened semantics, but these methods are limited by the instability of enhanced modules. This paper proposes a novel solution by employing language prompts to enhance weakened semantics without image enhancement. Specifically, we design Approximation of Mutual Exclusion (AME) to provide credible weights for Cross-Entropy Loss, resulting in CLIP-guided Cross-Entropy Loss (CLIP-CE). The provided weights assess the semantic weakening of objects. Through the backpropagation of CLIP-CE, weakened semantics are enhanced, making degraded objects easier to detect. In addition, we present Fine-tuned AME (FAME) which adaptively fine-tunes the weight of AME based on the predicted confidence. The proposed FAME compensates for the imbalanced optimization in AME. Furthermore, we present HazyCOCO, a large-scale synthetic hazy dataset comprising 61258 images. Ex-perimental results demonstrate that our method achieves state-of-the-art performance. The code and dataset will be released. 
+
+Index Terms —Object detection, CLIP, Approximation of Mutual Exclusion, HazyCOCO. 
+
+I. I NTRODUCTION 
+
+Recently, deep learning models have achieved promising performance in object detection under clear and visible environ-ments [1]–[5]. However, in visually degraded conditions such as hazy environments, their performance drops significantly. Object Detection in Hazy Environments (ODHE) is particularly challenging due to the prevalence of degraded objects, which are almost invisible and exhibit weakened semantic cues, making them extremely difficult to detect. For instance, in hazy scenes, persons or vehicles located deeper in the scene are more severely affected by environmental noise, resulting in blurred edges, reduced contrast, and corrupted textures. Consequently, detectors struggle to accurately classify and localize such de-graded objects based on compromised semantics. This limitation poses a serious challenge for safety-critical applications such as autonomous driving [6], intelligent surveillance [7], [8], and UAV navigation [9], where reliable detection under adverse conditions is essential. Currently, most common approaches employ image enhance-ment modules (e.g., image dehazing modules) to enhance 
+
+J. Pang, B. Zhang, J. Wang, B Liu, W Liu, are with the College of Control Science and Engineering, China University of Petroleum (East China), Qingdao 266580, Shandong, P.R. China. (e-mail: jianpang@s.upc.edu.cn; bingfeng.zhang@upc.edu.cn; wangjin@s.upc.edu.cn; liubaodi@upc.edu.cn; li-uwf@upc.edu.cn.). Corresponding author: Weifeng Liu. D. Tao is with the School of Information Science and Engineering, Yunnan University, Kunming 650091, Yunnan, P.R. China, and also with Yunnan United Vision Technology Co., Ltd., Kunming 650504, Yunnan, P.R. China. (e-mail: dapeng.tao@gmail.com). 
+
+Fig. 1. Pipeline comparison. Our method can detect overlooked objects using only language prompts. 
+
+weakened semantics [10]–[13]. As shown in Fig. 1, the image enhancement module is linked to the detection module either in series or fusion. For methods with a series connection [13], the enhancement module and detection module are independent. Their objective is to obtain visually pleasant images for object detection. In contrast, methods with a fusion connection do not focus on recovering visually pleasing images. Instead, they optimize the enhancement module to generate detection-friendly semantic representations using detection loss [10] or customized loss [11], [12]. However, experiments reveal that the image enhancement module exhibits instability in two aspects. (1) The enhanced regions are uncontrollable: enhancement modules treat every pixel in the image equally, leading to inaccurate en-hancement of degraded objects. For instance, if the background occupies most of the image, the enhancement may preferentially enhance the background and overlook the objects. (2) CNN-based enhancement modules can introduce human invisible noise [11], which may result in misclassifications during object detection. Fig. 2 shows failure cases of IA-YOLO [10] to verify our opinion. Based on the aforementioned analysis, we believe that image enhancement may not be a suitable choice for ODHE. To compensate for weakened semantics, we involve CLIP which has been proven to provide credible semantic priors [14]. In this work, we present a CLIP-guided Cross-Entropy loss (CLIP-CE) to enhance the weakened semantics of degraded objects. Compared with CE, the CLIP-CE provides credible weights for degraded objects. The provided weight is calculated using the Approximation of Mutual Exclusion (AME) and Fine-tuned AME (FAME). In AME, we employ CLIP to compute similarities between the object and mutually exclusive prompts. These prompts consist of a positive prompt “a photo of a {cls }”and a negative prompt “a photo without {cls }”. The negative similarity represents the degree of semantic weakening. For 
+
+> arXiv:2604.10637v1 [cs.CV] 12 Apr 2026 2
+
+instance, if an object is heavily degraded, the negative similarity between the object and the negative prompt will be higher. We directly incorporate the negative similarity as the weight. With CLIP-CE, the model pays more attention to objects with weaker semantics. FAME is a fine-tuned version of AME. As training progresses, continuously assigning a larger weight to degraded objects leads to imbalanced optimization. Hence, we present FAME to balance the estimated weights in AME for further improvement. Specifically, we involve an adapter [15] after CLIP and rely on the predicted confidence of the object to fine-tune the weight. The principle behind FAME is to decrease the weights of objects with high predicted confidence and increase the weights of objects with low predicted confidence. Our method differs from Focal Loss (FL) [16], which is designed to focus on hard samples by assigning larger weights to those with lower predictions. In Section III-B, we analyze the principles of FL and explain why the weights estimated by FL are not suitable for ODHE. Furthermore, we present the HazyCOCO dataset, a large-scale synthetic hazy dataset consisting of 61,258 images designed for ODHE. Compared to the commonly used datasets, such as VOC Fog [10], HazyCOCO has two advantages: (1) to the best of our knowledge, it is the largest synthetic hazy dataset for ODHE; (2) HazyCOCO better approximates real-world hazy conditions by using only outdoor scenes and reliable depth information. To generate reliable depths, we design a clamping operation on the relative depth, enhancing their hierarchical structure. This operation ensures that the generated hazy images closely mimic real-world hazy conditions. Our contributions are summarized as follows:  
+
+> •
+
+To the best of our knowledge, this is the first work to leverage a vision-language model to boost object detection in hazy environments.  
+
+> •
+
+To enhance weakened semantics, we propose the CLIP-guided Cross-Entropy loss (CLIP-CE), which comprises the Approximation of Mutual Exclusion (AME) and Fine-tuned AME (FAME). CLIP-CE assigns credible weights to boost the weakened semantics of degraded objects.  
+
+> •
+
+We introduce HazyCOCO, the largest synthetic hazy dataset for ODHE. Moreover, HazyCOCO ensures that the generated hazy images closely resemble the real world.  
+
+> •
+
+The experimental results demonstrate that CLIP-CE out-performs existing approaches, achieving state-of-the-art (SOTA) performance in hazy environments. Moreover, CLIP-CE exhibits high generalizability, proving effective in real-world underwater and low-light conditions. The remainder of the paper is organized as follows. We first review the related works in Section II; Section III describes the proposed method in detail; Section IV reports extensive experimental results and analysis; and finally the paper is summarized in Section V. II. R ELATED WORKS 
+
+A. Object Detection in Hazy Environments 
+
+Object detection in hazy environments (ODHE) aims to locate and classify objects of interest in images captured under adverse conditions. In such environments, degraded objects (almost GT     
+
+> IA -YOLO
+> (Enhancement+YOLO -V3)
+> Missed Object
+> Misclassified Object
+> car car person car car person
+> person person
+> bus
+> bus
+> person
+> YOLO -V3
+> Fig. 2. Failure cases of IA-YOLO. GT: Ground Truth. Involving image enhancement may lead to missed detections or misclassifications.
+
+invisible) are widespread, and their semantics are weakened by environmental noise, leading to detection failures. Common approaches involve image enhancement to assist the detec-tor [10]–[12], [17]–[19]. These methods can be divided into two categories, (1) enhancement modules used to generate enhanced images for detection [10]–[12], [19]. For instance, IA-YOLO [10] employs a module that integrates traditional image processing methods to enhance the image, and the resulting enhanced image is input to YOLO-V3 [20] for detection. (2) Enhancement modules used to generate enhanced semantic representations [17], [18], [21]. For example, IEG [18] employs contrastive learning [22] between the image feature and the enhanced image feature to explore additional semantics. To the best of our knowledge, few studies have explored using vision-language models to boost ODHE. We believe that language prompts can compensate for the weakened visual semantics of degraded objects, thereby improving their visual representation. 
+
+B. Vision-Language Models 
+
+Vision-language models have been widely studied, numerous works utilize image-text pairs to learn a shared embedding space [23]–[25]. This space can be used for image classification, retrieval, and zero-shot prediction on unseen labels. CLIP [23] collects 400 million image-text pairs from the Internet and uses a contrastive pre-training method to learn image-text re-lationships. CLIP enhances Open Vocabulary tasks, such as Open Vocabulary Semantic Segmentation and Open Vocabu-lary Detection, allowing for the detection or segmentation of objects using arbitrary text descriptions [26]–[28]. Recently, some approaches have employed CLIP to provide credible priors to support high-level vision tasks [14], [29]. For instance, PI-CLIP [14] uses CLIP with well-designed mutually exclusive prompts to generate credible masks for segmentation. Unlike these works, we propose a novel loss function that uses CLIP to provide credible weights for degraded objects. Through back-propagation of this loss, the weakened semantics are enhanced, thereby improving detection performance. III. P ROPOSED METHOD 
+
+A. Overview of Method 
+
+As shown in Fig. 3, our method consists of three parts: the detection pipeline, Approximation of Mutual Exclusion 3“a photo of a person ”
+
+“a photo without person ”
+
+Text 
+
+Encoder 
+
+Adapter 
+
+Classifier CLIP -CE Loss 
+
+Detection pipeline 
+
+roi_b 
+
+ROIAlign 
+
+> 0.9 0.1
+> 0.1 0.9
+> 0.9 0.1
+> 0.1 0.9
+
+Backbone 
+
++RPN 
+
+> Proposals
+
+a b
+
+> ROI Features
+
+Mutually exclusive prompts 
+
+Weight of AME 
+
+Crop Image 
+
+Encoder 
+
+Image 
+
+Encoder 
+
+Weight offset 
+
+> 0.3 0.7
+> 0.02 0.98
+> 0.3 0.7
+> 0.02 0.98
+
+Mean 0.6 
+
+> 0.06
+
+Weight of FAME 
+
+> Weight of AME
+> 0.9
+> 0.1
+> 0.9
+> 0.1
+> 0.3
+> 0.02
+> 0.3
+> 0.02
+> Weight offset a
+
+vbvbvavpos tneg tpos tneg t
+
+roi_a 
+
+roi_b 
+
+roi_a 
+
+a
+
+b
+
+Objects ˆavˆbv
+
+> Predict logits a
+
+pbp Weight of AME/FAME 
+
+form 
+
+AME FAME 
+
+Supervise       
+
+> Fig. 3. Overall of our pipeline. In detection pipeline: The image is processed to obtain ROI features. The predicted logits of objects are combined with estimated weights to form CLIP-CE. In AME: We crop objects within the image and extract their visual embeddings. Meanwhile, we get text embeddings from mutually exclusive prompts. We calculate the negative similarity between these embeddings to determine the weight of AME. In FAME: We concatenate the ROI features with the visual embeddings to create adapted visual embeddings. We use negative similarities from adapted visual embeddings as weight offset. The final weight for FAME is averaged from the AME weight and the weight offset.
+
+(AME) and Fine-tuned AME (FAME). The detection pipeline employs Faster R-CNN [30] as experimental results indicate that recently introduced detectors, such as RT-DETR [31] and Deformable-DETR [32], do not demonstrate a significant per-formance advantage in hazy environments. more analysis can be referred to sec IV-E2. We replace the Cross-Entropy loss (CE) used in Faster-RCNN with our CLIP-guided Cross-Entropy loss (CLIP-CE). In the following, we first introduce CE and its variants, analyzing their drawbacks when applied to ODHE. Our objective is to improve CE for ODHE. Therefore, we present AME and FAME which provide credible weights for CE and result in the development of CLIP-CE. 
+
+B. Drawbacks in Cross-Entropy Loss and its Variants 
+
+In object detection, the Cross-Entropy loss (CE) plays a crucial role in model performance. The CE loss is defined as follows: 
+
+LCE = −
+
+> C
+
+X
+
+> c=1
+
+yclog (pc), (1) 
+
+C is the number of classes. pc is the predict probability for the 
+
+c class. yc is the c-th element in one-hot vector, and defined as follows: 
+
+yc =
+
+(
+
+1 c = GT 
+
+0 otherwise , (2) 
+
+GT is the ground truth. For notational convenience, we rewrite 
+
+LCE = − PCc=1 yclog (pc) = −log (pt), pt is the predict probability for the ground truth. The CE treats each object with equal importance. However, in hazy environments, numerous degraded objects with weakened semantics require additional attention. Consequently, CE is not suitable for ODHE. Focal Loss (FL) [16] is an improved version of CE, it designs a novel weight for hard detected objects (predict probability is low): 
+
+LFL = −(1 − pt)γ log (pt), (3) where a weight item (1 − pt)γ is involved. This weight prompts FL to pay greater attention to objects with low predictions. However, our experiments reveal that during training, FL can easily lead to overfitting and subsequently decrease the weights assigned to degraded objects. For instance, FL initially assigns high weights to degraded objects. However, as training contin-ues, these weights decrease significantly, leading to insufficient attention to the degraded objects. The detailed analysis can be found in experiments IV-F. 
+
+C. Approximation of Mutual Exclusion 
+
+The objective of Approximation of Mutual Exclusion (AME) is to provide credible weights for degraded objects in CE, thereby making the improved CE suitable for ODHE. Given an image I ∈ RH×W ×3, we crop objects within the image, forming a set {bi}mi=1 , where bi is the i-th object. For each object bi, we define a pair of mutually exclusive texts epos  
+
+> i
+
+and 
+
+eneg  
+
+> i
+
+. Here, epos  
+
+> i
+
+is a positive text, e.g., “a photo of a {cls }”, eneg 
+
+> i
+
+is a negative text, e.g., “a photo without {cls }”, where {cls }
+
+represents the class of bi.Let V and T denote the visual encoder and text encoder in CLIP, respectively. The visual embedding of bi is vi = V (bi).The mutually exclusive text embeddings of bi are tpos  
+
+> i
+
+=
+
+T  epos 
+
+> i
+
+ and tneg  
+
+> i
+
+= T  eneg 
+
+> i
+
+. We measure the similarity between 4
+
+the visual embedding and the two mutually exclusive text embeddings as follows: sim pos  
+
+> i
+
+= v⊤ 
+
+> i
+
+× tpos  
+
+> i
+
+and sim neg  
+
+> i
+
+=
+
+v⊤ 
+
+> i
+
+×tneg  
+
+> i
+
+. If the visual semantics of the object are weakened, the similarity sim neg  
+
+> i
+
+will be higher than sim pos  
+
+> i
+
+. We apply softmax to approximate the score of negative similarity: 
+
+wame  
+
+> i
+
+= esim neg 
+
+> i
+
+esim neg  
+
+> i
+
++ esim pos 
+
+> i
+
+, (4) 
+
+wame  
+
+> i
+
+is the weight for object bi, representing the degree of semantic weakening of bi. For example, if an object is severely degraded and almost invisible in the image, the visual encoder in CLIP fails to capture its semantics, leading to esim neg  
+
+> i
+
+higher than 
+
+esim pos  
+
+> i
+
+, and ultimately resulting in a high wame  
+
+> i
+
+. We incorporate 
+
+wame  
+
+> i
+
+into the cross-entropy loss to form CLIP-CE (Eq. 10). With CLIP-CE, the detector pays greater attention to objects with weakened semantics. 
+
+D. Fine-tuned Approximation of Mutual Exclusion 
+
+In the previous section, we used mutually exclusive texts to approximate the weight for each object. However, since the CLIP model is frozen, these approximated weights remain constant. As training progresses, continuously assigning large weights to degraded objects leads to imbalanced optimization of the detector. To address this issue, we propose a Fine-tuned Approximation of Mutual Exclusion (FAME) to dynamically adjust the approximated weights in AME. Our objective is intuitive: as training progresses, high-confidence objects should no longer require large weights, while low-confidence objects should have their weights increased. To achieve this, we add an adapter [15] after the CLIP to fine-tune the approximated weights in AME. In AME, the approximated weight depends solely on the visual embedding from CLIP, which is insufficient to determine whether the weight needs adjustment. Therefore, we incorporate both the object feature and the predicted probability from the detection pipeline for fine-tuning. The object feature is the basis for adjusting weight. The predicted probability guides the direction of the weight adjustment. The object feature is obtained as follows: in the detection pipeline (Fig. 3), we first extract the feature map from the image. Then, we employ RoIAlign [30] based on positive proposals (IoU > 0.5) to obtain a set of object features rhi
+
+> Hh=1
+
+, where 
+
+H is the number of positive proposals. For simplicity, we assume H = 1 . For the object bi, its object feature ri and visual embedding vi are input to the adapter: 
+
+ˆvi = Adapter ([ vi, r i]) , (5) where [·] is concatenation. ˆvi is the adapted visual embedding. Following AME, the similarities between the adapted visual embedding and the two mutually exclusive text embeddings are given by ˆsim pos  
+
+> i
+
+= ˆ v⊤ 
+
+> i
+
+× tpos  
+
+> i
+
+and ˆsim neg  
+
+> i
+
+= ˆ v⊤ 
+
+> i
+
+× tneg  
+
+> i
+
+. Following Eq. 4, we approximate the score of the negative similarity as follows: 
+
+woffset  
+
+> i
+
+= e ˆsim neg 
+
+> i
+
+e ˆsim neg  
+
+> i
+
++ e ˆsim pos 
+
+> i
+
+, (6) where woffset  
+
+> i
+
+is the offset weight. We expect woffset  
+
+> i
+
+to be dynamically adjusted according to the object feature. However, without supervision for the adapter, woffset  
+
+> i
+
+will be ineffective. To address this, we use the predicted probability to build soft labels to supervise the adapter. The soft label is defined as follows: 
+
+ui =
+
+(
+
+0 pi,t > θ 
+
+1 otherwise , (7) where pi,t ∈ [0 , 1] is the predicted probability for the ground truth of the i-th object, and θ is a probability threshold. We use binary cross-entropy loss to supervise the adapter as follows: 
+
+Ladapter = − ui × log  woffset 
+
+> i
+
+ +(1 − ui) × log  1 − woffset 
+
+> i
+
+ , (8) with Eq. 8, woffset  
+
+> i
+
+is dynamically adjusted according to the object feature from the detector. Here, we present FAME to compensate for the imbalanced optimization in AME. The FAME uses the offset weight woffset 
+
+> i
+
+to fine-tune wame  
+
+> i
+
+as follows: 
+
+wfame  
+
+> i
+
+= wame  
+
+> i
+
++ woffset 
+
+> i
+
+2 (9) Finally, we present the proposed CLIP-guided Cross-Entropy loss (CLIP-CE): 
+
+LCLIP-CE =
+
+(
+
+−eα1×wame  
+
+> i
+
+× log (pi,t ) if epoch ∈ (0 , ep i]
+
+−eα2×wfame  
+
+> i
+
+× log (pi,t ) if epoch ∈ (ep i, ep j ]
+
+(10) where ep i is the pre-training epoch and ep j is the total training epoch. For instance, during the training epoch within (0 , ep i],
+
+eα1×wame  
+
+> i
+
+is used as the weight of the CE loss. Here, pi,t is the predicted probability for the ground truth of the i-th object. 
+
+E. Training Objective 
+
+Our training objective has two parts, one for object detection, and another for adapter. The objectives are as follows: 
+
+L =
+
+(
+
+Lrpn + Lbbox + LCLIP-CE , for detection 
+
+Ladapter , for adapter (11) For object detection, we replace the cross-entropy loss in Faster-RCNN with our LCLIP-CE . For Lrpn and Lbbox , please refer to [30]. IV. E XPERIMENTS 
+
+A. Datasets 
+
+Our method is evaluated not only in real hazy environments, but also in real underwater and real low-light scenarios. The details of all datasets are shown in Tab. I. 
+
+Low-light: Exdark [33] contains 7363 images collected from low light environment. We consider 5 classes in Exdark, i.e., person, car, bus, bicycle and motorcycle. 
+
+Underwater: TrashCan [34] has 7083 images which are observations of trash and a variety of undersea flora and fauna. We consider 18 classes, e.g., fish, crab, and bottle. 
+
+Hazy environment: We use RTTS [35] and HazyCOCO for evaluation. RTTS is a real hazy dataset, we randomly divide it into 2161 images for training and the rest 2161 images for testing, the classes in RTTS are consistent with the Exdark. 5                        
+
+> Dataset Train Test Total Environment HazyCOCO 58800 2458 61258 Synthetic Haze RTTS 2161 2161 4,322 Real Haze Exdark 4411 2952 7363 Low light TrashCan 5936 1147 7083 Underwater TABLE I IMAGE STATISTICS OF THE DATASETS .Clear Images Depth Maps HazyCOCO Images Hazy Images (VOC FOG)
+> Fig. 4. Left part: Using the clear image and its depth map to generate HazyCOCO image. Right part: Hazy images from VOC FOG [10].
+
+HazyCOCO is presented in this work, it is a large-scale synthetic hazy dataset, and has 80 classes which is consistent with the COCO2017 [36]. 
+
+B. HazyCOCO Generation 
+
+Problems in existing datasets: (1) Insufficient data: The popular synthetic dataset VOC Fog [10] only includes 10,845 images from Pascal VOC [37]. It is desired to build a large-scale dataset for object detection in hazy environments. (2) Deviate from real hazy images. The synthetic process of VOC Fog does not adhere to the atmospheric scattering model, resulting in unrealistic images. Furthermore, Pascal VOC includes many indoor images, synthesizing hazy images on these indoor images is inappropriate. 
+
+1) Synthetic Details of HazyCOCO: To address these issues, we synthesize the HazyCOCO dataset using the COCO2017 object detection dataset [36], which comprises 80 classes and is divided into train2017 (118,287 images) and val2017 (5,000 images). First, we employ Places365 [38] to filter out outdoor images from COCO2017, resulting in 58,800 images for training and 2,458 images for testing. Next, we use Depth-Anything [39] to generate depth maps for each filtered outdoor image. Finally, we apply the Atmospheric Scattering Model (ASM) [40] to synthesize hazy images as follows: 
+
+I(x) = J(x)t(x) + A(1 − t(x)) , (12) where I(x) is the hazy image, J(x) represents the hazy-free image. A is the atmospheric light. t(x) is medium transmission and can be expressed as: 
+
+t(x) = e−βd (x), (13) where β is the scattering coefficient. d(x) is the depth map corresponding to the hazy-free image. Given J(x), d(x), β and 
+
+A, the hazy image can be synthetic. Some generated images are given in Fig. 4. In the following sections, we discuss how to obtain a reliable d(x), as well as how to select appropriate values for A and β.
+
+2) Clamp of Depth Map: In synthesis, the depth generated by Depth-Anything represents relative depth, which cannot be used directly. Since the relative depth shows a large discrep-ancy between the farthest and nearest pixels, caused the depth information at intermediate positions to be less discernible. To synthesize high-quality hazy images, one key factor is to provide the absolute depth map for ASM. However, in the COCO2017 dataset, it is not feasible to obtain the absolute depth, as the images are not captured using stereo or depth cameras. To tackle this, we use Depth-Anything [39] to generate relative depth and design clamping operations to make the generated depth closer to real-world conditions. In Fig 5, we show the limitations of the generated depth from Depth-Anything (denoted as “depth without clamping”). The region within the orange box appears deep, but the depth map fails to accurately reflect the depth information. This issue arises because the relative depth shows a large discrepancy between the farthest and nearest pixels, causing the depth information at intermediate positions to be less discernible. To mitigate this, we clamp the farthest depth value to 100 times that of the nearest, thereby reducing the disparity between the farthest and nearest pixels. The clamped depth is shown in Fig.5 (denoted as “depth with clamping”). With the clamped depth, the generated hazy images exhibit a clearer sense of depth. 
+
+3) Parameters Estimation: In image synthesis, A controls the brightness, while β controls the haze density. Directly setting A
+
+as a constant may reduce image diversity; therefore, we employ DCP [41] to dynamically estimate A for each image. To make the synthetic images more realistic, β is randomly selected from the set {1, 2, 3, 4, 5}. Fig. 6 shows synthetic images with different values of β, which cover a range of hazy densities commonly observed in real-world scenarios. 
+
+C. Implementation Details 
+
+Model setting: We utilize Faster-RCNN [30] for object detection, with a batch size of 4. We set the learning rate to 0.01 and employ stochastic gradient descent to optimize Faster-RCNN. The total training epoch is 20 ( ep j = 20 in Eq. 10), and the pre-training epoch is 15 ( ep i = 15 in Eq. 10). The CLIP [23] uses the pre-trained ViT-B/32 model. Our adapter comprises two fully connected layers, each followed by a ReLU [42]. The learning rate of the adapter is 0.01. Our experiments are conducted on two Tesla V100 GPUs and our code is based on the Pytorch. 
+
+Hyperparamters: In Eq. 7, θ is 0.5 for all datasets. In Eq. 10, for HazyCOCO, α1 is 0.5 and α2 is 1. For RTTS, Exdark, and TrashCan datasets, α1 = α2, set to 2, 1, 0.5, respectively. 
+
+Evaluation metrics: We employ the mean Average Precision (mAP) as the evaluation metric and set IoU to 0.5 for all comparisons with other methods. 
+
+D. Comparison with the State-of-the-Art 
+
+We compared our method with state-of-the-art methods in hazy, low-light, and underwater environments. While, most 6COCO   
+
+> Image
+> Depth Map
+> With C lamping
+> Depth Map
+> Without C lamping
+> HazyCOCO Image
+> With C lamping
+> HazyCOCO Image
+> Without C lamping
+> Fig. 5. Visualizations of the depth map with and without clamping. The depth map without clamping is directly generated by Depth-Anything. The HazyCOCO images are synthesized using the depth maps described above. In the depth map with clamping, the area within the orange box exhibits more hierarchical depth information. 1
+> 
+> =2
+> =3
+> =4
+> =5
+> =
+> Fig. 6. Visualizations for the HazyCOCO images with different hazy densities.
+
+existing methods focus on the hazy environment [12], [17], [43], few consider two more adverse environments [10]. To ensure a fair comparison, we evaluate these methods within their suitable environments. Note that, we reproduce all compared methods based on their released code, the parameters of each method follow the default setting in the paper. The compared methods are divided into three categories based on the training strategy: (1) Separation: the image is enhanced offline, and then used to train a detector. (2) Fusion: the image is used to train the image enhancement and the detector simultaneously. (3) Direct: the image is used directly to train the detector. 
+
+Hazy environment: Results are shown in Tab. II. In the separation strategy, Advancing [13] and DCP [41] are dehazing algorithms. Advancing is based on neural networks, while DCP is a traditional method. The unsatisfactory results from Advancing may be attributed to the neural network introduc-ing undesirable noise, which hinders detection performance. In contrast, DCP, which does not involve any neural net-work, achieves moderate performance. This suggests that neural network-based enhancements produce unstable images, thereby impairing detection. In the Fusion strategy, the performances of IA-YOLO [10] and TogetherNet [12] are unpleasant, since these methods depend on the semantic quality of the enhanced image. However, in real hazy environments, enhancement algorithms often fail to restore rich semantic objects within the image. In direct strategy, we compared our method to Focal Loss [16], which involves customized weight into Cross-Entropy loss for exploring hard samples. Our method outperforms Focal Loss across two datasets. 
+
+Low-light and underwater environments: Results are shown in Tab. III. In the separation strategy, RUSA [44], Zero-DCE [45], and UHDFour [46] are low-light enhancement algorithms, while HCLR [47] and UFormer [48] are designed for underwater enhancement. In the direct category, Boostin-gRCNN [49] has recently been released for object detection in underwater environments. Based on the comparison, our method outperforms all the evaluated approaches, demonstrating its high generalizability and better performance. 
+
+E. Ablation Study 1) Effectiveness of the Proposed Components: In this paper, we present the CLIP-guided Cross-Entropy loss (CLIP-CE). The CLIP-CE involves a novel weight item which estimated from AME or FAME. We evaluate the effectiveness of AME and FAME in common adverse environments. The results are shown 7                                                 
+
+> Strategy Method Detector HazyCOCO RTTS Separation Advancing [13] Faster-RCNN 36.77 70.29 DCP [41] 42.82 74.26 Fusion IA-YOLO [10] YOLOV3 29.27 59.20 TogetherNet [12] YOLOX 32.31 54.00 Direct Focal Loss [16] Faster-RCNN 39.67 70.20 Ours 44.92 76.76
+> TABLE II PERFORMANCE COMPARISON IN HAZY ENVIRONMENT . B OLD IS THE BEST . R ESULTS ARE REPORTED BY M AP. Strategy Method Detector Exdark TrashCan Separation RUSA [44] Faster-RCNN 61.12 -Zero-DCE [45] 68.77 -UHDFour [46] 58.85 -HCLR [47] -48.23 UFormer [48] -46.57 Fusion IA-YOLO [10] YOLOV3 51.50 -TogetherNet [12] YOLOX -44.22 Direct BoostingRCNN [49] Faster-RCNN -59.31 Focal Loss [16] 64.50 46.96 Ours 70.42 59.63
+> TABLE III PERFORMANCE COMPARISON IN LOW -LIGHT AND UNDERWATER ENVIRONMENTS . B OLD IS THE BEST . R ESULTS ARE REPORTED BY MAP. “-” MEANS THAT THE METHOD IS NOT SUITABLE FOR THE ENVIRONMENT .
+
+in Tab. V. All experiments in Tab. V are based on the Faster-RCNN. Our Baseline uses the Cross-Entropy loss (CE). The CE with our AME weight (w/ AME) improved performance of the baseline on all datasets. Specifically, in the TrashCan dataset, the mAP is improved from 52.03% to 58.52%. It demonstrates the effectiveness of AME. Our Fine-tuned AME (w/ AME+FAME) further improved the performance based on the AME. It proves that the fine-tuned weight can compensate for the shortcomings of AME weight, thereby performance has further improvement. 
+
+2) Generalization to Other Detectors: In tab. IV-D, we embed our method into newly released detectors (Deformable-DETR [32] and RT-DETR [31]), as well as a classical detector Faster R-CNN [30]. When integrated with our CLIP-CE loss, Deformable-DETR achieves an improvement from 64.42% to 65.36%, RT-DETR improves from 74.61% to 76.48%, and Faster R-CNN improves from 74.12% to 76.76% on the RTTS dataset. These consistent gains across different architectures demonstrate the strong generalization capability and versatility of the proposed method. 
+
+F. Weight Visualizations and Analysis 
+
+We visualize the AME weight and compare it with the Focal weight (as defined in Focal Loss [16]). The AME weight represents the similarity between the object and the negative prompt (“a photo without {cls }”). The Focal weight is computed as follows: w = (1 − p)2, where p is the predicted logit of an object. For instance, for an object, the lower the predicted confidence, the larger the Focal weight. The comparison is given in Fig. 7. We observe that as the object becomes more degraded,             
+
+> Method Cross-Entropy Loss (CE) CLIP-CE Deformable-DETR [32] 64.42 65.36 RT-DETR [31] 74.61 76.48 Faster-RCNN [30] 74.12 76.76
+> TABLE IV PERFORMANCE COMPARISON OF DIFFERENT DETECTORS WITH AND WITHOUT THE PROPOSED CLIP-CE LOSS ON THE RTTS
+> DATASET .
+> Fig. 7. Visualization for the AME weights and Focal weights. The AME weights are the similarity between object and negative prompt (“a photo without {cls }”). The focal weight is computed from the predicted logit of object.
+
+the AME weight increases. For example, in the first columns, the weights for the three objects, from nearest to farthest, are 0.02, 0.26, and 0.79, respectively. In contrast, the Focal weights are not hierarchical, with the weights for the nearest, middle, and farthest objects being 0.04, 0.04, and 0.27, respectively. This issue may stem from overfitting caused by the use of Focal Loss, which leads the model to focus too heavily on degraded objects within the training set, resulting in high confidence for these objects. In contrast, our AME weight utilizes CLIP to provide reliable weights and mitigate overfitting. 
+
+G. Prompt Comparison 
+
+We evaluate the impact of different prompts on the perfor-mance. The experiments are conducted on the real hazy dataset RTTS. We select three types of prompts for comparison. Among the chosen prompts, “a photo of a {cls }” is used in our paper, we additionally add an environmental factor to it and raise a new prompt “a foggy photo of a {cls }”. Furthermore, we considered the prompt “it is a {cls }” for comparison, which carries a similar meaning to our prompt. The experimental results are shown in Tab. VI. The prompt “a photo of a {cls }” yielded the best results. While, the prompt “a foggy photo of a {cls }” with the environment factor demonstrates suboptimal performance, possibly because the environmental context diminished the significance of the class information. Similarly, the prompt “it is a {cls }”, although semantically similar to our prompt, produced unsatisfactory results, which might be attributed to its infrequent usage in the CLIP. Our prompt, consistent with those commonly 8
+
+Methods HazyCOCO (synthetic hazy) RTTS (real hazy) ExDark (real dark) TrashCan (real underwater) CE (baseline) 42.40 74.12 68.59 52.03 CE w/ AME 44.58 75.91 69.77 58.52 CE w/ FAME 44.92 76.76 70.42 59.63 
+
+TABLE V ABLATION STUDY . CE: C ROSS -E NTROPY LOSS . AME: A PPROXIMATION OF MUTUAL EXCLUSION . FAME: F INE -TUNED 
+
+AME. “CE W/ AME” MEANS CE WITH THE WEIGHT FROM AME, WHILE “CE W/ FAME” MEANS CE WEIGHTED BY 
+
+FAME. B OLD IS THE BEST . R ESULTS ARE REPORTED BY M AP. 
+
+Fig. 8. Visualization of detection results on HazyCOCO and RTTS datasets. We recommend examining the zoomed-in areas (highlighted with red dashed boxes) for a clearer comparison. GT: ground truth. Prompt RTTS AME FAME “a photo of a {cls }” 75.91 76.76 
+
+“a photo without {cls }”“a foggy photo of a {cls }” 75.22 76.30 “a foggy photo without {cls }”“it is a {cls }” 75.39 75.48 “it is not a {cls }”TABLE VI PROMPT COMPARISON ON THE REAL HAZY DATASET RTTS. THE FIRST PROMPT IS USED IN OUR PAPER . T HE SECOND PROMPT ADDITIONALLY HAS ENVIRONMENTAL FACTORS .THE THIRD PROMPT IS SIMILAR TO OURS . B OLD IS THE BEST .
+
+used prompts in CLIP, provides robust text-visual alignment, thereby contributing to its superior performance. 
+
+H. Detection Visualizations 1) Visualizations for Hazy Environments: To intuitively demonstrate the superiority of our method, we provide visualiza-tions of the detection results in Fig. 8, comparing our approach with IA-YOLO [10], Advancing [13], and Focal Loss [16]. Both IA-YOLO and Advancing incorporate enhancement modules and apply object detection to enhanced images. Focal Loss means using the Faster-RCNN with Focal loss [16]. In Fig. 8, our method effectively detects objects that are overlooked by competitors, including those that are nearly unnoticeable to humans. For example, in the last column of Fig. 8, the motorbike goes undetected by all compared methods. Although IA-YOLO produces enhanced images with richer textures and clearer colors, the detector still fails to identify the object. This reveals that visually appealing images may not contribute to object detection. Conversely, we believe that the key to success in this 9 
+
+> Fig. 9. Visualization of detection results. We recommend examining the zoomed-in areas for a clearer comparison. GT: ground truth. IA-YOLO, UHDFour and UFormer are image enhancement-based methods. Focal Loss refers to using Faster-RCNN with Focal loss. Ours is using Faster-RCNN with CLIP-CE.
+
+task lies in enhancing the semantic information of the objects, which may not depend solely on image quality. 
+
+2) Visualizations for Low-light and Underwater Environ-ments: We present detection results in low-light and underwa-ter environments in Fig. 9. In the low-light environment, the compared methods include IA-YOLO [10], UHDFour [46], and Focal Loss [16]. IA-YOLO integrates image enhancement with object detection, UHDFour [46] is a recently introduced method for low-light enhancement, and Focal Loss refers to the use of Faster-RCNN with Focal Loss [16]. In Fig.9, our method effectively detects objects that are overlooked by competitors, including those that are nearly invisible to humans. In the underwater environment, UFormer [48] is a newly released method for underwater enhancement. Our comparison shows that while UFormer brightens the images, it fails to detect objects effectively. This highlights that visually appealing im-ages may not necessarily improve object detection. Overall, our method outperforms existing approaches in common adverse environments, demonstrating its high generalizability. V. C ONCLUSION 
+
+In this paper, we present a novel solution for Object De-tection in Hazy Environments (ODHE) by employing language prompts to enhance the weakened semantics of objects, rather than relying on image enhancement. The introduced CLIP-guided Cross-Entropy loss is highly generalizable and effective across common adverse conditions, such as hazy, low-light, and underwater environments. Compared to existing methods, our CLIP-CE demonstrates superior performance. The ablation study highlights the effectiveness of the proposed AME and FAME. Visualization of the detection results provides an intu-itive comparison, revealing that our method can successfully detect objects overlooked by other approaches. The weight comparison shows that our weights are more suitable for ODHE. Furthermore, this work introduces HazyCOCO, the largest syn-thetic hazy dataset for ODHE, which ensures that the generated hazy images closely resemble real-world conditions. REFERENCES [1] Y. Zhao, W. Lv, S. Xu, J. Wei, G. Wang, Q. Dang, Y. Liu, and J. Chen, “Detrs beat yolos on real-time object detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 16 965–16 974. [2] S. S. Mullappilly, A. S. Gehlot, R. M. Anwer, F. S. Khan, and H. Cholakkal, “Semi-supervised open-world object detection,” in Proceed-ings of the AAAI Conference on Artificial Intelligence , vol. 38, no. 5, 2024, pp. 4305–4314. [3] Z. Wang, B. Yang, H. Yue, and Z. Ma, “Fine-grained prototypes distillation for few-shot object detection,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 38, no. 6, 2024, pp. 5859–5866. [4] Y. Quan, D. Zhang, and J. Tang, “Generalized concordant vision trans-former with masked image tokens for object detection,” IEEE Transactions on Circuits and Systems for Video Technology , pp. 1–1, 2025. [5] J. Feng, Y. Yang, M. Lyu, T. Hao, Y.-J. Huang, Y. Xie, Y. Li, J. Han, L. Xiang, and G. Ding, “Towards realistic hierarchical object detection: Problem, benchmark and solution,” IEEE Transactions on Circuits and Systems for Video Technology , pp. 1–1, 2025. [6] Z. Ma, Z. Zheng, J. Wei, Y. Yang, and H. T. Shen, “Instance-dictionary learning for open-world object detection in autonomous driving scenarios,” 
+
+> IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 5, pp. 3395–3408, 2024. 10
+
+[7] H. Li, S. Yan, Z. Yu, and D. Tao, “Attribute-identity embedding and self-supervised learning for scalable person re-identification,” IEEE Transac-tions on Circuits and Systems for Video Technology , vol. 30, no. 10, pp. 3472–3485, 2020. [8] N. Dong, L. Zhang, S. Yan, H. Tang, and J. Tang, “Erasing, transforming, and noising defense network for occluded person re-identification,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 6, pp. 4458–4472, 2024. [9] D. Sun, L. Cheng, S. Chen, C. Li, Y. Xiao, and B. Luo, “Uav-ground visual tracking: A unified dataset and collaborative learning approach,” 
+
+IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 5, pp. 3619–3632, 2024. [10] W. Liu, G. Ren, R. Yu, S. Guo, J. Zhu, and L. Zhang, “Image-adaptive yolo for object detection in adverse weather conditions,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 36, no. 2, 2022, pp. 1792–1800. [11] C. Li, H. Zhou, Y. Liu, C. Yang, Y. Xie, Z. Li, and L. Zhu, “Detection-friendly dehazing: Object detection in real-world hazy scenes,” IEEE Transactions on Pattern Analysis and Machine Intelligence , 2023. [12] Y. Wang, X. Yan, K. Zhang, L. Gong, H. Xie, F. L. Wang, and M. Wei, “Togethernet: Bridging image restoration and object detection together via dynamic enhancement learning,” in Computer Graphics Forum , vol. 41, no. 7. Wiley Online Library, 2022, pp. 465–476. [13] Y. Feng, L. Ma, X. Meng, F. Zhou, R. Liu, and Z. Su, “Advancing real-world image dehazing: Perspective, modules, and training,” IEEE Transactions on Pattern Analysis and Machine Intelligence , 2024. [14] J. Wang, B. Zhang, J. Pang, H. Chen, and W. Liu, “Rethinking prior infor-mation generation with clip for few-shot segmentation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2024, pp. 3941–3951. [15] P. Gao, S. Geng, R. Zhang, T. Ma, R. Fang, Y. Zhang, H. Li, and Y. Qiao, “Clip-adapter: Better vision-language models with feature adapters,” In-ternational Journal of Computer Vision , vol. 132, no. 2, pp. 581–595, 2024. [16] T.-Y. Lin, P. Goyal, R. Girshick, K. He, and P. Doll´ ar, “Focal loss for dense object detection,” in Proceedings of the IEEE international conference on computer vision , 2017, pp. 2980–2988. [17] S.-C. Huang, T.-H. Le, and D.-W. Jaw, “Dsnet: Joint semantic learning for object detection in inclement weather conditions,” IEEE transactions on pattern analysis and machine intelligence , vol. 43, no. 8, pp. 2623–2633, 2020. [18] H. Liu, F. Jin, H. Zeng, H. Pu, and B. Fan, “Image enhancement guided object detection in visually degraded scenes,” IEEE transactions on neural networks and learning systems , 2023. [19] S. Kalwar, D. Patel, A. Aanegola, K. R. Konda, S. Garg, and K. M. Krishna, “Gdip: Gated differentiable image processing for object detection in adverse conditions,” in 2023 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2023, pp. 7083–7089. [20] J. Redmon and A. Farhadi, “Yolov3: An incremental improvement,” arXiv preprint arXiv:1804.02767 , 2018. [21] H. Li, Q. Hu, B. Zhou, Y. Yao, J. Lin, K. Yang, and P. Chen1, “Cfmw: Cross-modality fusion mamba for robust object detection under adverse weather,” IEEE Transactions on Circuits and Systems for Video Technology , pp. 1–1, 2025. [22] T. Chen, S. Kornblith, M. Norouzi, and G. Hinton, “A simple framework for contrastive learning of visual representations,” in International confer-ence on machine learning . PMLR, 2020, pp. 1597–1607. [23] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in International con-ference on machine learning . PMLR, 2021, pp. 8748–8763. [24] K. Desai and J. Johnson, “Virtex: Learning visual representations from textual annotations,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 11 162–11 173. [25] C. Ma, Y. Liu, J. Deng, L. Xie, W. Dong, and C. Xu, “Understanding and mitigating overfitting in prompt tuning for vision-language models,” 
+
+IEEE Transactions on Circuits and Systems for Video Technology , vol. 33, no. 9, pp. 4616–4629, 2023. [26] R. Fang, G. Pang, and X. Bai, “Simple image-level classification improves open-vocabulary object detection,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 38, no. 2, 2024, pp. 1716–1725. [27] B. Xie, J. Cao, J. Xie, F. S. Khan, and Y. Pang, “Sed: A simple encoder-decoder for open-vocabulary semantic segmentation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2024, pp. 3426–3436. [28] S. Xu, X. Li, S. Wu, W. Zhang, Y. Tong, and C. Change Loy, “Dst-det: Open-vocabulary object detection via dynamic self-training,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 35, no. 5, pp. 5037–5050, 2025. [29] S. Chen, F. Meng, R. Zhang, H. Qiu, H. Li, Q. Wu, and L. Xu, “Visual and textual prior guided mask assemble for few-shot segmentation and beyond,” IEEE Transactions on Multimedia , 2024. [30] S. Ren, K. He, R. Girshick, and J. Sun, “Faster r-cnn: Towards real-time object detection with region proposal networks,” Advances in Neural Information Processing Systems , vol. 28, 2015. [31] Y. Zhao, W. Lv, S. Xu, J. Wei, G. Wang, Q. Dang, Y. Liu, and J. Chen, “Detrs beat yolos on real-time object detection,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2024, pp. 16 965–16 974. [32] X. Zhu, W. Su, L. Lu, B. Li, X. Wang, and J. Dai, “Deformable detr: Deformable transformers for end-to-end object detection,” in International Conference on Learning Representations .[33] Y. P. Loh and C. S. Chan, “Getting to know low-light images with the exclusively dark dataset,” Computer Vision and Image Understanding , vol. 178, pp. 30–42, 2019. [34] J. Hong, M. S. Fulton, and J. Sattar, “Trashcan 1.0 an instance-segmentation labeled dataset of trash observations,” 2020. [35] B. Li, W. Ren, D. Fu, D. Tao, D. Feng, W. Zeng, and Z. Wang, “Benchmarking single-image dehazing and beyond,” IEEE Transactions on Image Processing , vol. 28, no. 1, pp. 492–505, 2018. [36] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Doll´ ar, and C. L. Zitnick, “Microsoft coco: Common objects in context,” in Computer Vision–ECCV 2014: 13th European Conference, Zurich, Switzerland, September 6-12, 2014, Proceedings, Part V 13 . Springer, 2014, pp. 740–755. [37] M. Everingham, L. Van Gool, C. K. Williams, J. Winn, and A. Zisserman, “The pascal visual object classes (voc) challenge,” International Journal of Computer Vision , vol. 88, no. 2, pp. 303–338, 2010. [38] B. Zhou, A. Lapedriza, A. Khosla, A. Oliva, and A. Torralba, “Places: A 10 million image database for scene recognition,” IEEE Transactions on Pattern Analysis and Machine Intelligence , 2017. [39] L. Yang, B. Kang, Z. Huang, X. Xu, J. Feng, and H. Zhao, “Depth any-thing: Unleashing the power of large-scale unlabeled data,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2024, pp. 10 371–10 381. [40] E. J. McCartney, “Optics of the atmosphere: scattering by molecules and particles,” New York , 1976. [41] K. He, J. Sun, and X. Tang, “Single image haze removal using dark chan-nel prior,” IEEE transactions on pattern analysis and machine intelligence ,vol. 33, no. 12, pp. 2341–2353, 2010. [42] V. Nair and G. E. Hinton, “Rectified linear units improve restricted boltzmann machines,” Proceedings of the 27th International Conference on Machine Learning (ICML-10) , pp. 807–814, 2010. [43] F. Zhong, W. Shen, H. Yu, G. Wang, and J. Hu, “Dehazing & reasoning yolo: Prior knowledge-guided network for object detection in foggy weather,” Pattern Recognition , p. 110756, 2024. [44] L. Risheng, M. Long, Z. Jiaao, F. Xin, and L. Zhongxuan, “Retinex-inspired unrolling with cooperative prior architecture search for low-light image enhancement,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2021. [45] C. G. Guo, C. Li, J. Guo, C. C. Loy, J. Hou, S. Kwong, and R. Cong, “Zero-reference deep curve estimation for low-light image enhancement,” in Proceedings of the IEEE conference on computer vision and pattern recognition (CVPR) , June 2020, pp. 1780–1789. [46] C. Li, C.-L. Guo, M. Zhou, Z. Liang, S. Zhou, R. Feng, and C. C. Loy, “Embeddingfourier for ultra-high-definition low-light image enhance-ment,” in ICLR , 2023. [47] J. Zhou, J. Sun, C. Li, Q. Jiang, M. Zhou, K.-M. Lam, W. Zhang, and X. Fu, “Hclr-net: Hybrid contrastive learning regularization with locally randomized perturbation for underwater image enhancement,” 
+
+International Journal of Computer Vision , pp. 1–25, 2024. [48] L. Peng, C. Zhu, and L. Bian, “U-shape transformer for underwater image enhancement,” IEEE Transactions on Image Processing , vol. 32, pp. 3066– 3079, 2023. [49] P. Song, P. Li, L. Dai, T. Wang, and Z. Chen, “Boosting r-cnn: Reweighting r-cnn samples by rpn’s error for underwater object detection,” Neurocom-puting , vol. 530, pp. 150–164, 2023. 11 
+
+Jian Pang is currently a Ph.D. candidate at the College of Control Science and Engineering, China University of Petroleum (East China), Qingdao, PR China. He received the B.S. degree in electronic information en-gineering from Qiqihar University, Qiqihar, PR China, in 2018, and the M.E. degree in electronic and com-munication engineering from Kunming University of Science and Technology, Kunming, PR China, in 2021. His main research interests include image enhance-ment, image re-identification, and object detection. 
+
+Bingfeng Zhang received the B.S. degree in elec-tronic information engineering from China Univer-sity of Petroleum (East China), Qingdao, PR China, in 2015, the M.E. degree in systems, control and signal processing from University of Southampton, Southampton, U.K., in 2016. And the Ph.D degree from the University of Liverpool, Liverpool, U.K. His current research interest is computer vision, including semantic segmentation with limited annotation, salient object detection, and video object segmentation. 
+
+Jin Wang received the B.S. degree in automation from Qingdao University of Science and Technology, Qing-dao, PR China, in 2021. He is currently pursuing the Ph.D. degree with China University of Petroleum (East China), Qingdao, PR China. His research interests include computer vision, deep learning, and pattern recognition, especially semantic segmentation. 
+
+Baodi Liu received the Ph.D. degree in Electronic En-gineering from Tsinghua University. Currently, he is an assistant professor in the College of Information and Control Engineering, China University of Petroleum, China. His research interests include computer vision and machine learning. 
+
+Dapeng Tao received the B.E. degree from North-western Polytechnical University, Xi’an, China, in 1999, and the Ph.D. degree from the South China University of Technology, Guangzhou, China, in 2014. He is currently a Professor with the School of Infor-mation Science and Engineering, Yunnan University, Kunming, China. He has authored and coauthored more than 50 scientific articles. He has served more than ten international journals, including the IEEE Transactions on Image Processing, the IEEE Trans-actions on Neural Networks and Learning Systems, the IEEE Transactions on Cybernetics, the IEEE Transactions on Multimedia, the IEEE Transactions on Circuits and Systems for Video Technology, Pattern Recognition, and Information Sciences. His research interests include machine learning, computer vision, and robotics. 
+
+Weifeng Liu is currently a Professor with the College of Control Science and Engineering, China University of Petroleum (East China), China. He received the double B.S. degree in automation and business admin-istration and the Ph.D. degree in pattern recognition and intelligent systems from the University of Science and Technology of China, Hefei, China, in 2002 and 2007, respectively. His current research interests in-clude pattern recognition and machine learning. He has authored or co-authored a dozen papers in top journals and prestigious conferences including 10 ESI Highly Cited Papers and 3 ESI Hot Papers. Dr. Weifeng Liu serves as associate editor for Neural Processing Letter, co-chair for IEEE SMC technical committee on cognitive computing, and guest editor of special issue for Signal Processing, IET Computer Vision, Neurocomputing, and Remote Sensing. He also serves dozens of journals and conferences.

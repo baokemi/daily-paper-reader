@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-001.webp",
+      "caption": "Table 3: Mapping of numerical strength levels to prompt descriptions.",
+      "page": 26,
+      "index": 1,
+      "width": 825,
+      "height": 693
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-002.webp",
+      "caption": "Figure 3: Qualitative comparison. The naive greedy strategy (Config A) results in disjointed text where one advertiser overpowers the other, leading to hallucinations. IAMFM (Config B) identifies the optimal influence configuration, improving total welfare by +36% through enhanced semantic coherence.",
+      "page": 34,
+      "index": 2,
+      "width": 829,
+      "height": 521
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-003.webp",
+      "caption": "Figure 5: SAE Steering for promoting ice creams and lemons. Prompt: “Help me plan the perfect movie night tonight with 8 guests coming. What do I need to buy?” Columns steer for ice cream, and rows steer for lemon-related things.",
+      "page": 42,
+      "index": 3,
+      "width": 805,
+      "height": 1265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-004.webp",
+      "caption": "Figure 1: Visual Over-Saturation in Generative Advertising (advertisers: Alpha sports jacket and Beta boba). (a) Baseline produces a natural image lacking commercial utility (unbranded cup and jacket). Balanced configurations naturally prioritize a single brand: (b) sharp focus on Alpha logo with a blurred Beta branded cup; (c) prominent Beta logo, pushing Alpha to the periphery. Conversely, extreme parameters (d) cause catastrophic structural collapse, hallucinating an amalgamated “AB” logo onto the boba cup.",
+      "page": 3,
+      "index": 4,
+      "width": 826,
+      "height": 224
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-005.webp",
+      "caption": "Table 5: Optimal configuration s∗ for different user utility weights (wU), calculated using F4 mean utilities aggregated across all 5 users. Restaurant A is “QuickBite” and B is “Thai Spice Garden”.",
+      "page": 35,
+      "index": 5,
+      "width": 806,
+      "height": 428
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-006.webp",
+      "caption": "Table 6: Optimal configuration s∗ in advertiser-only extreme scenarios, using F4 aggregated means. The optimum is found by maximizing only E[VA] or E[VB].",
+      "page": 35,
+      "index": 6,
+      "width": 806,
+      "height": 312
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-007.webp",
+      "caption": "Table 4: Statistical significance (Welch’s t-test) for key comparisons across budget regimes. We report p-values and 95% CIs for the mean difference. Bolded methods are our novel proposals.",
+      "page": 28,
+      "index": 7,
+      "width": 823,
+      "height": 320
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-008.webp",
+      "caption": "Figure 2: Comparison of welfare across all methods. Left: Box plots stratified by token budget summarize performance, showing the median (center line), mean (diamond), interquartile range (box), and outliers (points). All reported statistics include outliers. The IAMFM methods outperform the baselines and reveal a token-budget-dependent shift in the optimal method. Right: Aggregated performance across all budgets. Our proposed multi-fidelity instantiations (IAMFM-MFBO, IAMFM-ASH) show better median performance, while IAMFM-MFBO demonstrates a clear advantage at higher budgets.",
+      "page": 8,
+      "index": 8,
+      "width": 826,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-009.webp",
+      "caption": "Table 1: Aggregated performance (mean welfare ± std. dev.) stratified by budget regime. Methods are sorted by High-Budget performance. Bolded are proposed methods.",
+      "page": 9,
+      "index": 9,
+      "width": 686,
+      "height": 181
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06263v1/fig-010.webp",
+      "caption": "Figure 4: Absolute error (compared with the offline ground truth) in finding the best counterfactual welfare as a function of additional budget (Bc f ). We compare our warm-start methods against their cold-start counterparts. The GP-based methods are shown in blue: ACO-MFBO (solid blue line) and Cold-Start MFBO (dashed blue line). The eliminationbased methods are in green: ACO-ASH (solid green line) and Cold-Start ASH (dashed green line).",
+      "page": 37,
+      "index": 10,
+      "width": 829,
+      "height": 271
+    }
+  ]
+}

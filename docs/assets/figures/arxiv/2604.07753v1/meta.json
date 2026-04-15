@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07753v1/fig-001.webp",
+      "caption": "Fig. 3: Overview of Symbiotic-MoE. We re-architect the Transformer FFN layer to resolve task interference. Our framework features: (1) Modality-Aware Expert Disentanglement, where input tokens are routed to specialized Understanding (blue) or Generation (orange) experts via decoupled routers; (2) A Shared Expert Bridge (purple), which processes all tokens to enforce semantic alignment and prevent modal isolation. The entire framework is optimized via Progressive Training Strategy, harmonizing generation and understanding within a unified Transformer backbone.",
+      "page": 6,
+      "index": 1,
+      "width": 717,
+      "height": 223
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07753v1/fig-002.webp",
+      "caption": "Fig. 5: Analysis of Training Dynamics. (a) Standard MoE (blue) and MoT (orange) suffer from routing collapse, indicated by the dropping capacity rate. In contrast, our Symbiotic-MoE (green) maintains highest expert utilization (∼0.95). (b) This structural stability translates into superior optimization efficiency, with our method achieving lower convergence generation loss than baselines.",
+      "page": 11,
+      "index": 2,
+      "width": 607,
+      "height": 270
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07753v1/fig-003.webp",
+      "caption": "Fig. 2: Comparison of Architectures. (a) Standard MoE suffers from routing collapse due to multi-task gradient conflicts (like cognitive dissonance). (b) MoT avoids conflict via physical isolation but induces a “Split-Brain” dilemma, which structurally hinders cross-modal synergy and knowledge transfer. (c) Our Symbiotic-MoE introduces shared experts as a semantic bridge, enabling co-evolution of generation and understanding within a unified, parameter-efficient architecture.",
+      "page": 2,
+      "index": 3,
+      "width": 642,
+      "height": 497
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07753v1/fig-004.webp",
+      "caption": "Fig. 6: Evidencing Generative Synergy. (a) We probe the isolated performance of Shared Experts. Compared to the baseline trained without generation (Train w/o Gen), our Symbiotic method significantly boosts the semantic density of shared experts. (b) & (c) The training dynamics show that while the control baseline degrades, SymbioticMoE effectively reverses the forgetting trend via generative regularization.",
+      "page": 13,
+      "index": 4,
+      "width": 717,
+      "height": 220
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07753v1/fig-005.webp",
+      "caption": "Table 2: Ablation on Architectural Designs. We evaluate knowledge retention at iteration zero to validate structural integrity. “Tripartite” denotes separating Text, ViT, and VAE; “Bimodal” merges Text/ViT into a single group. The 96/32 Bimodal split with shared experts offers the optimal trade-off.",
+      "page": 12,
+      "index": 5,
+      "width": 466,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07753v1/fig-006.webp",
+      "caption": "Fig. 1: Macro-level routing dynamics of the pre-trained VLM. We track the (a) imbalance ratio and (b) standard deviation of expert selection counts across all 47 layers for Text tokens. The metrics reveal a severe long-tail distribution (ratio consistently ≫ 1.0), indicating that the pre-trained VLM inherently relies on a concentrated subset of “core experts” while leaving others underutilized.",
+      "page": 16,
+      "index": 6,
+      "width": 594,
+      "height": 272
+    }
+  ]
+}

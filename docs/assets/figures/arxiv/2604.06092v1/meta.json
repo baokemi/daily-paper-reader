@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06092v1/fig-001.webp",
+      "caption": "Figure 1: Illustration of the definitions of apx, yq, cousinpx, yq and killerpx, yq. The block apx, yq is the closest ancestor of px, yq that lies on the longest chain C˚. The block cousinpxi, yiq is the unique block on C˚ with the same depth as pxi, yiq. Suppose J “ 1. Then killerpx1, y1q “ cousinpx1, y1q and pw, zq is the killer of px0, y0q, px2, y2q and px3, y3q.",
+      "page": 14,
+      "index": 1,
+      "width": 334,
+      "height": 441
+    }
+  ]
+}

@@ -1,0 +1,1165 @@
+Title: FedRio: Personalized Federated Social Bot Detection via Cooperative Reinforced Contrastive Adversarial Distillation
+
+URL Source: https://arxiv.org/pdf/2604.10678v1
+
+Published Time: Tue, 14 Apr 2026 01:19:11 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+> IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 1
+
+# Personalized Federated Social Bot Detection via Cooperative Reinforced Contrastive Adversarial Distillation 
+
+Yingguang Yang, Hao Liu, Xin Zhang, Yunhui Liu, Yutong Xia, Qi Wu, Hao Peng, Taoran Liang, Bin Chong, Tieke He, Philip S. Yu, Life Fellow, IEEE ,
+
+Abstract —Social bot detection is critical to the stability and security of online social platforms. However, current state-of-the-art bot detection models are largely developed in isolation, overlooking the benefits of leveraging shared detection patterns across platforms to improve performance and promptly identify emerging bot variants. The heterogeneity of data distributions and model architectures further complicates the design of an effective cross-platform and cross-model detection framework. To address these challenges, we propose F ED RIO (Personalized Fed erated Social Bot Detection with Cooperative R e inf orced Contrastive Adversarial Distillation framework. We first introduce an adaptive message-passing module as the graph neural network backbone for each client. To facilitate efficient knowledge sharing of global data distributions, we design a federated knowledge extraction mechanism based on generative adversarial networks. Additionally, we employ a multi-stage adversarial contrastive learning strategy to enforce feature space consistency among clients and reduce divergence between local and global models. Finally, we adopt adaptive server-side parameter aggregation and reinforcement learning-based client-side parameter control to better accommodate data heterogeneity in heterogeneous federated settings. Extensive experiments on two real-world social bot detection benchmarks demonstrate that F ED RIO consistently out-performs state-of-the-art federated learning baselines in detection accuracy, communication efficiency, and feature space consistency, while remaining competitive with published centralized results under substantially stronger privacy constraints. 
+
+Index Terms —social bot detection, federated learning, multi-agent reinforcement learning, graph neural network 
+
+Yingguang Yang, Hao Liu, Xin Zhang and Qi Wu are with the School of Cyber science at University of Science and Technology of China, Hefei 230026, China. E-mail: {dao, rcdchao, darcy , qiwu4512, }@mail.ustc.edu.cn; Yutong Xia is with the Institute of Data Science at the National University of Singapore, 119077, Singapore. E-mail: yutong.xia@u.nus.edu; Hao Peng is with the State Key Laboratory of Software Develop-ment Environment, Beihang University, Beijing 1000191, China. E-mail: 
+
+{penghao }@buaa.edu.cn; Taoran Liang is with the in Systems Science from Beijing University of Posts and Telecommunications, Beijing 100876, China. E-mail: tao-rann@bupt.edu.cn. Bin Chong is with the National Engineering Laboratory for Big Data Analysis and Applications, Peking University, Beijing, 100871, P.R. China. E-mail: chongbin@pku.edu.cn; Yunhui Liu and Tieke He are with the State Key Laboratory for Novel Software Technology, Nanjing University, Nanjing 210023, China. E-mail: 
+
+{lyhcloudy1225, hetieke }@gmail.com; Philip S. Yu is with the Department of Computer Science, University of Illinois Chicago, Chicago, IL 60607, USA. E-mail: psyu@uic.edu. Manuscript received September 2025. (Corresponding authors: Hao Peng, Bin Chong and Tieke He.) 
+
+I. I NTRODUCTION 
+
+Social bots mimic human behavior across platforms such as Twitter, Facebook, and Instagram [ 1]. Millions of bots, often controlled by automation programs or platform APIs [ 2], attempt to infiltrate genuine user communities at scale for malicious purposes, including election manipulation [ 3], [ 4], disinformation campaigns [ 5 ], privacy breaches [ 6], and the spread of extremist ideologies [ 7], [ 8]. Beyond these, bots are also implicated in spreading extremist ideologies [ 7], [ 8], posing a significant threat to online communities. The detrimental societal impacts and compromised user experience on social platforms highlight the urgent need for effective bot detection mechanisms. A key challenge in social bot detection is the lack of effective privacy-preserving collaboration across platforms. In practice, bot networks often operate in a coordinated manner across multiple social media platforms, whereas most existing detection approaches remain platform-specific. Prior studies have explored metadata-derived user features [9], [ 10 ], textual content from social posts [ 11 ], [ 12 ], and more advanced graph-based models [ 13 ], [ 14 ], [ 15 ], [ 16 ]. However, these methods are typically developed and evaluated within a single-platform setting, and their effectiveness is therefore constrained by the quantity, structure, and quality of data available on that platform. Moreover, many recent graph-based detectors [ 17 ], [18 ], [ 19 ] benefit from holistic graph structures and cross-community connectivity. Under federated deployment, where data are isolated across platforms and only local subgraphs are observable, part of this structural information is no longer directly accessible, which may reduce the advantages of such centralized designs. These limitations motivate the need for collaborative bot detection frameworks that can transfer bot-relevant knowledge across isolated platforms without sharing raw data. Federated learning (FL) has emerged as a promising paradigm for training models collaboratively across platforms without exposing local data. Recent efforts [ 20 ], [ 21 ], [ 22 ], [23 ] have enhanced FL through data-free approaches such as generative adversarial networks and knowledge distillation to further mitigate privacy risks. However, these methods face several critical limitations: 
+
+• Model Homogeneity Constraint. Although heterogeneous federated learning has been explored with various solutions, traditional FL frameworks often still assume a homoge- 
+
+> arXiv:2604.10678v1 [cs.AI] 12 Apr 2026 IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 2
+
+neous model architecture across clients. In cross-platform bot detection, where platforms may possess diverse data modalities and structures, enforcing strict homogeneity can be suboptimal. There remains a need for flexible frameworks that seamlessly support structural heterogeneity while maintaining collaborative learning efficacy.  
+
+> •
+
+Inconsistent Feature Spaces. Existing federated knowledge distillation techniques, while increasingly applied to diverse modalities [ 24 ], [ 25 ], often assume relatively consistent feature spaces across clients. In the context of social bot detec-tion across heterogeneous platforms, discrepancies between global and local data distributions—arising from platform-specific graph structures, feature schemas, and labeling conventions—can lead to model drift and misaligned feature representations, ultimately degrading overall performance. Feature alignment among clients is therefore essential.  
+
+> •
+
+Suboptimal Parameter Aggregation. In heterogeneous settings, the contribution of each client model to the global update should dynamically adapt based on the relevance and quality of its data. While research on client aggregation has surpassed simple heuristic methods, many existing approaches still struggle to effectively assign fine-grained aggregation weights at the neuron level, or lack adaptive mechanisms for personalized updates tailored to shifting local data distributions. To address these challenges, we propose F ED RIO , a Per-sonalized Fed erated Social Bot Detection with Cooperative Re inf orced Contrastive Adversarial Distillation framework. FED RIO integrates an adaptive graph neural network back-bone, federated adversarial knowledge distillation, contrastive representation alignment, server-side adaptive aggregation, and client-side reinforcement learning to improve collaborative bot detection under heterogeneous federated settings. At the model level, F ED RIO introduces a graph neural net-work backbone with an adaptive message-passing mechanism, together with a federated knowledge distillation architecture based on generative adversarial networks. Within this frame-work, a global generator captures transferable distributional knowledge and conveys it to each client without requiring raw data sharing. To mitigate feature-space inconsistency and model drift, each client performs multi-stage adversarial learning with two classifiers, including one globally shared classifier and one locally customized classifier, while contrastive learning is used to align optimization trajectories between local and global models. At the optimization level, F ED RIO addresses heterogeneous data distributions and client contribution variability through adaptive personalization on both the server and client sides. On the server, an adaptive parameter aggregation mechanism assigns neuron-level weights to refine global model updates. On the client, reinforcement learning determines the extent to which downloaded global parameters should be integrated into the local model, thereby enabling client-specific updates tailored to local data characteristics. To evaluate F ED RIO ’s robustness under realistic hetero-geneous conditions, we conduct extensive experiments by partitioning benchmark datasets via a Dirichlet distribution to simulate non-IID scenarios with varying degrees of la-bel distribution skew. Experimental results demonstrate that FED RIO consistently outperforms state-of-the-art heteroge-neous federated learning baselines in terms of detection accuracy while achieving fast convergence and consistent feature space alignment across clients. We emphasize that the current evaluation validates cross-distribution robustness within a federated setting; extending the framework to true cross-platform scenarios with fundamentally different feature schemas remains an important direction for future work. The main contributions of this work are summarized as follows:  
+
+> •
+
+A multi-stage adversarial learning and federated knowledge distillation framework is proposed to better transfer global knowledge in heterogeneous federated settings with skewed data distributions.  
+
+> •
+
+A reinforcement learning-based strategy is introduced to guide client-specific parameter updates.  
+
+> •
+
+An adaptive server-side parameter aggregation mechanism is developed to enable fine-grained, neuron-level model integration.  
+
+> •
+
+Extensive experiments on two benchmark bot detection datasets show that F ED RIO consistently outperforms existing representative federated learning approaches. II. R ELATED WORKS 
+
+In this section, we introduce three aspects of research, social bot detection based on graph neural networks, federated knowledge distillation, and personalized federated learning. 
+
+A. Social Bot Detection with Graph Neural Networks 
+
+Social networks inherently contain rich contextual infor-mation, such as social familiarity [ 26 ], [ 27 ], affiliation sim-ilarity [ 28 ], and user interactions [ 29 ]. The graph structure derived from social networks is well-suited for social bot detection using recent advances in graph neural networks (GNNs), which are capable of countering bots’ mimicking behaviors and adaptive evolution. Early attempts to apply GNNs for bot detection [ 30 ] involved combining GNNs with multilayer perceptrons and belief propagation. Subsequent studies extended this by constructing heterogeneous graphs to model user influence and by extracting node-level features using pre-trained language models. These features were then aggregated through personalized GCNs, relational GCNs [ 31 ], or relation-aware graph transformers [ 32 ] to learn expressive node representations. Other efforts explored hybrid approaches that integrate graph and textual features [ 33 ], [ 34 ], or de-signed novel GNN architectures that account for network heterogeneity [ 32 ]. Recently, multi-modal semantic approaches and self-supervised architectures have been introduced to boost detection performance. For instance, ETS-MM [ 35 ]enhances textual semantics by synergizing language models with GNNs, while LMBot [ 36 ] distills graph knowledge directly into language models to enable graph-less deployment. In cross-domain scenarios, domain adaptation methods like BotTrans [ 37 ] seek to transfer knowledge from a source network to a target network. Furthermore, approaches like CACL [ 38 ]and self-supervised tuning mechanisms [ 12 ] adopt contrastive IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 3
+
+learning paradigms to adapt to evolving bot communities. Additionally, recent advances have focused on structural and temporal dynamics, SEBOT [ 18 ] leverages structural entropy-guided multi-view contrastive learning to uncover hidden bot clusters, while dynamic graph transformers [ 19 ] have been proposed to capture the temporal evolution of bot behaviors. Th adversarial robustness of these GNN-based detectors has also been scrutinized, with studies like RoBCtrl [ 15 ] demonstrating how reinforced manipulation of bot interactions can evade detection. However, most of these methods primarily focus on centralized settings or assume access to source data for adaptation, limiting their applicability under strict data privacy constraints across multiple platforms. To overcome these limitations, F ED RIO integrates an adaptive message-passing mechanism with federated learning protocols. This allows the model to collaboratively distill global knowledge without raw data sharing, thereby improving its resilience to evolving bot strategies across heterogeneous platforms. 
+
+B. Federated Knowledge Distillation 
+
+Knowledge Distillation (KD) was originally introduced to enable compact models to replicate the knowledge learned by larger models [ 39 ]. In KD, knowledge is typically represented as soft targets in the form of logits, where the student model learns from the output distribution of the teacher model [ 40 ]. KD is particularly beneficial in federated learning (FL), as it facilitates efficient model training with limited data and enables the transfer of knowledge without sharing clients’ private datasets. Given these advantages, a growing number of FL approaches have adopted KD-based techniques. For instance, FedDistill [ 41 ] refines user data logits through forward passes and distills global knowledge to mitigate global model drift. FedDF [ 42 ] leverages ensemble learning by aggregating local model logits to train a global model. Similarly, FedGen [ 20 ] combines averaged logits from local models to train a global generator, which acts as the teacher model. FedFTG [ 22 ] uses individual local model logits as supervision signals to train a global generator that produces synthetic data for fine-tuning the global model. However, these methods often overlook the importance of consistent feature spaces for effective knowledge transfer, resulting in suboptimal distillation performance. FedACK [ 43 ] introduces a GAN-based bidirectional distillation mechanism that facilitates efficient sharing of data distribution knowledge across clients, achieving state-of-the-art results on heterogeneous data. MH-pFLID [ 24 ]addresses model heterogeneity through injection and distillation in medical data analysis, while DUAL3D-Fed [ 25 ] tackles 3D continual federated learning via dual distillation with vision-language models. These works demonstrate that federated KD and personalized FL are increasingly applicable to diverse modalities and domains beyond their original image-centric scope. Despite the progress made in federated KD, its ap-plication to social bot detection remains largely unexplored. Traditional bot detection methods typically focus on isolated models and detection patterns [ 5], whereas social bots often operate collaboratively across multiple platforms. Federated knowledge distillation—without requiring access to private local datasets—holds strong potential as a driving force for cross-platform social bot detection, enabling collaborative modeling while preserving user privacy. 
+
+C. Personalized Federated Learning 
+
+In federated learning (FL), the objective is to train one or more models that generalize well to the test data of each participating client. Existing approaches broadly follow two technical paths: personalizing model parameters under a homogeneous architecture, and personalizing the model architecture itself. For parameter-level personalization, Fallah et al. [ 44 ] proposed a meta-learning approach to train a global model that better adapts to local client data. Inspired by similar workflows, T et al. [ 45 ] utilized Moreau envelopes as regularizers for local training. Wang et al. [ 46 ], Arivazhagan et al. [ 47 ], and Yu et al. [ 48 ] adopted local fine-tuning strategies, while Mansour et al. [ 49 ] and Deng et al. [ 50 ] proposed hybrid schemes that combine global and local models. Zhang et al. [ 51 ]further searched for optimal weighted combinations of local models to better match clients’ target data distributions. These approaches leverage the global model to some extent, which lim-its the flexibility of local customization. For architecture-level personalization, some works suggest training multiple global models on the server and clustering clients based on similarity to assign a model per group [ 52 ], [ 53 ], [ 49 ]. FedAMP [ 52 ]can be viewed as a special case of this cluster-based paradigm, where each client maintains a personalized global model on the server. In contrast, other methods abandon the notion of a unified global model altogether to address personalization directly [ 54 ], [ 55 ]. For example, MOCHA [ 55 ] formulates FL as a multi-task learning problem, while FedHN [ 54 ]introduces a hypernetwork framework for client-specific model generation. FedSSP [ 56 ] tackles structural heterogeneity in cross-domain scenarios by sharing generic spectral knowledge while maintaining personalized preference modules. Similarly, ADPFedGNN [ 57 ] employs mutual information minimization to adaptively decouple global and local knowledge parameters. Despite these advancements, producing effective personalized models remains challenging in many scenarios—especially for complex architectures like graph neural networks. The proposed FED RIO framework addresses this challenge by supporting both local model parameter adaptation and global model parameter aggregation via adaptive mechanisms. This enables a higher degree of personalization tailored for cross-platform social bot detection with graph-based models. III. P ROBLEM FORMULATION AND NOTATION 
+
+In the federated learning setting for social bot detection, the system consists of a central server and K clients, each holding a private dataset {D 1, . . . , D𝐾 }. These datasets contain a mixture of benign user accounts and social bots from various generations. In such scenarios, clients may have different model architectures or parameters, resulting in model heterogeneity. To address this challenge, the proposed method employs reinforcement learning to adaptively adjust aggregation parameters during the local update process at each client. Specifically, each client 𝑘 maintains a local model composed IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 4label & noise                       
+
+> 𝐷 1
+> 𝐷 2
+> ℓ𝐺  , ℓ𝐷  ,ℓ𝜀  ,
+> client 𝑘
+> 𝑟 𝑢
+> ෤x
+> 𝐺 |𝐺 1
+> adaptive message passing
+> ···
+> label & noise
+> 𝐷 1
+> 𝐷 2
+> ℓ𝐺  , ℓ𝐷  ,ℓ𝜀  ,
+> client 1
+> 𝑟 𝑢
+> ෤x
+> 𝐺 |𝐺 1
+> adaptive message passing
+> upload 𝜃 𝜀
+> 1,𝜃 𝐷 1
+> 1update 𝜃 𝐺 ,𝜃 𝜀 ,𝜃 𝐷 upload 𝜃 𝜀
+> 𝑘 ,𝜃 𝐷 1
+> 𝑘 update 𝜃 𝐺 ,𝜃 𝜀 ,𝜃 𝐷 via 𝑎 1~𝜋 (𝑠 𝑡 )via 𝑎 𝑘 ~𝜋 (𝑠 𝑡 )
+> AGENT
+> SEMANTIC REPRESENTATION TRAIN LOSS PREDICT PROBABILITY
+> server
+> 𝑠 𝑡
+> Figure 1. The proposed F ED RIO framework.
+
+of a GNN backbone and a fully connected layer. The GNN dynamically adjusts the message propagation for each node to enable personalized node representations. The overall objective is to minimize the total error across all clients. The server does not collect raw data from clients but aggregates model parameters to tackle challenges arising from non-identically distributed data. During global aggregation, the server learns a unique aggregation parameter for each client to perform weighted averaging. The overall optimization objective of the proposed method is to minimize the following global loss function: 
+
+arg min  
+
+> 𝑤
+
+L( 𝑤 ) = 1
+
+𝐾 
+
+> 𝐾
+
+∑︁ 
+
+> 𝑘 =1
+
+1
+
+𝑁 𝑘 𝑁 𝑘 ∑︁ 
+
+> 𝑖 =1
+
+L( 𝑥 𝑘 𝑖 , 𝑦 𝑘 𝑖 ; 𝑤 ), (1) where L denotes the loss function used to evaluate the predictive model 𝑤 on client 𝑘 ’s data sample (𝑥 𝑘 𝑖 , 𝑦 𝑘 𝑖 ), and 
+
+D𝑘 = {( 𝑥 𝑘 𝑖 , 𝑦 𝑘 𝑖 )} 𝑁 𝑘 
+
+> 𝑖 =1
+
+.IV. M ETHOD 
+
+A. Overview 
+
+As illustrated in Figure 1, F ED RIO comprises four key components: an adaptive message passing module as the backbone model, a federated adversarial contrastive knowledge distillation mechanism, a client-driven reinforcement learning-based parameter update module, and a server-side adaptive parameter aggregation module. The adaptive message pass-ing module is designed to dynamically adjust the message propagation and aggregation process within the backbone model, enabling platform-specific personalization to address distributional differences across social media platforms. The 
+
+federated adversarial contrastive knowledge distillation module facilitates the sharing of data distribution knowledge across platforms without requiring data exchange. It employs a multi-stage adversarial training mechanism to align feature spaces across clients, promoting more effective knowledge sharing. The third component is the client-side reinforcement learning module , which determines an appropriate parameter update rate during local model optimization. The fourth component is the server-side adaptive parameter aggregation module , which learns individualized aggregation weights for each client to optimize the global model updates. 
+
+1) Adaptive Message Passing Module: The adaptive message passing module is deployed within the backbone GNN model 
+
+𝜀 of each client. It comprises a pair of cooperative networks: the action network and the environment network, implemented using GraphSAGE and GIN, respectively. The action network aggregates node features and outputs a probability distribution over actions (i.e., message passing modes) for each node. These actions guide how the environment network, centered on a target node, propagates and filters messages from its neighbors during representation learning. This design enables node-level personalized representations. 
+
+2) Federated Adversarial Contrastive Knowledge Distillation Mechanism: The proposed framework follows a standard server–client paradigm, where each client maintains a global generator 𝐺 for knowledge distillation and a local generator 
+
+𝐺 𝑘 for data augmentation. Two classifiers, 𝐷 1 and 𝐷 2, are used: classifier 𝐷 1 has a consistent architecture and parameter initialization across clients but is trained independently on each local dataset; classifier 𝐷 2 is client-specific and may differ in structure to accommodate model customization needs. The local dataset D𝑘 is first encoded by the adaptive message passing backbone model 𝜀 to obtain user representations 
+
+𝑟 𝑢 = 𝜀 (𝑥 𝑢 ). A multi-stage adversarial training mechanism is then applied, in which the global generator 𝐺 serves as a medium for transferring data distribution knowledge across clients without sharing raw data. Simultaneously, both classi-fiers within each client are jointly optimized, and contrastive learning is employed to align heterogeneous feature spaces across clients. 
+
+3) Client-Guided Reinforcement Learning-Based Parameter Update Module: The adaptive parameter update process in each client’s backbone model is formulated as a reinforce-IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 5
+
+ment learning (RL)-based policy optimization problem. At the beginning of each communication round, an RL agent determines the update momentum for each client. This federated optimization process is modeled as a Markov Decision Process (MDP), where the state 𝑠 is constructed by concatenating the representation vectors of aggregated client nodes, the predicted label distributions, and the client-specific loss values. Given a state, the RL agent selects an action 𝑎 to determine the weighted contribution of the global model parameters when updating the local model. Afterward, the agent receives a reward signal 𝑟 based on the accuracy of the global model on a validation set generated by the global generator 𝐺 , enabling it to improve its policy. Notably, this approach does not require sharing any client data samples—only model parameters are exchanged, thereby preserving user privacy across social media platforms. 
+
+4) Server-Side Adaptive Parameter Aggregation Module: 
+
+Under non-IID data distributions, each client’s data represents only a small fraction of the overall global distribution, and thus contributes differently to the final global model. To address this, a trainable parameter mask matrix is introduced. During the server-side aggregation step, the backbone model parameters from each client are element-wise multiplied with the corresponding parameter masks. The masked parameters are then used to aggregate the global model, enabling neuron-level adaptive model parameter fusion. 
+
+B. Adaptive Message Passing Module 
+
+The backbone model in this work operates on graph-structured data, where edges between nodes represent friendship or interaction relations among user accounts on social media platforms. Each node is associated with a set of initial features, including user metadata, descriptive attributes, and additional content features and named entities extracted from tweets via natural language processing tools. Due to the significant differences in graph data distributions across platforms, the performance of a model trained on one platform often fails to generalize to others. This is because different spatial-based GNN architectures essentially differ in how they control message passing and aggregation. In a traditional GNN, all nodes share the same message propagation and aggregation scheme, which limits its flexibility in handling heterogeneous data. Applying a uniform message passing mechanism on one platform may result in suboptimal detection performance on another. To address this challenge, this work adopts a collaborative adaptive message passing module as the backbone model on each client. The key motivation lies in its ability to dynamically adjust the message propagation mode for each node and adaptively aggregate information to generate personalized node representations. Consequently, the learned strategies for control-ling node-level message propagation and bot detection patterns can be effectively shared across platforms. This flexibility in adjusting message-passing behaviors enhances the model’s ability to adapt to diverse platform-specific data characteristics, resulting in more accurate and efficient social bot detection, thereby improving the overall system effectiveness. The adaptive message passing mechanism proceeds as follows. Given input node features 𝑥 (omitting node indices) composed into a matrix X, the first step is to apply layer normalization to stabilize and accelerate training: 
+
+ℎ = 𝜆 · 𝑥 − 𝐸 (𝑥 )√︁ 
+
+𝑉 𝑎𝑟 (𝑥 ) + 𝜖 + 𝛽, (2) where ℎ ∈ H denotes the normalized node feature matrix. The normalized features H and adjacency matrix 𝐴 are then fed into two separate but structurally identical GraphSAGE networks: one controls message reception ( 𝑈 𝑖𝑛 ), and the other controls message emission ( 𝑈 𝑜𝑢𝑡 ). These GNNs output a probability distribution over actions for each node 𝑣 :
+
+𝑝 𝑣 𝑖𝑛 = 𝑈 𝑙 𝑖𝑛 (ℎ𝑙 𝑣 , 𝑀 𝑙 𝑖𝑛 {ℎ𝑙 𝑢 |𝑢 ∈ 𝑁 (𝑣 )}) , (3) 
+
+𝑝 𝑣 𝑜𝑢𝑡 = 𝑈 𝑙 𝑜𝑢𝑡 (ℎ𝑙 𝑣 , 𝑀 𝑙 𝑜𝑢𝑡 {ℎ𝑙 𝑢 |𝑢 ∈ 𝑁 (𝑣 )}) , (4) where 𝑀 𝑙 𝑖𝑛 and 𝑀 𝑙 𝑜𝑢𝑡 denote the neighborhood aggregation functions (e.g., MEAN, MAX, or SUM) utilized at layer 𝑙 
+
+to collect features from node 𝑣 ’s immediate neighbors 𝑁 (𝑣 ).The vector 𝑝 𝑣 ∈ R|Ω| denotes the probability distribution over the finite action space Ω for node 𝑣 . The full matrices of probabilities across all nodes are denoted as 𝑃 𝑖𝑛 and 𝑃 𝑜𝑢𝑡 .To enable edge-wise adaptive message passing, the Gumbel-Softmax reparameterization trick is employed to compute edge weights from the action probabilities: 
+
+𝑔 𝑣 𝑖 = − log (− log (𝜖 𝑣 𝑖 )) , (5) 
+
+𝐺𝑆 ( 𝑝 𝑣 𝑖 ) = exp (( log ( 𝑝 𝑣 𝑖 ) + 𝑔 𝑣 𝑖 )/ 𝜏 )
+
+Í𝑘 𝑗 =1 exp (( log ( 𝑝 𝑣 𝑗 ) + 𝑔 𝑣 𝑗 )/ 𝜏 ) , (6) where 𝜖 ∈ Uniform (0, 1) is a uniformly distributed random variable, 𝑔 𝑣 𝑖 is an i.i.d. Gumbel noise term, 𝑝 𝑣 𝑖 is the probability of action 𝑎 𝑖 ∈ Ω for node 𝑣 , and 𝜏 is the softmax temperature. This technique enables differentiable sampling of discrete actions, allowing for end-to-end training of node-specific message passing strategies. Based on the above equations and the action probability distributions, the edge weight between nodes 𝑢 and 𝑣 is calculated as: 
+
+𝑤 𝑢𝑣 = 𝐺𝑆 ( 𝑝 𝑢 𝑜𝑢𝑡 ) · 𝐺𝑆 ( 𝑝 𝑣 𝑖𝑛 ), (7) where 𝐺𝑆 ( 𝑝 𝑢 𝑜𝑢𝑡 ) and 𝐺𝑆 ( 𝑝 𝑣 𝑖𝑛 ) denote the probabilities that the source node 𝑢 and the target node 𝑣 retain the edge, respectively. Next, the adjacency matrix is updated by retaining only edges with positive weights: 
+
+𝐴 ′ 
+
+> 𝑢𝑣
+
+=
+
+(1, if 𝐴 𝑢𝑣 = 1 & 𝑤 𝑢𝑣 > 0,
+
+0, otherwise . (8) The updated adjacency matrix 𝐴 ′ and the node representa-tions are then fed into the environment network 𝑈 𝑒𝑛𝑣 (imple-mented using GIN) to generate updated node embeddings: 
+
+ℎ𝑙 𝑣 = 𝑈 𝑙 𝑒𝑛𝑣 (ℎ(𝑙 ) 
+
+> 𝑣
+
+, 𝑀 𝑙 𝑒𝑛𝑣 {ℎ𝑙 𝑢 |𝑢 ∈ 𝑁 (𝑣 )′, 𝑁 (𝑣 )′ ∈ 𝐴 ′ }) , (9) where 𝑀 𝑙 𝑒𝑛𝑣 denotes the neighborhood aggregation function in the environment network, ℎ𝑙 𝑣 is the representation of node 𝑣 
+
+after layer 𝑙 of the environment network, and 𝑁 (𝑣 )′ denotes IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 6
+
+the neighbors of 𝑣 defined by the updated adjacency matrix 
+
+𝐴 ′.Finally, each node embedding ℎ𝑙 𝑣 is passed through a fully connected layer to produce the final output representation 𝑟 𝑣 
+
+from the backbone model, which is used in subsequent training stages. 
+
+C. Client-Driven Federated Adversarial Contrastive Knowl-edge Distillation 1) Local Adversarial Contrastive Knowledge Distillation: 
+
+Each client adopts a multi-stage adversarial contrastive knowl-edge distillation strategy to address the challenge of non-IID data distributions across clients. 
+
+Stage 1: Training classifiers 𝐷 1 and 𝐷 2. This stage aims to encourage the model to learn distinct decision boundaries for the same class and to compress the feature space generated by the backbone model. Given the non-IID nature and data scarcity on clients, the global generator 𝐺 acts as a teacher network, providing knowledge of the global data distribution. For a sample (𝑥 𝑘 𝑖 , 𝑦 𝑘 𝑖 ), 𝐺 synthesizes a pseudo-sample ˜𝑥 =
+
+𝐺 (𝑧, 𝑦 𝑘 𝑖 ; 𝜃 𝐺 ), where 𝑧 ∼ N ( 0, 1) is a standard Gaussian noise and 𝑦 𝑘 𝑖 is the label. The classifier 𝐷 1 then processes both (𝑥 𝑘 𝑖 , ˜𝑥 )
+
+to obtain the predicted distributions ( 𝑝, ˜𝑝 ). The distillation loss minimizes the divergence between the probability distribution 
+
+𝑝 of real data 𝑥 𝑘 𝑖 and that of the synthetic data ˜𝑝 , as defined in Eq. (10): 
+
+L𝑘 𝑑𝑖𝑠 = 1
+
+𝑁 𝑘 𝑁 𝑘 ∑︁ 
+
+> 𝑖 =1
+
+𝐷 𝐾 𝐿 (𝜎 (𝐷 1 (𝑟 𝑘 𝑖 ))∥ 𝜎 (𝐷 1 ( ˜𝑥 ))) , (10) where 𝜎 is the softmax function, 𝐷 𝐾 𝐿 denotes the Kullback-Leibler divergence, and 𝑟 𝑘 𝑖 = 𝜀 (𝑥 𝑘 𝑖 ) is the feature representation produced by the backbone model. A similar loss L𝑘 𝑑𝑖𝑠  
+
+> ′
+
+is computed for classifier 𝐷 2 using the same formula. To further refine the feature space, we introduce an adver-sarial loss that measures the divergence between the output distributions of 𝐷 1 and 𝐷 2 for the same input: 
+
+L𝑘 𝑎𝑑𝑣 = 1
+
+𝑁 𝑘 𝑁 𝑘 ∑︁ 
+
+> 𝑖 =1
+
+𝐷 𝐾 𝐿 (𝜎 (𝐷 1 (𝑟 𝑘 𝑖 ))∥ 𝜎 (𝐷 2 (𝑟 𝑘 𝑖 ))) . (11) Maximizing Eq. (11) encourages 𝐷 1 and 𝐷 2 to learn di-verse decision boundaries, thus promoting a more granular partitioning of the feature space. Intuitively, if the feature vectors produced by 𝜀 can be correctly classified by both classifiers despite differing boundaries, then the vectors must lie in their overlapping classification region, leading to finer feature learning. Similarly, we apply Eq. (11) to the pseudo-data generated by the local generator 𝐺 𝑘 , computing an adversarial loss L𝑘 𝑎𝑑𝑣𝑔 , which is minimized. In addition, 𝐷 1 and 𝐷 2 are required to correctly classify pseudo-data randomly generated by 𝐺 , helping to address data imbalance and scarcity. In summary, the total loss for training both classifiers is defined as: 
+
+L𝑘 𝐷 = L𝑘 𝑐𝑙𝑠 + 𝛼 (L 𝑘 𝑑𝑖𝑠 + L 𝑘 𝑑𝑖𝑠 
+
+> ′
+
+) + 𝛾 (L 𝑘 𝑎𝑑𝑣𝑔 − L 𝑘 𝑎𝑑𝑣 ), (12) where 𝛼 and 𝛾 are balancing hyperparameters. 
+
+Stage 2: Training the backbone model 𝜀 . This stage begins by minimizing the adversarial loss in Eq. (11) to reduce the divergence between the output distributions of the two classifiers for the same feature vector. A lower divergence implies that the data point lies on the same side of both decision boundaries, thereby encouraging the backbone model to produce more precise and compact feature representations. Contrastive learning is employed to guide the parameter optimization of the backbone model, mitigating model drift 
+
+between local and global extractors. At the 𝑡 -th communication round, the objective is to ensure that the representation 𝑟 =
+
+𝜀 𝑘 𝑡 (𝑥 𝑘 𝑖 ) produced by the client-side backbone 𝜀 𝑘 𝑡 aligns closely with the global representation 𝑟 𝑔𝑙𝑜 = 𝜀 𝑡 (𝑥 𝑘 𝑖 ), while remaining dissimilar from the previous round’s representation 𝑟 𝑝𝑟 𝑒 =
+
+𝜀 𝑡 −1 (𝑥 𝑘 𝑖 ). The contrastive loss is defined as: 
+
+L𝑘,𝑖 𝑐𝑜𝑛 = − log exp (sim (𝑟, 𝑟 𝑔𝑙𝑜 )/ 𝜏 )
+
+exp (sim (𝑟, 𝑟 𝑔𝑙𝑜 )/ 𝜏 ) + exp (sim (𝑟, 𝑟 𝑝𝑟 𝑒 )/ 𝜏 ) ,
+
+(13) where sim (· , ·) denotes a similarity function, and 𝜏 is a temperature scaling factor. This contrastive approach not only alleviates local model drift but also leverages the global model as an adversarial mediator to coordinate the feature spaces across different clients. Accordingly, the total loss function for training the feature extractor is given by: 
+
+L𝑘 𝜀 = L𝑘 𝑐𝑙𝑠 + 𝛾 L𝑘 𝑎𝑑𝑣 + 𝜇 1
+
+𝑁 𝑘 𝑁 𝑘 ∑︁ 
+
+> 𝑖 =1
+
+L𝑘,𝑖 𝑐𝑜𝑛 , (14) 
+
+Stage 3: Training 𝐺 𝑘 . To ensure that 𝐺 𝑘 generates pseudo samples lying near the decision boundaries of both classifiers, the adversarial loss L𝑘 𝑎𝑑𝑣𝑔 is maximized. This encourages the boundaries to converge toward overlapping regions and, consequently, compresses the consistent feature space learned by 𝜀 .Since 𝐺 𝑘 generates samples conditioned only on class labels, a diversity loss L𝑣𝑎𝑟 is introduced to enhance the variability of generated samples and prevent mode collapse: 
+
+L𝑣𝑎𝑟 = exp ©«
+
+1
+
+𝑁 2∑︁ 𝑖, 𝑗 ∈ { 1,··· , 𝑁 }
+
+ −∥ ˜𝑥 𝑖 − ˜𝑥 𝑗 ∥2 · ∥ 𝑧 𝑖 − 𝑧 𝑗 ∥2
+
+ª ®¬
+
+,
+
+(15) where ˜𝑥 𝑖 = 𝐺 𝑘 (𝑧 𝑖 , ˆ𝑦 𝑖 ). The overall loss for the generator 𝐺 𝑘 
+
+is defined as: 
+
+L𝑘 𝑔 = L𝑘 𝑐𝑙𝑠 − L 𝑘 𝑎𝑑𝑣𝑔 + L 𝑣𝑎𝑟 . (16) After local training, each client 𝑘 transmits the parameters 
+
+{Θ𝑘 𝜀 , Θ𝑘 𝐷 1 } to the server. The server then performs adaptive parameter aggregation, as detailed in Section IV-E , to update the global parameters of 𝐺 , 𝐷 , and 𝜀 . Subsequently, each client downloads the updated global models and integrates them into its local environment following the procedure described in Section IV-D , thereby initiating the next round of client training. 
+
+2) Server-Side Aggregated Knowledge Extraction: To enable knowledge sharing of local data distributions across clients, the global discriminator 𝐷 and generator 𝐺 are used to extract global knowledge, without relying on proxy data for server-side distillation. In this process, each client’s local classifier 𝐷 1IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 7
+
+serves as a teacher model. The loss function for updating the generator 𝐺 is defined as: 
+
+L𝐺 = 1
+
+𝐾 
+
+> 𝐾
+
+∑︁ 
+
+> 𝑘 =1
+
+∑︁ ˜𝑥 
+
+𝛼 𝑘,𝑦 𝑡 
+
+h
+
+𝐷 𝐾 𝐿 
+
+
+
+𝜎 (𝐷 𝑘  
+
+> 1
+
+( ˜𝑥 ))∥ 𝜎 (𝐷 ( ˜𝑥 )) 
+
+
+
++ L ˜𝑥 𝑐𝑙𝑠 
+
+i
+
+,
+
+(17) where ˜𝑥 is a synthetic sample drawn from the experience set D𝐺 generated by 𝐺 , with noise 𝑧 ∼ N ( 0, 1) and label 𝑦 
+
+sampled according to the label distribution 𝑝 (𝑦 ). The coefficient 
+
+𝛼 𝑘,𝑦 𝑡 denotes the proportion of samples with label 𝑦 in client 
+
+𝑘 relative to the total number of label-𝑦 samples in the global dataset D.The label distribution 𝑝 (𝑦 ) is estimated through the exchange of label statistics among clients during communication rounds. This allows the generator 𝐺 to acquire knowledge of the global data distribution and enables multi-stage training to propagate such knowledge to each client model effectively. 
+
+D. Reinforcement Learning-Based Client Parameter Update 1) Deep Q-Network-Based Reinforcement Learning: This module aims to enhance the detection accuracy of social bots on different platforms by learning appropriate parameter update weights for each client using a reinforcement learning (RL) agent. The definitions of state, action, and reward in the RL setting are introduced below. 
+
+State. At each time step, the state 𝑠 𝑡 is constructed using the node feature vectors, predicted probability distributions, and corresponding loss values generated by the backbone models of all clients. It is represented as: 
+
+𝑠 𝑡 = [r1 
+
+> 𝑡
+
+, p1 
+
+> 𝑡
+
+, ℓ 1 
+
+> 𝑡
+
+, . . . , r𝐾 𝑡 , p𝐾 𝑡 , ℓ 𝐾 𝑡 ], (18) where r𝑘 𝑡 denotes the feature vector of client 𝑘 at communica-tion round 𝑡 , p𝑘 𝑡 denotes the predicted probability distribution of client 𝑘 at round 𝑡 , and ℓ𝑘 𝑡 is the corresponding loss value. 
+
+Action Selection and Parameter Update. At the end of each communication round in federated learning, the RL agent predicts the Q-values for each action under the current state. These Q-values are then converted into a probability distribution using the softmax function, which determines the weights for updating each client’s model parameters. The action selection distribution 𝜋 (𝑎 |𝑠 𝑡 ) is defined as: 
+
+𝜋 (𝑎 |𝑠 𝑡 ) = exp (𝑄 (𝑠 𝑡 , 𝑎 )) 
+
+Í𝑎 ′ exp (𝑄 (𝑠 𝑡 , 𝑎 ′)) , (19) where 𝑄 (𝑠 𝑡 , 𝑎 ) is the Q-value for action 𝑎 in state 𝑠 𝑡 . The optimal action 𝑎 𝑡 is selected based on the distribution 𝜋 (𝑎 |𝑠 𝑡 ).Each component 𝑎 𝑘 𝑡 of the selected action 𝑎 𝑡 represents the parameter update weight for client 𝑘 . Specifically, if 𝛼 = 𝑎 𝑘 𝑡 ,the model parameter update rule for client 𝑘 is given by: 
+
+Θ𝑘 𝑡 = (1 − 𝛼 )Θ𝑘 𝑡 −1 + 𝛼 Θ′ 
+
+> 𝑡
+
+, (20) where Θ𝑘 𝑡 is the updated model parameter of client 𝑘 at round 𝑡 ,
+
+Θ𝑘 𝑡 −1 is the parameter from the previous communication round, 
+
+Θ′ 
+
+> 𝑡
+
+is the new global model parameter downloaded from the server, 𝛼 is the update weight. 
+
+Reward Mechanism. The reward observed at each time step is defined as 𝑟 𝑡 = 𝜉 ( 𝜔 𝑡 −Ω) − 1, where 𝜔 𝑡 denotes the testing accuracy of the global model on the held-out validation set at round 𝑡 , and Ω is the target accuracy. The constant 𝜉 > 0
+
+ensures that the reward 𝑟 𝑡 increases exponentially with respect to the accuracy 𝜔 𝑡 . Since 0 < 𝜔 𝑡 ≤ Ω ≤ 1, the reward 𝑟 𝑡 ∈(− 1, 0], achieving its maximum value of 0 when 𝜔 𝑡 = Ω .The objective of the reinforcement learning agent is to maximize the expected cumulative discounted reward, defined as: 
+
+𝑅 =
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =1
+
+𝛾 𝑡 −1𝑟 𝑡 =
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =1
+
+𝛾 𝑡 −1 (𝜉 ( 𝜔 𝑡 −Ω) − 1), (21) where 𝛾 ∈ ( 0, 1) is the discount factor, which controls the agent’s preference for immediate versus long-term rewards. The exponential term 𝜉 ( 𝜔 𝑡 −Ω) encourages the agent to select parameter update weights for client models that lead to higher accuracy 𝜔 𝑡 .As training progresses, improvements in accuracy tend to slow down. The exponential formulation amplifies marginal gains in accuracy, providing meaningful incentives even in the later training stages. The constant term −1 penalizes longer training durations, thereby motivating the agent to achieve the target accuracy with fewer communication rounds. 
+
+2) Reinforcement Learning Optimization: We employ the Double Deep Q Network (DDQN) to train a neural network that approximates the optimal action-value function 𝑄 ∗ (𝑠 𝑡 , 𝑎 ).The value function provides an estimate of the expected return for each possible action 𝑎 in a given state 𝑠 𝑡 . The original Q-learning algorithm is known to suffer from instability because it indirectly optimizes the reinforcement learning agent by learning an approximator 𝑄 (𝑠, 𝑎 ; 𝜃 𝑡 ). DDQN stabilizes the estimation of the action-value function by introducing a second value function 𝑄 (𝑠, 𝑎 ; 𝜃 ′ 
+
+> 𝑡
+
+). To train the reinforcement learning agent, parameter aggregation weights for clients are randomly selected during the first 𝑡 communication rounds. The state, action, and reward tuples obtained from the environment are stored. After several rounds of federated learning communication, the training of the reinforcement learning agent begins. Samples of state-action pairs are drawn from the stored experiences, and the network parameters are optimized by minimizing the following loss function: 
+
+ℓ𝑡 (𝜃 𝑡 ) =
+
+
+
+𝑌 DoubleQ  
+
+> 𝑡
+
+− 𝑄 (𝑠 𝑡 , 𝑎 ; 𝜃 𝑡 )
+
+2
+
+, (22) where 𝑌 DoubleQ  
+
+> 𝑡
+
+denotes the target value at round 𝑡 , defined as: 
+
+𝑌 DoubleQ  
+
+> 𝑡
+
+= 𝑟 𝑡 + 𝛾𝑄 
+
+
+
+𝑠 𝑡 +1, arg max 
+
+> 𝑎
+
+𝑄 (𝑠 𝑡 +1, 𝑎 ; 𝜃 𝑡 ); 𝜃 ′
+
+> 𝑡
+
+
+
+, (23) where the target 𝑌 DoubleQ  
+
+> 𝑡
+
+is updated using two action-value functions, where 𝜃 𝑡 denotes the online network parameters updated at each step and 𝜃 ′ 
+
+> 𝑡
+
+represents the frozen target network parameters that provide stability for the action-value estimation. The action-value function 𝑄 (𝑠 𝑡 +1, 𝑎 ; 𝜃 𝑡 ) is updated by minimizing the loss ℓ𝑡 (𝜃 𝑡 ) via gradient descent: 
+
+𝜃 𝑡 +1 = 𝜃 𝑡 + 𝜂 
+
+
+
+𝑌 DoubleQ  
+
+> 𝑡
+
+− 𝑄 (𝑠 𝑡 , 𝑎 ; 𝜃 𝑡 )
+
+
+
+∇𝜃 𝑡 𝑄 (𝑠 𝑡 , 𝑎 ; 𝜃 𝑡 ), (24) where 𝜂 is the learning rate and ∇𝜃 𝑡 𝑄 (𝑠 𝑡 , 𝑎 ; 𝜃 𝑡 ) denotes the gradient of 𝑄 with respect to 𝜃 𝑡 .IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 8
+
+Algorithm 1: FED RIO 
+
+Input: Client datasets D𝑘 , 𝑘 = 1, . . . , 𝐾 ; client generators 
+
+𝐺 𝑘 ; 𝜀 ; classifiers {𝐷 𝑘  
+
+> 1
+
+}, {𝐷 𝑘  
+
+> 2
+
+}; global generator 𝐺 ;discriminator 𝐷 
+
+Output: Client models {𝐷 2 }, global model parameters 𝜀 , and 
+
+𝐺  
+
+> 1
+
+Initialize all parameters;  
+
+> 2
+
+for each communication round 𝑡 = 1, . . . , 𝑇 do  
+
+> 3
+
+The server broadcasts all model parameters {𝜃 𝐺 , 𝜃 𝜀 , 𝜃 𝐷 }
+
+to clients;  
+
+> 4
+
+for each client 𝑘 in parallel do  
+
+> 5
+
+Clients update their model parameters via adaptive aggregation using Eq. 20;  
+
+> 6
+
+for each training epoch 𝑒 = 1, . . . , 𝐸 ; // Stage 1 
+
+> 7
+
+do  
+
+> 8
+
+Compute classifier loss L𝑘 𝐷 with Eq. 12;  
+
+> 9
+
+Update classifier parameters: 
+
+{𝜃 𝑘 𝐷 1 , 𝜃 𝑘 𝐷 2 } ← { 𝜃 𝑘 𝐷 1 , 𝜃 𝑘 𝐷 2 } − ∇L 𝑘 𝐷 ; 
+
+> 10
+
+end  
+
+> 11
+
+for each training epoch 𝑒 = 1, . . . , 𝐸 ; // Stage 2 
+
+> 12
+
+do  
+
+> 13
+
+Compute backbone model loss L𝑘 𝜀 via Eq. 14;  
+
+> 14
+
+Update backbone parameters: 𝜃 𝑘 𝜀 ← 𝜃 𝑘 𝜀 − ∇L 𝑘 𝜀 ; 
+
+> 15
+
+end  
+
+> 16
+
+for each training epoch 𝑒 = 1, . . . , 𝐸 ; // Stage 3 
+
+> 17
+
+do  
+
+> 18
+
+Compute generator loss L𝑘 𝑔 using Eq. 16;  
+
+> 19
+
+Update client generator parameters: 
+
+𝜃 𝑘 𝐺 𝑘 ← 𝜃 𝑘 𝐺 𝑘 − ∇L 𝑘 𝑔 ; 
+
+> 20
+
+end  
+
+> 21
+
+Client 𝑘 sends {𝜃 𝑘 𝜀 , 𝜃 𝑘 𝐷 1 } to the server;  
+
+> 22
+
+end  
+
+> 23
+
+Aggregate server model parameters using Algorithm 3;  
+
+> 24
+
+Update global generator 𝐺 with Eq. 17;  
+
+> 25
+
+Update reinforcement learning agent via Algorithm 2;  
+
+> 26
+
+end 
+
+E. Server-Side Adaptive Parameter Aggregation 
+
+To account for the varying importance of different client models in aggregating global model parameters, this section proposes an adaptive parameter aggregation method. The method performs fine-grained, neuron-level integration of global and local model parameters. At the start of federated training, the server initializes a learnable aggregation weight matrix 𝑊 𝑘 for each client backbone model 𝜀 𝑘 , which is of the same shape as the model parameters and initialized with all elements set to 1. At the 𝑡 -th communication round of federated learning, after receiving the backbone model parameters Θ𝑘 𝑡 from any client 
+
+𝑘 , the server updates the global model parameters Θ′ 
+
+> 𝑡
+
+using the aggregation weight matrices 𝑊 𝑘 as follows: 
+
+Θ′ 
+
+> 𝑡
+
+=∑︁ 
+
+> 𝑘
+
+(Θ𝑘 𝑡 − Θ𝑘 𝑡 −1) ⊙ 𝑊 𝑘 , (25) where each client’s parameter update (Θ𝑘 𝑡 − Θ𝑘 𝑡 −1) is element-wise multiplied by the corresponding weight matrix 𝑊 𝑘 . The weight matrices 𝑊 𝑘 are normalized neuron-wise across clients to ensure that for each parameter position, the sum of weights 
+
+𝑤 𝑘 over all clients equals 1. 
+
+Algorithm 2: Client Parameter Update Based on Reinforcement Learning 
+
+Input: Sample feature vectors {𝑟 𝑘 𝑡 }, predicted probability distributions {p𝑘 𝑡 }, loss values {ℓ𝑘 𝑡 }, learning rate 𝜂 ,discount factor 𝛾 , constant 𝜉 , target accuracy Ω,number of clients 𝐾 , communication round 𝑡 
+
+Output: Updated client model parameters Θ𝑘 𝑡  
+
+> 1
+
+Construct the state vector for the current communication round: 
+
+𝑠 𝑡 = [𝑟 1 
+
+> 𝑡
+
+, p1 
+
+> 𝑡
+
+, ℓ 1 
+
+> 𝑡
+
+, . . . , 𝑟 𝐾 𝑡 , p𝐾 𝑡 , ℓ 𝐾 𝑡 ] 
+
+> 2
+
+Select action 𝑎 𝑡 based on state 𝑠 𝑡 according to Eq. (19);  
+
+> 3
+
+for each client 𝑖 = 1, . . . , 𝐾 in parallel do  
+
+> 4
+
+Update client parameters using action 𝑎 𝑘 𝑡 according to Eq. (20);  
+
+> 5
+
+Evaluate classification accuracy 𝜔 𝑡 on the validation set;  
+
+> 6
+
+end  
+
+> 7
+
+Calculate the reward 𝑟 𝑡 according to Eq. (21);  
+
+> 8
+
+Store the transition (𝑠 𝑡 , 𝑎 𝑡 , 𝑟 𝑡 , 𝑠 𝑡 +1) in the replay buffer;  
+
+> 9
+
+for each reinforcement learning update step do  
+
+> 10
+
+Sample a batch of transitions (𝑠, 𝑎, 𝑟, 𝑠 ′) from the replay buffer;  
+
+> 11
+
+Compute the target Q-value 𝑌 DoubleQ  
+
+> 𝑡
+
+using Eq. (23);  
+
+> 12
+
+Minimize the loss function and update the Q-network according to Eq. (22);  
+
+> 13
+
+Update network parameters 𝜃 𝑡 according to Eq. (24);  
+
+> 14
+
+end  
+
+> 15
+
+Every 𝑀 update steps, update the target network parameters 
+
+𝜃 ′ 
+
+> 𝑡
+
+with the current online network parameters 𝜃 𝑡 ;
+
+To optimize the weight matrices, the global generator 𝐺 is used to produce synthetic samples. The generator 𝐺 takes as input the label vector y and Gaussian noise 𝝐 and generates outputs ˜𝑥 :
+
+˜𝑥 = 𝐺 (y, 𝜖, Θ𝐺 ), (26) where ˜𝑥 denotes the generated synthetic data. After generating 
+
+𝑁 synthetic samples to combine the synthetic dataset ˜𝑋 . The aggregated global model Θ′ 
+
+> 𝑡
+
+then classifies the synthetic dataset, and the cross-entropy loss is computed as: 
+
+L𝑎𝑔𝑔 = 1
+
+𝑁 ∑︁ 𝑖 
+
+−𝑦 𝑖 log (Θ′ 
+
+> 𝑡
+
+(𝑥 𝑖 )) − ( 1 − 𝑦 𝑖 ) log (1 − Θ′ 
+
+> 𝑡
+
+(𝑥 𝑖 ))  .
+
+(27) Finally, the weight matrices are optimized by backpropagat-ing the loss gradient with learning rate 𝜂 :
+
+𝑊 𝑘 = 𝑊 𝑘 − 𝜂 ∇𝑊 𝑘 L𝑎𝑔𝑔 , (28) 
+
+F. Overall Workflow 
+
+Algorithm 1 outlines the complete workflow of F ED RIO .Initially, all model parameters are initialized, followed by alternating phases of knowledge distillation and reinforce-ment learning-based selection. In each communication round, FED RIO first broadcasts the latest 𝐺 , 𝜀 , and 𝐷 to all clients (Line 3). Each client then optimizes the required local models 
+
+𝐷 𝑘  
+
+> 1
+
+, 𝐷 𝑘  
+
+> 2
+
+, 𝜀 , 𝑎 𝑘 , and 𝐺 𝑘 using its local data through three train-ing stages (Lines 6-20). Upon completing parallel optimization, the server aggregates the clients’ parameters from the current round to update the global parameters 𝜃 𝜀 and 𝜃 𝐷 (Line 23) and further optimizes the global generator 𝐺 (Line 24). Finally, the reinforcement learning agent is optimized (Line 25). IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 9
+
+Algorithm 3: Server-Side Adaptive Parameter Aggre-gation 
+
+Input: Sample labels y, global generator 𝐺 , learning rate 𝜂 , model parameters {Θ𝑘 𝑡 } and {Θ𝑘 𝑡 −1 }
+
+Output: Updated global model parameters Θ′ 
+
+> 𝑡
+> 1
+
+Generate a synthetic dataset ˜𝑋 using Eq. 26;  
+
+> 2
+
+for each sample 𝑥 𝑖 in the dataset, 𝑖 = 1, . . . , 𝑁 do  
+
+> 3
+
+Compute the sample loss L𝑎𝑔𝑔 via Eq. 27;  
+
+> 4
+
+end  
+
+> 5
+
+Update the weight matrix 𝑊 𝑘 according to Eq. 28;  
+
+> 6
+
+Update the server model parameters Θ′ 
+
+> 𝑡
+
+by Eq. 25; 
+
+G. Complexity and Practicality Analysis 1) Complexity Analysis: The overall complexity of F ED RIO 
+
+consists of the local GNN backbone execution, adversarial knowledge distillation, and the server-side reinforcement learning mechanism. For a client graph G = (V , E) with 
+
+𝑁 = |V | nodes and 𝑀 = |E| edges, the time complexity of the adaptive message passing backbone M𝑎 is 𝑂 (𝐿 (𝑁 𝑑 21 + 𝑀𝑑 1)) ,where 𝐿 is the number of layers and 𝑑 1 is the feature dimension. The multi-stage adversarial contrastive knowledge distillation requires 𝑂 (𝐸 𝑙𝑜𝑐𝑎𝑙 · 𝑁 𝑏 · 𝑑 22 ) time per client, where 
+
+𝐸 𝑙𝑜𝑐𝑎𝑙 is the number of local epochs, 𝑁 𝑏 is the batch size, and 𝑑 2 is the hidden layer size. On the server side, the neuron-level parameter aggregation and RL-based weight adaptation take 𝑂 (𝐾 · | Θ𝐷 |) time, where 𝐾 is the number of clients and |Θ𝐷 | is the number of parameters in the shared classifier. The space complexity on the client side is dominated by the storage of the M𝑎 , local classifiers, local discriminator, local discriminator, and global discriminator, bounded by 𝑂 (𝑁 𝑑 1 + | ΘM𝑎 | + 𝑀 + | Θ𝐷 | + | Θ𝐺 𝑘 | + | Θ𝐺 |) . The server space complexity is 𝑂 (𝐾 · | Θ𝐷 | + | Θ𝐺 |) , where |Θ𝐺 |
+
+is the parameter size of the global generator. Overall, the communication complexity per round scales linearly with the model size 𝑂 (| ΘM𝑎 | + | Θ𝐷 |) , which is well within standard FL requirements and mitigates the overhead associated with raw graph data transmission. 
+
+2) Justification for Framework Complexity: While F ED RIO 
+
+integrates multiple components, each module addresses a specific challenge in heterogeneous federated bot detection:  
+
+> •
+
+RL-based Adaptation: Simpler alternatives face fundamen-tal limitations in our setting: (1) validation-based adaptive weighting requires representative held-out data on each client, which is problematic under severe non-IID conditions (𝛼 ≤ 0.1) where some clients may lack certain classes entirely; (2) gradient-based heuristics (e.g., gradient cosine similarity) provide only first-order local information and can-not capture the long-term, cross-round impact of aggregation decisions. Our RL agent observes a holistic state vector (client representations, loss values, label distributions) and learns a non-myopic policy that adapts to client-specific distribution shifts across communication rounds. Our ablation (Table V) confirms that removing RL (F ED RIO -NR) degrades accuracy by up to 5.06% under 𝛼 = 0.1. 
+
+> •
+
+Neuron-level Masking: Standard client-level weighting assumes all features from a client are equally useful. In contrast, our neuron-level masking (optimized via synthetic data from the global generator) filters out client-specific noise, enabling fine-grained knowledge transfer that prevents dominant clients from biasing the global model. This masking mechanism is robust to imperfect generator quality because it relies on relative differences in client model activations rather than absolute accuracy of synthetic samples. Our ablation confirms that removing this module (F ED RIO -NA) causes up to 6.9% accuracy degradation. Thus these targeted complexities are essential for ensuring feature space consistency and robust performance under severe data heterogeneity. V. E XPERIMENTS 
+
+The experiments aim to answer the following questions:  
+
+> •
+
+Q1 . How does F ED RIO perform in classification under different data distribution scenarios?  
+
+> •
+
+Q2 . How does F ED RIO perform in learning efficiency?  
+
+> •
+
+Q3 . Can F ED RIO learn a consistent feature space across clients?  
+
+> •
+
+Q4 . What is the effect of the different parameter values in different stages of F ED RIO ? 
+
+> •
+
+Q5 . How does the RL Update Mechanism, adaptive message-passing module, and Adaptive Parameter Aggregation module perform when combined in F ED RIO and other baselines?  
+
+> •
+
+Q6 . How does F ED RIO compare with centralized social bot detection methods under different privacy constraints? 
+
+A. Experimental Setup 1) Software and Hardware: FED RIO is implemented with Python 3.8.10, Pytorch 1.7.1 and runs on two servers, one is equipped with NVIDIA Tesla V100 GPU, 2.20GHz Intel Xeon Gold 5220 CPU and 512GB RAM, and the other is equipped with NVIDIA GeForce RTX 3090 GPU, 3.40GHz Intel Xeon Gold 6246 CPU and 256GB RAM.              
+
+> Table I STATISTICS OF THE DATASETS
+> Dataset Total Nodes Edges Bots Humans Vendor-19 5,349 11,284 2,553 2,796 TwiBot-20 11,826 85,927 6,589 5,237
+
+2) Datasets: We conduct experiments on two Twitter bot datasets Vendor-19 [58] and TwiBot-20 [59], the largest ones in the public domain by far. We mix the Vendor-19 with a dataset of benign accounts Verified, which is presented in [ 10 ]. The TwiBot-20 dataset includes comprehensive user metadata, tweets, and graph structures (e.g., follower/following relationships), making it highly suitable for evaluating advanced GNN-based algorithms. For both datasets, we adhere to a standard chronological or random stratified split, utilizing 70% of the data for training, 10% for validation, and 20% for testing. The detailed statistics of the datasets, including the total number of nodes, edges, and the class distribution of bots versus genuine human accounts, are summarized in Table I. IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 10 1 2 3 4 5 6 7 8 9 10                                                                                                   
+
+> 1
+> 2
+> Client ID
+> Class ID
+> 070 140 210 280 350 420
+> (a) Vendor-19 ( 𝛼 =1). 12345678910
+> 1
+> 2
+> Client ID
+> Class ID
+> 070 140 210 280 350 420 (b) Vendor-19 ( 𝛼 =0.5). 12345678910
+> 1
+> 2
+> Client ID
+> Class ID
+> 070 140 210 280 350 420 (c) Vendor-19 ( 𝛼 =0.1). 12345678910
+> 1
+> 2
+> Client ID
+> Class ID
+> 0200 400 600 800 1000 1200
+> (d) TwiBot-20 ( 𝛼 =1). 12345678910
+> 1
+> 2
+> Client ID
+> Class ID
+> 0300 600 900 1200 1500 1800 (e) TwiBot-20 ( 𝛼 =0.5). 12345678910
+> 1
+> 2
+> Client ID
+> Class ID
+> 0350 700 1050 1400 1750 2100 (f) TwiBot-20 ( 𝛼 =0.1). Figure 2. Visualization of data heterogeneity. The darker color means more training samples with a label available to the client.
+
+3) Data heterogeneity: We employ a Dirichlet distribution Dir (𝛼 ) to simulate the non-IID data scenario, as discussed in [ 60 ]. The spammer dataset is partitioned heterogeneously and distributed across different clients to emulate multiple social bot platforms, as illustrated in Figure 2. The parameter 
+
+𝛼 controls the degree of heterogeneity: a smaller 𝛼 results in a higher level of data distribution skewness across clients. 
+
+4) Baselines: Given that federated KD offers a natural and privacy-preserving alternative to raw data sharing – an essential requirement in cross-platform bot detection – we primarily compare our method against KD-based approaches that address data heterogeneity under non-IID settings. FedAvg 
+
+and [ 61 ], FedProx [62 ] improve the local model training and update under heterogeneity by adding an optimization item. FedDF [42 ] employs data-free knowledge distillation to improve the global model on server side. FedEnsemble 
+
+[ 63 ] uses an ensemble mechanism for combining the output of all models to predict a specific sample. FedDistill [63 ]shares label-wise average of logit vectors among users for data-free knowledge distillation without sharing network parameters. 
+
+FedGen [ 20 ] and FedFTG [ 22 ] offer flexible parameter sharing and knowledge distillation. FedACK [ 43 ] devises a GAN-based federated knowledge distillation mechanism that facilitates efficient transfer of data distribution knowledge among clients. We note that recent centralized social bot detection models (e.g., ETS-MM [ 35 ], SEBot [ 18 ],LMBot [ 36 ], BotTrans [ 37 ], CACL [ 38 ], BotMoE [ 14 ], BotDGT [ 19 ]) have demonstrated strong performance under full data access. However, these models are fundamentally designed for centralized settings where the complete social graph and all user features are acces-sible. Directly running them within our federated framework would require either (a) granting them pooled data access (violating privacy constraints and giving an unfair advantage) or (b) fragmenting their inputs across clients (breaking their architectures and misrepresenting their capability). Instead, we provide a principled contextual comparison by referencing their published benchmark results in Section V-G , allowing readers to evaluate F ED RIO ’s performance relative to centralized upper bounds. A detailed discussion of these models and their design philosophies is provided in Section II. 
+
+5) Implementation Details: We implement F ED RIO and all baselines using PyTorch 2.0.1. We configure 10 participating clients for the federated experiments, with local training conducted over 𝐸 = 5 epochs per communication round. The maximum number of global communication rounds is set to 
+
+𝑇 = 100 . We use Adam optimizer with an initial learning rate 
+
+𝜂 = 10 −3 and weight decay 10 −4. The batch size is set to 
+
+64 . For the GNN backbone, we use 2 layers with a hidden dimension of 64 . The contrastive learning margins are set to 
+
+𝛿 = 0.5. Our RL agent employs a learning rate of 5 × 10 −4
+
+with a discount factor 𝛾 = 0.99 . The server’s generator network comprises three fully connected layers with batch normalization and ReLU activations. 
+
+B. Effectiveness (Q1) 
+
+Overall Performance. As shown in Tables II and III, our pro-posed method, F ED RIO , consistently outperforms all baseline approaches on both the Vendor-19 and TwiBot-20 datasets. FED RIO achieves substantial improvements over existing federated KD models across all heterogeneity levels. Under highly heterogeneous settings ( 𝛼 ≤ 0.5), where standard federated methods suffer significant performance degradation, FED RIO ’s personalized architecture effectively tailors local models to distinct client distributions while distilling platform-agnostic global knowledge, demonstrating strong robustness to non-IID data challenges. Multiple perspectives highlight the advantages of F ED RIO in detail. Firstly, on the Vendor-19 dataset, F ED RIO achieves superior accuracy across all settings. For example, at 𝛼 = 1, it reaches an accuracy of 95.42%, significantly higher than other methods. This result demonstrates F ED RIO ’s effectiveness under low heterogeneity and evenly distributed data. In contrast, FedAvg and FedProx show inferior performance in the same setting, with accuracies of 71.30% and 84.37%, respectively. This significant performance gap underscores the benefits of its data-free knowledge distillation and reinforcement learning mechanisms in optimizing global model performance. Moreover, as data heterogeneity increases (e.g., 𝛼 = 0.1 and 
+
+𝛼 = 0.05 ), F ED RIO maintains its advantage. Specifically, at 
+
+𝛼 = 0.05 , it achieves an accuracy of 78.02%, outperforming the IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 11 
+
+Table II COMPARISON OF THE AVERAGE MAXIMUM ACCURACY OF DIFFERENT METHODS FOR SOCIAL BOT DETECTION ON DATASET VENDOR -19 (%). Metric Accuracy F1 Setting 𝛼 = 1 𝛼 = 0.5 𝛼 = 0.1 𝛼 = 0.05 𝛼 = 1 𝛼 = 0.5 𝛼 = 0.1 𝛼 = 0.05 
+
+FedAvg 71.30 ±0.60 61.06 ±1.52 60.88 ±2.85 59.81 ±2.48 68.48 ±4.08 66.78 ±0.15 65.70 ±0.65 66.61 ±0.01 FedProx 84.37 ±0.43 78.25 ±1.02 51.86 ±0.04 63.27 ±2.32 84.99 ±0.60 76.70 ±0.67 77.16 ±0.61 67.07 ±0.15 FedDF 86.37 ±1.23 80.17 ±2.21 63.16 ±1.37 67.01 ±1.78 - - - -FedEnsemble 81.12 ±2.22 76.70 ±1.21 64.51 ±2.56 68.05 ±1.15 80.87 ±8.04 67.77 ±1.20 69.45 ±3.38 67.35 ±0.40 FedDistill 79.68 ±0.58 68.77 ±1.13 52.88 ±0.06 70.25 ±0.39 77.20 ±0.09 69.16 ±1.00 67.08 ±0.37 67.57 ±0.17 FedGen 90.05 ±0.33 84.83 ±0.96 65.12 ±0.60 70.79 ±2.39 85.03 ±0.63 78.24 ±1.70 73.06 ±1.79 67.99 ±0.68 FedFTG 88.31 ±1.41 82.17 ±1.52 66.01 ±1.25 68.39 ±1.94 81.55 ±3.58 75.78 ±1.97 70.61 ±0.86 69.61 ±1.58 FED ACK-A 91.31 ±0.52 84.79 ±1.05 66.10 ±2.90 68.21 ±1.95 86.38 ±0.48 79.73 ±2.91 65.19 ±2.83 62.49 ±3.02 FED ACK 88.58 ±1.91 87.05 ±2.03 76.04 ±3.40 75.27 ±2.50 85.44 ±0.69 77.98 ±2.52 76.67 ±0.27 69.26 ±0.05 FED RIO 95.42 ±0.33 90.74 ±1.05 78.95 ±1.23 78.02 ±2.53 95.26 ±0.30 89.87 ±1.26 69.77 ±1.97 70.34 ±1.71 
+
+Gain ↑ 4.10 ∼24.12 ↑ 3.68 ∼29.67 ↑ 2.90 ∼27.09 ↑ 2.75 ∼18.20 ↑ 8.88 ∼26.78 ↑ 10.14 ∼23.09 ↑ 0∼4.06 ↑ 0.73 ∼3.73 
+
+Table III COMPARISON OF THE AVERAGE MAXIMUM ACCURACY OF DIFFERENT METHODS FOR SOCIAL BOT DETECTION ON DATASET TWI BOT -20 (%). Metric Accuracy F1 Setting 𝛼 = 1 𝛼 = 0.5 𝛼 = 0.1 𝛼 = 0.05 𝛼 = 1 𝛼 = 0.5 𝛼 = 0.1 𝛼 = 0.05 
+
+FedAvg 54.04 ±0.50 55.41 ±1.35 51.37 ±0.77 52.46 ±0.02 53.37 ±0.01 55.06 ±2.96 50.40 ±0.00 50.41 ±0.01 FedProx 74.34 ±0.06 73.32 ±0.25 51.86 ±0.04 52.30 ±0.63 78.46 ±0.17 77.33 ±0.45 50.08 ±0.00 51.02 ±0.25 FedDF 72.12 ±1.96 71.25 ±1.03 55.23 ±1.32 53.35 ±1.41 - - - -FedEnsemble 55.98 ±2.55 54.15 ±0.04 54.21 ±0.04 54.15 ±0.04 68.63 ±16.88 45.73 ±5.23 47.38 ±5.53 38.99 ±1.74 FedDistill 64.11 ±0.29 63.34 ±0.56 50.00 ±0.00 54.30 ±0.05 66.04 ±1.59 63.99 ±0.27 50.08 ±0.00 52.50 ±0.37 FedGen 74.14 ±0.47 73.12 ±2.09 59.19 ±2.70 55.78 ±1.79 74.69 ±9.33 73.02 ±0.93 63.05 ±2.56 53.02 ±0.27 FedFTG 74.27 ±1.21 74.13 ±0.53 60.14 ±1.74 56.17 ±1.27 74.25 ±0.03 73.48 ±3.49 60.50 ±0.08 53.04 ±0.04 FED ACK-A 77.16 ±1.09 74.70 ±1.64 63.52 ±1.09 55.39 ±1.24 70.59 ±0.28 73.69 ±0.92 61.04 ±2.18 54.21 ±1.83 FED ACK 77.08 ±1.83 78.26 ±2.60 67.81 ±2.20 60.14 ±1.32 71.20 ±0.62 76.21 ±3.48 65.35 ±3.01 56.07 ±5.46 FED RIO 81.48 ±0.08 80.32 ±0.20 74.25 ±5.12 69.94 ±3.87 80.61 ±0.12 79.36 ±0.48 72.12 ±7.43 66.02 ±5.83 
+
+Gain ↑ 4.32 ∼27.44 ↑ 2.05 ∼26.16 ↑ 6.43 ∼24.25 ↑ 9.79 ∼17.64 ↑ 2.15 ∼27.24 ↑ 2.03 ∼33.63 ↑ 6.77 ∼24.74 ↑ 9.94 ∼27.02 
+
+second-best method by margins ranging from 2.75% to 18.20%. In contrast, the performance of FedProx and FedGen declines sharply under the same settings, revealing their limitations in handling highly non-IID data. F ED RIO , by comparison, adapts effectively to such distributions. In terms of F1 score, F ED RIO demonstrates both stability and superiority. On the Vendor-19 dataset, it consistently achieves higher F1 scores across all 𝛼 values, including 69.77% and 70.34% at 𝛼 = 0.1 and 𝛼 = 0.05 , respectively. These results confirm F ED RIO ’s ability to maintain not only high accuracy but also balanced classification performance under varying data distributions, reinforcing its reliability in social bot detection. For the TwiBot-20 dataset, a similar trend is observed. At 
+
+𝛼 = 1, F ED RIO achieves an accuracy of 81.48%, significantly outperforming other baseline methods, especially FedAvg and FedProx, by 27.44% and 7.14%, respectively. This indicates that F ED RIO consistently delivers high performance across different datasets. Additionally, under the highly heterogeneous setting of 𝛼 = 0.05 , F ED RIO still achieves 69.94% accuracy, showcasing strong adaptability and performance in challenging scenarios. FED RIO also excels in F1 score on TwiBot-20. At 𝛼 = 0.1,for instance, it achieves an F1 score of 72.12%, significantly higher than those of competing methods. This demonstrates FED RIO ’s capacity to deliver both accurate and high-quality classification results, which is critical for practical deployment. In summary, the comparative results across diverse datasets and data heterogeneity levels clearly validate F ED RIO ’s advantages in social bot detection. Its integration of data-free knowledge distillation and reinforcement learning not only enhances global model performance but also ensures stable and reliable operation under non-IID settings. These findings establish F ED RIO as a robust and broadly applicable solution for federated bot detection tasks under heterogeneous data distributions. 
+
+Loss sensitivity study. Figure 3 illustrates the loss dynamics during training on the Vendor-19 and TwiBot-20 datasets under varying data heterogeneity levels ( 𝛼 ) and loss functions. Specifically, subfigures (a)–(d) correspond to the Vendor-19 dataset, while subfigures (e)–(h) pertain to TwiBot-20. For Vendor-19, subfigures (a) and (b) show training curves using the dloss function with 𝛼 = 1 and 𝛼 = 0.1, respectively. At 𝛼 = 1, the loss decreases rapidly at the beginning but exhibits significant fluctuations throughout training. In contrast, at 𝛼 = 0.1, the decline in loss is more gradual but notably smoother and more stable, suggesting that lower 𝛼 values help mitigate training instability. Subfigures (c) and (d) depict the training curves using the tloss function. Compared to dloss, tloss yields a smoother loss trajectory, particularly with 𝛼 = 0.1,where the loss decreases quickly with minimal fluctuation and converges to a lower value. For TwiBot-20, subfigures (e) and (f) show training with IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 12 0 25 50 75 100 Communication Rounds                                                    
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean
+> (a) Vendor-19 ( 𝛼 =1tloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean (b) Vendor-19 ( 𝛼 =0.1tloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean (c) Vendor-19 ( 𝛼 =1dloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean (d) Vendor-19 ( 𝛼 =0.1dloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean
+> (e) TwiBot-20 ( 𝛼 =1tloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean (f) TwiBot-20 ( 𝛼 =0.1tloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean (g) TwiBot-20 ( 𝛼 =1dloss). 025 50 75 100 Communication Rounds
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8 Loss
+> Mean (h) TwiBot-20 ( 𝛼 =0.1dloss). Figure 3. Loss dynamics during training under different data consistency parameters and loss functions.
+
+dloss under 𝛼 = 1 and 𝛼 = 0.1, respectively. A similar pattern is observed: although the initial loss reduction is faster with 
+
+𝛼 = 1, it is accompanied by pronounced oscillations. With 𝛼 =
+
+0.1, the loss declines more steadily with reduced fluctuation. Subfigures (g) and (h) present training results using tloss, which consistently leads to smoother and more stable loss curves across both 𝛼 values. Notably, with 𝛼 = 0.1, the loss decreases rapidly and stabilizes at a lower level with minimal variation. In summary, across both datasets, the tloss function consis-tently outperforms dloss in terms of training stability, producing smoother and more reliable loss curves. Additionally, smaller 
+
+𝛼 values (e.g., 0.1) significantly reduce training fluctuations, enhancing convergence stability. These findings highlight the importance of selecting appropriate loss functions and data heterogeneity parameters to achieve stable and efficient training, with practical implications for optimizing model performance across varying data distributions. 
+
+C. Efficiency (Q2) 
+
+In this subsection, we further compare the convergence speed and accuracy of different methods on the Vendor-19 and TwiBot-20 datasets. Table IV reports the average number of communication rounds required by each method to reach a predefined accuracy threshold. Specifically, the target accuracies are set to 85% and 75% for the Vendor-19 dataset, and 75% and 70% for the TwiBot-20 dataset. Across all scenarios, F ED RIO consistently requires the fewest communication rounds to achieve the target. For instance, at 𝛼 = 1 and 𝛼 = 0.5, F ED RIO reaches the desired accuracy in just 3.8 and 1.5 rounds, respectively. In comparison, other methods such as FedProx and FedGen, despite their relative competitiveness, require 13.3 and 25.2 rounds, respectively. Some baselines even fail to meet the target. These results highlight the substantially faster convergence achieved by F ED RIO .On the TwiBot-20 dataset, F ED RIO also exhibits excellent performance. Under 𝛼 = 1 and 𝛼 = 0.5, F ED RIO achieves the target accuracies in only 3.2 and 2.2 rounds, respectively. In contrast, other methods, including FedProx and FedGen, require significantly more rounds, while approaches like FedAvg and FedDF fail to reach the target under all tested conditions. This further underscores F ED RIO ’s robustness and adaptability to diverse and heterogeneous data distributions. Figure 5 presents the learning curves of various methods over 100 communication rounds. F ED RIO ranks among the top performers. Although FedDistill demonstrates strong sta-bility—reaching a steady state within a dozen rounds—its maximum accuracy remains below 0.65, rendering it less competitive. By contrast, F ED RIO not only converges rapidly to a high accuracy level but also maintains this performance consistently across subsequent rounds. rounds, indicating that it delivers both fast convergence and sustained model performance. The advantage of F ED RIO lies in its unique reinforcement learning mechanism and knowledge extraction method. During global knowledge extraction and classification, F ED RIO incor-porates the label distribution of each pseudo-sample across clients as part of the extracted knowledge, evaluating the importance of each client to the knowledge of a specific sample. Additionally, based on the DQN network, the global agent evaluates each client’s contribution to the optimization of the global model and assigns weights to determine its degree of participation in the global model optimization. This mechanism not only limits the feature space and optimization direction of the models at the client side but also significantly accelerates the convergence to the target accuracy. In summary, comparative evaluations across datasets and data distribution settings clearly demonstrate the effectiveness of FED RIO in social bot detection tasks. Its data-free knowledge distillation and reinforcement learning strategies enable high model accuracy, fast convergence, and robust performance IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 13 0.05 0.1 0.5 1.0 60 
+
+70 
+
+80 
+
+90 Accuracy (%)    
+
+> =0.3 =0.5 =0.7 =0.9
+
+(a) FED RIO with different 𝛾 in adversarial learning. 0.05 0.1 0.5 1.0 60 
+
+70 
+
+80 
+
+90 Accuracy (%)     
+
+> =0.3 =0.5 =0.7 =0.9
+
+(b) FED RIO with different 𝜏 in contrastive learning. 0.1 0.3 0.5 0.7 0.9 55 
+
+65 
+
+75 
+
+85 
+
+95 Accuracy (%)     
+
+> =0.05 =0.1 =0.5 =1
+
+(c) FED RIO with different 𝜇 in contrastive learning. 
+
+Figure 4. Hyperparameter Sensitivity ( 𝛾, 𝜏, 𝜇 ) of FedACK on Vendor-19 under diferent data heterogeneity settings ( 𝛼 ). FedAvg FedProx Ensemble FedDistill FedGen FedACK FedRio w/o amp FedRio 0 25 50 75 100 
+
+> Communication Rounds
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Accuracy
+
+(a) Vendor-19 ( 𝛼 = 1). 0 25 50 75 100  
+
+> Communication Rounds
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Accuracy
+
+(b) Vendor-19 ( 𝛼 = 0.5). 0 25 50 75 100  
+
+> Communication Rounds
+> 0.45
+> 0.55
+> 0.65
+> 0.75
+> 0.85
+> Accuracy
+
+(c) TwiBot-20 ( 𝛼 = 1). 0 25 50 75 100  
+
+> Communication Rounds
+> 0.45
+> 0.55
+> 0.65
+> 0.75
+> 0.85
+> Accuracy
+
+(d) TwiBot-20 ( 𝛼 = 0.5). Figure 5. Learning Curve of (a-b) Vendor-19 and (c-d) TwiBot-20 in 100 communication rounds in different 𝛼 settings. Table IV THE ROUND NUMBER TO REACH THE TARGET ACCURACY ON VENDOR -19 
+
+(80% , 70% ) AND TWI BOT -20 (70% , 65% ) .Dataset Vendor-19 TwiBot-20 Setting 𝛼 = 1 (85 ) 𝛼 = 0.5 (75 ) 𝛼 = 1 (75 ) 𝛼 = 0.5 (70 )                                 
+
+> FedAvg unreached unreached unreached unreached FedProx unreached 50.2 ±1.3 13.3 ±2.8 44.4 ±8.4 FedDF unreached unreached unreached unreached FedDistill unreached 60.3 ±12.6 unreached unreached FedGen 25.2 ±3,7 7.5 ±1.2 10.6 ±0.9 16.6 ±2.2 FedACK 12.2 ±2.8 10.3 ±2.1 90.4 ±5.5 6.4 ±0.4 FED RIO 3.8 ±0.8 1.5 ±0.2 3.2 ±0.3 2.2 ±0.4 20 10 010 20
+> 20
+> 0
+> 20
+> 40
+> 60
+> bot human
+
+(a) Visualization of client 1. 20 10 0 10 20   
+
+> 20
+> 0
+> 20
+> 40
+> 60
+> bot human
+
+(b) Visualization of client 2. Figure 6. Decision boundaries and feature space of two randomly selected clients from F ED RIO trained on Vendor-19. The x-axis and y-axis represent the values of the 2-dimensional features output by 𝜀 described in Sec V-D. 
+
+under varying degrees of data heterogeneity. These results collectively validate FED RIO ’s superiority and practical applicability in real-world federated learning scenarios. 
+
+D. Feature Space Consistency (Q3) 
+
+Here we conduct an additional experiment to demonstrate how F ED RIO learns the feature space. Figure 6 visualizes the learned feature representations and the decision boundaries of two classifiers within F ED RIO on the Vendor-19 dataset. To facilitate clearer interpretation, we modified the feature extractor 𝜀 to output 2-dimensional features for each input sample. After training F ED RIO for 100 communication rounds, we randomly selected two clients and plotted the feature representations of their respective test data. It can be observed that adversarial learning enables the two classifiers—both within and across clients—to learn distinct decision boundaries. These boundaries, in turn, constrain the feature space learned by the feature extractor. To ensure that features from the same class are mapped to overlapping regions on the same side of each classifier’s boundary, the extractor compresses the representations into a shared linear region, thereby facilitating consistent classification. This behavior is particularly evident in Figures 6(a) and 6(b). Additionally, contrastive learning effectively regulates the update directions of the feature extractors, promoting consistency across clients and resulting in a shared, well-aligned feature space. These findings highlight F ED RIO ’s strong capability in feature space learning. Through adversarial learning, F ED RIO 
+
+establishes distinct yet cooperative decision boundaries across clients, refining the representation space. Simultaneously, contrastive learning promotes alignment among client-specific feature extractors, preserving both stability and transferability of learned features. Collectively, these results demonstrate the advanced and effective mechanisms of F ED RIO for learning IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 14 
+
+Table V COMPARISON OF THE AVERAGE MAXIMUM ACCURACY (%) OF DIFFERENT METHODS WITH /WITHOUT AGA (NA), WITH /WITHOUT RL (NR), AND WITH /WITHOUT THE ADAPTIVE MESSAGE -PASSING MODULE (NC). G AIN IS THE DISPARITY BETWEEN 
+
+FED RIO AND OTHER BASELINES .Dataset Vendor-19 Setting 𝛼 = 1 𝛼 = 0.5 𝛼 = 0.1 𝛼 = 0.05                                 
+
+> FED RIO -NA&NR&NC 88.58 ±1.91 87.05 ±2.03 76.04 ±3.40 75.27 ±2.50 FED RIO -NA&NR 93.28 ±0.94 87.28 ±01.32 77.92 ±1.78 70.41 ±1.73 FED RIO -NA 94.19 ±1.23 89.37 ±0.92 78.02 ±2.16 77.57 ±1.93 FED RIO -NC 89.38 ±1.45 88.31 ±1.63 76.31 ±1.27 71.12 ±1.72 FED RIO -NR 92.37 ±1.03 90.07 ±0.79 73.89 ±2.19 70.27 ±2.53 FED RIO 95.42 ±0.33 90.74 ±1.05 78.95 ±1.23 78.02 ±2.53
+> Gain ↑1.23 ∼6.84 ↑0.67 ∼3.68 ↑0.93 ∼5.06 ↑0.45 ∼7.78
+
+discriminative and consistent feature spaces in federated classification tasks. 
+
+E. Sensitivity (Q4) 
+
+We investigate the sensitivity of key hyperparameters using the Vendor-19 dataset. The hyperparameters include 𝛾 , which controls the weight of the adversarial loss, and 𝜇 and 𝜏 ,which regulate the contribution of the contrastive loss. Each experiment is repeated with 5 different random seeds for robustness. As shown in Figure 4(a), when data heterogeneity is minimal (i.e., 𝛼 = 1), the model’s accuracy is relatively insensitive to variations in 𝛾 . However, as heterogeneity increases (i.e., with decreasing 𝛼 ), accuracy becomes more sensitive to the choice of 𝛾 , showing notable variation across different settings. A similar trend is observed with 𝜏 (see Figure 4(b)), where discrepancies in accuracy arise under heterogeneous data distributions, indicating that both parameters must be carefully according to the degree of non-IIDness. Figure 4(c) also presents model accuracy under different combinations of 𝜇 and 
+
+𝛼 . Notably, for a fixed data distribution, accuracy peaks when 
+
+𝜇 increases to 0.5, but declines if 𝜇 continues to rise. This behavior reflects the need to balance adversarial and contrastive losses; overemphasis on either can negatively impact model performance. 
+
+F. Module Validation (Q5) 
+
+To assess the contribution of each component in our model, we conduct an ablation study by removing specific modules: server-side adaptive parameter aggregation (F ED RIO -NA), reinforcement learning (F ED RIO -NR), and the adaptive message passing module (F ED RIO -NC). The experimental settings follow those described in Section V-A . Table V reports the average maximum accuracy (%) for F ED RIO and its ablated variants, as well as the gain over other baseline methods. The gain is defined as the accuracy difference between F ED RIO 
+
+and the respective method. The results indicate that F ED RIO consistently outperforms all variant baselines across varying degrees of data heterogeneity. Under low heterogeneity ( 𝛼 = 1), F ED RIO achieves the highest accuracy, improving performance by 1.23 to 6.84 percentage points over baselines. As data heterogeneity increases (i.e., 
+
+Table VI CONTEXTUAL COMPARISON BETWEEN CENTRALIZED SOCIAL BOT DETECTORS (PUBLISHED RESULTS ON TWI BOT -20 WITH FULL DATA ACCESS ) AND FED RIO (FEDERATED SETTING WITH LOCAL SUBGRAPH ACCESS ONLY ). C ENTRALIZED RESULTS ARE CITED FROM THE ORIGINAL PAPERS . “ †” INDICATES RESULTS CITED FROM LMB OT . [36]. Method Setting Acc.(%) F1(%) Data Access                                            
+
+> Centralized methods (full TwiBot-20, 229K nodes, complete graph)
+> SGBot †Central. 79.58 83.51 Full graph + tweets BotRGCN †Central. 84.42 86.90 Full graph + metadata RGT †Central. 84.70 87.19 Full graph + metadata SimpleHGN †Central. 84.65 87.13 Full heterog. graph LMBot †Central. 85.63 87.61 Full graph →LM distill. SeBot [18] Central. 87.24 88.74 Full graph + struct. entropy BotDGT [19] Central. 87.25 88.87 Full dynamic graph
+> Federated methods (TwiBot-20 subset, 11.8K nodes, partitioned across 10 clients)
+> FedACK Feder. 77.08 71.20 Local subgraph only FedGen Feder. 74.14 74.69 Local subgraph only
+> FedRio (𝛼 =1) Feder. 81.48 80.61 Local subgraph only
+
+lower 𝛼 values), the performance gain remains evident but narrows. Specifically, for 𝛼 = 0.5, gains range from 0.67 to 3.68 points; for 𝛼 = 0.1, from 0.93 to 5.06 points; and for 
+
+𝛼 = 0.05 , from 0.45 to 7.78 points. This trend reflects the increasing difficulty posed by highly non-IID data, where the impact of each module becomes more critical. The ablation results clearly demonstrate the effectiveness of each module. Removing server-side adaptive parameter aggregation (FedRio-NA) significantly reduces performance, affirming its essential role in addressing heterogeneity through adversarial optimization. Excluding RL (F ED RIO -NR) also leads to decreased accuracy, highlighting the value of dynamic, reinforcement-based update strategies. Notably, under extreme heterogeneity ( 𝛼 = 0.05 ), removing RL causes the largest performance drop (7.75%), indicating that RL is critical for coordinating the other modules and preventing them from overfitting to local noise. Similarly, the removal of the adaptive message passing module (F ED RIO -NC) results in performance degradation, confirming its importance in capturing structural patterns in graph-based data. In summary, the ablation study underscores the robust-ness and superiority of F ED RIO . Each module contributes substantially to the overall performance, enabling F ED RIO 
+
+to effectively handle diverse data distributions in federated learning scenarios. 
+
+G. Centralized Detectors Comparison (Q6) 
+
+While our primary baselines are federated learning methods— the methodologically appropriate comparison targets given FedRio’s privacy-preserving design—it is important to con-textualize FedRio’s performance within the broader social bot detection landscape. To this end, we compile published results from recent centralized methods on TwiBot-20 and present them alongside FedRio’s federated results in Table VI. Several important observations emerge from this comparison: FED RIO achieves competitive accuracy despite severe infor-mation asymmetry. Centralized methods access the complete TwiBot-20 graph with full cross-user connectivity, while FED RIO operates on a subset further partitioned across 10 IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 15 
+
+clients, with each client seeing only ∼1.2K nodes and zero cross-client edges. Under these constraints, F ED RIO ’s 81.48% accuracy is 5.77 percentage points below the best centralized model (BotDGT, 87.25%), while preserving data isolation. Given the much stricter information constraints, this result suggests a favorable privacy–utility trade-off. Specifically, the ratio of F ED RIO ’s accuracy to the best centralized accuracy is 81 .48 /87 .25 = 93 .39% . We report this number only as contextual evidence of a relatively small performance gap under much stricter privacy and information constraints, not as a claim of direct comparability between the two settings. Direct experimental comparison is methodologically infea-sible. Running centralized models in a federated setup would require fragmenting their inputs (e.g., severing the global graph that RGT/BotRGCN depend on), fundamentally breaking their architectures and misrepresenting their capability. Conversely, granting F ED RIO centralized access would negate its core design purpose. The reference-based comparison in Table VI provides a fair and transparent contextualization. Regarding the difference in data scale, we note that our evaluation uses the commonly adopted TwiBot-20 subset (11.8K nodes) following prior federated and GNN-based studies. The centralized results are on the full TwiBot-20 (229K nodes). This scale difference further favors centralized methods, making FED RIO ’s competitive performance more notable. 
+
+Limitations and Future Work 
+
+We acknowledge several limitations that point to promising future directions: Cross-platform evaluation: Our current experiments val-idate cross-distribution robustness via Dirichlet-based non-IID simulation on single-platform datasets (Vendor-19 and TwiBot-20). A more realistic cross-platform benchmark—e.g., training on one platform and evaluating on another—remains an important future direction. The primary challenge lies in the substantial feature-schema mismatch across platforms, including differences in metadata fields, graph construction protocols, and labeling criteria, which would require non-trivial federated feature alignment beyond the scope of this work. Newer benchmarks: Incorporating more recent and larger-scale datasets such as TwiBot-22 [ 64 ] would further strengthen the evaluation of scalability and generalization. We plan to extend our evaluation to these benchmarks in future work. Empirical efficiency measurements: While we provide theo-retical complexity analysis, wall-clock training time and GPU memory measurements would further help practitioners assess deployment feasibility. Simplified deployment modes: F ED RIO is modular, and some components can be disabled depending on deployment con-straints and heterogeneity severity. Providing more systematic guidance on component selection is a useful practical direction for future work. VI. C ONCLUSION 
+
+This paper presents F ED RIO , a personalized federated learn-ing framework for social bot detection across heterogeneous platforms. By integrating adversarial distillation, contrastive learning, and reinforcement-based aggregation, F ED RIO effec-tively addresses key challenges such as model heterogeneity, feature misalignment, and inconsistent client contributions. Experimental results on real-world datasets demonstrate its strong performance and robustness compared to existing federated baselines, highlighting its potential for practical, privacy-preserving bot detection in heterogeneous federated environments. ACKNOWLEDGMENTS 
+
+This work is supported by the NSFC through grant 62322202. REFERENCES [1] S. Yardi, D. Romero, G. Schoenebeck et al. , “Detecting spam in a twitter network,” First monday , 2010. [2] N. Abokhodair, D. Yoo, and D. W. McDonald, “Dissecting a social botnet: Growth, content and influence in twitter,” in CSCW , 2015, pp. 839–851. [3] A. Deb, L. Luceri, A. Badaway, and E. Ferrara, “Perils and challenges of social media and election manipulation analysis: The 2018 us midterms,” in WWW , 2019, pp. 237–247. [4] E. Ferrara, H. Chang, E. Chen, G. Muric, and J. Patel, “Characterizing social media manipulation in the 2020 us presidential election,” First Monday , 2020. [5] S. Cresci, “A decade of social bot detection,” Commun. ACM , vol. 63, no. 10, pp. 72–83, 2020. [6] O. Varol, E. Ferrara, C. Davis, F. Menczer, and A. Flammini, “Online human-bot interactions: Detection, estimation, and characterization,” in 
+
+ICWSM , vol. 11, no. 1, 2017, pp. 280–289. [7] J. M. Berger and J. Morgan, “The isis twitter census: Defining and describing the population of isis supporters on twitter,” 2015. [8] E. Ferrara, W.-Q. Wang, O. Varol, A. Flammini, and A. Galstyan, “Predicting online extremism, content adopters, and interaction reciprocity,” in ICSI . Springer, 2016, pp. 22–39. [9] E. D’Andrea, P. Ducange, B. Lazzerini, and F. Marcelloni, “Real-time detection of traffic from twitter stream analysis,” T-ITS , vol. 16, no. 4, pp. 2269–2283, 2015. [10] K.-C. Yang, O. Varol, P.-M. Hui, and F. Menczer, “Scalable and generalizable social bot detection through data selection,” in AAAI , vol. 34, no. 01, 2020, pp. 1096–1103. [11] F. Wei and U. T. Nguyen, “Twitter bot detection using bidirectional long short-term memory neural networks and word embeddings,” in TPS-ISA .IEEE, 2019, pp. 101–109. [12] S. Feng, H. Wan, N. Wang, J. Li, and M. Luo, “Satar: A self-supervised approach to twitter account representation learning and its application in bot detection,” in CIKM , 2021, pp. 3808–3817. [13] J. Zhao, X. Liu, Q. Yan, B. Li, M. Shao, and H. Peng, “Multi-attributed heterogeneous graph convolutional network for bot detection,” IS , vol. 537, pp. 380–393, 2020. [14] Y. Liu, Z. Tan, H. Wang, S. Feng, Q. Zheng, and M. Luo, “Botmoe: Twitter bot detection with community-aware mixtures of modal-specific experts,” in SIGIR . ACM, 2023, pp. 485–495. [15] Y. Yang, X. Zeng, Q. Wu, H. Peng, Y. Xia, H. Liu, B. Chong, and P. S. Yu, “Robctrl: Attacking gnn-based social bot detectors via reinforced manipulation of bots control interaction,” arXiv preprint arXiv:2510.16035 , 2025. [16] Q. Wu, Y. Yang, H. Peng, B. He, Y. Xia, Y. Liao et al. , “Certainly bot or not? trustworthy social bot detection via robust multi-modal neural processes,” arXiv preprint arXiv:2503.09626 , 2025. [17] Y. Yang, R. Yang, Y. Li, K. Cui, Z. Yang, Y. Wang, J. Xu, and H. Xie, “Rosgas: Adaptive social bot detection with reinforced self-supervised gnn architecture search,” TWEB , 2022. [18] Y. Yang, Q. Wu, B. He, H. Peng, R. Yang, Z. Hao, and Y. Liao, “Sebot: Structural entropy guided multi-view contrastive learning for social bot detection,” in Proceedings of the 30th ACM SIGKDD conference on knowledge discovery and data mining , 2024, pp. 3841–3852. [19] B. He, Y. Yang, Q. Wu, H. Liu, R. Yang, H. Peng, X. Wang, Y. Liao, and P. Zhou, “Dynamicity-aware social bot detection with dynamic graph transformers,” in Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence , 2024, pp. 5844–5852. IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 16 
+
+[20] Z. Zhu, J. Hong, and J. Zhou, “Data-free knowledge distillation for heterogeneous federated learning,” in ICML . PMLR, 2021, pp. 12 878– 12 889. [21] M. Rasouli, T. Sun, and R. Rajagopal, “Fedgan: Federated generative adversarial networks for distributed data,” arXiv , 2020. [22] L. Zhang, L. Shen, L. Ding, D. Tao, and L.-Y. Duan, “Fine-tuning global model via data-free knowledge distillation for non-iid federated learning,” in CVPR , 2022, pp. 10 174–10 183. [23] Z. Zhang, “Feddtg: Federated data-free knowledge distillation via three-player generative adversarial networks,” arXiv , 2022. [24] L. Xie, M. Lin, S. Liu, C. Xu, Y. Gong, Q. Shen, and Z. Wu, “MH-pFLID: Model heterogeneous personalized federated learning via injection and distillation for medical data analysis,” in ICML , 2024. [25] K. Roy, M. Harandi, and P. Moghadam, “Dual3d-fed: Dual distillation for 3d continual federated learning with vision–language models,” IEEE Access , vol. 13, pp. 204 072–204 086, 2025. [26] K. Dey, R. Shrivastava, S. Kaushik, and V. Mathur, “Assessing the effects of social familiarity and stance similarity in interaction dynamics,” in 
+
+JCN . Springer, 2018, pp. 843–855. [27] K. Dey, R. Shrivastava, S. Kaushik, and K. Garg, “Assessing topical homophily on twitter,” in JCN . Springer, 2019, pp. 367–376. [28] Z. Peng, M. Luo, J. Li, H. Liu, Q. Zheng et al. , “Anomalous: A joint modeling approach for anomaly detection on attributed networks.” in 
+
+IJCAI , 2018, pp. 3513–3519. [29] B. Viswanath, A. Mislove, M. Cha, and K. P. Gummadi, “On the evolution of user interaction in facebook,” in WOSN , 2009, pp. 37–42. [30] S. Ali Alhosseini, R. Bin Tareaf, P. Najafi, and C. Meinel, “Detect me if you can: Spam bot detection using inductive representation learning,” in WWW , 2019, pp. 148–153. [31] S. Feng, H. Wan, N. Wang, and M. Luo, “Botrgcn: Twitter bot detection with relational graph convolutional networks,” in ASONAM , 2021, pp. 236–239. [32] S. Feng, Z. Tan, R. Li, and M. Luo, “Heterogeneity-aware twitter bot detection with relational graph transformers,” in AAAI , vol. 36, no. 4, 2022, pp. 3977–3985. [33] Q. Guo, H. Xie, Y. Li, W. Ma, and C. Zhang, “Social bots detection via fusing bert and graph convolutional networks,” Symmetry , vol. 14, no. 1, p. 30, 2021. [34] Z. Lei, H. Wan, W. Zhang, S. Feng, Z. Chen, J. Li, Q. Zheng, and M. Luo, “BIC: twitter bot detection with text-graph interaction and semantic consistency,” in ACL (1) . Association for Computational Linguistics, 2023, pp. 10 326–10 340. [35] W. Li, J. Deng, J. You, Y. He, Y. Zhuang, and F. Ren, “ETS-MM: A multi-modal social bot detection model based on enhanced textual semantic representation,” in Proceedings of the ACM Web Conference 2025 , 2025. [36] Z. Cai, Z. Tan, Z. Lei, Z. Zhu, H. Wang, Q. Zheng, and M. Luo, “Lmbot: distilling graph knowledge into language model for graph-less deployment in twitter bot detection,” in Proceedings of the 17th ACM international conference on web search and data mining , 2024, pp. 57–66. [37] B. Shi, Y. Wang, F. Guo, J. Shao, H. Shen, and X. Cheng, “Bottrans: A multi-source graph domain adaptation approach for social bot detection,” in Joint European Conference on Machine Learning and Knowledge Discovery in Databases , 2025, pp. 228–243. [38] S. Chen, S. Feng, L. Songsong, C.-C. Zong, J. Li, and P. Li, “Cacl: Community-aware heterogeneous graph contrastive learning for social media bot detection,” in Findings of the Association for Computational Linguistics: ACL 2024 , 2024, pp. 10 349–10 360. [39] C. Bucilu ˇa, R. Caruana, and A. Niculescu-Mizil, “Model compression,” in SIGKDD , 2006, pp. 535–541. [40] G. Hinton, O. Vinyals, J. Dean et al. , “Distilling the knowledge in a neural network,” arXiv , vol. 2, no. 7, 2015. [41] H. Seo, J. Park, S. Oh, M. Bennis, and S.-L. Kim, “Federated knowledge distillation,” arXiv , 2020. [42] T. Lin, L. Kong, S. U. Stich, and M. Jaggi, “Ensemble distillation for robust model fusion in federated learning,” Advances in Neural Information Processing Systems , vol. 33, pp. 2351–2363, 2020. [43] Y. Yang, R. Yang, H. Peng, Y. Li, T. Li, Y. Liao, and P. Zhou, “Fedack: Federated adversarial contrastive knowledge distillation for cross-lingual and cross-model social bot detection,” in WWW , 2023. [44] A. Fallah, A. Mokhtari, and A. Ozdaglar, “Personalized federated learning with theoretical guarantees: A model-agnostic meta-learning approach,” 
+
+Advances in Neural Information Processing Systems , vol. 33, pp. 3557– 3568, 2020. [45] C. T Dinh, N. Tran, and J. Nguyen, “Personalized federated learning with moreau envelopes,” Advances in Neural Information Processing Systems , vol. 33, pp. 21 394–21 405, 2020. [46] K. Wang, R. Mathews, C. Kiddon, H. Eichner, F. Beaufays, and D. Ramage, “Federated evaluation of on-device personalization,” arXiv preprint arXiv:1910.10252 , 2019. [47] M. G. Arivazhagan, V. Aggarwal, A. K. Singh, and S. Choud-hary, “Federated learning with personalization layers,” arXiv preprint arXiv:1912.00818 , 2019. [48] T. Yu, E. Bagdasaryan, and V. Shmatikov, “Salvaging federated learning by local adaptation,” arXiv preprint arXiv:2002.04758 , 2020. [49] Y. Mansour, M. Mohri, J. Ro, and A. T. Suresh, “Three approaches for personalization with applications to federated learning,” arXiv preprint arXiv:2002.10619 , 2020. [50] Y. Deng, M. M. Kamani, and M. Mahdavi, “Adaptive personalized federated learning,” arXiv preprint arXiv:2003.13461 , 2020. [51] M. Zhang, K. Sapra, S. Fidler, S. Yeung, and J. M. Alvarez, “Personalized federated learning with first order model optimization,” arXiv preprint arXiv:2012.08565 , 2020. [52] Y. Huang, L. Chu, Z. Zhou, L. Wang, J. Liu, J. Pei, and Y. Zhang, “Per-sonalized cross-silo federated learning on non-iid data,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 35, no. 9, 2021, pp. 7865–7873. [53] A. Ghosh, J. Chung, D. Yin, and K. Ramchandran, “An efficient frame-work for clustered federated learning,” Advances in Neural Information Processing Systems , vol. 33, pp. 19 586–19 597, 2020. [54] J. Zhang, S. Guo, X. Ma, H. Wang, W. Xu, and F. Wu, “Parameterized knowledge transfer for personalized federated learning,” Advances in Neural Information Processing Systems , vol. 34, pp. 10 092–10 104, 2021. [55] V. Smith, C.-K. Chiang, M. Sanjabi, and A. S. Talwalkar, “Federated multi-task learning,” Advances in neural information processing systems ,vol. 30, 2017. [56] Z. Tan, G. Wan, W. Huang, and M. Ye, “Fedssp: federated graph learning with spectral knowledge and personalized preference,” Advances in Neural Information Processing Systems , vol. 37, pp. 34 561–34 581, 2024. [57] Z. Guan, Y. Li, J. Du, R. Tang, and X. Meng, “Adpfedgnn: Adaptive decoupling personalized federated graph neural network,” in Proceed-ings of the Thirty-Fourth International Joint Conference on Artificial Intelligence , 2025, pp. 5253–5261. [58] K.-C. Yang, O. Varol, C. A. Davis, E. Ferrara, A. Flammini, and F. Menczer, “Arming the public with artificial intelligence to counter social bots,” Comput. Hum. Behav. , vol. 1, no. 1, pp. 48–61, 2019. [59] S. Feng, H. Wan, N. Wang, J. Li, and M. Luo, “Twibot-20: Acomprehensive twitter bot detection benchmark,” in CIKM , 2021, pp. 4485–4494. [60] Q. Li, Y. Diao, Q. Chen, and B. He, “Federated learning on non-iid data silos: An experimental study,” arXiv , 2021. [61] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efficient learning of deep networks from decentralized data,” in AISTATS . PMLR, 2017, pp. 1273–1282. [62] T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, and V. Smith, “Federated optimization in heterogeneous networks,” PMLS , vol. 2, pp. 429–450, 2020. [63] N. Shi, F. Lai, R. A. Kontar, and M. Chowdhury, “Fed-ensemble: Im-proving generalization through model ensembling in federated learning,” 
+
+arXiv , 2021. [64] S. Feng, Z. Tan, H. Wan, N. Wang, Z. Chen, B. Zhang, Q. Zheng, W. Zhang, Z. Lei, S. Yang, X. Feng, Q. Zhang, H. Wang, Y. Liu, Y. Bai, H. Wang, Z. Cai, Y. Wang, L. Zheng, Z. Ma, J. Li, and M. Luo, “Twibot-22: Towards graph-based twitter bot detection,” in NeurIPS , 2022. 
+
+Yingguang Yang received the Ph.D. degree in the School of Cyber Science at University of Science and Technology of China. His research interests include machine learning, data mining, and social bot detection. 
+
+Hao Liu is currently a master’s student in the School of Cyber Science and Technology at the University of Science and Technology of China. His research interests include fairness, federated learning and graph neural networks. IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING 17 
+
+Xin Zhang is currently a master’s student in the School of Cyber Science and Technology at the University of Science and Technology of China. Her research interests include fairness, federated learning and privacy policy security under the guidance of LLM. 
+
+Yunhui Liu is working toward the Ph.D. degree with the Software Institute, Nanjing University, China. His research interests include graph machine learning and self-supervised learning. 
+
+Yutong Xia is currently a PhD student at the Institute of Data Science, National University of Singapore. She has published several papers in refereed conferences, such as NeurIPS, IJCAI, AAAI, and SIGSPATIAL. Her research interests mainly lie in spatio-temporal data mining and graph neural networks. 
+
+Qi Wu is currently a master’s student in the School of Cyber Science and Technology at University of Science and Technology of China. His research interests include multi-view learning, social bot detection and graph neural networks. 
+
+Hao Peng is currently a Professor at the School of Cyber Science and Technology in Beihang University. His current research interests include machine learning, deep learning, and reinforcement learning. He is the Associate Editor of the International Journal of Machine Learning and Cybernetics (IJMLC). 
+
+Taoran Liang received the M.Sc. degree in Systems Science from Beijing University of Posts and Telecommunications, China. His research interests include reinforcement learning for large language models (LLMs) and graph neural networks (GNNs). 
+
+Bin Chong received the Ph.D. degree in physical chemistry from the Peking University. He is currently an associate professor in the Peking University. His research interest includes machine learning, molecular modelling and digital transformation. 
+
+Tieke He received the B.E. and Ph.D. degrees in software engineering from the Software Institute, Nanjing University, Jiangsu, China. He is currently an Associate Professor with the Software Institute, Nanjing University. His research interests lie in intelligent software engineering, knowledge graph, and question answering. 
+
+Philip S. Yu is a Distinguished Professor and the Wexler Chair in Information Technology at the Department of Computer Science, University of Illinois Chicago. He is a Fellow of the ACM and IEEE. Dr. Yu has published more than 1,200 referred conference and journal papers cited more than 190,000 times with an H-index of 195. He has applied for more than 300 patents. Dr. Yu was the Editor-in-Chief of ACM TKDD (2011-2017) and IEEE TKDE (2001-2004).

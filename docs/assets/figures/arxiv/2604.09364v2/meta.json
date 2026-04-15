@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-001.webp",
+      "caption": "Figure 5: Distribution of per-sample MAC layers across seven primary models (Color, 493 samples each). Box widths reflect crossover variance; fast integrators (DeepSeek-Janus, LLaVA-Next) show early medians with moderate spread, while slow integrators (Qwen2VL, InternVL2) cluster near the final layers with tight distributions.",
+      "page": 15,
+      "index": 1,
+      "width": 735,
+      "height": 394
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-002.webp",
+      "caption": "Figure 6: Fine-grained visual encoding trajectory: L2 distance (counterfactual vs. standard) at 20 normalized depth points (5%–100%) across all seven primary models (× markers indicate MAC depth). Encoding grows monotonically and is never suppressed, reaching peak values at the final layer—the exact point where grounding failures occur.",
+      "page": 15,
+      "index": 2,
+      "width": 734,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-003.webp",
+      "caption": "Figure 4: MAC logit trajectories for all models (color, 493 samples). Each subplot shows per-layer visual (blue) and prior (orange) logits with sample traces and mean ±1 std shading. Green dashed line: MAC crossover. ”V wins” indicates the percentage of samples where the visual logit exceeds the prior logit at the final layer. Top: seven primary models (7–8B). Bottom: three scaled-up variants (13–72B).",
+      "page": 14,
+      "index": 3,
+      "width": 693,
+      "height": 723
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-004.webp",
+      "caption": "Figure 10: Activation patching case studies. Each row shows a counterfactual image (altered color) and its standard counterpart, followed by baseline and patched outputs for three models. Full-sequence patching causally flips outputs from visual to prior answer.",
+      "page": 18,
+      "index": 4,
+      "width": 826,
+      "height": 813
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-005.webp",
+      "caption": "Table 1: MAC crossover and latent encoding (Color: 493 samples; Size: 727). Color / Size: MAC = mean crossover layer; R% = % samples where visual logit wins at final layer; D% = MAC depth as % of total layers L. Latent (Color): L2 distance at 25%, 50%, and 75% of mean MAC depth (higher = stronger encoding); Cos@75 = cosine similarity at 75% depth. Per-model rankings partially reverse between Color and Size; scaled variants show 2–5× stronger L2 at 75%.",
+      "page": 4,
+      "index": 5,
+      "width": 830,
+      "height": 271
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-006.webp",
+      "caption": "Figure 2: Left: concrete banana example with the max-variant rule: at each layer, we take the best-matching blue and yellow token forms, then define MAC as the first stable layer where visual (v) exceeds prior (p), verified by persistence at the next layer. Right: MAC logit trajectories (color, 493 samples). Each subplot shows per-layer visual (blue) and prior (orange) logits with sample traces and mean ±1 std shading. Green dashed line: MAC crossover. “V wins” indicates the percentage of samples where the visual logit exceeds the prior logit at the final layer. Top: three primary models (7–8B). Bottom: scaled-up variants. See Appendix Section C.1 for all ten models.",
+      "page": 4,
+      "index": 6,
+      "width": 822,
+      "height": 307
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-007.webp",
+      "caption": "Figure 11: Behavioral shift: baseline (BL) vs. patched (PT) output distributions. Blue: follows visual answer. Orange: follows prior answer. Full-sequence patching reverses the dominant behavior in all three models.",
+      "page": 19,
+      "index": 7,
+      "width": 648,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-008.webp",
+      "caption": "Table 4: Linear probe AUC (5-fold CV, 493 samples) for decoding visual attributes from hidden states at three depths. Right columns: mean probe confidence for success vs. failure samples at ∼10% depth.",
+      "page": 17,
+      "index": 8,
+      "width": 648,
+      "height": 194
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-009.webp",
+      "caption": "Figure 9: Encoding strength in success vs. failure cases (L2 distance at 75% MAC depth, Color). Dark boxes: samples where the model followed visual evidence (success). Light boxes: samples where the prior won (failure). Distributions overlap substantially for all seven models, with ratios in [0.91, 1.12]. Sample sizes shown in green (success) and red (failure).",
+      "page": 17,
+      "index": 9,
+      "width": 748,
+      "height": 320
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-010.webp",
+      "caption": "Table 2: Left: encoding at 75% MAC depth (Color, 493 samples per model): L2 between counterfactual vs. standard hidden states for samples where the model answered with the visual vs. prior token; Ratio = VISUAL/PRIOR mean L2; p(MW) = Mann–Whitney p. Ratio ≈ 1 favors arbitration failure over perceptual blindness. Right: activation patching at the MAC probe layer (100 Color samples per model): Chg/Flip/Cond. = % any change, % visual→prior flips, % flips conditioned on baseline-visual; Full/Img/Txt = flip counts; Ret. = Img/Full. BLIP-2: patching not run (—). Last-token patching 0–1% flip; see Section E.",
+      "page": 5,
+      "index": 10,
+      "width": 830,
+      "height": 236
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-011.webp",
+      "caption": "Figure 8: Cross-stage correlation analysis (n = 7 primary models). (a) Encoding strength (L2 at 75% depth) shows no correlation with success (ρ = 0.198). (b) Logit gap is strongly predictive (ρ = 0.847, p = 0.016). (c) Visual rank is also predictive (ρ = −0.893). (d) Encoding does not predict logit gap (ρ = 0.464). (e) Sample-level ROC-AUC near chance (0.528). (f) Arbitration-phase metrics predict success; encoding-phase metrics do not.",
+      "page": 16,
+      "index": 11,
+      "width": 776,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09364v2/fig-012.webp",
+      "caption": "Figure 7: Visual encoding heatmap: mean L2 distance across all depth points and seven primary models. Warmer colors indicate stronger visual encoding. DeepSeek-Janus and LLaVA-OneVision form the “strong” tier, InternVL2/Qwen2-VL/BLIP-2 the “moderate” tier, and LLaVA-v1.5/LLaVA-Next the “weak” tier.",
+      "page": 16,
+      "index": 12,
+      "width": 748,
+      "height": 288
+    }
+  ]
+}

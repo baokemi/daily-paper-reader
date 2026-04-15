@@ -1,0 +1,707 @@
+Title: Symbiotic-MoE: Unlocking the Synergy between Generation and Understanding
+
+URL Source: https://arxiv.org/pdf/2604.07753v1
+
+Published Time: Fri, 10 Apr 2026 00:28:51 GMT
+
+Number of Pages: 27
+
+Markdown Content:
+# Symbiotic-MoE: Unlocking the Synergy between Generation and Understanding 
+
+Xiangyue Liu 1, Zijian Zhang 2, Miles Yang 2, Zhao Zhong 2,Liefeng Bo 2, Ping Tan 1⋆
+
+> 1
+
+HKUST 2Tencent Hunyuan (a) Standard MoE (b) MoT (c) Ours (Symbiotic-MoE)   
+
+> Conceptual Architecture Comparison Performance & Efficiency
+> Gradient
+> Conflict
+> Routing
+> Collapse (No Synergy)
+> Split-Brain
+> (The Bridge)
+> Shared Experts
+> Synergy
+> Symbiotic
+> Standard
+> MoE
+> Training
+> Efficiency
+> (Capacity)
+> T2I-CompBench
+> MoT
+> OCRBench
+> Ours
+> (Symbiotic-MoE)
+> Parameter
+> Efficiency
+
+Fig. 1: Teaser. We visualize the evolution of training paradigms: moving from (a) destructive interference and (b) the “Split-Brain” compromise to (c) symbiotic synergy. As shown in the radar chart, our framework achieves holistic superiority, simultaneously boosting generation and understanding capabilities with zero-parameter overhead and maximal parameter efficiency. 
+
+Abstract. Empowering Large Multimodal Models (LMMs) with image generation often leads to catastrophic forgetting in understanding tasks due to severe gradient conflicts. While existing paradigms like Mixture-of-Transformers (MoT) mitigate this conflict through structural isola-tion, they fundamentally sever cross-modal synergy and suffer from ca-pacity fragmentation. In this work, we present Symbiotic-MoE, a unified pre-training framework that resolves task interference within a native multimodal Mixture-of-Experts (MoE) Transformers architecture with zero-parameter overhead. We first identify that standard MoE tuning leads to routing collapse, where generative gradients dominate expert utilization. To address this, we introduce Modality-Aware Expert Dis-entanglement, which partitions experts into task-specific groups while utilizing shared experts as a multimodal semantic bridge. Crucially, this design allows shared experts to absorb fine-grained visual semantics from generative tasks to enrich textual representations. To optimize this, we propose a Progressive Training Strategy featuring differential learning rates and early-stage gradient shielding. This mechanism not only shields pre-trained knowledge from early volatility but eventually transforms generative signals into constructive feedback for understanding. Exten-sive experiments demonstrate that Symbiotic-MoE achieves rapid gener-ative convergence while unlocking cross-modal synergy, boosting inherent understanding with remarkable gains on MMLU and OCRBench. 
+
+Keywords: Mixture-of-Experts Transformers · Unified Generation and Understanding · Catastrophic Forgetting  
+
+> ⋆
+
+Corresponding author. 
+
+> arXiv:2604.07753v1 [cs.CV] 9 Apr 2026
+
+2 X. Liu et al. Tokens   
+
+> Mixed
+> (a) Standard MoE (b) MoT (c) Ours (Symbiotic-MoE)
+> Experts
+> Conflict
+> Gradient
+> Tokens
+> Text
+> Experts
+> Text
+> Tokens
+> Image
+> Experts
+> Image
+> Tokens
+> Mixed
+> Router
+> Understanding
+> Router
+> Generation
+> Experts
+> Understanding
+> Experts
+> Generation
+
+Fig. 2: Comparison of Architectures. (a) Standard MoE suffers from routing col-lapse due to multi-task gradient conflicts (like cognitive dissonance). (b) MoT avoids conflict via physical isolation but induces a “Split-Brain” dilemma, which structurally hinders cross-modal synergy and knowledge transfer. (c) Our Symbiotic-MoE intro-duces shared experts as a semantic bridge, enabling co-evolution of generation and understanding within a unified, parameter-efficient architecture. 
+
+## 1 Introduction 
+
+The convergence of perception and creation within a single cognitive system has long been a holy grail in the pursuit of Artificial General Intelligence (AGI). In recent years, Large Multimodal Models (LMMs) have made remarkable strides in understanding the visual world [1, 32, 46]. However, enabling these models to also generate visual content that transforms them into true “Any-to-Any” omni-modal foundation models remains a formidable challenge. Recent advances have attempted to unify vision and language through diverse paradigms, ranging from discrete tokenization [43, 45] to continuous feature alignment [3, 56, 65]. Despite these architectural innovations, a critical optimization bottleneck persists: ex-tending a pre-trained understanding model with generative capabilities often triggers severe catastrophic forgetting. This phenomenon stems from the intrinsic stability-plasticity dilemma [38, 40]. Visual understanding tasks, which require the model to converge onto precise semantic representations (many-to-one mapping), fundamentally conflict with the high-entropy, divergent nature of generative tasks (one-to-many mapping). When naively co-trained, the high-variance gradients from the generative ob-jective tend to overwhelm the established optimization landscape of the under-standing task, washing away pre-trained knowledge. Consequently, current uni-fied models often face a zero-sum game: significant improvements in generation quality typically come at the expense of understanding retention, or necessitate complex, multi-stage training strategies to mitigate interference. To mitigate this interference, prior arts have predominantly resorted to struc-tural isolation. Approaches like Mixture-of-Transformers (MoT) [7,28] or adapter-based methods [8,53,57] physically decouple the parameters for different modal-ities. While effective at preserving stability, this “divide-and-conquer” strategy comes at a steep cost: it often introduces significant parameter overhead, in-creases inference latency, and most critically, severs the semantic connectivity between modalities. By segregating the processing pathways, these methods for-feit the potential synergy where generative feedback could refine understand-ing—a cognitive mechanism inherent in biological intelligence. Symbiotic-MoE 3
+
+In this work, we ask a fundamental question: Can we achieve the stability of isolated architectures while retaining the synergistic benefits of a unified model, without any parameter overhead? To answer this, we present Symbiotic-MoE, a novel pre-training framework that harmonizes generation and understanding within a native sparse Mixture-of-Experts (MoE) Transformers architecture. Our key insight is that task interference is not a failure of the unified ar-chitecture itself, but a failure of routing dynamics. We observe that standard MoE training leads to routing collapse, where generative tokens monopolize the experts, starving the understanding task. To resolve this, we propose Modality-Aware Expert Disentanglement. Instead of physical separation, we logically par-tition the expert space into task-specific groups based on their pre-trained acti-vation patterns. Crucially, we introduce shared experts to act as a multimodal semantic bridge. This private-shared design allows task-specific experts to spe-cialize in conflicting objectives, while shared experts facilitate deep cross-modal alignment, turning the conflict into symbiosis. Furthermore, we recognize that architecture alone is insufficient to tame the volatile training dynamics of generative adaptation. We thus introduce the Pro-gressive Training Strategy. We devise a Knowledge-Inherited Initialization to eliminate the cold-start penalty and a Differential Learning Rate schedule to bal-ance the update pace of different modules. Most notably, we propose a Warmup Gradient Shielding mechanism. This strategy temporarily blocks noisy genera-tive gradients from updating shared experts during the early unstable phase, protecting the foundational knowledge until the generative module matures. Our contributions are summarized as follows: 
+
+– We propose Symbiotic-MoE, a zero-overhead framework that resolves rout-ing collapse in unified multimodal pre-training. It introduces Modality-Aware Expert Disentanglement to resolve resource contention and incorporates Shared Experts as a multimodal bridge to enable seamless cross-modal align-ment. 
+
+– We introduce a Progressive Training Strategy that harmonizes the conflict-ing optimization dynamics. By employing Differential Learning Rates and Warmup Gradient Shielding, we effectively navigate the stability-plasticity dilemma, protecting pre-trained knowledge while unlocking generative capa-bilities. 
+
+– Extensive experiments demonstrate that our method not only achieves rapid generative convergence but also boosts understanding capabilities. This pro-vides empirical validation for the symbiotic hypothesis: generative training, when properly orchestrated, can reciprocally enhance multimodal under-standing. 
+
+## 2 Related Work 
+
+2.1 Unified Multimodal Understanding and Generation 
+
+The evolution of Large Multimodal Models (LMMs) has progressed from per-ception centric systems [5,34,46,49] to unified “Any-to-Any” frameworks [44,54]. 4 X. Liu et al. 
+
+Early attempts cascaded LLMs with diffusion models [25, 52], limiting end-to-end synergy. To achieve native unification, pioneers like Chameleon [45] and Emu3 [51] adopted discrete tokenization, formulating image generation as auto-regressive next-token prediction. Conversely, continuous approaches like Transfu-sion [65] and Show-o [57] integrated diffusion or flow-matching objectives directly into the transformers backbone to improve fidelity. More recently, to mitigate modality interference, Janus-Pro [53] explored decoupled visual encodings, while OmniGen [56] pushed for a unified diffusion transformer. Despite these strides, training a single backbone for both tasks remains unstable. The divergent na-ture of generation (one-to-many) and the convergent nature of understanding (many-to-one) create a fundamental optimization paradox [38, 40]. This conflict often leads to a “seesaw effect”, where improving generative plasticity inevitably degrades understanding stability. 
+
+2.2 Multimodal Mixture-of-Experts (MoE) 
+
+Sparse Mixture-of-Experts (MoE) [11, 26, 42] Transformers has emerged as a promising solution to scale model capacity without inflating inference costs, widely adopted in LLMs [9, 15, 36, 66], most notably exemplified by milestones such as Mixtral [22], DeepSeek-MoE [6] and Qwen3 [59]. In the multimodal domain, sparse architectures have proliferated to handle high-resolution inputs efficiently [35, 47, 48, 58]. Beyond foundational works like MoE-LLaVA [29], V-MoE [41], and MM1 [39], recent advances including DeepSeek-V3 [31], MM1.5 [61] further demonstrate the scalability of experts in processing complex modalities. However, the application of MoE in unified generation and understanding re-mains underexplored. Standard routing mechanisms often fail in this context because the gradients from generative losses are significantly larger and nois-ier than those from understanding losses. This leads to a routing collapse phe-nomenon, where experts are overwhelmingly co-opted by the generative task, leaving the understanding capability starved of capacity. Our work is among the first to address this imbalance within a native MoE framework, turning the sparsity from a scaling tool into a mechanism for task disentanglement. 
+
+2.3 Task Interference and Resolution Strategies 
+
+Catastrophic forgetting [2,4,62,64] arising from gradient conflicts remains a pri-mary bottleneck in extending VLMs with generative capabilities. Prior works mitigate this via two dominant paradigms: Additive Adaptation and Structural Isolation. Additive approaches freeze the pre-trained backbone and append auxil-iary modules, such as complex adapters or side-networks [13,19,54,60,63]. While effective for stability, they intrinsically limit deep cross-modal interaction and incur non-negligible inference latency. Conversely, Structural Isolation methods, exemplified by MoT and recent sparse variants [7, 28, 50], physically decouple processing pathways for different modalities. Although this avoids interference, it enforces a “Split-Brain” architecture that severs potential synergy and suffers Symbiotic-MoE 5
+
+from capacity fragmentation. In contrast, Symbiotic-MoE proposes a Modality-Aware Expert Disentanglement strategy. We achieve the best of both worlds: the specialized optimization of decoupled architectures without parameter overhead, and the deep fusion benefits of a unified model via shared experts. By orches-trating gradient flow rather than physically separating parameters, we resolve interference while fostering positive cross-modal transfer. 
+
+## 3 Method 
+
+In this section, we present Symbiotic-MoE , a unified pre-training framework designed to harmonize the conflicting objectives of visual generation and multi-modal understanding within a single sparse architecture. Unlike prior approaches such as MoT [7, 28] that enforce strict structural isolation, our method operates on the principle of co-evolution .As illustrated in Fig. 3, we address the catastrophic forgetting and rout-ing collapse issues through two core components: (1) Symbiotic-MoE Archi-tecture (Sec. 3.2), which employs Modality-Aware Expert Disentanglement to partition experts into task-specific groups, bridged by Shared Experts for cross-modal alignment, alongside Knowledge-Inherited Initialization for a zero-cold-start transition; and (2) Progressive Training Strategy (Sec. 3.3), which re-solves the stability-plasticity dilemma by orchestrating update dynamics through 
+
+Differential Learning Rates and Warmup Gradient Shielding .
+
+3.1 Preliminaries Sparse Mixture-of-Experts (MoE). We adopt the standard sparse MoE for-mulation where the dense Feed-Forward Network (FFN) in a Transformer block is replaced by a set of experts E = {Ei}Ni=1 . For an input x, the router selects top-k experts (denoted by indices I) based on gating scores. The output is the weighted sum of the selected experts: 
+
+y = X
+
+> i∈I
+
+gi(x) · Ei(x) (1) where gi(x) is the softmax-normalized routing weight for the chosen expert i.This architecture allows the model to scale capacity while maintaining constant inference costs. 
+
+Conflicts in Co-training. Naively integrating generative objectives into a pre-trained MoE-based VLM precipitates a severe stability-plasticity dilemma [38, 40]. The aggressive, high-magnitude gradients required for learning pixel-level synthesis inevitably overwhelm the converged optimization landscape of the un-derstanding task. This gradient interference causes experts to drift uncontrol-lably toward the generative manifold, erasing pre-trained semantic structures and triggering catastrophic forgetting. 6 X. Liu et al. Pre-trained  
+
+> VLM
+> Weights
+> Router
+> Weight
+> Slicing
+> Warmup
+> Gradient
+> Shielding
+> Multimodal
+> Understanding
+> Visual
+> Generation
+> Understanding Group
+> Experts
+> Shared Experts
+> Generation Group
+> Experts
+> Text
+> Tokens
+> ViT
+> Tokens
+> VAE
+> Tokens
+> Input
+> Knowledge-Inherited
+> Initialization
+> Symbiotic-MoE
+> Architecture
+> Progressive Training
+> Strategy & Objectives
+> (The Bridge)
+> Add & Norm
+> Add & Norm
+> Feed-Foward
+> Network (FFN)
+> Multi-Head
+> Attention
+> Standard
+> Transformer Block
+> Input
+
+Fig. 3: Overview of Symbiotic-MoE. We re-architect the Transformer FFN layer to resolve task interference. Our framework features: (1) Modality-Aware Expert Disen-tanglement , where input tokens are routed to specialized Understanding (blue) or Gen-eration (orange) experts via decoupled routers; (2) A Shared Expert Bridge (purple), which processes all tokens to enforce semantic alignment and prevent modal isolation. The entire framework is optimized via Progressive Training Strategy , harmonizing gen-eration and understanding within a unified Transformer backbone. 
+
+3.2 Symbiotic-MoE Architecture Modality-Aware Expert Disentanglement. To resolve the conflict between retaining pre-trained knowledge and learning new generative capabilities, we propose a specialized grouping strategy derived from the intrinsic activation patterns of the experts. 
+
+Expert Role Analysis. Instead of random grouping, we conduct a data-driven analysis to identify the role of each expert in the pre-trained VLM. Specifically, we perform inference on two representative benchmarks: MMLU [16] (for lin-guistic Text tokens) and OCRBench [33] (for discriminative ViT tokens). We calculate the activation frequency of all 128 experts across all 47 MoE layers. By ranking experts based on their cumulative activation rates for Text and ViT tokens, we identify the core experts that are essential for the model’s fundamen-tal capabilities by modality. Detailed visualizations of activation landscapes are provided in Supplementary Material Sec. A. 
+
+Hard Routing Strategy. Based on the frequency profiling, we implement a hard routing split. For each layer, we designate the top 96 experts with the highest relevance to original modalities (Text and ViT) as the understanding group ,ensuring that the vast majority of pre-trained knowledge is preserved (stability). The remaining 32 experts in each layer, which are less frequently activated, are repurposed as the generation group assigned to the VAE features (plasticity). During training, tokens are routed to their respective groups based on their modality type. Accordingly, the parameters of the original router are sliced and assigned to initialize the specific routers for each group, ensuring a warm start. Symbiotic-MoE 7
+
+The Bridge: Shared Experts. A critical distinction of our Symbiotic-MoE from prior hard-routing methods ( e.g ., MoT [7, 28]) is the preservation of shared ex-perts. We retain the shared experts in each layer to process all tokens, regardless of whether they are Text, ViT, or VAE. This design allows the shared experts to function as a multimodal bridge, facilitating information exchange between the decoupled expert groups. It ensures that the generative process remains se-mantically aligned with the understanding representations, enabling cross-modal synergy rather than isolation. 
+
+Knowledge-Inherited Initialization. Transitioning from a unified MoE to a disentangled architecture typically incurs a cold-start penalty if the new com-ponents are randomly initialized. To mitigate this and ensure a seamless adap-tation, we propose a Knowledge-Inherited Initialization strategy that transfers the learned routing priors and expert capabilities from the pre-trained VLM to our Symbiotic-MoE. 
+
+Expert and Shared Weight Inheritance. Since our architecture retains the physical structure of the experts, we directly initialize the parameters of the partitioned understanding and generation groups using the weights from their corresponding expert indices in the original VLM. Similarly, the shared experts, which serve as the multimodal bridge, inherit their parameters directly from the pre-trained shared experts. This ensures that the foundational knowledge stored within the VLM is preserved intact. 
+
+Router Weight Slicing. The most critical challenge lies in initializing the two newly decoupled routers (one for understanding group, one for generation group) from the single original router. Random initialization would destroy the learned mapping between tokens and their preferred experts, leading to immediate per-formance collapse. To address this, we introduce Router Weight Slicing . Let 
+
+Wr ∈ Rd×N denote the projection matrix of the original router, where N = 128 
+
+is the total number of experts. For a specific group g ∈ { und , gen } containing a subset of expert indices Ig , we construct the new router weight Wgr by slic-ing the columns of Wr corresponding to Ig . Mathematically, Wgr = Wr [: , Ig ].This operation effectively preserves the routing priors: a token that originally preferred Expert i will still produce a high gating score for Expert i in the new sub-router. This strategy achieves a zero-cold-start, allowing the model to main-tain near-original understanding performance at iteration zero, as in Table 2. 
+
+3.3 Progressive Training Strategy 
+
+Even with a disentangled architecture, the simultaneous optimization of a con-verged VLM and a newly added generative module presents a significant chal-lenge due to their disparate optimization landscapes. To harmonize these con-flicting dynamics, we propose a progressive training strategy. 
+
+Differential Learning Rates. A unified learning rate is suboptimal for the Symbiotic-MoE due to the maturity gap between modules. The pre-trained VLM components (Text/ViT experts and routers) reside in a sharp local minimum 8 X. Liu et al. 
+
+where a high learning rate ( e.g ., 1e−4) triggers immediate divergence and catas-trophic forgetting. Conversely, the newly initialized generative components (VAE experts and routers) require a larger step size to escape their initial random state and learn effective representations. To resolve this conflict, we implement a Differential Learning Rate schedule. We assign a larger learning rate ( 1e−4) ex-clusively to the generation-centric components (VAE experts and routers) to ac-celerate their convergence. Simultaneously, we apply a conservative learning rate (1e−6) to the understanding-centric components (Text/ViT experts, routers, and shared experts) to perform fine-grained adaptation without destroying their pre-trained priors. This differential optimization ensures that each module evolves at its appropriate pace. 
+
+Warmup Gradient Shielding. Initial phase of co-training is highly volatile. The generative module, starting from scratch, produces high variance gradi-ents that can catastrophically distort the well-tuned semantic features within the shared experts. To prevent this, we introduce a temporal gradient shield-ing mechanism. Specifically, during the warmup period, while VAE tokens are permitted to forward-propagate through shared experts to leverage pre-trained features, we enforce a stop-gradient operation on the backward pass. This strat-egy acts as a protective buffer, ensuring that shared experts are updated solely by stable Text and ViT gradients while the generative module is in its chaotic early learning phase. Crucially, this shielding is transient. Once the generative opti-mization trajectory stabilizes after warmup iterations, we remove the constraint to enable full bidirectional gradient flow, thereby facilitating deep cross-modal fusion through shared experts. Concurrently, to counterbalance the update mag-nitude disparity arising from our differential learning rates ( 1e−4 vs . 1e−6), we apply a gradient scaling factor of 0.1 to generative tokens within the shared experts, preventing aggressive generative signals from monopolizing the shared experts semantic space. 
+
+Objective Functions. Our training objective is designed to strictly preserve the original VLM optimization landscape while integrating generative capabilities. The final loss function extends the original VLM objectives by incorporating the image generation term: 
+
+Ltotal = λdisc · L discrete + λaux · L aux + λimg · L img  (2) where we set λdisc = 1 .0, λaux = 0 .01 , and λimg = 1 .0 in all of our experiments. The components are defined as follows: 
+
+– Ldiscrete (Inherited): The standard cross-entropy loss for next-token pre-diction. Specifically, this unifies pure language modeling, multimodal under-standing, and conditional text prompts for image generation, ensuring model maintains robust instruction following capabilities. 
+
+– Laux (Inherited): The auxiliary load-balancing loss is to encourage uniform token distribution, which prevents expert collapse and ensures efficient rout-ing. Crucially, consistent with our architectural disentanglement, this loss is computed independently for the understanding and generation groups. This Symbiotic-MoE 9
+
+ensures balanced expert utilization within each modality-specific subspace, rather than enforcing a global balance that might dilute modality special-ization. 
+
+– Limg (New): The flow matching loss on VAE latents, responsible for aligning the visual features with the generative manifold to synthesize high-fidelity images. 
+
+## 4 Experiments 
+
+4.1 Experimental Setup Experimental Setup. All experiments are conducted on a large-scale propri-etary corpus spanning T2I, T2I-Long, LM, and MMU tasks. We adopt a holistic evaluation protocol to rigorously assess both modalities. 
+
+Evaluation Metrics. Due to space constraints, the main paper focuses on two representative benchmarks for understanding: MMLU [16] (general knowledge reasoning) and OCRBench [33] (fine-grained visual perception). For genera-tion, we report FID [18], CLIPScore [17], and HPSv2 [55] on COCO-30K [30] to evaluate generation fidelity, alongside T2I-CompBench [20] for semantic alignment. Extensive evaluations on a broader suite of multimodal understand-ing and generation benchmarks are provided in Supplementary Material Sec. B. These extensive results further corroborate the consistent superiority of our method across diverse domains. 
+
+Baselines. We compare against two representative architectures under identi-cal data settings: (1) Standard MoE : naive unified co-tuning; and (2) MoT :structural expert partitioning (96/32 split) without shared experts. Crucially, all baselines undergo full fine-tuning to isolate the impact of our architectural and training innovations. Note: Since the generative module is trained from scratch in this pre-training phase, our primary focus is on architectural comparison and training dynamics rather than absolute aesthetic perfection. 
+
+Implementation Details. All models are initialized from the state-of-the-art Hunyuan-A3B (total 30B parameters) VLM. Training is conducted on 256 NVIDIA H20 GPUs with a global batch size of 2500 sample ( ∼2M tokens) per iteration, optimized via AdamW with 500 warmup steps. The data mixture is fixed at T2I:T2I-Long:LM:MMU = 3 : 3 : 2 : 2 . We enforce strict determinism by fixing all random seeds to ensure reproducibility and verified that the setup yields identical training loss curves and evaluation metrics across multiple inde-pendent runs. Comprehensive dataset details and hyperparameters are provided in Supplementary Material Sec. C. 
+
+4.2 Main Results Image Generation. We evaluate generative fidelity and semantic alignment on 
+
+COCO-30K (FID, CLIP, HPSv2) and T2I-CompBench (color, shape, texture) .10 X. Liu et al. “The glass vase and 
+
+> metallic stand display the
+> wooden flowers on the
+> fabric dresser ”
+
+Ours 
+
+Standard 
+
+MoE 
+
+MoT  
+
+> “A big sunflower and a
+> small daisy ”
+> “The triangular sail with its
+> pentagonal stitching and
+> oblong boom propelled the
+> circular boat in the ocean ”
+> “A dining area features a
+> wood table and chairs, a
+> brown refrigerator and
+> light silver cabinets ”
+> “A red carpet in a
+> bathroom with white
+> fixtures ”
+> “The oblong rug and the
+> circular ottoman were
+> arranged in the center of
+> the living room ”
+
+Fig. 4: Visualization Comparisons. We compare samples generated by Symbiotic-MoE (top), Standard MoE (middle), and MoT (bottom). Standard MoE suffers from severe structural collapse and visual artifacts due to gradient conflicts. While MoT recovers basic object shapes, it often misses fine-grained semantic details. In contrast, our method achieves superior fidelity and precise semantic alignment ( e.g ., triangular sail , oblong rug ), validating the effectiveness of our symbiotic strategy. 
+
+Table 1: Quantitative Results. We evaluate Image Generation (left) and Un-derstanding Capabilities (right). Standard MoE suffers from severe catastrophic forgetting in understanding tasks. MoT preserves original capabilities via isolation but lacks synergy. Symbiotic-MoE (Ours) delivers superior generation quality while syner-gistically boosting understanding capabilities ( e.g ., MMLU, OCRBench) beyond the Only_LM_MMU baseline. Best results are highlighted in bold . Additionally, we pro-vide results of Symbiotic-MoE trained for 100k steps (in gray) to showcase its extended scaling capacity. 
+
+Method Training Steps Image Generation Capabilities Understanding 
+
+T2I-Comp ↑ Color ↑ Shape ↑ Texture ↑ FID ↓ CLIP ↑ HPSv2 ↑ MMLU ↑ OCRBench ↑
+
+Only_LM_MMU 60k - - - - - - - 0.449 683 Standard MoE 60k 0.24 0.25 0.15 0.29 48.20 0.24 0.17 0.370 593 MoT 60k 0.33 0.38 0.21 0.38 32.23 0.26 0.18 0.409 611 
+
+Symbiotic-MoE 60k 0.38 0.41 0.29 0.45 23.04 0.28 0.20 0.492 747 
+
+Symbiotic-MoE 100k 0.49 0.55 0.35 0.56 13.65 0.31 0.23 0.507 768 
+
+As detailed in Table 1, Standard MoE suffers from routing collapse, resulting in severe artifacts and a high FID of 48.20. While MoT improves stability via isola-tion, it lacks the semantic guidance required for complex prompts, resulting 0.33 on T2I-Compbench [20]. In contrast, our Symbiotic-MoE achieves best perfor-mance across all metrics. We ascribe this superior fidelity to the holistic synergy 
+
+of our architecture: the specialized Generation Group effectively captures high-frequency visual details, while the Shared Expert bridge anchors these details to robust semantic representations. Qualitative comparisons in Fig. 4 corroborate Symbiotic-MoE 11 0 2000 4000 6000 8000 10000 12000 14000                
+
+> Training Iterations
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Capacity Rate
+> Standard MoE
+> MoT
+> Symbiotic-MoE
+> (a) Expert Capacity Rate 02000 4000 6000 8000 10000 12000 14000
+> Training Iterations
+> 0.50
+> 0.75
+> 1.00
+> 1.25
+> 1.50
+> 1.75
+> 2.00
+> 2.25
+> T2I Image Loss
+> Standard MoE
+> MoT
+> Symbiotic-MoE
+> 12000 13000 14000
+> 0.57
+> 0.58
+> 0.59
+> 0.60
+> 0.61
+> 500 1000 1500 2000
+> 0.60
+> 0.69
+> 0.77
+> 0.86
+> 0.94 (b) T2I Training Loss
+
+Fig. 5: Analysis of Training Dynamics. (a) Standard MoE (blue) and MoT (or-ange) suffer from routing collapse, indicated by the dropping capacity rate. In contrast, our Symbiotic-MoE (green) maintains highest expert utilization ( ∼0.95). (b) This structural stability translates into superior optimization efficiency, with our method achieving lower convergence generation loss than baselines. 
+
+this. As highlighted in the 3 rd column, our model accurately synthesizes geo-metrically complex objects like the “ triangular sail ”, whereas baselines struggle with shape consistency. Similarly, in the 6 th column, Symbiotic-MoE successfully disentangles spatial relationships (placing the “ oblong rug ” correctly), avoiding the structural distortion observed in MoT. Additional qualitative results are provided in Supplementary Material Sec. D. 
+
+Understanding Capabilities. To verify the understanding abality, we re-port results on MMLU [16] (reasoning) and OCRBench [33] (perception) in Table 1. Standard MoE succumbs to severe gradient conflict, suffering catas-trophic forgetting with MMLU scores plummeting to 0.370. While MoT miti-gates this decay via physical isolation, it merely maintains a baseline level of 
+
+0.409 , failing to leverage the visual signals from the generative stream. Cru-cially, Symbiotic-MoE achieves a breakthrough. It not only outperforms both standard MoE and MoT baselines by a significant margin but, most notably, surpasses the Only_LM_MMU control group—which was trained exclusively on understanding tasks without generative interference using the same setting of ours. Specifically, our method boosts MMLU performance from 0.449 to 0.492 (+9.6% relative gain) and OCRBench from 683 to 747 (+9.3%). This empirical evidence challenges the prevailing view that generation and understanding are zero-sum competitors. Instead, it validates our core hypothesis: pixel-level gener-ative training, when properly orchestrated via our shared-expert bridge, acts as a powerful fine-grained visual regularizer. It forces the visual encoder to capture denser semantic details required for reconstruction, which reciprocally enhances the model’s discriminative reasoning capabilities. 
+
+Training Efficiency. Beyond final performance, we analyze the training dy-namics to uncover the source of our model’s efficiency. As illustrated in Fig. 5a, standard MoE suffers from severe routing collapse, where expert utilization (ca-pacity rate) drops significantly. In contrast, Symbiotic-MoE maintains an excep-12 X. Liu et al. 
+
+Table 2: Ablation on Architectural Designs. We evaluate knowledge retention at iteration zero to validate structural integrity. “Tripartite” denotes separating Text, ViT, and VAE; “Bimodal” merges Text/ViT into a single group. The 96/32 Bimodal split with shared experts offers the optimal trade-off.                                              
+
+> Grouping Strategy Expert Allocation (Count) Shared Zero-Shot Metrics Text ViT VAE Expert MMLU OCRBench
+> Original VLM 128 (Entangled) -✓0.697 845 – w/o Shared Expert 128 (Entangled) -×0.460 498 Tripartite Split 32 32 64 ✓0.244 109 44 42 42 ✓0.234 179 Bimodal Split 32 (Understanding) 96 ✓0.285 532 64 (Understanding) 64 ✓0.453 742 86 (Understanding) 42 ✓0.561 786
+> 96 (Understanding) 32 ✓0.601 807
+
+tionally high capacity rate, approaching 0.95 , a value that significantly exceeds the typical equilibrium threshold of 0.90. This confirms that our method effec-tively enforces a near-perfect load balance across experts. Crucially, this structural efficiency translates directly into better optimiza-tion. Figure 5b Text-to-image Training Loss reveals a turning point around 1,000 iterations, where our method surpasses the baseline MoE in convergence speed and consistently maintains a lower loss thereafter. This provides strong empirical evidence that a compact set of 32 specialized generative experts, supported by a shared expert, is more effective than a massive pool of 128 entangled generalists plus one shared expert. This finding underscores that for multimodal MoE, archi-tectural specialization via the allocation of specific experts to specific modalities is more critical than simply scaling the total number of available experts. 
+
+4.3 Ablation Studies Architectural Design Analysis. We first investigate the impact of expert par-titioning and shared experts at iteration zero on knowledge retention (Table 2). 
+
+Expert Disentanglement Strategy. We first hypothesize a granular Tripartite Split 
+
+(separating Text, ViT, and VAE). However, this configuration triggers a catas-trophic collapse (MMLU 0.69 → 0.24 ), revealing a critical functional overlap between Text and ViT experts in the original VLM. Forcibly separating them severs essential semantic pathways. Consequently, we adopt a Bimodal Split ,consolidating Text and ViT into a unified Understanding Group. By evaluating different assignment ratios, we identify the 96/32 split as the optimal configu-ration. This setting maximizes understanding retention ( 0.60 ) while reserving sufficient plasticity (32 experts) for the generative task. 
+
+Necessity of Shared Expert Bridge. Table 2 (row 2) further validates the role of shared experts. Removing them from the original VLM precipitates a sharp performance decline ( 0.69 → 0.46 ). This confirms that shared experts act as a non-negotiable semantic anchor, ensuring feature alignment across specialized expert groups. Symbiotic-MoE 13 Initial 
+
+> State
+> Train w/o
+> Gen
+> Ours
+> (Symbiotic)
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> MMLU  0.235
+> 0.168
+> 0.201
+> MMLU
+> OCRBench
+> 0
+> 50
+> 100
+> 150
+> 200
+> 250
+> 300
+> 350
+> 400
+> OCRBench
+> 300
+> 180
+> 235
+
+(a) Shared Expert Probing 0 500 1000 1500 2000  
+
+> Training Iterations
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> 0.45
+> 0.50
+> 0.55
+> 0.60
+> 0.65
+> MMLU
+> Ours
+> Ours_only_lm_mmu
+> Ours_only_lm_mmu_1e-4
+> Ours_wo_wgs
+
+(b) MMLU Dynamics 0 500 1000 1500 2000  
+
+> Training Iterations
+> 600
+> 625
+> 650
+> 675
+> 700
+> 725
+> 750
+> 775
+> 800
+> 825
+> 850
+> OCRBench
+> Ours
+> Ours_only_lm_mmu
+> Ours_only_lm_mmu_1e-4
+> Ours_wo_wgs
+
+(c) OCRBench Dynamics 
+
+Fig. 6: Evidencing Generative Synergy. (a) We probe the isolated performance of Shared Experts. Compared to the baseline trained without generation ( Train w/o Gen ), our Symbiotic method significantly boosts the semantic density of shared experts. (b) & (c) The training dynamics show that while the control baseline degrades, Symbiotic-MoE effectively reverses the forgetting trend via generative regularization. 
+
+Optimization Dynamics Analysis. We decouple the effects of two critical strategies designed to navigate the stability-plasticity dilemma: 
+
+Differential Learning Rates. We identify a critical optimization mismatch: gen-erative learning demands aggressive updates, whereas the pre-trained backbone requires conservative fine-tuning. Crucially, as shown by the green dashed line (Ours_only_lm_mmu_1e-4 ) in Fig. 6(b–c), training solely on understanding tasks at 1e−4 triggers immediate collapse even without generative interference. This exposes a fundamental insight: catastrophic forgetting here is driven less by task conflict and more by the backbone’s intrinsic intolerance to high-magnitude up-dates. Consequently, we enforce a hierarchical strategy, assigning 1e−4 to gener-ative experts for plasticity, while restricting shared/understanding experts to a conservative 1e−6 to respect their stability constraints. 
+
+Warmup Gradient Shielding. Generative modules trained from scratch inher-ently emit high-variance gradients during early optimization. Directly exposing shared experts, the model’s semantic anchor, to this volatility causes an “ini-tial shock”, washing out pre-trained representations before generative features become semantically meaningful. To mitigate this, we explicitly detach the gen-erative gradient flow to shared experts during warmup. As evidenced by the orange dashed line ( Ours_wo_wgs ) in Fig. 6(b–c), removing this shield results in a precipitous decline in MMLU and OCRBench during the first 500 iterations, confirming that early stage isolation is vital for stability. 
+
+4.4 Analysis of Synergy 
+
+While standard MoE training suffers from interference, Symbiotic-MoE orches-trates a constructive interference, synergy. To rigorously verify this, we decon-struct the interaction between modalities through three analytical lenses: com-ponent probing, subtractive ablation, and optimization dynamics. 
+
+Component Isolation of Shared Experts. To pinpoint the architectural lo-cus of cross-modal synergy, we probe the Shared Experts in isolation. By applying 14 X. Liu et al. 
+
+a hard mask to all modality-specific routed experts, we enforce zero-shot infer-ence using only the shared expert parameters. As visualized in Fig. 6(a), the base-line ( Train w/o Gen ) optimized exclusively on understanding tasks ( λimg = 0 )suffers from representational degradation in the shared module. In contrast, the shared experts within Symbiotic-MoE demonstrate a substantial performance resurgence, consistently outperforming the understanding-only baseline on both MMLU and OCRBench by a clear margin. This empirical evidence validates that generative gradients do not overwrite linguistic priors, rather, they function as a dense semantic compressor, forcing the shared parameters to encapsulate highly generalized representations. 
+
+Generative Regularization: Does Painting Help Seeing? We isolate the impact of generative training via a counter-factual baseline trained solely on un-derstanding tasks. As visualized in Fig. 6b, the baseline (red dashed line) suffers from severe knowledge decay (0.60 → 0.52 on MMLU) driven by distribution shift. Crucially, incorporating generation arrests this decline. Our Symbiotic-MoE (blue solid line) not only stabilizes general reasoning but significantly boosts fine-grained perception, propelling OCRBench to a peak of 820 ( vs . 790). We attribute this to the unique nature of generative objectives: unlike discrim-inative tasks that often allow for semantic shortcuts, pixel-level reconstruction compels the shared experts to capture precise spatial relationships. This strictly constrains the representation space, effectively acting as a regularizer that pre-vents overfitting to textual patterns and reciprocally sharpens visual perception. 
+
+Acceleration in Optimization. Finally, we examine if strong understanding capabilities benefit generation. Figure 5b illustrates that the T2I convergence of Symbiotic-MoE is significantly faster and deeper than the Standard MoE and MoT baselines. This bi-directional flexibility aligns the semantic space with the generative manifold, turning potential conflicts into a driver for comprehensive capability emergence. 
+
+## 5 Conclusion 
+
+In this work, we presented Symbiotic-MoE, a unified pre-training framework that successfully reconciles the long-standing catastrophic forgetting in extend-ing VLMs with generative capabilities. By moving beyond the structural isola-tion typical of prior arts like MoT, we demonstrated that task interference is not an intrinsic limitation of unified architectures, but rather an optimization challenge resolvable through modality-aware disentanglement and progressive training dynamics. Most significantly, our empirical results challenge the con-ventional zero-sum view of multimodal training. We show that when the routing landscape is carefully orchestrated, the fine-grained visual semantics acquired from generation can retroactively refine the model’s understanding capability, rather than eroding them. We hope this work serves as a blueprint for future native omni-modal foundation models, establishing that the path to true general intelligence lies not in the segregation of perception and creation, but in their symbiotic integration within a single, efficient parameter space. Supplementary Materials for Symbiotic-MoE: Unlocking the Synergy between Generation and Understanding 
+
+This supplementary material complements the main paper by providing in-depth architectural analyses, extended evaluation results, and detailed reproduction specifications. The content is organized as follows: 
+
+– Section A : In-depth analysis of expert specialization, providing comprehen-sive empirical justification for our modality-aware grouping strategy. 
+
+– Section B : Additional quantitative evaluations on diverse benchmarks and fine-grained training dynamics analysis. 
+
+– Section C : Detailed hyperparameters, dataset composition, and computa-tional costs. 
+
+– Section D : Additional qualitative results for image generation. 
+
+## A In-Depth Architectural Analysis 
+
+A.1 Expert Specialization Analysis: The Rationale for Bimodal Split 
+
+In the main paper (Sec. 3.2), we proposed Modality-Aware Expert Disentangle-ment , partitioning the experts into a unified Understanding Group (Text+ViT) and a Generation Group (VAE). To validate the empirical foundation of this design, we conduct an in-depth visualization of the intrinsic activation patterns within the pre-trained VLM prior to any fine-tuning. 
+
+Macro-Level Routing Dynamics. To understand the internal allocation of model capacity, we first investigate the global routing distribution across all 47 MoE layers. Specifically, we establish two metrics to quantify the activation frequencies of Text tokens (using MMLU [16]) and ViT tokens (using OCR-Bench [33]): (1) Imbalance Ratio : Defined as the ratio of the maximum expert selection count to the mean selection count ( max  
+
+> mean
+
+). An ideal uniform routing would yield a ratio of 1.0. An ideal uniform routing would yield a ratio of 1.0, whereas higher values indicate a high concentration of routing density onto a few “popular” experts. (2) Standard Deviation (Std) : Measures the absolute dis-persion of selection counts from the mean. As illustrated in Fig. 1, the routing mechanism exhibits a heavily skewed, long-tail distribution. For instance, the Imbalance Ratio frequently exceeds 2.5 and reaches up to 4.26 ( e.g ., in Layer 16). This pronounced imbalance reveals that the original VLM does not uti-lize experts uniformly; instead, a specific subset of “core experts” dominates the processing. 
+
+Micro-Level Modality Entanglement. Given that a small subset of experts dominates, the critical question is: Do Text and ViT tokens rely on different 16 0 10 20 30 40 
+
+> Layer Index
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> 4.0
+> 4.5
+> Imbalance Ratio
+> Perfect Balance (1.0)
+
+(a) Imbalance Ratio 0 10 20 30 40  
+
+> Layer Index
+> 0
+> 500
+> 1000
+> 1500
+> 2000
+> 2500
+> 3000
+> 3500
+> 4000
+> Standard Deviation
+> Perfect Balance (0.0)
+
+(b) Standard Deviation 
+
+Fig. 1: Macro-level routing dynamics of the pre-trained VLM. We track the (a) imbalance ratio and (b) standard deviation of expert selection counts across all 47 layers for Text tokens. The metrics reveal a severe long-tail distribution (ratio consistently 
+
+≫ 1.0), indicating that the pre-trained VLM inherently relies on a concentrated subset of “core experts” while leaving others underutilized. 0 8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 127 
+
+Expert ID                 
+
+> 0
+> 5000
+> 10000
+> 15000
+> 20000
+> 25000
+> 30000
+> Selection Count
+> Layer 16 - Expert Selection Counts (Text)
+> Mean=6986, Std=2972.4, CV=0.426, Imbalance Ratio=4.26 (Min=3907, Max=29744)
+> Mean: 6986 0816 24 32 40 48 56 64 72 80 88 96 104 112 120 127
+
+Expert ID 
+
+> 0
+> 2000
+> 4000
+> 6000
+> 8000
+> 10000
+> 12000
+> 14000
+> Selection Count
+> Layer 16 - Expert Selection Counts (ViT)
+> Mean=4572, Std=1207.7, CV=0.264, Imbalance Ratio=2.92 (Min=2654, Max=13346)
+> Mean: 4572
+
+Fig. 2: Micro-level modality entanglement in Layer 16. Activation frequencies of all 128 experts for Text (top) and ViT (bottom) tokens. The top-8 most activated experts are highlighted in dark colors (blue/purple), and the bottom-8 in light colors (yellow/green). A profound intersection is observed ( e.g ., Experts 16, 52, and 122 are heavily utilized by both modalities in top-8 experts), demonstrating that linguistic and visual perception pathways are intrinsically coupled within the same core experts in the pre-trained VLM. 
+
+core experts, or do they share the same ones? To answer this, we zoom into the granular activation profiles of individual layers. Symbiotic-MoE Supplementary Material 17 
+
+Figure 2 visualizes the selection counts for Text and ViT tokens in Layer 16, which serves as an example for the micro-level routing behavior. We highlight the top-8 most frequently activated experts (dark blue for Text, dark purple for ViT) and the bottom-8 least activated experts (yellow/green). A striking phenomenon emerges: there is a profound intersection between the most heavily utilized experts for Text and ViT modalities in the original VLM . For instance, Expert IDs 9, 18, and 92 are among the top choices for both modalities in top-8 experts. This high degree of coupling is not an isolated artifact but a consistent structural trait observed across the network’s depth. 
+
+Conclusion: Why a Bimodal Split? These probing results provide compelling empirical evidence for our architectural decision. The original VLM has intrin-sically coupled linguistic and visual perception pathways into a shared subset of "generalist" experts. Forcibly severing these modalities into a granular tripartite split ( i.e ., isolated Text, ViT, and VAE groups) would violently rupture these learned semantic connections, explaining the catastrophic performance drop ob-served in our ablation studies in the main paper Table 2. Consequently, con-solidating Text and ViT into a unified Understanding Group while separating the VAE tokens emerges as the optimal strategy to balance pre-trained stability with generative plasticity. 
+
+## B Extended Quantitative Evaluation and Dynamics 
+
+In this section, we provide exhaustive quantitative results deferred from the main manuscript due to space limitations, alongside a fine-grained analysis of the internal routing dynamics to validate the structural health of our Symbiotic-MoE. 
+
+B.1 Comprehensive Benchmark Results 
+
+To rigorously ensure that the integration of generative objectives introduces no implicit degradation across specialized understanding domains, we expand our evaluation beyond MMLU [16] and OCRBench [33] to a comprehensive suite of multimodal benchmarks. To guarantee a standardized, reproducible, and unbi-ased assessment, all evaluations are systematically conducted utilizing the open-source VLMEvalKit [10] toolkit. Rather than reducing these diverse metrics to a monolithic score, we decouple them into distinct functional dimensions, pro-viding a granular and multifaceted analysis of the model’s capabilities (detailed in Table 1): 
+
+Text Scene Recognition (e.g ., TextVQA [24]): Building upon the robust OCR capabilities shown in the main text, these tasks require precise grounding and interpretation of text within natural scenes. We observe that the fine-grained, pixel-level supervision derived from the generative task acts as a strong visual regularizer. Via the shared expert bridge, Symbiotic-MoE noticeably enhances text-centric perception. 18 
+
+Table 1: Additional Understanding Capabilities. To ensure no implicit degra-dation occurs in specialized understanding domains, we expand our evaluation across diverse multimodal benchmarks, including spatial reasoning (POPE), compositional visual QA (GQA), chart and diagram understanding (ChartQA, AI2D), and compre-hensive multimodal evaluations (TQA, MME). For the MME benchmark, we report the Perception score (MME-P), Cognition score (MME-C), and their total sum (MME-S). Symbiotic-MoE consistently preserves robust understanding across all domains com-pared to the Standard MoE and MoT baselines. Method POPE ↑ GQA ↑ TQA ↑ ChartQA ↑ AI2D ↑ MME-S ↑ MME-P ↑ MME-C ↑                                
+
+> Only_LM_MMU 70.1 45.2 61.9 66.8 0.65 1689.6 1250.0 439.6 Standard MoE 60.3 38.5 55.9 57.5 0.56 1477.5 1093.8 383.7 MoT 63.1 40.9 57.5 60.1 0.57 1521.1 1125.4 395.7
+> Symbiotic-MoE 74.5 48.0 66.9 70.3 0.67 1795.2 1328.1 467.1
+
+General Perception, Reasoning, and Hallucination (e.g ., MME [12], GQA [21], POPE [27]): While naive co-training often exacerbates object hallucinations due to generative domain shifts, Symbiotic-MoE maintains robust structural align-ment. It effectively resists the stability-plasticity dilemma, avoiding the fabri-cation of non-existent objects (validated by POPE) while excelling in compo-sitional scene understanding (GQA) and comprehensive perception-reasoning (MME-P/MME-C). 
+
+Chart and Scientific Comprehension (e.g ., ChartQA [37], AI2D [23]): These tasks demand rigorous numerical reasoning and topological understanding. The preservation of high scores in these domains demonstrates that our Modality-Aware Disentanglement successfully shields the foundational reasoning pathways from the high-variance gradients of the diffusion process. The collective results across these diverse taxonomies vividly illustrate the superiority of our framework. Standard MoE suffers from severe catastrophic forgetting due to unconstrained gradient interference. Conversely, while MoT merely preserves baseline capabilities via strict structural isolation, it fundamen-tally fails to leverage cross-modal synergy. In striking contrast, Symbiotic-MoE consistently mitigates forgetting and aligns closely with and notably surpasses the original VLM’s only training on LM and MMU performance across all eval-uated domains. The absence of a performance drop on these reasoning-heavy tasks, coupled with competitive generation scores, empirically corroborates our core claim: the symbiotic architecture successfully transforms generative signals into a constructive regularizer rather than a destructive interference. 
+
+B.2 Fine-Grained Modality Routing Stability 
+
+In the main paper, we demonstrated that Symbiotic-MoE maintains a near-optimal global capacity rate ( ∼0.95). To definitively rule out the possibility of partial routing collapse, where one dominant modality monopolizes expert uti-lization while others starve, we decompose the routing dynamics into modality-specific trajectories. Symbiotic-MoE Supplementary Material 19 0 2000 4000 6000 8000 10000 12000 14000 
+
+> Training Iterations
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Capacity Rate
+> Text
+
+(a) Text 0 2000 4000 6000 8000 10000 12000 14000  
+
+> Training Iterations
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Capacity Rate
+> ViT
+
+(b) ViT 0 2000 4000 6000 8000 10000 12000 14000  
+
+> Training Iterations
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Capacity Rate
+> VAE
+
+(c) VAE 
+
+Fig. 3: Capacity Rate Dynamics of Text, ViT, and VAE. We decompose the global capacity rate to verify modality-specific routing health. (a-c) All three modali-ties maintain an exceptionally high and stable capacity rate ( > 0.90 ), indicating near-perfect load balancing without partial routing collapse. The VAE curve closely mirrors the global trajectory (main paper Fig. 5a) due to its dominant token volume in our 
+
+3 : 3 : 2 : 2 data mixture, confirming the architectural robustness of Symbiotic-MoE across disparate modalities. 
+
+Figure 3 visualizes the individual capacity usage curves for Text, ViT, and VAE tokens throughout the training process. Strikingly, despite the disparate optimization paces enforced by our differential learning rates, all three modalities maintain exceptionally stable utilization above 0.90 , a highly ideal state in sparse MoE training, with Text and VAE consistently approaching 0.95 .This fine-grained visualization definitively rules out partial routing collapse and clarifies two key training dynamics. First, the global capacity curve pre-sented in the main text visually mirrors the VAE trajectory simply because dense generative tokens constitute the absolute majority ( 60% ) of our training budget ( T2I: T2I-Long: LM: MMU = 3:3:2:2 ), as corroborated by the token consumption in Fig. 4. Second, the marginally lower rate of the ViT branch (∼0.93) is a natural consequence of the sparser routing signals from the MMU task, which provides the smallest token influx. Ultimately, this confirms that our near-optimal global efficiency ( ∼0.95) is not a statistical artifact masked by the dominant modality, but a genuine reflection of system-wide load balancing successfully enforced by our Modality-Aware Disentanglement. 
+
+## C Implementation Details 
+
+To ensure a rigorous comparison, our training protocol aligns strictly with the initial settings of the original VLM backbone. By isolating confounding variables, we guarantee that any performance variations are exclusively attributable to our architectural and optimization innovations. 20 
+
+Table 2: Hyperparameter Settings. The hyperparameters are strictly aligned with the pre-trained VLM to isolate the impact of our architectural improvements.                                
+
+> Hyperparameter Value
+> Base model Hunyuan-VL-30B-A3B Learning rate (Gen) 1×10 −4
+> Learning rate (Und) 1×10 −6
+> LR scheduler Constant Weight decay 0.0 Gradient norm clip 1.0 Optimizer Adam ( β1= 0 .9,β2= 0 .95 ,ϵ= 10 −6)Warm-up steps 500 Gen resolution ≈256 ×256 (bucketed) Loss Weight λdisc 1.0 Loss Weight λimg 1.0 Loss Weight λaux 0.01 Training iters 30k Training seen tokens 60B
+
+C.1 Training Paradigm and Evaluation Philosophy 
+
+We build upon the powerful Hunyuan-VL-30B-A3B backbone, adopting the Transfusion [65] framework to seamlessly unify the modeling of discrete text tokens and continuous visual latents. Modern foundation models typically undergo a multi-stage curriculum to achieve optimal aesthetic alignment: Pre-Training (PT), Continued Training (CT) for resolution scale-up, and Supervised Fine-Tuning (SFT) on curated high-quality subsets. In this work, our experiments are deliberately confined exclusively to the PT Stage . Accordingly, the visual generation objective is re-stricted to a base pixel budget equivalent to a 256 × 256 resolution. Rather than forcing rigid square crops, we employ a dynamic aspect ratio bucketing strategy, where images are grouped into variable resolution buckets ( H × W ≈ 256 2) to preserve their native semantic compositions. Note that we exclusively perform the Pre-Training (PT) phase from scratch, and no subsequent Continuous Train-ing (CT) or Supervised Fine-Tuning (SFT) is employed in all of our experiments. This constrained setting is a conscious experimental design choice. Our pri-mary objective is to benchmark the intrinsic architectural superiority of the Symbiotic-MoE in mitigating gradient conflicts and routing collapse, rather than blindly pursuing absolute aesthetic perfection via massive computational scal-ing. Because all baselines (Standard MoE and MoT) operate under the exact same resolution and data constraints, the relative performance margins and the robust preservation of understanding capabilities serve as definitive, unbiased evidence of our framework’s foundational efficacy. Detailed hyperparameters for reproducibility are summarized in Table 2. Symbiotic-MoE Supplementary Material 21 0 2000 4000 6000 8000 10000 12000 14000 
+
+> Training Iterations
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> 1.25
+> 1.50
+> 1.75
+> Number of Tokens
+> 1e10
+> T2I
+> T2I Long
+> LM
+> MMU
+
+Fig. 4: Cumulative Token Consumption Dynamics. We track the total number of tokens processed by the routing mechanism across 14,000 iterations. The massive influx of tokens across all three modalities highlights the rigorous scale of our co-training phase, providing a solid empirical foundation for cross-modal synergy. 
+
+C.2 Data Mixture and Evaluation Protocols 
+
+To foster true cross-modal synergy, our training corpus comprises a high-quality, proprietary mixture of text, image-text pairs, and interleaved multimodal data. The sampling ratio during the co-training phase is deterministically set to T2I : T2I-Long : LM : MMU = 3:3:2:2 . This balanced distribution ensures that the generative experts receive sufficient optimization signals without starving the discriminative understanding pathways. To rigorously validate this balance, we adopt a comprehensive, dual-faceted evaluation protocol. For Generative Fidelity and Alignment , we utilize GenEval [14], FID [18], CLIPScore [17], and HPSv2 [55] on COCO-30K [30], along with T2I-CompBench [20] for compositional semantics. Conversely, to verify Understand-ing Preservation , we deploy a broad suite of reasoning and perception bench-marks, including MMLU [16] (general knowledge), OCRBench [33] (fine-grained perception), POPE [27], GQA [21], TQA [24], ChartQA [37], AI2D [23], and MME [12]. This holistic approach ensures that the model’s capabilities are eval-uated across the entire spectrum of unified intelligence. 
+
+C.3 Computational Budget and Token Dynamics 
+
+All experiments are conducted on a high-performance cluster equipped with 256 NVIDIA H20 GPUs. Benefiting from the zero-parameter overhead of our Symbiotic-MoE architecture, the training process maintains optimal hardware utilization without introducing memory bottlenecks. The main model is trained for a total of 30,000 iterations using the AdamW optimizer. Given the massive Global Batch Size (GBS) of approximately 2,500 samples ( ∼2M tokens) per iteration, the entire adaptation phase consumes roughly 60 Billion tokens. To provide a granular perspective on this computational scale, Fig. 4 illus-trates the cumulative token consumption throughout the training trajectory. 22 Ours 
+
+> “A photo of a wine
+> glass ”
+
+MoT 
+
+> “A pizza type dish
+> with vegetables and
+> a lemon wedge ”
+> “A black and white
+> cat sits in a white
+> sink ”
+> “A photo of a white
+> dog and a blue
+> potted plant ”
+> “A photo of a green
+> couch ”
+> “A photo of a
+> handbag ”
+
+Ours 
+
+> “A man in a black
+> jacket standing in a
+> kitchen next to a gray
+> dog ”
+> “A green leaf and a
+> yellow butterfly ”
+> “A living room with
+> a large green couch
+> and office desk ”
+> “A photo of a
+> backpack ”
+> “A bathroom with
+> green tile and a red
+> shower curtain ”
+> “A photo of a
+> purple potted plant ”
+
+Standard 
+
+MoE 
+
+MoT 
+
+Standard 
+
+MoE 
+
+Fig. 5: Extended Qualitative Comparison. We compare the early-stage text-to-image generation capabilities of Symbiotic-MoE against the Standard MoE and MoT baselines. At this stage of training, Standard MoE struggles to form coherent structures due to gradient interference ( e.g ., the handbag). While MoT isolates these conflicts, it exhibits slower semantic alignment, leading to occasional attribute mismatches ( e.g ., the wine glass). In contrast, Symbiotic-MoE leverages shared experts to accelerate cross-modal convergence, consistently synthesizing higher-fidelity images with more precise compositional attribute binding earlier in the training process. 
+
+Consistent with our T2I: T2I-Long: LM: MMU = 3:3:2:2 data mixture and the inherently high sequence density of continuous visual latents, VAE tokens dominate the overall volume. Concurrently, Text and ViT tokens scale steadily, providing a continuous regularization effect for the understanding modules. This massive and modality-proportional influx of data guarantees that both the newly Symbiotic-MoE Supplementary Material 23 
+
+initialized generative experts and the pre-trained understanding anchors reach a state of robust convergence. 
+
+## D Additional Qualitative Results 
+
+In this section, we provide extended qualitative visualizations to further val-idate the generative superiority of Symbiotic-MoE. Figure 5 presents a side-by-side comparison against the Standard MoE and MoT baselines, highlighting our model’s capacity to avert structural collapse and maintain precise semantic alignment. 
+
+Structural Integrity and Fine-grained Details. Standard MoE suffers from severe gradient interference, which irreversibly corrupts foundational visual pri-ors. As observed in the “handbag” and “wine glass” prompts, Standard MoE com-pletely collapses into amorphous textures. While MoT mitigates this collapse via physical isolation, it frequently hallucinates erroneous geometric structures, such as generating multiple floating rims for the wine glass or distorted limbs for the cat. In stark contrast, Symbiotic-MoE synthesizes geometrically precise objects with photorealistic details (e.g., the accurate refraction of the glass and the clean silhouette of the cat). This confirms that our optimization dynamics successfully protect generative plasticity from being overwhelmed by understanding tasks. 
+
+Compositional Attribute Binding. The most pronounced advantage of our Symbiotic-MoE emerges in prompts requiring complex attribute binding. Be-cause MoT structurally isolates the text understanding experts from the gener-ation pathways (the “split-brain” dilemma), its generative module lacks robust semantic grounding. Consequently, MoT struggles with precise compositional generation: it fails to render the “lemon wedge” on the pizza correctly, morphs the “purple potted plant” into an anomalous purple cart, and hallucinates ran-dom textual artifacts above the “green couch” while failing to generate its legs. Conversely, Symbiotic-MoE flawlessly renders the distinct lemon wedge, the del-icate wings of the yellow butterfly, and the four distinct legs of the green couch. This precise alignment is directly attributable to our Shared Experts , which act as a semantic bridge. By allowing the generative decoder to query deeply aligned textual representations without destroying them, Symbiotic-MoE ensures that fine-grained textual attributes are strictly bound to their corresponding visual entities. 
+
+## References 
+
+> 1. Achiam, J., Adler, S., Agarwal, S., Ahmad, L., Akkaya, I., Aleman, F.L., Almeida, D., Altenschmidt, J., Altman, S., Anadkat, S., et al.: Gpt-4 technical report. arXiv preprint arXiv:2303.08774 (2023) 2. Chen, J., Tang, Q., Lu, Q., Fang, S.: Mol for llms: Dual-loss optimization to enhance domain expertise while preserving general capabilities. arXiv preprint arXiv:2505.12043 (2025)
+
+24 3. Chen, X., Wu, Z., Liu, X., Pan, Z., Liu, W., Xie, Z., Yu, X., Ruan, C.: Janus-pro: Unified multimodal understanding and generation with data and model scaling. arXiv preprint arXiv:2501.17811 (2025) 4. Chen, Y., Wang, S., Zhang, Y., Lin, Z., Zhang, H., Sun, W., Ding, T., Sun, R.: Mofo: Momentum-filtered optimizer for mitigating forgetting in llm fine-tuning. arXiv preprint arXiv:2407.20999 (2024) 5. Chen, Z., Wu, J., Wang, W., Su, W., Chen, G., Xing, S., Zhong, M., Zhang, Q., Zhu, X., Lu, L., et al.: Internvl: Scaling up vision foundation models and aligning for generic visual-linguistic tasks. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 24185–24198 (2024) 6. Dai, D., Deng, C., Zhao, C., Xu, R., Gao, H., Chen, D., Li, J., Zeng, W., Yu, X., Wu, Y., et al.: Deepseekmoe: Towards ultimate expert specialization in mixture-of-experts language models. In: Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). pp. 1280– 1297 (2024) 7. Deng, C., Zhu, D., Li, K., Gou, C., Li, F., Wang, Z., Zhong, S., Yu, W., Nie, X., Song, Z., Shi, G., Fan, H.: Emerging properties in unified multimodal pretraining. arXiv preprint arXiv:2505.14683 (2025) 8. Dong, R., Han, C., Peng, Y., Qi, Z., Ge, Z., Yang, J., Zhao, L., Sun, J., Zhou, H., Wei, H., et al.: Dreamllm: Synergistic multimodal comprehension and creation. arXiv preprint arXiv:2309.11499 (2023) 9. Du, N., Huang, Y., Dai, A.M., Tong, S., Lepikhin, D., Xu, Y., Krikun, M., Zhou, Y., Yu, A.W., Firat, O., et al.: Glam: Efficient scaling of language models with mixture-of-experts. In: International conference on machine learning. pp. 5547– 5569. PMLR (2022) 10. Duan, H., Yang, J., Qiao, Y., Fang, X., Chen, L., Liu, Y., Dong, X., Zang, Y., Zhang, P., Wang, J., et al.: Vlmevalkit: An open-source toolkit for evaluating large multi-modality models. In: Proceedings of the 32nd ACM international conference on multimedia. pp. 11198–11201 (2024) 11. Fedus, W., Zoph, B., Shazeer, N.: Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity. Journal of Machine Learning Research 
+
+23 (120), 1–39 (2022) 12. Fu, C., Chen, P., Shen, Y., Qin, Y., Zhang, M., Lin, X., Yang, J., Zheng, X., Li, K., Sun, X., et al.: Mme: A comprehensive evaluation benchmark for multimodal large language models. arXiv preprint arXiv:2306.13394 (2023) 13. Gao, P., Han, J., Zhang, R., Lin, Z., Geng, S., Zhou, A., Zhang, W., Lu, P., He, C., Yue, X., et al.: Llama-adapter v2: Parameter-efficient visual instruction model. arXiv preprint arXiv:2304.15010 (2023) 14. Ghosh, D., Hajishirzi, H., Schmidt, L.: Geneval: An object-focused framework for evaluating text-to-image alignment. Advances in Neural Information Processing Systems 36 , 52132–52152 (2023) 15. Gu, H., Li, W., Li, L., Zhu, Q., Lee, M., Sun, S., Xue, W., Guo, Y.: Delta decom-pression for moe-based llms compression. arXiv preprint arXiv:2502.17298 (2025) 16. Hendrycks, D., Burns, C., Basart, S., Zou, A., Mazeika, M., Song, D., Stein-hardt, J.: Measuring massive multitask language understanding. arXiv preprint arXiv:2009.03300 (2020) 17. Hessel, J., Holtzman, A., Forbes, M., Le Bras, R., Choi, Y.: Clipscore: A reference-free evaluation metric for image captioning. In: Proceedings of the 2021 conference on empirical methods in natural language processing. pp. 7514–7528 (2021) Symbiotic-MoE Supplementary Material 25 18. Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., Hochreiter, S.: Gans trained by a two time-scale update rule converge to a local nash equilibrium. Advances in neural information processing systems 30 (2017) 19. Hu, E.J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., Chen, W., et al.: Lora: Low-rank adaptation of large language models. Iclr 1(2), 3 (2022) 20. Huang, K., Sun, K., Xie, E., Li, Z., Liu, X.: T2i-compbench: A comprehensive benchmark for open-world compositional text-to-image generation. Advances in Neural Information Processing Systems 36 , 78723–78747 (2023) 21. Hudson, D.A., Manning, C.D.: Gqa: A new dataset for real-world visual reasoning and compositional question answering. In: Proceedings of the IEEE/CVF confer-ence on computer vision and pattern recognition. pp. 6700–6709 (2019) 22. Jiang, A.Q., Sablayrolles, A., Roux, A., Mensch, A., Savary, B., Bamford, C., Chaplot, D.S., Casas, D.d.l., Hanna, E.B., Bressand, F., et al.: Mixtral of experts. arXiv preprint arXiv:2401.04088 (2024) 23. Kembhavi, A., Salvato, M., Kolve, E., Seo, M., Hajishirzi, H., Farhadi, A.: A di-agram is worth a dozen images. In: European conference on computer vision. pp. 235–251. Springer (2016) 24. Kembhavi, A., Seo, M., Schwenk, D., Choi, J., Farhadi, A., Hajishirzi, H.: Are you smarter than a sixth grader? textbook question answering for multimodal machine comprehension. In: Proceedings of the IEEE Conference on Computer Vision and Pattern recognition. pp. 4999–5007 (2017) 25. Koh, J.Y., Fried, D., Salakhutdinov, R.R.: Generating images with multimodal language models. Advances in Neural Information Processing Systems 36 , 21487– 21506 (2023) 26. Lepikhin, D., Lee, H., Xu, Y., Chen, D., Firat, O., Huang, Y., Krikun, M., Shazeer, N., Chen, Z.: Gshard: Scaling giant models with conditional computation and automatic sharding. arXiv preprint arXiv:2006.16668 (2020) 27. Li, Y., Du, Y., Zhou, K., Wang, J., Zhao, W.X., Wen, J.R.: Evaluating object hal-lucination in large vision-language models. In: Proceedings of the 2023 conference on empirical methods in natural language processing. pp. 292–305 (2023) 28. Liang, W., YU, L., Luo, L., Iyer, S., Dong, N., Zhou, C., Ghosh, G., Lewis, M., tau Yih, W., Zettlemoyer, L., Lin, X.V.: Mixture-of-transformers: A sparse and scalable architecture for multi-modal foundation models. Transactions on Machine Learning Research (2025), https://openreview.net/forum?id=Nu6N69i8SB 
+
+29. Lin, B., Tang, Z., Ye, Y., Huang, J., Zhang, J., Pang, Y., Jin, P., Ning, M., Luo, J., Yuan, L.: Moe-llava: Mixture of experts for large vision-language models. IEEE Transactions on Multimedia (2026) 30. Lin, T.Y., Maire, M., Belongie, S., Hays, J., Perona, P., Ramanan, D., Dollár, P., Zitnick, C.L.: Microsoft coco: Common objects in context. In: European conference on computer vision. pp. 740–755. Springer (2014) 31. Liu, A., Feng, B., Xue, B., Wang, B., Wu, B., Lu, C., Zhao, C., Deng, C., Zhang, C., Ruan, C., et al.: Deepseek-v3 technical report. arXiv preprint arXiv:2412.19437 (2024) 32. Liu, H., Li, C., Wu, Q., Lee, Y.J.: Visual instruction tuning. Advances in neural information processing systems 36 , 34892–34916 (2023) 33. Liu, Y., Li, Z., Huang, M., Yang, B., Yu, W., Li, C., Yin, X.C., Liu, C.L., Jin, L., Bai, X.: Ocrbench: on the hidden mystery of ocr in large multimodal models. Science China Information Sciences 67 (12), 220102 (2024) 34. Lu, H., Liu, W., Zhang, B., Wang, B., Dong, K., Liu, B., Sun, J., Ren, T., Li, Z., Yang, H., et al.: Deepseek-vl: towards real-world vision-language understanding. arXiv preprint arXiv:2403.05525 (2024) 26 35. Luo, G., Yang, X., Dou, W., Wang, Z., Liu, J., Dai, J., Qiao, Y., Zhu, X.: Mono-internvl: Pushing the boundaries of monolithic multimodal large language models with endogenous visual pre-training. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 24960–24971 (2025) 36. Lv, A., Ma, J., Ma, Y., Qiao, S.: Coupling experts and routers in mixture-of-experts via an auxiliary loss. arXiv preprint arXiv:2512.23447 (2025) 37. Masry, A., Do, X.L., Tan, J.Q., Joty, S., Hoque, E.: Chartqa: A benchmark for question answering about charts with visual and logical reasoning. In: Findings of the association for computational linguistics: ACL 2022. pp. 2263–2279 (2022) 38. McCloskey, M., Cohen, N.J.: Catastrophic interference in connectionist networks: The sequential learning problem. In: Psychology of learning and motivation, vol. 24, pp. 109–165. Elsevier (1989) 39. McKinzie, B., Gan, Z., Fauconnier, J.P., Dodge, S., Zhang, B., Dufter, P., Shah, D., Du, X., Peng, F., Belyi, A., et al.: Mm1: methods, analysis and insights from multimodal llm pre-training. In: European Conference on Computer Vision. pp. 304–323. Springer (2024) 40. Parisi, G.I., Kemker, R., Part, J.L., Kanan, C., Wermter, S.: Continual lifelong learning with neural networks: A review. Neural networks 113 , 54–71 (2019) 41. Riquelme, C., Puigcerver, J., Mustafa, B., Neumann, M., Jenatton, R., Su-sano Pinto, A., Keysers, D., Houlsby, N.: Scaling vision with sparse mixture of experts. Advances in Neural Information Processing Systems 34 , 8583–8595 (2021) 42. Shazeer, N., Mirhoseini, A., Maziarz, K., Davis, A., Le, Q., Hinton, G., Dean, J.: Outrageously large neural networks: The sparsely-gated mixture-of-experts layer. arXiv preprint arXiv:1701.06538 (2017) 43. Sun, Q., Yu, Q., Cui, Y., Zhang, F., Zhang, X., Wang, Y., Gao, H., Liu, J., Huang, T., Wang, X.: Emu: Generative pretraining in multimodality. arXiv preprint arXiv:2307.05222 (2023) 44. Tang, Z., Yang, Z., Zhu, C., Zeng, M., Bansal, M.: Any-to-any generation via com-posable diffusion. Advances in Neural Information Processing Systems 36 , 16083– 16099 (2023) 45. Team, C.: Chameleon: Mixed-modal early-fusion foundation models. arXiv preprint arXiv:2405.09818 (2024) 46. Team, G., Anil, R., Borgeaud, S., Alayrac, J.B., Yu, J., Soricut, R., Schalkwyk, J., Dai, A.M., Hauth, A., Millican, K., et al.: Gemini: a family of highly capable multimodal models. arXiv preprint arXiv:2312.11805 (2023) 47. Team, K., Du, A., Yin, B., Xing, B., Qu, B., Wang, B., Chen, C., Zhang, C., Du, C., Wei, C., et al.: Kimi-vl technical report. arXiv preprint arXiv:2504.07491 (2025) 48. Wang, D., Wang, S., Li, Z., Wang, Y., Li, Y., Tang, D., Shen, X., Huang, X., Wei, Z.: Moiie: Mixture of intra-and inter-modality experts for large vision language models. arXiv preprint arXiv:2508.09779 (2025) 49. Wang, P., Bai, S., Tan, S., Wang, S., Fan, Z., Bai, J., Chen, K., Liu, X., Wang, J., Ge, W., et al.: Qwen2-vl: Enhancing vision-language model’s perception of the world at any resolution. arXiv preprint arXiv:2409.12191 (2024) 50. Wang, X., Zhang, Z., Zhang, H., Lin, Z., Zhou, Y., Liu, Q., Zhang, S., Li, Y., Liu, S., Zheng, H., et al.: Hbridge: H-shape bridging of heterogeneous experts for unified multimodal understanding and generation. arXiv preprint arXiv:2511.20520 (2025) 51. Wang, X., Zhang, X., Luo, Z., Sun, Q., Cui, Y., Wang, J., Zhang, F., Wang, Y., Li, Z., Yu, Q., et al.: Emu3: Next-token prediction is all you need. arXiv preprint arXiv:2409.18869 (2024) Symbiotic-MoE Supplementary Material 27 52. Wu, C., Yin, S., Qi, W., Wang, X., Tang, Z., Duan, N.: Visual chatgpt: Talking, drawing and editing with visual foundation models. arXiv preprint arXiv:2303.04671 (2023) 53. Wu, C., Chen, X., Wu, Z., Ma, Y., Liu, X., Pan, Z., Liu, W., Xie, Z., Yu, X., Ruan, C., et al.: Janus: Decoupling visual encoding for unified multimodal understanding and generation. In: Proceedings of the Computer Vision and Pattern Recognition Conference. pp. 12966–12977 (2025) 54. Wu, S., Fei, H., Qu, L., Ji, W., Chua, T.S.: Next-gpt: Any-to-any multimodal llm. In: Forty-first International Conference on Machine Learning (2024) 55. Wu, X., Hao, Y., Sun, K., Chen, Y., Zhu, F., Zhao, R., Li, H.: Human preference score v2: A solid benchmark for evaluating human preferences of text-to-image synthesis. arXiv preprint arXiv:2306.09341 (2023) 56. Xiao, S., Wang, Y., Zhou, J., Yuan, H., Xing, X., Yan, R., Li, C., Wang, S., Huang, T., Liu, Z.: Omnigen: Unified image generation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 13294–13304 (2025) 57. Xie, J., Mao, W., Bai, Z., Zhang, D.J., Wang, W., Lin, K.Q., Gu, Y., Chen, Z., Yang, Z., Shou, M.Z.: Show-o: One single transformer to unify multimodal under-standing and generation. arXiv preprint arXiv:2408.12528 (2024) 58. Xu, Y., Yan, H., Cao, J., Cheng, Y., Hang, T., He, R., Yin, Z., Zhang, S., Zhang, Y., Li, J., et al.: Tag-moe: Task-aware gating for unified generative mixture-of-experts. arXiv preprint arXiv:2601.08881 (2026) 59. Yang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Gao, C., Huang, C., Lv, C., et al.: Qwen3 technical report. arXiv preprint arXiv:2505.09388 (2025) 60. Ye, H., Zhang, J., Liu, S., Han, X., Yang, W.: Ip-adapter: Text compati-ble image prompt adapter for text-to-image diffusion models. arXiv preprint arXiv:2308.06721 (2023) 61. Zhang, H., Gao, M., Gan, Z., Dufter, P., Wenzel, N., Huang, F., Shah, D., Du, X., Zhang, B., Li, Y., et al.: Mm1. 5: Methods, analysis & insights from multimodal llm fine-tuning. arXiv preprint arXiv:2409.20566 (2024) 62. Zhang, L., Xie, Y., Fang, F., Dong, F., Liu, R., Cao, Y.: Metagdpo: Alleviating catastrophic forgetting with metacognitive knowledge through group direct pref-erence optimization. arXiv preprint arXiv:2511.12113 (2025) 63. Zhang, L., Rao, A., Agrawala, M.: Adding conditional control to text-to-image diffusion models. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 3836–3847 (2023) 64. Zhang, Z., Dong, Q., Zhang, Q., Zhao, J., Zhou, E., Xi, Z., Jin, S., Fan, X., Zhou, Y., Fu, Y., et al.: Reinforcement fine-tuning enables mllms learning novel tasks stably. arXiv e-prints pp. arXiv–2506 (2025) 65. Zhou, C., Yu, L., Babu, A., Tirumala, K., Yasunaga, M., Shamis, L., Kahn, J., Ma, X., Zettlemoyer, L., Levy, O.: Transfusion: Predict the next token and diffuse images with one multi-modal model. arXiv preprint arXiv:2408.11039 (2024) 66. Zoph, B., Bello, I., Kumar, S., Du, N., Huang, Y., Dean, J., Shazeer, N., Fedus, W.: St-moe: Designing stable and transferable sparse expert models. arXiv preprint arXiv:2202.08906 (2022)

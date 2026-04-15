@@ -1,0 +1,672 @@
+Title: HTDC: Hesitation-Triggered Differential Calibration for Mitigating Hallucination in Large Vision-Language Models
+
+URL Source: https://arxiv.org/pdf/2604.12115v1
+
+Published Time: Wed, 15 Apr 2026 00:21:01 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# HTDC: Hesitation-Triggered Differential Calibration for Mitigating Hallucination in Large Vision-Language Models 
+
+# Xinyun Liu 
+
+2023141010186@stu.scu.edu.cn Sichuan University Chengdu, China 
+
+## Abstract 
+
+Large vision-language models (LVLMs) achieve strong multimodal performance, but still suffer from hallucinations caused by unstable visual grounding and over-reliance on language priors. Existing training-free decoding methods typically apply calibration at every decoding step, introducing unnecessary computation and poten-tially disrupting stable predictions. We address this problem by iden-tifying layer-wise hesitation, a simple signal of grounding instability reflected by fluctuations in token preference across intermediate layers. Based on this observation, we propose Hesitation-Triggered Differential Calibration ( HTDC ), a training-free decoding framework that preserves standard full-branch inference and activates calibra-tion only at hesitation-prone steps. When triggered, HTDC contrasts the full branch with two lightweight probes, a visual-nullification probe and a semantic-nullification probe, to suppress hallucination-prone candidates while avoiding unnecessary intervention on sta-ble steps. Experiments on representative hallucination benchmarks show that HTDC consistently reduces hallucinations while maintain-ing strong task accuracy, achieving a favorable trade-off between effectiveness and computational overhead. 
+
+## CCS Concepts 
+
+• Computing methodologies → Natural language generation ;
+
+Computer vision tasks ; Knowledge representation and reasoning. 
+
+## Keywords 
+
+Large Vision-Language Models, Hallucination Mitigation, Decoding Strategies 
+
+## 1 Introduction 
+
+Large Vision-Language Models (LVLMs) have shown impressive capabilities in image understanding and visual question answer-ing [ 1, 13 , 18 , 19 , 37 ]. However, their responses have always been plagued by hallucinations, referring to the phenomenon where the model generates textual descriptions that are coherent but in-consistent with the provided visual input or deviate from objective facts [ 2, 8, 20 , 24 , 43 ]. This issue is particularly problematic in safety-critical or decision-making scenarios, where reliability and factual consistency are essential [6, 8, 10, 16, 22, 42]. Existing work can be broadly categorized into two paradigms. Training-based approaches aim to rectify the model’s internal repre-sentations by optimizing its parameters, which involves supervised fine-tuning (SFT) and reinforcement learning from human feedback (RLHF) [ 36 , 41 , 45 , 48 , 49 ]. In contrast, training-free decoding-time approaches have gained increasing attention due to their lower computational cost and stronger practicality, as can be directly applied to existing LVLMs during inference. A common strategy Hallucination! 
+
+Please describe 
+
+this image in 
+
+detail. 
+
+Base LVLM 
+
+A toaster sitting on a kitchen counter .
+
+Continuous Calibration 
+
+Toaster... sit... sink... bathroom. 
+
+HTDC 
+
+A toaster sitting on a bathroom sink .  
+
+> Over -Refinement!
+> Token -level
+> Hesitation
+> Score
+> [USER]
+> A
+> toaster
+> sitting on
+> a
+> kitchen
+> counter
+> skip
+> Bes tAnswer !
+
+Figure 1: Motivation of our method. The base LVLM halluci-nates the scene context and incorrectly describes the toaster as being on a kitchen counter. Continuous calibration re-fines all tokens indiscriminately, leading to over-refinement without correcting the error. In contrast, our HTDC selectively calibrates only hallucination-prone tokens based on token-level hesitation scores, yielding a more accurate description. 
+
+is contrastive decoding, which compares model outputs under dif-ferent conditions (e.g., clean vs perturbed visual inputs) and then adjust token probabilities accordingly [ 3 , 14 , 15 , 26 , 36 , 47 ]. An-other line of work exploits the model’s internal dynamics, such as intermediate-layer signals, to identify unstable generation and refine predictions for hallucination mitigation [3, 25, 34, 44, 47]. Despite their effectiveness, existing decoding-time methods typi-cally refine the prediction of every generated token. However, such uniform intervention may be unnecessary, since not all tokens contribute equally to visually grounded reasoning. For example, function words such as prepositions (e.g., “at”) are usually less rel-evant to visual grounding [ 34 ], whereas hallucinations are more often associated with semantically important tokens, particularly those describing attributes such as color, position, and count [ 34 ]. Applying refinement indiscriminately to all tokens therefore intro-duces unnecessary computational overhead. For instance, VCD [ 15 ]requires two forward passes to obtain the logits for a single token, 
+
+> arXiv:2604.12115v1 [cs.CV] 13 Apr 2026 Xinyun Liu
+
+resulting in nearly doubled decoding cost. Moreover, uniform re-finement may lead to over-refinement, which can even degrade generation quality in some cases. As illustrated in Figure 1, we pro-vide a representative example in which the base LVLM produces a hallucinated response, while the decoding-time calibration method, instantiated here with VCD, over-corrects the generation and still fails to resolve the hallucination effectively. To address these limitations, we propose Hesitation-Triggered 
+
+Differential Calibration ( HTDC ), a training-free decoding framework that preserves the standard full-branch decoding process and in-vokes calibration only when intervention is necessary. Concretely, 
+
+HTDC leverages layer-wise hesitation, an observable signal derived from internal layer dynamics, to identify decoding steps that are more likely to be hallucination-prone. Once such hesitation is de-tected, HTDC performs hesitation-triggered differential calibration by contrasting the full branch with two probe branches: a visual-nullification branch and a semantic-nullification branch. This con-trastive design explicitly exposes candidates whose scores remain spuriously high even when visual evidence or query semantics is removed, and suppresses them during decoding. In this way, HTDC 
+
+reduces unnecessary computation, minimizes interference with the model’s normal decoding behavior on stable steps, and provides a more interpretable mechanism for hallucination mitigation. Extensive experiments on two LVLMs across four hallucination benchmarks show that HTDC significantly mitigates hallucinations and achieves superior performance over existing challenging base-lines. The contributions of this paper are summarized as follows: 
+
+• We introduce layer-wise hesitation, a simple yet effective metric derived from internal decoding dynamics, to char-acterize grounding instability and identify hallucination-prone decoding steps in LVLMs. 
+
+• We propose Hesitation-Triggered Differential Calibration (HTDC ), a training-free decoding framework that preserves standard full-branch inference and activates calibration only at hesitation-prone decoding steps. HTDC uses two lightweight probe branches, a visual perturbation probe and a semantic nullification probe, to perform differential calibration in an interpretable manner. 
+
+• Extensive experiments on representative hallucination bench-marks show that HTDC consistently mitigates hallucinations while maintaining strong task accuracy, achieving a fa-vorable trade-off between effectiveness and computational overhead. 
+
+## 2 Related Work 2.1 LVLMs and Hallucination 
+
+Large Vision-Language Models (LVLMs) typically consist of three components: a vision encoder, a projector that maps visual features into the language embedding space, and a Large Language Model (LLM) that performs autoregressive text generation. Representative systems such as LLaVA adopt this architecture to connect CLIP-ViT visual representations with an LLM through a lightweight projec-tor module [ 18 , 19 ], while more recent models such as Qwen3-VL further extend this paradigm with dynamic-resolution visual to-kenization [ 1 , 37 ]. Given an image and a textual instruction, an LVLM first encodes the image into visual tokens, projects them into the language embedding space, and then generates the response token by token conditioned on both visual and textual context. Based on this architecture, LVLMs have achieved strong perfor-mance across a wide range of multimodal tasks, including visual question answering, image captioning, and multimodal reason-ing [ 7, 12 , 29 , 39 , 40 ]. However, despite these advances, they still suffer from hallucination, namely generating outputs that are fluent and plausible at the language level but inconsistent with the actual visual evidence [2, 4, 20]. 
+
+## 2.2 Contrastive Decoding Calibration 
+
+Contrastive decoding has emerged as one of the most widely-used training-free strategies for mitigating hallucination. Its core idea is to construct a hallucinated branch and calibrate the original predic-tion by subtracting the hallucinated logits from the orginal logits during decoding [ 3 , 11 , 15 , 23 , 26 , 28 , 30 , 33 , 35 , 36 ]. For example, DoLa [ 3] first demonstrated in LLMs that contrasting late-layer logits against early-layer logits can improve factuality by surfacing more reliable knowledge. In the multimodal setting, VCD [ 15 ] con-trasts the output distributions conditioned on the original image and a distorted image, thereby suppressing hallucinations caused by excessive reliance on language priors. Subsequent work extends this paradigm by constructing alternative reference distributions. ICD [ 36 ] introduces disturbance instructions and contrasts them with normal instructions to reveal alignment instability during decoding. LCD [23] instead uses the output distribution of the un-derlying LLM as a language-only reference to reduce the influence of unsupported visual content. IFCD [ 33 ] further moves the contrast into the model’s internal space by perturbing hidden representa-tions to simulate hallucination-prone decoding states. 
+
+## 2.3 Layer-Wise Dynamics for Refinement 
+
+Another line of work mitigates hallucination by exploiting the inter-nal layer-wise dynamics of LVLMs [ 9, 21 , 31 , 32 , 34 , 38 , 44 ]. Its core idea is to analyze how visually grounded evidence evolves across depth and refine decoding with earlier or intermediate representa-tions when later layers become increasingly language-dominated. DAMO [ 34 ] shows that hallucination is often associated with lo-calized surges in the late layers and smooths the decoding trajec-tory with activation momentum. Subsequent work extends this paradigm by using preceding layers more explicitly. DeCo [ 32 ]adaptively incorporates informative earlier layers into the final pre-diction, while DCLA [ 31 ] aggregates preceding-layer activations as a dynamic semantic reference to correct semantically deviated layers. Devils in Middle Layers [ 9] further shows that the middle layers contain critical stages of visual enrichment and semantic refinement, and leverages attention-lens signals to rebalance visual attention during inference. HalluRNN [ 44 ] further introduces re-current cross-layer reasoning to stabilize information flow across depth. These type of methods are appealing because they are more mechanistically informative: rather than only correcting the final-token distribution, they also help reveal where hallucination forms inside the network. However, many of them directly modify hidden states during decoding, making the intervention relatively intrusive and potentially perturbing the model’s native generation dynamics. HTDC: Hesitation-Triggered Differential Calibration for Mitigating Hallucination in Large Vision-Language Models I. Baseline Branch 
+
+& Model 
+
+(LVLM) 
+
+Attention Layers II. Hesitation -Triggered 
+
+III. Differential 
+
+Calibration & Output  
+
+> Original image Original text
+> Noise image
+
+(v,x)        
+
+> (𝑣 !,𝑥 )
+> (𝑣 ,𝑥 !)
+> Template text
+> Model
+> Model
+> 𝑠 "
+> #!(𝑐 )
+> 𝑠 "
+> $!(𝑐 )Final
+> answer
+> 𝑆 "
+> %&'' (𝑐 )
+> Sampled ℎ"
+> ())
+> Hesitation Score
+> 𝒘 𝒕 >𝒘 𝒎𝒊𝒏
+> Adaptive Keywords Set
+> 𝓚 𝒕
+
+Calibrated Score           
+
+> 𝑠 !
+> "𝑐 =𝑠 !
+> #$%% 𝑐 +
+> 𝑤 !(𝜆 &𝑑 &𝑐 +𝜆 &𝑑 &𝑐 )
+
+Differential Calibration                 
+
+> 𝑑 $𝑐 =𝑆 !
+> #$%% 𝑐 −𝑠 !
+> &!(𝑐 )
+> 𝑑 #𝑐 =𝑆 !
+> #$%% 𝑐 −𝑠 !
+> &!(𝑐 )
+> Calibrated 𝒄 "
+> Preserved 𝒄 𝒇𝒖𝒍𝒍
+
+: Baseline : Parallel Probes : 𝑉 ! Branch : 𝑋 ! Branch 
+
+Figure 2: Overview of HTDC . At each decoding step, the model first performs standard full-branch inference and estimates a hesitation weight 𝑤 𝑡 from intermediate-layer dynamics. When 𝑤 𝑡 > 𝑤 min , two auxiliary probes are activated: a visual perturbation probe ( 𝑉 0) and a semantic nullification probe ( 𝑋 0). Their score differences with respect to the full branch are then used for differential calibration, yielding the final prediction. A hysteresis margin 𝜖 is further applied to avoid unstable switching. 
+
+## 3 Method 3.1 Preliminaries 
+
+Let 𝑓 𝜃 denote an LVLM with vocabulary V. At decoding step 𝑡 , given an image 𝑣 , a text query 𝑥 , and previously generated tokens 𝑦 <𝑡 , the model produces logits 𝑧 𝑡 ∈ R| V | and the next-token distribution 
+
+𝑝 𝜃 (𝑦 𝑡 | 𝑣, 𝑥, 𝑦 <𝑡 ) = softmax (𝑧 𝑡 ). (1) For the benchmark settings considered in this work, we further operate on a compact candidate set 
+
+C = {𝑐 1, . . . , 𝑐 𝑀 }, (2) where each candidate 𝑐 ∈ C is associated with a token set T ( 𝑐 )
+
+containing its possible surface forms. We assign a score to each candidate by aggregating the log-probabilities of the tokens in T ( 𝑐 ):
+
+𝑠 𝑡 (𝑐 ) = Agg ({ log 𝑝 𝜃 (𝜏 | 𝑣, 𝑥, 𝑦 <𝑡 ) : 𝜏 ∈ T ( 𝑐 )}) , (3) where Agg is LogSumExp by default, and Max is used in a few task-specific cases. This candidate-level formulation provides a lightweight and unified interface for calibration in our current setting. For simplicity, we omit the step index 𝑡 when it is clear from context. 
+
+## 3.2 Hesitation-Triggered Differential Calibration 
+
+Figure 2 shows the overall pipeline of HTDC . At decoding step 𝑡 ,we first run the full branch on the original image-query pair (𝑣, 𝑥 )
+
+under the standard inference process, and obtain the corresponding candidate scores 𝑠 full  
+
+> 𝑡
+
+(𝑐 ) for 𝑐 ∈ C via Equation 3. Based on the model’s intermediate-layer dynamics, we then compute a hesitation weight 𝑤 𝑡 ∈ [ 0, 1], which determines whether the current decoding step requires calibration. If the model exhibits low hesitation, we keep the full-branch prediction unchanged. Otherwise, HTDC activates two lightweight auxiliary probe branches to assess the source of the current pref-erence from two complementary perspectives. The first is a visual perturbation probe (𝑉 0), which weakens the visual evidence while keeping the text input fixed. The second is a semantic nullification probe (𝑋 0), which preserves the image but removes the task-specific semantics of the query while maintaining the answer format. The resulting candidate scores from the two probes are denoted by 
+
+𝑠 𝑣 0 
+
+> 𝑡
+
+(𝑐 ) and 𝑠 𝑥 0 
+
+> 𝑡
+
+(𝑐 ), respectively. These two probes provide complementary counterfactual ref-erences for the current prediction. The 𝑉 0 branch reveals how strongly a candidate depends on visual evidence: if the score of a candidate drops substantially after visual perturbation, the can-didate is more likely to be visually grounded. In contrast, the 𝑋 0
+
+branch reveals how strongly a candidate depends on the actual query semantics rather than generic response priors: if a candidate remains highly scored even after the semantic content of the query is removed, it is more likely to be supported by superficial answer bias or language inertia. Based on these probe branches, we define two differential signals 
+
+(𝑑 𝑣 𝑡 (𝑐 ) = 𝑠 full  
+
+> 𝑡
+
+(𝑐 ) − 𝑠 𝑣 0 
+
+> 𝑡
+
+(𝑐 ),𝑑 𝑥 𝑡 (𝑐 ) = 𝑠 full  
+
+> 𝑡
+
+(𝑐 ) − 𝑠 𝑥 0 
+
+> 𝑡
+
+(𝑐 ). (4) Xinyun Liu 
+
+which measure the change in support for candidate 𝑐 when visual evidence or query semantics is weakened. Intuitively, a larger 𝑑 𝑣 𝑡 (𝑐 )
+
+indicates that the candidate relies more heavily on visual grounding, while a larger 𝑑 𝑥 𝑡 (𝑐 ) indicates that it is more strongly supported by the actual query semantics beyond format-level priors. We then combine these differential signals with the original full-branch score to obtain the calibrated score 
+
+𝑠 ′ 
+
+> 𝑡
+
+(𝑐 ) = 𝑠 full  
+
+> 𝑡
+
+(𝑐 ) + 𝑤 𝑡 
+
+ 𝜆 𝑣 𝑑 𝑣 𝑡 (𝑐 ) + 𝜆 𝑥 𝑑 𝑥 𝑡 (𝑐 ), (5) where 𝜆 𝑣 and 𝜆 𝑥 are scalar coefficients that control the strength of the two calibration terms. In this way, calibration is applied adaptively: when hesitation is low, 𝑤 𝑡 remains small and the predic-tion stays close to the original full-branch output; when hesitation is high, the probe-based differential signals are emphasized to re-vise potentially hallucination-prone candidates. To mitigate the "garbage token" issue, where improbable tokens receive spuriously high scores, we apply an Adaptive Plausibility Constraint (APC). APC restricts the candidate space to the top-𝐾 (e.g., 𝐾 = 200 ) tokens of the full-branch distribution, masking all others to −∞ to preserve semantic plausibility. Finally, HTDC selects the prediction according to the calibrated candidate scores. To avoid unstable switching caused by minor score fluctuations, we further apply a small hysteresis margin when comparing the calibrated winner with the original full-branch win-ner. In the following subsection, we describe how the hesitation weight 𝑤 𝑡 is computed from intermediate-layer dynamics. 
+
+## 3.3 Layer-Wise Hesitation as a Trigger Signal 
+
+We now describe the hesitation signal used to determine whether calibration should be activated at decoding step 𝑡 . Our key observa-tion is that hallucination-prone predictions often exhibit unstable intermediate-layer dynamics. When the model is confident and well grounded, its preference over plausible candidates usually evolves in a relatively consistent direction across layers. In contrast, when the model is uncertain, this preference tends to fluctuate rather than converge steadily. We refer to this phenomenon as layer-wise hesitation .Let ℎ( 𝑗 ) 
+
+> 𝑡
+
+denote the hidden state of the last token at layer 𝑗 . Using the shared LM head 𝜙 (·) , we project each sampled layer to an intermediate logit vector 
+
+𝑧 ( 𝑗 ) 
+
+> 𝑡
+
+= 𝜙 (ℎ( 𝑗 ) 
+
+> 𝑡
+
+). (6) To avoid monitoring the entire vocabulary, we construct a com-pact keyword set K𝑡 by combining the top-𝑘 tokens from the final-layer logits with the token IDs associated with the candidate set: 
+
+K𝑡 = TopK (𝑧 𝑡 , 𝑘 ) ∪ 
+
+ Ø  
+
+> 𝑐 ∈ C
+
+T ( 𝑐 )
+
+
+
+. (7) For each sampled layer, we then compute a keyword-restricted distribution 
+
+𝑞 ( 𝑗 ) 
+
+> 𝑡
+
+= softmax  𝑧 ( 𝑗 ) 
+
+> 𝑡
+
+[K 𝑡 ]/ 𝜏 kw 
+
+, (8) where 𝜏 kw is a temperature parameter. A large change between adjacent layers does not necessarily imply hesitation, since confident refinement may also produce no-ticeable updates. Instead, we measure whether the current update is consistent with the recent trend. Specifically, we define the layer-to-layer update 
+
+Δ𝑞 ( 𝑗 ) 
+
+> 𝑡
+
+= 𝑞 ( 𝑗 ) 
+
+> 𝑡
+
+− 𝑞 ( 𝑗 −1) 
+
+> 𝑡
+
+, (9) and maintain its exponential moving average 
+
+cΔ𝑞 ( 𝑗 ) 
+
+> 𝑡
+
+= 𝛼 cΔ𝑞 ( 𝑗 −1) 
+
+> 𝑡
+
++ ( 1 − 𝛼 )Δ𝑞 ( 𝑗 ) 
+
+> 𝑡
+
+, (10) where 𝛼 ∈ [ 0, 1) controls the smoothing factor. We then quantify the hesitation at layer 𝑗 by the cosine distance between the current update and its smoothed momentum: 
+
+𝑟 ( 𝑗 ) 
+
+> 𝑡
+
+= 1 − cos  Δ𝑞 ( 𝑗 ) 
+
+> 𝑡
+
+, cΔ𝑞 ( 𝑗 )
+
+> 𝑡
+
+. (11) When the two directions are aligned, the model is refining its pre-diction consistently and the hesitation is small. When they differ substantially, the model is wavering among competing candidates, leading to a larger hesitation value. Finally, to capture both the overall hesitation trend and sudden layer-wise fluctuations, we define the scalar hesitation score hes 𝑡 
+
+by combining the average hesitation (core) and the frequency of high-hesitation spikes across the sampled late layers J :
+
+hes 𝑡 = 𝛾 · 1
+
+|J | ∑︁ 𝑗 ∈ J 
+
+𝑟 ( 𝑗 )
+
+> 𝑡
+
+| {z }
+
+> core
+
++ 1
+
+|J | ∑︁ 𝑗 ∈ J 
+
+I(𝑟 ( 𝑗 ) 
+
+> 𝑡
+
+> 𝜏 spike )
+
+| {z }
+
+> spike
+
+, (12) where I(·) is the indicator function, 𝜏 spike is a pre-defined spike threshold, and 𝛾 is a balancing coefficient. We then convert this score into a soft trigger weight 
+
+𝑤 𝑡 = 𝜎 
+
+ hes 𝑡 − 𝛿 𝑇 
+
+
+
+, (13) where 𝛿 controls the activation center, 𝑇 controls the sharpness of the transition, and 𝜎 (·) is the sigmoid function. Calibration is activated only when 𝑤 𝑡 exceeds a preset threshold. In this way, HTDC intervenes only at decoding steps that exhibit substantial internal hesitation. 
+
+## 3.4 Complexity 
+
+HTDC incurs low additional overhead by activating auxiliary probes only on hesitation-prone decoding steps. At each step, the full branch is evaluated once as in standard inference. The two probe branches, 𝑉 0 and 𝑋 0, are invoked only on a fraction 𝑟 of decoding steps satisfying 𝑤 𝑡 > 𝑤 min . As a result, the expected number of forward passes per step is 1 + 2𝑟 , which is substantially smaller than that of methods that apply contrastive calibration at every decoding step. Moreover, the hesitation estimator operates on a compact keyword set and a sparse set of sampled layers, introducing only limited extra computation. 
+
+## 4 Experiments 4.1 Experimental Settings 
+
+Benchmarks. We evaluate HTDC on four representative bench-marks covering both discriminative hallucination detection and open-ended multimodal generation. MME [5 ] is a comprehensive benchmark for multimodal large language models. Following prior hallucination work, we focus on the perception-related split, which is more directly associated with visual grounding, and report the HTDC: Hesitation-Triggered Differential Calibration for Mitigating Hallucination in Large Vision-Language Models 
+
+Table 1: Experimental results on the CHAIR benchmark.                                                 
+
+> LLaVA-v1.5 Qwen3-VL
+> CHAIRs (↓)CHAIRi (↓)Recall (↑)CHAIRs (↓)CHAIRi (↓)Recall (↑)
+> Regular 18.2 6.2 61.9 21.6 7.8 46.8
+> VCD 12.2 14.3 26.5 9.2 3.0 43.4
+> ICD 22.4 8.5 55.1 6.0 3.0 29.1
+> DoLa 16.6 9.8 55.8 4.2 5.3 29.0
+> DAMO 17.4 6.1 63.1 3.4 1.8 39.6
+> Ours 11.6 4.7 58.2 4.4 1.7 39.4
+> Method
+
+Table 2: Experimental results on MME benchmark.                              
+
+> Model Method Perception(Total) ↑Cognition (Total) ↑
+> LLaVA-v1.5 Regular 1508.38 357.86 VCD 1477.74 357.86 ICD 1441.19 333.93 DoLa 1412.13 298.57 DAMO 1512.01 297.86 Ours 1515.89 367.50
+> Qwen3-VL-4B regular 1701.93 630.71
+> VCD 1695.82 607.86 ICD 1660.76 597.14 DoLa 1640.93 601.79 DAMO 1663.72 628.57 Ours 1711.44 610.00
+
+official MME score based on the sum of Perception and Cognition .
+
+POPE [17 ] is designed to evaluate object hallucination through polling-based yes/no probing. We use both the MSCOCO and GQA variants under the random, popular, and adversarial settings, and report Accuracy and F1 , with primary attention to Accuracy and F1. 
+
+CHAIR [27 ] evaluates hallucination in open-ended image caption-ing. Following the standard protocol, we report sentence-level hal-lucination rate ( CHAIR 𝑆 ), instance-level hallucination rate ( CHAIR 𝐼 )and the percentage of recalled gt objects over all gt objects ( Re-call ). MM-Vet [ 46 ] is a challenging open-ended benchmark for integrated multimodal capabilities. We include it to assess whether hallucination mitigation can preserve broad visual reasoning and instruction-following ability, and report the official overall score. 
+
+Models. We conduct experiments on two representative open-source LVLM families: LLaVA-v1.5 [ 18 ] and Qwen3-VL [1]. These two backbones differ in architecture and multimodal alignment strategy, providing a useful testbed for evaluating the robustness and transferability of HTDC across models. Unless otherwise spec-ified, we use the default instruction-tuned checkpoints and the official conversation templates released for each model. 
+
+Baselines. We compare HTDC with four representative training-free hallucination mitigation baselines, together with the standard decoding of each backbone. VCD [15 ] mitigates hallucination by contrasting the output distributions from the original image and a visually perturbed image. ICD [ 36 ] performs instruction-level contrastive decoding by comparing predictions under the origi-nal instruction and a deliberately perturbed instruction. DoLa [3] improves generation by contrasting mature and premature layers during decoding. DAMO [ 34 ] refines decoding with layer-wise activation momentum to suppress hallucination emerging in later layers. These baselines cover input-level contrastive decoding, layer-level contrastive decoding, and hidden-state refinement, providing strong and diverse points of comparison. 
+
+Implementation Details. All methods are evaluated in a strictly training-free setting, without any additional finetuning or external supervision. To ensure fair comparison, we keep the prompt format, image preprocessing pipeline, and decoding configuration identical across methods for each backbone. For discriminative benchmarks such as MME and POPE, we use deterministic decoding with tem-perature set to 0 and top-𝑝 set to 1, and evaluate candidate-level predictions under the official benchmark protocols. For open-ended benchmarks such as CHAIR and MM-Vet, we follow the standard generation and evaluation pipelines provided by the correspond-ing benchmarks. For VCD, ICD, DoLa, and DAMO, we use their official implementations when available, or otherwise follow the hyperparameter settings reported in the original papers. For HTDC ,hyperparameters including the sampled layers, keyword set size, hesitation threshold, triggering gate, and calibration coefficients are tuned on a held-out validation split and then fixed across all reported experiments. No retrieval module, verifier model, or post-hoc correction stage is introduced. 
+
+## 4.2 Experimental Results 
+
+Results on MME . Table 2 shows that HTDC is particularly effec-tive on the grounding-sensitive MME benchmark. On LLaVA-v1.5, it achieves the best scores on both Perception (1515.89) and Cognition 
+
+(367.50), improving over Regular decoding by +7.51 and +9.64, re-spectively. On Qwen3-VL-4B, HTDC further obtains the best Percep-tion score (1711.44), outperforming Regular, VCD, ICD, and DAMO, while its Cognition score (610.00) remains higher than VCD,ICD and DoLa but below Regular and DAMO. Overall, these results suggest that HTDC is particularly effective for grounding-sensitive perception tasks, where selective calibration can strengthen visual grounding without the over-correction introduced by always-on decoding methods. 
+
+Results on POPE . Table 3 shows that HTDC performs strongly on POPE, with the clearest gains on the more challenging GQA set-ting. On MSCOCO, HTDC achieves the best results on LLaVA-v1.5 Xinyun Liu 
+
+Table 3: Experimental results on POPE benchmark. 
+
+Random Popular Adversarial 
+
+Acc ↑ F1 ↑ Acc ↑ F1 ↑ Acc ↑ F1 ↑
+
+Regular 0.8804 0.8718 0.8856 0.8756 0.8507 0.8413 
+
+VCD 0.8818 0.8734 0.8727 0.8614 0.8513 0.8418 
+
+ICD 0.8433 0.8330 0.8607 0.8487 0.8433 0.8330 
+
+DoLa 0.8821 0.8737 0.8790 0.8736 0.8403 0.8396 
+
+DAMO 0.8687 0.8564 0.8603 0.8446 0.8433 0.8290 
+
+Ours 0.8825 0.8742 0.8730 0.8618 0.8523 0.8429 
+
+Regular 0.9103 0.9058 0.8950 0.8885 0.8847 0.8789 
+
+VCD 0.9124 0.9081 0.8976 0.8914 0.8860 0.8805 
+
+ICD 0.8733 0.8615 0.8810 0.8687 0.8866 0.8775 
+
+DoLa 0.9058 0.9040 0.8887 0.8862 0.8760 0.8759 
+
+DAMO 0.9017 0.8957 0.8903 0.8819 0.8833 0.8753 
+
+Ours 0.9124 0.9081 0.8977 0.8914 0.8860 0.8805 
+
+Regular 0.8680 0.8809 0.7447 0.7926 0.6833 0.7550 
+
+VCD 0.7757 0.8147 0.6453 0.8147 0.6203 0.7220 
+
+ICD 0.8670 0.8800 0.7440 0.7923 0.7313 0.7490 
+
+DoLa 0.8970 0.9026 0.7900 0.8196 0.7393 0.7854 
+
+DAMO 0.8823 0.8913 0.7690 0.8068 0.7090 0.7683 
+
+Ours 0.8913 0.8967 0.7947 0.8211 0.7430 0.7861 
+
+Regular 0.9267 0.9247 0.8803 0.8822 0.8430 0.8517 
+
+VCD 0.9293 0.9193 0.8750 0.8798 0.8317 0.8449 
+
+ICD 0.9053 0.8990 0.8797 0.8750 0.8457 0.8452 
+
+DoLa 0.9210 0.9253 0.8710 0.8850 0.8217 0.8522 
+
+DAMO 0.9260 0.9241 0.8800 0.8820 0.8423 0.8513 
+
+Ours 0.9287 0.9272 0.8847 0.8873 0.8470 0.8544 
+
+Dataset Model Method 
+
+MSCOCO 
+
+LLaVA-v1.5 
+
+Qwen3-VL-4B 
+
+GQA 
+
+LLaVA-v1.5 
+
+Qwen3-VL-4B 
+
+Table 4: Computational overhead comparison on the MME benchmark Method Intervention Trigger Rate 𝑁 𝑓 𝑤𝑑 Latency (ms) Overhead                     
+
+> Regular None 0.0% 1.000 60.77 -
+> VCD Logit (Continuous) 100.0% 2.000 168.80 +177.8%
+> ICD Logit (Continuous) 100.0% 2.000 169.75 +179.3%
+> Ours Logit (Dynamic) 5.3% 1.107 71.08 +17.0%
+
+Random and Adversarial, and remains highly competitive across all subsets on Qwen3-VL-4B. On GQA, HTDC further delivers the best results on Popular and Adversarial for both backbones, while re-maining near-best on Random. These results suggest that HTDC is especially effective when object hallucination is driven by stronger language inertia and co-occurrence bias, where hesitation-triggered calibration can more accurately suppress spurious affirmative pre-dictions without unnecessarily perturbing stable decoding steps. 
+
+Results on CHAIR . As shown in Table 1, HTDC is particularly effective on CHAIR. On LLaVA-v1.5, it achieves the best hallucina-tion suppression, reducing CHAIR 𝑆 from 18.2 to 11.6 and CHAIR 𝐼 
+
+from 6.2 to 4.7, while maintaining competitive Recall (58.2). This indicates that hesitation-triggered calibration can suppress halluci-nated objects without the severe coverage loss caused by always-on correction, e.g., VCD drops Recall to 26.5. On Qwen3-VL, HTDC re-mains highly competitive, achieving the best CHAIR 𝐼 (1.7), near-best 
+
+CHAIR 𝑆 (4.4), and Recall comparable to DAMO (39.4 vs. 39.6). Over-all, these results show that HTDC provides a favorable hallucination– recall trade-off for open-ended generation, with especially strong gains on LLaVA-v1.5. 
+
+Results on MM-Vet . Table 5 demonstrates that HTDC effectively mitigates hallucinations without degrading general multimodal ca-pabilities. On LLaVA-v1.5, HTDC achieves a top Total score of 30.7. Crucially, it completely avoids the catastrophic collapse seen in VCD, whose score plummets to 7.1 due to the continuous over-penalization of fragile reasoning steps. On Qwen3-VL, HTDC fur-ther improves the baseline performance to 70.3, whereas intrusive internal-state refinement methods like DoLa and DAMO disrupt the model’s native representations and suffer significant drops (falling to 58.2 and 56.7, respectively). Overall, these results high-light that our hesitation-triggered mechanism successfully pre-serves the model’s inherent reasoning and instruction-following abilities, achieving an optimal balance between hallucination sup-pression and general capability. HTDC: Hesitation-Triggered Differential Calibration for Mitigating Hallucination in Large Vision-Language Models 
+
+Table 5: Experimental results on MM-Vet benchmark. We report the performance across different capability dimensions: recognition (rec), OCR (ocr), knowledge (know), generation (gen), spatial (spat), and math (math). 
+
+Model Method rec ( ↑) ocr ( ↑) know ( ↑) gen ( ↑) spat ( ↑) math ( ↑) Total ( ↑)
+
+Regular 34.4 23.0 16.1 20.5 25.2 11.5 29.9 
+
+VCD 7.5 8.9 10.1 14.5 6.3 5.8 7.1 
+
+ICD 27.0 20.1 15.9 20.6 24.6 7.8 29.8 
+
+DoLa 33.2 22.6 17.3 13.0 28.1 18.5 30.7 
+
+DAMO 33.5 20.4 18.0 19.7 23.7 7.7 29.3 
+
+Ours 35.1 23.2 17.4 21.0 25.5 11.5 30.7 
+
+Regular 64.2 77.9 50.8 51.6 76.4 80.0 69.0 
+
+VCD 63.9 80.3 50.8 51.1 79.3 75.8 69.0 
+
+ICD 63.5 79.3 52.9 53.1 77.6 75.4 69.0 
+
+DoLa 54.3 65.4 38.1 38.1 68.7 49.2 58.2 
+
+DAMO 54.8 58.6 39.6 37.1 61.1 48.1 56.7 
+
+Ours 64.0 82.7 51.9 51.9 80.4 82.3 70.3 
+
+LLaVA-v1.5 
+
+Qwen3-vl Prompt: What does this factory make?       
+
+> Base Model:
+> The factory in the image is a Leica
+> factory... indicating the presence of
+> the Leica ✗factory .
+> (Repetitive reasoning)
+> VCD:
+> ✗factory . The factory is located in a city...
+> (Initial OCR/reasoning chain disrupted)
+> HTDC (Ours):
+> The factory in the image is a Leica factory... specializes in
+> producing products related to ✓photography and optics.
+
+Figure 3: Qualitative comparison on complex reasoning (MM-Vet). VCD’s continuous intervention destroys the initial OCR-based reasoning chain, whereas HTDC preserves stable gener-ation and accurate reasoning capabilities. 
+
+Case Study . As shown in Figure 3, we present a case study to further demonstrate the effectiveness of HTDC on LLaVA1.5. While the vanilla setting and VCD fails to answer the given question, 
+
+HTDC successfully correct the vanilla and VCD deocoding, leading to accurate response. 
+
+## 4.3 Computational Efficiency Analysis 
+
+While continuous contrastive decoding methods (e.g., VCD, ICD) effectively mitigate hallucinations, their reliance on step-wise dual-branch generation imposes a severe computational bottleneck. In autoregressive decoding, computing the contrastive penalty for ev-ery single token intrinsically doubles the theoretical forward passes (𝑁 𝑓 𝑤𝑑 = 2.0). As shown in Table 4, this continuous intervention drastically inflates the generation latency on MME from 60.77 ms (Regular) to over 168 ms. Our proposed HTDC fundamentally resolves this inefficiency by shifting to a dynamic, hesitation-triggered paradigm. By leveraging internal epistemic uncertainty as a lightweight vanguard signal, HTDC only activates the computationally heavy visual ( 𝑉 0) and semantic ( 𝑋 0) probes when the LVLM is prone to hallucinatory gen-eration. Across the MME evaluation, HTDC maintains an extremely sparse trigger rate of 5.3%, compressing the expected forward passes per token ( 𝑁 𝑓 𝑤𝑑 ) to just 1.107. Ultimately, HTDC achieves robust differential calibration with a marginal latency overhead of merely +17.0% (71.08 ms per token). This stark contrast (+17.0% vs. +180%) demonstrates that HTDC successfully breaks the persistent trade-off between decoding speed and hallucination mitigation, making advanced contrastive decoding highly feasible for real-time deploy-ment. 
+
+## 5 Ablation Studies 
+
+To comprehensively understand the working mechanisms of our 
+
+HTDC framework, we conduct systematic ablation studies on its core components and key hyperparameters. 
+
+## 5.1 Synergy of Differential Calibration Branches 
+
+Table 6 decouples the effects of the visual branch ( 𝑉 0) and the semantic branch ( 𝑋 0). An intriguing task-specific phenomenon is observed: 
+
+• Discriminative Tasks (POPE): Removing the visual branch yields the highest performance (87.26% Acc). In Yes/No eval-uations, the primary source of error is the LLM’s statisti-cal bias toward affirmative answers. The semantic branch (𝑋 0) serves as a targeted remedy for this “language inertia,” precisely stripping the directive bias without disturbing fine-grained pixel evidence. 
+
+• Generative Tasks (CHAIR): In contrast, the visual branch (𝑉 0) is indispensable for open-ended captioning. Stripping the semantic branch reveals that the visual perturbation explicitly forces the model to mine deeper visual features, Xinyun Liu 0.1 0.3 0.5 0.8 1.0      
+
+> Visual Noise Scale ( )
+> 4.50
+> 4.75
+> 5.00
+> 5.25
+> 5.50
+> 5.75
+> 6.00
+> 6.25
+> 6.50
+> CHAIRi Score
+> (b)
+> CHAIRi ( )
+> Recall ( )
+> k=4 k=8 k=16
+> Layer(k)
+> 4.4
+> 4.6
+> 4.8
+> 5.0
+> 5.2
+> 5.4
+> 5.6
+> 5.8
+> 6.0
+> CHAIRi Score
+> (c)
+> CHAIRi ( )
+> Recall ( )
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> Recall Score
+> 57.2 59.2
+> 57.0
+> 57.5
+> 58.0
+> 58.5
+> 59.0
+> 59.5
+> 60.0
+> Recall Score
+> 57.0
+> 57.5
+> 58.0
+> 58.5
+> 59.0
+> 59.5
+> Recall Score
+> Static
+> (w/o Threshold)
+> Dynamic
+> (wmin = 0.35 )
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> CHAIRi Score
+> 4.6
+> 5.1
+> (a)
+> CHAIRi ( )
+> Recall ( )
+
+Figure 4: Impact of key hyperparameters on the CHAIR benchmark, including (a) dynamic vs. static gating strategy, (b) visual noise scale ( 𝜎 ), and (c) layer selection depth ( 𝑘 ). 
+
+driving Recall to a peak of 62.2, albeit at the cost of slightly higher hallucinations. Ultimately, the Full HTDC orchestrates these orthogonal strengths, delivering state-of-the-art hallucination suppression ( CHAIR 𝐼 4.7) while generalizing powerfully across diverse evaluation paradigms. 
+
+## 5.2 Hyperparameter Sensitivity 
+
+Figure 4 illustrates the impact of critical control mechanisms within our framework, evaluated on the sensitive CHAIR benchmark. 
+
+• Gating Strategy (Figure 4(a)): Applying static calibration relentlessly penalizes every token, which minimizes hal-lucinations but severely harms the Recall rate (57.2). Our dynamic hesitation-triggered gating successfully preserves confident, accurate generations, recovering Recall to 59.2. 
+
+• Visual Noise Scale (Figure 4(b)): A non-monotonic trend is observed across varying noise scales ( 𝜎 ). A moderate noise level ( 𝜎 = 0.8) optimally exposes visual vulnerabilities (achieving the lowest CHAIR 𝐼 ), whereas excessive noise (𝜎 = 1.0) corrupts the contrastive reference. 
+
+• Layer Selection (Figure 4(c)): The probing depth 𝑘 dic-tates the sensitivity of the hesitation trigger. A larger 𝑘 
+
+(𝑘 = 16 ) captures early, minute uncertainties, yielding ag-gressive hallucination suppression ( CHAIR 𝐼 4.6), while a smaller 𝑘 (𝑘 = 4, 8) focuses on late-stage logit flips, offering a balanced trade-off. 
+
+Table 6: Ablation studies on CHAIR and POPE. 
+
+CHAIR POPE 
+
+C𝑆 ↓ C𝐼 ↓ Recall ↑ Acc ↑ F1 ↑
+
+Ours (Full HTDC) 11.6 4.7 58.2 86.94 86.91 
+
+w/o visual branch 11.6 4.7 58.3 87.26 87.11 
+
+w/o semantic branch 18.2 6.6 62.2 86.12 85.45 
+
+w/o both (Baseline) 18.2 6.2 61.9 86.86 85.89 
+
+Method 
+
+## 6 Discussion and Limitations 
+
+While HTDC provides an effective and highly efficient training-free solution for hallucination mitigation, it has a few limitations that warrant future exploration. First, because our layer-wise hesitation metric relies on intermediate hidden states and logit distributions, 
+
+HTDC intrinsically requires white-box access to the model’s inter-nal representations. Consequently, it cannot be directly applied to closed-source models accessed via black-box APIs. Second, the optimal hesitation triggering threshold ( 𝛿 ) and the APC cutoff ( 𝐾 )may exhibit slight variations across different LVLM families due to their distinct pre-training and alignment dynamics, necessitating a modest calibration phase on a validation set. Finally, our current framework primarily operates at the token level. Extending this hesitation-triggered mechanism to multi-token candidate decoding, or designing more sophisticated multimodal nullification operators for emerging domains like video-language reasoning, represent promising directions for future work. 
+
+## 7 Conclusion 
+
+In this paper, we proposed Hesitation-Triggered Differential Calibra-tion (HTDC), a novel, training-free decoding framework designed to efficiently mitigate hallucinations in Large Vision-Language Mod-els. By identifying layer-wise hesitation as a reliable internal signal of grounding uncertainty, HTDC shifts the hallucination-mitigation paradigm from continuous, computationally heavy intervention to a lightweight, dynamic gating mechanism. When triggered, HTDC adaptively calibrates the prediction using complementary visual and semantic nullification probes, reinforced by an Adaptive Plau-sibility Constraint (APC) to ensure generation stability. Extensive experiments demonstrate that HTDC effectively suppresses object and attribute hallucinations across diverse benchmarks (e.g., POPE, CHAIR, MME) while rigorously preserving the model’s general mul-timodal capabilities on complex tasks like MM-Vet. Crucially, HTDC 
+
+achieves these state-of-the-art results with a marginal latency over-head of merely 17.0%, successfully breaking the persistent trade-off between decoding speed and hallucination mitigation, and paving the way for the robust real-time deployment of LVLMs. HTDC: Hesitation-Triggered Differential Calibration for Mitigating Hallucination in Large Vision-Language Models 
+
+## References 
+
+[1] Shuai Bai, Yuxuan Cai, Ruizhe Chen, Keqin Chen, Xionghui Chen, Zesen Cheng, Lianghao Deng, Wei Ding, Chang Gao, Chunjiang Ge, et al . 2025. Qwen3-vl technical report. arXiv preprint arXiv:2511.21631 (2025). [2] Zechen Bai, Pichao Wang, Tianjun Xiao, Tong He, Zongbo Han, Zheng Zhang, and Mike Zheng Shou. 2024. Hallucination of multimodal large language models: A survey. arXiv preprint arXiv:2404.18930 (2024). [3] Yung-Sung Chuang, Yujia Xie, Hongyin Luo, Yoon Kim, James Glass, and Pengcheng He. 2023. Dola: Decoding by contrasting layers improves factuality in large language models. arXiv preprint arXiv:2309.03883 (2023). [4] Alessandro Favero, Luca Zancato, Matthew Trager, Siddharth Choudhary, Pra-muditha Perera, Alessandro Achille, Ashwin Swaminathan, and Stefano Soatto. 2024. Multi-modal hallucination control by visual information grounding. In Pro-ceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition .14303–14312. [5] Chaoyou Fu, Peixian Chen, Yunhang Shen, Yulei Qin, Mengdan Zhang, Xu Lin, Jinrui Yang, Xiawu Zheng, Ke Li, Xing Sun, et al . 2023. Mme: A comprehensive evaluation benchmark for multimodal large language models. arXiv preprint arXiv:2306.13394 (2023). [6] Paul Hager, Friederike Jungmann, Robbie Holland, Kunal Bhagat, Inga Hubrecht, Manuel Knauer, Jakob Vielhauer, Marcus Makowski, Rickmer Braren, Georgios Kaissis, et al . 2024. Evaluation and mitigation of the limitations of large language models in clinical decision-making. Nature medicine 30, 9 (2024), 2613–2622. [7] Iryna Hartsock and Ghulam Rasool. 2024. Vision-language models for medical report generation and visual question answering: A review. Frontiers in artificial intelligence 7 (2024), 1430984. [8] Lei Huang, Weijiang Yu, Weitao Ma, Weihong Zhong, Zhangyin Feng, Haotian Wang, Qianglong Chen, Weihua Peng, Xiaocheng Feng, Bing Qin, et al . 2025. A survey on hallucination in large language models: Principles, taxonomy, chal-lenges, and open questions. ACM Transactions on Information Systems 43, 2 (2025), 1–55. [9] Zhangqi Jiang, Junkai Chen, Beier Zhu, Tingjin Luo, Yankun Shen, and Xu Yang. 2025. Devils in middle layers of large vision-language models: Interpreting, detecting and mitigating object hallucinations via attention lens. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 25004– 25014. [10] Haoqiang Kang and Xiao-Yang Liu. 2023. Deficiency of large language mod-els in finance: An empirical examination of hallucination. arXiv preprint arXiv:2311.15548 (2023). [11] Junho Kim, Hyun J Kim, Yeon J Kim, and Yong M Ro. 2024. Code: Contrasting self-generated description to combat hallucination in large multi-modal models. 
+
+Advances in Neural Information Processing Systems 37 (2024), 133571–133599. [12] Wonkyun Kim, Changin Choi, Wonseok Lee, and Wonjong Rhee. 2024. An image grid can be worth a video: Zero-shot video question answering using a vlm. IEEE Access 12 (2024), 193057–193075. [13] JDMCK Lee and K Toutanova. 2018. Pre-training of deep bidirectional trans-formers for language understanding. arXiv preprint arXiv:1810.04805 3, 8 (2018), 4171–4186. [14] Yi-Lun Lee, Yi-Hsuan Tsai, and Wei-Chen Chiu. 2024. Delve into visual con-trastive decoding for hallucination mitigation of large vision-language models. 
+
+arXiv preprint arXiv:2412.06775 (2024). [15] Sicong Leng, Hang Zhang, Guanzheng Chen, Xin Li, Shijian Lu, Chunyan Miao, and Lidong Bing. 2024. Mitigating object hallucinations in large vision-language models through visual contrastive decoding. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 13872–13882. [16] Xiaoqi Li, Mingxu Zhang, Yiran Geng, Haoran Geng, Yuxing Long, Yan Shen, Ren-rui Zhang, Jiaming Liu, and Hao Dong. 2024. Manipllm: Embodied multimodal large language model for object-centric robotic manipulation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 18061– 18070. [17] Yifan Li, Yifan Du, Kun Zhou, Jinpeng Wang, Wayne Xin Zhao, and Ji-Rong Wen. 2023. Evaluating object hallucination in large vision-language models. In Proceedings of the 2023 conference on empirical methods in natural language processing . 292–305. [18] Haotian Liu, Chunyuan Li, Yuheng Li, and Yong Jae Lee. 2024. Improved baselines with visual instruction tuning. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 26296–26306. [19] Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2023. Visual in-struction tuning. Advances in neural information processing systems 36 (2023), 34892–34916. [20] Hanchao Liu, Wenyuan Xue, Yifei Chen, Dapeng Chen, Xiutian Zhao, Ke Wang, Liping Hou, Rongjun Li, and Wei Peng. 2024. A survey on hallucination in large vision-language models. arXiv preprint arXiv:2402.00253 (2024). [21] Sheng Liu, Haotian Ye, and James Zou. 2025. Reducing hallucinations in large vision-language models via latent space steering. In The Thirteenth International Conference on Learning Representations .[22] Xinbei Ma, Zhuosheng Zhang, and Hai Zhao. 2024. Coco-agent: A comprehen-sive cognitive mllm agent for smartphone gui automation. In Findings of the Association for Computational Linguistics: ACL 2024 . 9097–9110. [23] Avshalom Manevich and Reut Tsarfaty. 2024. Mitigating hallucinations in large vision-language models (lvlms) via language-contrastive decoding (lcd). In Find-ings of the Association for Computational Linguistics: ACL 2024 . 6008–6022. [24] Joshua Maynez, Shashi Narayan, Bernd Bohnet, and Ryan McDonald. 2020. On faithfulness and factuality in abstractive summarization. In Proceedings of the 58th annual meeting of the association for computational linguistics . 1906–1919. [25] Amir Hameed Mir. 2025. The Geometry of Truth: Layer-wise Semantic Dy-namics for Hallucination Detection in Large Language Models. arXiv preprint arXiv:2510.04933 (2025). [26] Yeji Park, Deokyeong Lee, Junsuk Choe, and Buru Chang. 2025. Convis: Con-trastive decoding with hallucination visualization for mitigating hallucinations in multimodal large language models. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 39. 6434–6442. [27] Anna Rohrbach, Lisa Anne Hendricks, Kaylee Burns, Trevor Darrell, and Kate Saenko. 2018. Object hallucination in image captioning. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing . 4035–4045. [28] Rico Sennrich, Jannis Vamvas, and Alireza Mohammadshahi. 2024. Mitigating hallucinations and off-target machine translation with source-contrastive and language-contrastive decoding. In Proceedings of the 18th Conference of the Euro-pean Chapter of the Association for Computational Linguistics (Volume 2: Short Papers) . 21–33. [29] Chonghao Sima, Katrin Renz, Kashyap Chitta, Li Chen, Hanxue Zhang, Chen-gen Xie, Jens Beißwenger, Ping Luo, Andreas Geiger, and Hongyang Li. 2024. Drivelm: Driving with graph visual question answering. In European conference on computer vision . Springer, 256–274. [30] Wei Suo, Lijun Zhang, Mengyang Sun, Lin Yuanbo Wu, Peng Wang, and Yanning Zhang. 2025. Octopus: Alleviating hallucination via dynamic contrastive decod-ing. In Proceedings of the Computer Vision and Pattern Recognition Conference .29904–29914. [31] Kai Tang, Jinhao You, Xiuqi Ge, Hanze Li, Yichen Guo, and Xiande Huang. 2025. Mitigating Hallucinations via Inter-Layer Consistency Aggregation in Large Vision-Language Models. arXiv preprint arXiv:2505.12343 (2025). [32] Chenxi Wang, Xiang Chen, Ningyu Zhang, Bozhong Tian, Haoming Xu, Shumin Deng, and Huajun Chen. 2024. Mllm can see? dynamic correction decoding for hallucination mitigation. arXiv preprint arXiv:2410.11779 (2024). [33] Chao Wang, Xuancheng Zhou, Weiwei Fu, and Yang Zhou. 2025. Mitigating Hallucinations in Large Vision-Language Models with Internal Fact-based Con-trastive Decoding. arXiv preprint arXiv:2502.01056 (2025). [34] Kaishen Wang, Hengrui Gu, Meijun Gao, and Kaixiong Zhou. 2025. Damo: Decoding by accumulating activations momentum for mitigating hallucinations in vision-language models. In The Thirteenth International Conference on Learning Representations .[35] Kaishen Wang, Xun Xia, Jian Liu, Zhang Yi, and Tao He. 2024. Strengthening layer interaction via dynamic layer attention. arXiv preprint arXiv:2406.13392 
+
+(2024). [36] Lei Wang, Jiabang He, Shenshen Li, Ning Liu, and Ee-Peng Lim. 2024. Mitigating fine-grained hallucination by fine-tuning large vision-language models with caption rewrites. In International Conference on Multimedia Modeling . Springer, 32–45. [37] Peng Wang, Shuai Bai, Sinan Tan, Shijie Wang, Zhihao Fan, Jinze Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, et al . 2024. Qwen2-vl: Enhancing vision-language model’s perception of the world at any resolution. arXiv preprint arXiv:2409.12191 (2024). [38] Junfei Wu, Yue Ding, Guofan Liu, Tianze Xia, Ziyue Huang, Dianbo Sui, Qiang Liu, Shu Wu, Liang Wang, and Tieniu Tan. 2025. Sharp: Steering hallucination in lvlms via representation engineering. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing . 14357–14372. [39] Lin Xu, Yilin Zhao, Daquan Zhou, Zhijie Lin, See Kiong Ng, and Jiashi Feng. 2024. Pllava: Parameter-free llava extension from images to videos for video dense captioning. arXiv preprint arXiv:2404.16994 (2024). [40] Xu Yang, Yongliang Wu, Mingzhuo Yang, Haokun Chen, and Xin Geng. 2023. Exploring diverse in-context configurations for image captioning. Advances in Neural Information Processing Systems 36 (2023), 40924–40943. [41] Zhihe Yang, Xufang Luo, Dongqi Han, Yunjian Xu, and Dongsheng Li. 2025. Mitigating hallucinations in large vision-language models via dpo: On-policy data hold the key. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 10610–10620. [42] Shukang Yin, Chaoyou Fu, Sirui Zhao, Ke Li, Xing Sun, Tong Xu, and Enhong Chen. 2024. A survey on multimodal large language models. National Science Review 11, 12 (2024), nwae403. [43] Shukang Yin, Chaoyou Fu, Sirui Zhao, Tong Xu, Hao Wang, Dianbo Sui, Yunhang Shen, Ke Li, Xing Sun, and Enhong Chen. 2024. Woodpecker: Hallucination correction for multimodal large language models. Science China Information Sciences 67, 12 (2024), 220105. Xinyun Liu 
+
+[44] Le Yu, Kaishen Wang, Jianlong Xiong, Yue Cao, Lei Zhang, and Zhang Yi Tao He. 2025. Hallurnn: Mitigating hallucinations via recurrent cross-layer reasoning in large vision-language models. arXiv preprint arXiv:2506.17587 (2025). [45] Tianyu Yu, Yuan Yao, Haoye Zhang, Taiwen He, Yifeng Han, Ganqu Cui, Jinyi Hu, Zhiyuan Liu, Hai-Tao Zheng, Maosong Sun, et al . 2024. Rlhf-v: Towards trustworthy mllms via behavior alignment from fine-grained correctional human feedback. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 13807–13816. [46] Weihao Yu, Zhengyuan Yang, Linjie Li, Jianfeng Wang, Kevin Lin, Zicheng Liu, Xinchao Wang, and Lijuan Wang. 2023. Mm-vet: Evaluating large multimodal models for integrated capabilities. arXiv preprint arXiv:2308.02490 (2023). [47] Hongxiang Zhang, Hao Chen, Muhao Chen, and Tianyi Zhang. 2025. Active layer-contrastive decoding reduces hallucination in large language model generation. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing . 3028–3046. [48] Linxi Zhao, Yihe Deng, Weitong Zhang, and Quanquan Gu. 2024. Mitigating ob-ject hallucination in large vision-language models via image-grounded guidance. 
+
+arXiv preprint arXiv:2402.08680 (2024). [49] Yiyang Zhou, Chenhang Cui, Rafael Rafailov, Chelsea Finn, and Huaxiu Yao. 2024. Aligning modalities in vision large language models via preference fine-tuning. 
+
+arXiv preprint arXiv:2402.11411 (2024).

@@ -1,0 +1,1655 @@
+Title: FEDBUD: Joint Incentive and Privacy Optimization for Resource-Constrained Federated Learning
+
+URL Source: https://arxiv.org/pdf/2604.10499v1
+
+Published Time: Tue, 14 Apr 2026 01:04:06 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# FEDBUD: Joint Incentive and Privacy Optimization for Resource-Constrained Federated Learning 
+
+Tao Liu 1 and Xuehe Wang 1,∗
+
+Abstract — Federated learning has become a popular paradigm for privacy protection and edge-based machine learning. However, defending against differential attacks and devising incentive strategies remain significant bottlenecks in this field. Despite recent works on privacy-aware incentive mechanism design for federated learning, few of them consider both data volume and noise level. In this paper, we propose a novel federated learning system called FEDBUD, which com-bines privacy and economic concerns together by considering the joint influence of data volume and noise level on incentive strategy determination. In this system, the cloud server controls monetary payments to edge nodes, while edge nodes control data volume and noise level that potentially impact the model performance of the cloud server. To determine the mutually optimal strategies for both sides, we model FEDBUD as a two-stage Stackelberg Game and derive the Nash Equilibrium using the mean-field estimator and virtual queue. Experimental results on real-world datasets demonstrate the outstanding performance of FEDBUD. 
+
+I. INTRODUCTION With the development of the Internet of Things, many smart things (mobile phones, wearable devices, electric ve-hicles) are generating a large amount of data every day. The traditional machine learning paradigm of uploading data from edge nodes to cloud server for centralized model training faces key challenges: on the one hand, it is incapable of taking advantage of growing storage and computational power on edge nodes; on the other hand, straight data transfer between the cloud server and edge nodes may incur malicious privacy attack, thereby lead to privacy leakage over data owner. In response to these concerns, federated learning provides a solution by supporting edge nodes to train a model locally before uploading it to the cloud server for model aggregation. This framework leverages edge computation resources while protecting data privacy effectively, and has been widely applied in various scenarios such as smart cities [1] and smart healthcare [2]. Despite the above advantages, federated learning still faces two bottlenecks: 1) Differential Attack : It is a privacy inference technology that enables attackers to infer sensitive information from model parameters. Vanilla federated learn-ing is unable to defend data privacy against it amid model transmission; 2) Resource Expenditure : From an economic aspect, edge nodes inevitably consume computation and communication resources when performing model training                  
+
+> 1Tao Liu and Xuehe Wang are with the School of Artificial Intelligence, Sun Yat-sen University, Zhuhai 519082, China (e-mail: liut353@mail2.sysu.edu.cn; wangxuehe@mail.sysu.edu.cn).
+> ∗Corresponding author: Xuehe Wang.
+
+and uploading. Without enough economic reward, they may be reluctant to participate in federated learning tasks. For the first bottleneck, researchers have proposed awidely used framework called differential privacy, which enhances the ability of federated learning to defend against malicious attacks by injecting tunable levels of noise into the local model before it is uploaded. In addition, variants of differential privacy have been developed for specific concerns, including data distribution [3], [4] and information aging [5], [6]. However, few studies investigate differential privacy from an economic optimization perspective. For the second bottleneck, efforts have been made in incentive mechanism design where the cloud server provides elaborate monetary payment to stimulate edge nodes to participate in federated learning. It ranges from game theory [7], [8] to auction theory [9], [10] and contract theory [11]. However, most of them do not involve differential privacy in incentive mechanism design. Some works have proposed a privacy-aware incentive mechanism. Yet, they fail to account for the joint effect of data volume and noise level on payment strategy determination. Motivated by the above discussion, this paper devises an innovative federated learning system called FEDBUD, which combines privacy and economic concern together by considering the joint influence of data volume and noise level on strategy determination. Specifically, the cloud server controls monetary payment to edge nodes while edge nodes control data volume and noise level that impact the model performance of the cloud server. The key questions in FEDBUD are: 1) Cloud server determines the optimal payment strategy to balance monetary payment to edge nodes and model performance influenced by edge nodes . 2) Edge nodes determine their optimal data volume and noise level simultaneously to balance the resource cost and allocated payment from the cloud server .There are three challenges to solve the key questions: 1) 
+
+Absence of model performance characterization . Although model performance is influenced by data volume and noise level, there is a lack of a quantitative relationship link-ing these factors to model performance, which hinders the strategy determination for the cloud server. 2) Incomplete information . Edge nodes’ strategies are interdependent, as the allocated payment is based on relative contribution. But in federated learning, the phenomenon of information silo among edge nodes makes individual strategy optimization challenging. 3) Resource Constraints . Computation and com-munication resources of each edge node are limited during a federated learning task. How to allocate resources for each 
+
+> arXiv:2604.10499v1 [cs.DC] 12 Apr 2026
+
+round to optimize the long-term objective is non-trivial. To overcome the above challenges and determine the optimal strategies for both sides, we conduct a theoretical analysis for FEDBUD, model a two-stage Stackelberg Game, and derive the Nash Equilibrium using the mean-field esti-mator and virtual queue. The main contributions in this paper are summarized as follows:  
+
+> •
+
+We propose an innovative federated learning system called FEDBUD, which combines privacy and economic concern together by considering the joint influence of data volume and noise level on strategy determination.  
+
+> •
+
+We conduct a theoretical analysis on FEDBUD and uncover a quantitative tie linking model performance with data volume and noise level.  
+
+> •
+
+We model FEDBUD as a two-stage Stackelberg game. By means of backward reduction, we explore the op-timal strategies of both edge nodes and cloud server using the mean-field estimator and virtual queue.  
+
+> •
+
+We conduct experiments on real-world datasets to vali-date the viability and efficiency of FEDBUD compared with other benchmarks. II. P ROBLEM FORMULATION AND ANALYSIS 
+
+A. Federated Learning with Privacy Protection 
+
+A typical federated learning system comprises a cloud server and N edge nodes with T communication rounds. In the system, the cloud server contains a global model with parameters w and edge node k ∈ N holds a set of privacy data of Btk with volume of Btk = |B tk| at round t. The loss function of edge node k based on global model parameters 
+
+w is defined as 
+
+Fk(w; Btk) = 1
+
+BtkBtkX
+
+> j=1
+
+f (w; xjk, y jk), (1) where f (w; xjk, y jk) is the loss function of each data point 
+
+{xjk, y jk} ∈ B tk.During each round, the cloud server distributes its global model parameters wt to edge nodes. Then, edge node k
+
+performs a local model update based on its own data by 
+
+wt+1  
+
+> k
+
+= wt − η∇Fk(wt; Btk) + ntk, (2) where η is the learning rate and ∇Fk(wt; Btk) is the loss gradient of nodes k at round t. ntk ∼ N (0 , σ tk
+
+> 2
+
+) is noise injected into the local model for data privacy, where σtk = 
+
+> ηC Btkεtk
+
+[7]. C is a constant and εtk is the privacy budget. The noise level can be manipulated through privacy budget εtk set by edge node k.Until each node completes local training and uploads local model parameter wtk to the cloud server, it will aggregate them by 
+
+wt+1 =
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+PNi=1 Bti
+
+wt+1  
+
+> k
+
+. (3) Subsequently, the cloud server launches a new global model wt+1 to each edge node for the next round’s training. The goal of federated learning is to find the optimal model parameters w∗ to minimize the global loss function, which is represented as 
+
+w∗ = arg min  
+
+> w
+
+F (w) = 
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+PNi=1 Bti
+
+Fk(w; Btk), (4) where Bt = ∪Nk=1 Btk is total data used for model training at round t.
+
+B. Convergence Analysis for Federated Learning with Pri-vacy Protection 
+
+Convergence analysis for model performance is provided in this section. In practice, it is challenging to derive ac-curate model performance in closed form. Therefore, we approximate it with a convergence upper bound, which takes into consideration the impact of data volume and privacy budget on model performance. Before that, we introduce some assumptions on the local loss function Fk(w; Btk),which have been widely used in previous work [12], [13]. 
+
+Assumption 1: For k ∈ {1, ..., N }, t ∈ {0, · · · , T −
+
+1}, Fk(w; Btk) is ρ−Lipschitz, i.e., ∀w1, w2, F k(w1; Btk) −
+
+Fk(w2; Btk) ≤ ρ∥w1 − w2∥2.
+
+Assumption 2: For k ∈ { 1, ..., N }, t ∈ { 0, · · · , T − 1},
+
+Fk(w; Btk) is μ−strong convex, i.e., ∀w, Fk(w; Btk) satisfies 
+
+Fk(w; Btk) − Fk(w∗) ≤ 12μ ∥∇ Fk(w; Btk)∥22.
+
+Assumption 3: For k ∈ { 1, ..., N }, t ∈ { 0, · · · , T − 1},non-iid degree is bounded, i.e., ∥∇ Fk(w; Btk)−∇ F (w)∥2 ≤
+
+λtk.
+
+Assumption 4: For k ∈ { 1, ..., N }, t ∈ { 0, · · · , T − 1},
+
+ntk is zero-mean and variance-bounded, i.e., ntk ∼ N (0 , σ tk
+
+> 2
+
+)
+
+with σtk = ηC Btk εtk
+
+.Then, the convergence analysis is given as follows. 
+
+Theorem 5: Under Assumptions 1-4, with η ≤ 1 
+
+> ρ
+
+, the convergence upper bound after T rounds of global training can be formulated as 
+
+E[F (wT ) − F (w∗)] 
+
+≤κ1T E[F (w0) − F (w∗)] + 
+
+> T−1
+
+X
+
+> t=0
+
+κ1T −1−t κ2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + κ3
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk
+
+> 2
+
+!
+
+, (5) where κ1 = 1 + 2 μρη 2 − 2μη, κ 2 = ρη 2, κ 3 = ρd  
+
+> 2
+
+.The detailed proof is provided in Appendix A.1 in the supplementary material. Equ. (5) unveils that model perfor-mance in FedBUD is influenced by total data volume and privacy budget simultaneously. Apparently, the greater both the total data volume and privacy budget, the better the global model performs. III. G AME FORMULATION 
+
+In this section, we formulate a cost optimization problem for the cloud server and a utility optimization problem for each edge node, respectively. Afterwards, we formulate the potential interaction between optimization problems on both sides as a two-stage Stackelberg Game. A. Cost Optimization of Cloud Server 
+
+The cost of the cloud server consists of two units: accuracy loss of model performance, and monetary payment to edge nodes. Although it is hard to secure the exact form of accuracy loss, we approximate it with the convergence upper bound provided in Equ. (5). Denote Rt as payment to edge nodes at round t, the cost of the cloud server over the time horizon can be formulated as 
+
+C(R, B, ε) =  
+
+> T−1
+
+X
+
+> t=0
+
+γ1Rt +
+
+> N
+
+X
+
+> k=1
+
+κ1T −1−tκ3η2C2
+
+Bt2εtk
+
+> 2
+
+!
+
+, (6) where R = {Rt}T −1 
+
+> t=0
+
+, B = {{ Btk}T −1 
+
+> t=0
+
+}Nk=1 , and ε =
+
+{{ εtk}T −1 
+
+> t=0
+
+}Nk=1 . In addition, γ1 > 0 is a factor to balance the influence between monetary payment and model accuracy loss. When γ1 approaches 0, the cloud server prefers model performance enhancement rather than expenditure control. The optimization problem on the cloud server’s side can be formulated as 
+
+min  
+
+> R
+
+C(R, B, ε). (7) 
+
+B. Utility Optimization of Edge Nodes 
+
+For edge node k, the computation resource expenditure amid model training is associated with data volume Btk,while privacy risk expenditure amid model uploading is associated with privacy budget εtk. We use αkH1(Btk) and 
+
+βkH2(εtk) to quantify the two terms, respectively. αk is the unit cost for computation resource, and βk is the unit cost for privacy risk. Both H1(·) and H2(·) are convex functions to capture the fact that an edge node’s computation resource consumption and privacy risk increase convexly with the data volume Btk and privacy risk εtk, respectively. In this work, we choose the quadratic forms of H1(Btk) = ( Btk)2
+
+and H2(εtk) = ( εtk)2, which has been widely adopted in expenditure formulation [14], [15]. Hence, the cost of edge node k at round t can be formulated as 
+
+Ek(t) = αk(Btk)2 + βk(εtk)2. (8) To stimulate edge nodes to provide high-quality local model parameters efficiently, the payment allocation strategy is formulated as 
+
+Pk(t) = max 
+
+(
+
+0, log( Btkεtk)
+
+PNi=1 log( Bti εti) Rt
+
+)
+
+. (9) Under the above strategy, the payment edge node k obtains at round t depends on its data volume Btk and privacy budget 
+
+εtk compared with that of other edge nodes. Therefore, the utility function of edge node k over the time horizon is formulated as 
+
+Uk(R, Bk, B−k, εk, ε−k) =  
+
+> T−1
+
+X
+
+> t=0
+
+(Pk(t) − Ek(t)) , (10) where B−k = B\Bk, and ε−k = ε\εk.In addition, in the real world, computation resource a certain edge node access is limited, while the privacy risk it can bear is also upper-bounded. Thus, we introduce two constraints:  
+
+> T−1
+
+X
+
+> t=0
+
+(Btk)2 ≤ nk, 
+
+> T−1
+
+X
+
+> t=0
+
+(εtk)2 ≤ mk, (11) where nk and mk are the upper bounds of computation resource and privacy risk for edge node k, respectively. In summary, the optimization problem on the edge nodes’ side can be formulated as 
+
+max  
+
+> Bk,εk
+
+Uk(R, Bk, B−k, εk, ε−k) (12) 
+
+s.t.  
+
+> T−1
+
+X
+
+> t=0
+
+(Btk)2 ≤ nk, 
+
+> T−1
+
+X
+
+> t=0
+
+(εtk)2 ≤ mk.
+
+C. Stackelberg Game Formulation 
+
+Based on the discussion on Sections III-A and III-B, we can find that optimization problems (7) and (12) are influenced by each other, which makes it impossible to derive the optimal strategies for the cloud server and edge nodes individually. To formulate the interaction between the two optimization problems, we model them as a two-stage Stackelberg Game: Stage I : min  
+
+> R
+
+C(R, B, ε); 
+
+Stage II : max  
+
+> Bk,εk
+
+Uk(R, Bk, B−k, εk, ε−k), (13) 
+
+s.t.  
+
+> T−1
+
+X
+
+> t=0
+
+(Btk)2 ≤ nk, 
+
+> T−1
+
+X
+
+> t=0
+
+(εtk)2 ≤ mk,
+
+where the cloud server acts as the leader, and edge nodes respond as followers. By deriving the Nash Equilibrium of this game, we can get a set of mutually optimal strategies between the cloud server and edge nodes in a stable condi-tion. IV. M ETHODOLOGY 
+
+In this section, we explore the Nash Equilibrium of the above Stackelberg Game by means of backward reduction. Firstly, we analyze edge node k’s optimal strategy (Bk, εk)∗
+
+in Stage II given any cloud server’s payment R. Then we discuss the optimal strategy R∗ based on {(Bk, εk)∗}Nk=1 
+
+in Stage I. 
+
+A. Optimal Strategy for Edge Nodes 
+
+Before the analysis of the strategy for edge nodes, we face two key challenges: 1) Incomplete information . As shown in Equ. (10), deriving edge node k’s optimal strategy 
+
+(Bk, εk)∗ requires the global knowledge of PNi=1 log( Bti εti)
+
+in the game. Yet PNi=1 log( Bti εti) is usually kept unknown to edge node k due to inter-edge node information isolation in federated learning tasks. 2) Resource Constraints . Equ. (12) is an optimization problem with a long-term objective function and time-average constraints. Strategies made in former slots will affect latter ones, and it is difficult to derive the optimal strategy for previous slots considering unpredictable circumstances in the future. To cope with the first challenge, we introduce a mean-field estimator ϕt to approximate PNi=1 log( Bti εti). Mathe-matically, ϕt is a given function and viewed as a known term here. The estimation of ϕt will be discussed later in Section IV-C. By alternating PNi=1 log( Bti εti) in Equ. (12) with ϕt, the optimization problem of edge node k is rewritten as 
+
+max   
+
+> Bk,εk
+> T−1
+
+X
+
+> t=0
+
+ log( Btkεtk)
+
+ϕt Rt − αk(Btk)2 − βk(εtk)2
+
+
+
+,s.t.  
+
+> T−1
+
+X
+
+> t=0
+
+(Btk)2 ≤ nk, 
+
+> T−1
+
+X
+
+> t=0
+
+(εtk)2 ≤ mk. (14) To handle the second challenge, we proposed an online strategy-making approach based on the Lyapunov drift-plus-penalty framework, which transforms the time-average re-source constraints in Equ. (12) into queue stability problems. Specifically, we define virtual queues as 
+
+Qt+1  
+
+> k
+
+= max 
+
+n
+
+Qtk + ( Btk)2 − nk
+
+T , 0
+
+o
+
+, ∀k ∈ [1 , N ], (15) 
+
+Zt+1  
+
+> k
+
+= max 
+
+n
+
+Ztk + ( εtk)2 − mk
+
+T , 0
+
+o
+
+, ∀k ∈ [1 , N ], (16) with initial condition of Q1 
+
+> k
+
+= 0 and Z1 
+
+> k
+
+= 0 . The above virtual queues capture accumulated violations of resource constraints. By ensuring the stability of virtual queues, we can guarantee the satisfaction of the time-average resource constraints within a bounded violation error. Using virtual queues Qtk and Ztk, Equ. (14) can be further transformed into single-slot optimization problems. For a particular round t, the optimization problem for edge node 
+
+k is rewritten as 
+
+min  
+
+> Btk,ε tk
+
+γ2
+
+
+
+αk(Btk)2 + βk(εtk)2 − log( Btkεtk)
+
+ϕt Rt
+
+
+
++ Qtk
+
+
+
+(Btk)2 − nk
+
+T
+
+
+
++ Ztk
+
+
+
+(εtk)2 − mk
+
+T
+
+
+
+. (17) It targets to optimize edge node k’s utility and the queue stability of Qtk, Z tk simultaneously, with γ2 > 0 working as the weight factor. Note that Equ. (17) is an online problem because solving it requires the real-time state of virtual queues. Given mean-field estimator ϕt and payment Rt launched by the cloud server, the optimal strategy (Btk, ε tk) for edge node k at round t is as follows: 
+
+Proposition 6: For any edge node k at arbitrary round t,the optimal strategy (Btk, ε tk)∗ is 
+
+(Btk)∗ =
+
+s
+
+γ2Rt
+
+2ϕt(γ2αk + Qtk) , (18) 
+
+(εtk)∗ =
+
+s
+
+γ2Rt
+
+2ϕt(γ2βk + Ztk) . (19) The detailed proof is provided in Appendix A.2 in the sup-plementary material. Proposition 6 uncovers that (Btk, ε tk)∗
+
+increases with Rt, which means a greater payment by the cloud server appeals to edge nodes to risk higher privacy leakage in exchange for economic reward, while high unit cost of αk, β k and unstable virtual queue of Qtk, Z tk have the opposite effect. 
+
+B. Optimal Strategy for Cloud Server 
+
+In this section, we explore the optimal strategy (Rt)∗
+
+for the cloud server given all edge nodes’ strategy 
+
+{(Btk, ε tk)∗}Nk=1 at arbitrary round t. Based on the back-ward reduction, we substitute {(Btk, ε tk)∗}Nk=1 into the cloud server’s cost function in Equ. (6), and the optimal strategy 
+
+Rt for the cloud edge under given mean-field estimator ϕt
+
+is as follows: 
+
+Proposition 7: The optimal strategy (Rt)∗ for cloud server at arbitrary round t is 
+
+(Rt)∗ =
+
+ 2κ1T −1−tκ3η2C2
+
+γ1
+
+·
+
+PNk=1 (Y tk )−1
+
+PNk=1 (Xtk) 12
+
+2
+
+
+
+> 13
+
+, (20) 
+
+Xtk = γ2
+
+2ϕt(γ2αk + Qtk) , Y tk = γ2
+
+2ϕt(γ2βk + Ztk) .
+
+The detailed proof is provided in Appendix A.3 in the supplementary material. Xtk and Y tk are defined as quality factors of edge node k at round t in term of two resource constraints. We say edge node k is of high quality if it features a lower unit cost αk, β k and more stable virtual queues Xtk, Y tk at round t. According to Proposition 7, the cloud server has to afford more monetary payment for low-quality edge nodes to guarantee full participation of them, which is consistent with our intuition. 
+
+C. Algorithm for Finalizing Strategy Design 
+
+In this section, we explore finding the precise value of the mean-field estimator ϕ(t), thereby finalizing strategy design for the Stackelberg Game. On the one hand, ϕt
+
+defined as PNk=1 log( Btkεtk) is affected by {(Btk, ε tk)}Nk=1 ;on the other hand, ϕt will in turn affect the determination of 
+
+{(Btk, ε tk)}Nk=1 according to Proposition 6. There is a closed-loop among ϕt and {(Btk, ε tk)}Nk=1 . Based on this, we have the following proposition: 
+
+Proposition 8: There exists a fixed point for the mean-field estimator {ϕt}T −1 
+
+> t=0
+
+.The detailed proof is provided in Appendix A.4 in the supplementary material [2]. Based on Proposition 8, we develop a fixed-point approach to determine ϕt, which will be introduced later in Section IV-D. In summary, the Nash Equilibrium for Equ. (13) is Stage I :( Rt)∗,
+
+Stage II :( Btk, ε tk)∗. (21) 
+
+D. Complete Workflow for FEDBUD Mechanism 
+
+The complete algorithm of FEDBUD is summarized in Algorithm 1. Take round t for instance: 1) Strategy Decision Phase : the system initializes mean-field estimator ϕt
+
+> 0
+
+. Amid the i-th fixed-point iteration, given ϕti, the cloud server optimizes strategy Rti to minimize its cost function before edge nodes optimize strategy (Btk,i , ε tk,i ) to maximize their utility function, which is followed by the update of mean-field es-timator ϕti+1 . Iterations will come to the end until convergence, when ϕt, R t and {(Btk, ε tk)}Nk=1 are fixed synchronously. 2) Federated Training Phase : the cloud server distributes global model wt with optimal payment Rt to edge nodes. After that, edge node k conducts local train-ing with optimal data volume Btk and injects noise according to optimal privacy budget εtk. In addition, edge node k updates virtual queue of Qt+1  
+
+> k
+
+and Zt+1 
+
+> k
+
+for next round’s use. After T rounds of federated training, Algorithm 1 returns global model wT .
+
+Algorithm 1 FEDBUD Mechanism  
+
+> 1:
+
+Input: number of rounds T , number of clients N . 
+
+> 2:
+
+Output: global model wT . 
+
+> 3:
+
+Initialize: global model w0, virtual queues {Q1
+
+> k
+
+}Nk=1 and 
+
+{Z1 
+
+> k
+
+}Nk=1 , other hyperparameters.  
+
+> 4:
+
+for t = 0 to T − 1 do  
+
+> 5:
+
+Strategy Decision Phase  
+
+> 6:
+
+Initialize: mean-field estimator ϕt
+
+> 0
+
+, iteration counter 
+
+i = 0 . 
+
+> 7:
+
+repeat  
+
+> 8:
+
+Cloud server computes the optimal Rti based on ϕti
+
+according to Proposition 7.  
+
+> 9:
+
+for edge node k = 1 to N do  
+
+> 10:
+
+Compute (Btk,i , ε tk,i ) according to Proposition 6.  
+
+> 11:
+
+end for  
+
+> 12:
+
+Update estimator ϕti+1 ← PNk=1 log( Btkεtk). 
+
+> 13:
+
+i ← i + 1 . 
+
+> 14:
+
+until |ϕti − ϕti−1| ≤ ϵ. 
+
+> 15:
+
+Set (ϕt, R t, B tk, ε tk) ← (ϕti, R ti , B ti,k , ε ti,k ). 
+
+> 16:
+
+Federated Training Phase  
+
+> 17:
+
+Cloud server broadcasts (wt, R t) to all edge nodes.  
+
+> 18:
+
+for edge node k = 1 to N do  
+
+> 19:
+
+Perform local training and noise injecting using 
+
+(Btk, ε tk) according to Equ. (2).  
+
+> 20:
+
+Upload local model wt+1  
+
+> k
+
+to server.  
+
+> 21:
+
+Update virtual queue Qt+1  
+
+> k
+
+according to Equ. (15).  
+
+> 22:
+
+Update virtual queue Zt+1  
+
+> k
+
+according to Equ. (16).  
+
+> 23:
+
+end for  
+
+> 24:
+
+Cloud server aggregates model according to Equ. (3).  
+
+> 25:
+
+end for 
+
+V. E XPERIMENTS 
+
+In this section, we evaluate the performance of our pro-posed FEDBUD by numerical experiments. 
+
+A. Settings 
+
+In our experiments, we arrange federated tasks on the widely used benchmark of CIFAR-10. We set T = 100 
+
+communication rounds, and N = 100 edge nodes participate. Each edge node conducts local update using Stochastic Gradient Descent (SGD) with a learning rate η = 10 −3
+
+for 10 epochs. The unit cost for computation resource and TABLE I: Impact of weight factor γ1 on the cloud server’s objective trade-off.                                    
+
+> Factor γ1Payment PRtModel Loss F(wT)−F(w∗)1×10 −11 398 .838 ×10 61.337 ×10 −3
+> 5×10 −11 78 .368 ×10 61.347 ×10 −3
+> 10 ×10 −11 38 .174 ×10 61.354 ×10 −3
+
+privacy risk obeys αk ∼ U(1 × 10 −2, 5 × 10 −2), β k ∼U(1 × 10 −2, 5 × 10 −2). The weight factor is set as γ1 =1 × 10 −10 , γ 2 = 1 . All experiments are implemented in PyTorch and conducted on a workstation equipped with an NVIDIA GPU. To accelerate training, multiple clients are executed in parallel using multiprocessing. 
+
+B. Performance Evaluation 
+
+We illustrate the performance evaluation of FEDBUD in this section. 
+
+Fixed-point Convergence Process: Fig. 1 shows the movement trajectory of mean-field estimator ϕt, the cloud server’s strategy Rt, edge node k’ strategy (Rtk, ε tk) and virtual queues Qtk, Z tk over the time horizon. In the early stage, the system is in an unstable condition where both the cloud server and edge nodes are exploring their optimal strategies. After only 50-60 rounds, both sides fix their best or near-best (( Rt)∗ → 7.63 ×10 4, (Btk, ε tk)∗ → (40 .1, 20 .7)) ,which means the system converges to a relatively stable state for model training. The result shows the viability and efficiency of Algorithm 1 in solving the complex problem of Equ. (13). In addition, we can find virtual queue Qtk and Ztk
+
+keep within a limited upper bound of 50 − 60 throughout the task. Despite sight resource infringement, the general stability of virtual queues demonstrates that strategies derived by Algorithm 1 obey resource constraints literally. 
+
+Verification of Derived Strategy as Nash Equilibrium: 
+
+In this paragraph, we verify the strategy of Equ. (21) as Nash Equilibrium. For comparison, we set two auxiliary strategies: 1) Constant strategy . It means the cloud server or edge nodes take static actions over the time horizon, with the value not equal to the converged results in Fig. 1 (Rconstant ̸ = 7 .63 ×
+
+10 4; ( Bk, ε k)constant ̸ = (40 .1, 20 .7)) . 2) Random strategy .It refers to taking random actions over the task. Considering fairness, the slot-average value under this strategies is set to keep in line with that of converged results in Fig. 1 (randomized Rrandom with 1
+
+> T
+
+PT −1 
+
+> t=0
+
+Rrandom = 7.63 ×
+
+10 4; randomized (Bk, ε k)random with 1
+
+> T
+
+PT −1 
+
+> t=0
+
+Brandom k =40 .1, 1
+
+> T
+
+PT −1 
+
+> t=0
+
+εrandom k = 20 .7). As plotted in Fig. 2, com-pared with other baselines, (Rt)∗ helps the cloud server obtain the lowest cost, while (Btk, ε tk)∗ helps edge nodes secure the highest utility. Provided that both the cloud server and edge nodes are selfish, the above results mean they will strictly obey the optimal strategies derived by Algorithm 1 rather than others, thereby the mutually optimal strategies are reached simultaneously, and the Nash Equilibrium holds. In addition, we can find that both the cloud server’s cost and edge nodes’ objectives decrease marginally with the number Fig. 1: Illustration of movement trajectory for mean-field estimator ϕt, the cloud server’s strategy Rt, edge node k’ strategy 
+
+(Btk, ε tk) and virtual queues Qtk, Z tk over the time horizon. 
+
+Fig. 2: Comparison of cloud server’s cost C (left ) and edge node k’s utility Uk (right ) over different strategies. of edge nodes N . For edge nodes, number expansion inten-sifies competition for payment, further leading to allocated payment reduction and utility reduction. For the cloud server, despite incurring more payment, numerous edge nodes help improve model performance in return, which reduces the overall cost. 
+
+Impact of Weight Factor on Strategy: In this paragraph, we explore the impact of weight factor γ1 on the cloud server’s strategy. For comparison, we set a range of γ1 (from 1 to 10, ×10 −11 ) and the results are plotted in Table I. It shows training loss F (wT ) − F (w∗) increases (from 1.337 to 1.354, ×10 −3) with γ1 while the accumulated monetary payment PTt=1 Rt decreases (from 398.838 to 38.174, ×10 6)with it. The underlying reason is that the cloud server takes priority to economic expenditure rather than model perfor-mance with the growth of γ1. In addition, the payment-loss relationship is drastically nonlinear. Once model performance approaches a near-saturated state, further reducing γ1 will result in tremendous payment in exchange for redundant contribution to model performance enhancement. Therefore, it is an important step to determine γ1 according to real-world demand in Algorithm 1. VI. C ONCLUSION 
+
+In this paper, we propose a novel federated learning system called FEDBUD, which combines privacy and economic concerns together by considering the joint influence of data volume and noise level on incentive strategy determination. To determine the optimal strategies for both sides, we model FEDBUD as a two-stage Stackelberg Game and derive the Nash Equilibrium. Extensive experiments demonstrate the superiority of our proposed approach. REFERENCES [1] M. Gandhi, S. K. Singh, R. Ravikumar, and K. Vaghela, “Federated learning in secure smart city sensing: Challenges and opportunities,” 
+
+Edge of Intelligence: Exploring the Frontiers of AI at the Edge , pp. 215–251, 2025. [2] M. Nasajpour, S. Pouriyeh, R. M. Parizi, M. Han, F. Mosaiyebzadeh, L. Liu, Y. Xie, and D. M. Batista, “Federated learning in smart healthcare: A survey of applications, challenges, and future directions,” 
+
+Electronics , vol. 14, no. 9, p. 1750, 2025. [3] B. Yang, I. Sato, and H. Nakagawa, “Bayesian differential privacy on correlated data,” in Proceedings of the 2015 ACM SIGMOD international conference on Management of Data , 2015, pp. 747–762. [4] A. Triastcyn and B. Faltings, “Bayesian differential privacy for ma-chine learning,” in International Conference on Machine Learning .PMLR, 2020, pp. 9583–9592. [5] M. Zhang, E. Wei, R. Berry, and J. Huang, “Age-dependent differential privacy,” IEEE Transactions on Information Theory , vol. 70, no. 2, pp. 1300–1319, 2023. [6] K.-Y. Lin, H.-Y. Lin, Y.-P. Hsu, and Y.-C. Huang, “Age aware scheduling for differentially-private federated learning,” in 2024 IEEE International Symposium on Information Theory (ISIT) . IEEE, 2024, pp. 398–403. [7] G. Huang, Q. Wu, P. Sun, Q. Ma, and X. Chen, “Collaboration in federated learning with differential privacy: A stackelberg game analysis,” IEEE Transactions on Parallel and Distributed Systems ,vol. 35, no. 3, pp. 455–469, 2024. [8] W. Tang, E. Liu, W. Ni, X. Qu, B. Huang, K. Li, D. Niyato, and A. Jamalipour, “Game-theoretic incentive mechanism for blockchain-based federated learning,” IEEE Transactions on Mobile Computing ,2025. [9] X. Chen, X. Zhou, S. Zhang, and M. Sun, “Dualgfl: Federated learning with a dual-level coalition-auction game,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 39, no. 15, 2025, pp. 15 904– 15 912. [10] X. Tang and H. Yu, “Reputation-aware revenue allocation for auction-based federated learning,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 39, no. 19, 2025, pp. 20 832–20 840. [11] L. Xie, Z. Su, Y. Wang, N. Chen, Y. Liu, R. Wang, X. Liu, D. Liu, and H. Zhang, “A privacy-preserving incentive scheme for uav-aided federated learning: A contract method with prospect theory,” IEEE Transactions on Dependable and Secure Computing , 2025. [12] S. Wang, J. Perazzone, M. Ji, and K. S. Chan, “Federated learning with flexible control,” in IEEE INFOCOM 2023-IEEE Conference on Computer Communications . IEEE, 2023, pp. 1–10. [13] B. Luo, W. Xiao, S. Wang, J. Huang, and L. Tassiulas, “Adaptive heterogeneous client sampling for federated learning over wireless networks,” IEEE Transactions on Mobile Computing , vol. 23, no. 10, pp. 9663–9677, 2024. [14] Y. Zhan, C. H. Liu, Y. Zhao, J. Zhang, and J. Tang, “Free market of multi-leader multi-follower mobile crowdsensing: An incentive mech-anism design by deep reinforcement learning,” IEEE Transactions on Mobile Computing , vol. 19, no. 10, pp. 2316–2329, 2019. [15] J. Nie, J. Luo, Z. Xiong, D. Niyato, P. Wang, and H. V. Poor, “A multi-leader multi-follower game-based analysis for incentive mechanisms in socially-aware mobile crowdsensing,” IEEE Transactions on Wireless Communications , vol. 20, no. 3, pp. 1457–1471, 2020. In the appendix, the complete proofs of theoretic results provided in the main text are exhibited in detail. APPENDIX IPROOF OF THEOREM 5
+
+Proof: Let us pay attention to round t + 1 . According to Assumption 2, we have 
+
+E F (wt+1 ) − F (wt)
+
+≤ E ∇F (wt), wt+1 − wt
+
+| {z }
+
+> A
+
++ ρ
+
+2 E wt+1 − wt 22
+
+| {z }
+
+> B
+
+. (22) First, we focus on bounding A:
+
+E ∇F (wt), wt+1 − wt
+
+=E ∇F (wt), −η∇F (wt) + nt
+
+=E ∇F (wt), −η∇F (wt) + E ∇F (wt), nt
+
+=( −η)E ∇F (wt) 22 . (23) The third step holds due to zero-mean noise in DP. Then, we focus on bounding B:
+
+ρ
+
+2 E wt+1 − wt 22
+
+= ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt (−η∇Fk(wt; Btk) + ntk)
+
+> 22
+
+= ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt (−η∇Fk(wt; Btk)) 
+
+> 22
+
++ ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ntk
+
+> 22
+
+− ρE 
+
+* NX
+
+> k=1
+
+Btk
+
+Bt (−η∇Fk(wt); Btk)) ,
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ntk
+
++
+
+= ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt (−η∇Fk(wt; Btk))) 
+
+> 22
+
++ ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ntk
+
+> 22
+
+= ρη 2
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ∇Fk(wt; Btk)) 
+
+> 22
+
+| {z }
+
+> B1
+
++ ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ntk
+
+> 22
+
+| {z }
+
+> B2
+
+.
+
+(24) According to Assumption 3, B1 is bounded by 
+
+ρη 2
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ∇Fk (wt; Btk )
+
+> 22
+
+≤ ρη 2
+
+2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt E ∇Fk (wt; Btk ) 22
+
+= ρη 2
+
+2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt E ∇Fk (wt; Btk ) − F (wt) + F (wt)) 22
+
+≤ ρη 2
+
+2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt
+
+
+
+2E ∇Fk (wt; Btk ) − F (wt)∥22 + 2 E∥F (wt)) 22
+
+
+
+≤ρη 2E F (wt) 22 + ρη 2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk . (25) 
+
+According to Assumption 4, B2 is bounded by 
+
+ρ
+
+2 E
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt ntk
+
+> 22
+
+≤ ρ
+
+2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt E ntk 
+
+> 22
+
+= ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+ Btk
+
+Bt
+
+2
+
+σtk
+
+> 2
+
+= ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+ Btk
+
+Bt
+
+2 ηC Btk εtk
+
+!2
+
+= ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk 
+
+> 2
+
+. (26) 
+
+Combining A, B 1 and B2, we have 
+
+E F (wt+1 ) − F (wt)
+
+≤ (ρη 2 − η)E F (wt) 22
+
+| {z }
+
+> C
+
++ρη 2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk 
+
+> 2
+
+.
+
+(27) Now we bound C. We set η < 1 
+
+> ρ
+
+, then ρη 2 − η < 0.According to Assumption 2, the following inequality holds: 
+
+2μ(ρη 2 − η)E[F (wt) − F (w∗)] ≥ (ρη 2 − η)E ∆F (wt) 22 .
+
+(28) Substituting Equ. (28) into Equ. (27), we have 
+
+E F (wt+1 ) − F (wt)
+
+≤2μ(ρη 2 − η)E[F (wt) − F (w∗)] + ρη 2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk 
+
+> 2
+
+. (29) Adding E[F (wt−1) − F (w∗)] on both sides on Equ. (29), we have 
+
+E F (wt+1 ) − F (w∗)
+
+≤(1 + 2 μρη 2 − 2μη )E[F (wt) − F (w∗)] + ρη 2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk 
+
+> 2
+
+. (30) Recursively using Equ. (30), we have 
+
+E F (wt+1 ) − F (w∗)
+
+≤(1 + 2 μρη 2 − 2μη )E[F (wt) − F (w∗)] + ρη 2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk
+
+> 2
+
+≤(1 + 2 μρη 2 − 2μη )2E[F (wt−1) − F (w∗)] + (1 + 2 μρη 2 − 2μη )×
+
+ρη 2
+
+> N
+
+X
+
+> k=1
+
+Bt−1
+
+> k
+
+Bt−1 λt−1 
+
+> k
+
++ ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt−12εt−1
+
+> k
+> 2
+
+!
+
++ ρη 2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk
+
+> 2
+
+!
+
+≤ · · · ≤(1 + 2 μρη 2 − 2μη )t+1 E[F (w0) − F (w∗)] +
+
+> t
+
+X
+
+> r=0
+
+(1 + 2 μρη 2 − 2μη )r ×
+
+ρη 2
+
+> N
+
+X
+
+> k=1
+
+Bt−rk
+
+Bt−r λt−rk + ρd 
+
+2
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt−r 2εt−rk
+
+> 2
+
+!
+
+. (31) For ease of representation, let κ1 = 1+2 μρη 2 −2μη, κ 2 =
+
+ρη 2, κ 3 = ρd  
+
+> 2
+
+. Thus, the convergence upper bound of Equ. (31) after T + 1 rounds can be formulated as 
+
+E F (wT +1 ) − F (w∗)
+
+≤κ1T +1 E[F (w0) − F (w∗)] +
+
+> T
+
+X
+
+> t=0
+
+κ1t κ2
+
+> N
+
+X
+
+> k=1
+
+BT −tk
+
+BT −t λT −tk + κ3
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+BT −t2εT −tk
+
+> 2
+
+!
+
+≤κ1T +1 E[F (w0) − F (w∗)] +
+
+> T
+
+X
+
+> t=0
+
+κ1T −t κ2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + κ3
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk
+
+> 2
+
+!
+
+. (32) Further, the convergence upper bound after T rounds is 
+
+E[F (wT ) − F (w∗)] 
+
+≤κ1T E[F (w0) − F (w∗)] + 
+
+> T−1
+
+X
+
+> t=0
+
+κ1T −1−t κ2
+
+> N
+
+X
+
+> k=1
+
+Btk
+
+Bt λtk + κ3
+
+> N
+
+X
+
+> k=1
+
+η2C2
+
+Bt2εtk
+
+> 2
+
+!
+
+.
+
+(33) APPENDIX II PROOF OF PROPOSITION 6
+
+Proof: According to Equ. (17), we have 
+
+f (Btk) = γ2(αk + Qtk)( Btk)2 − Rt
+
+ϕt log( Btk). (34) Then we get the first derivative of f (Btk) by 
+
+f ′
+
+(Btk) = 2( αk + Qtk)Btk − Rt
+
+ϕt · 1
+
+Btk
+
+. (35) Let f ′
+
+(Btk) = 0 , we have 
+
+(Btk)∗ =
+
+s
+
+Rt
+
+2ϕt(αk + Qtk) . (36) Afterwards, we get the second derivative of f (Btk) by 
+
+f ′′ 
+
+(Btk) = 2( αk + Qtk) + Rt
+
+ϕt · 1(Btk)2 > 0. (37) If αk + Qtk > 0 and Rt > 0 hold, (Btk) is the optimal solution to minimize Equ. (17). The proof for (εtk)∗ is analogous and thus omitted. APPENDIX III PROOF OF PROPOSITION 7
+
+Proof: We set 
+
+Xtk = γ2
+
+2ϕt(γ2αk + Qtk) , Y tk = γ2
+
+2ϕt(γ2βk + Ztk) . (38) Proposition 6 can be reformulated as 
+
+(Btk)∗ =
+
+q
+
+RtXtk, (εtk)∗ =
+
+q
+
+RtY tk . (39) Afterwards, we have 
+
+1(Bt)2 = 1
+
+Rt
+
+PNi=1 (Xti ) 12
+
+2 , 1(εtk)2 = 1
+
+RtY tk
+
+. (40) Substituting Equ. (40) into Equ. (6), we have 
+
+f (Rt) = γ1Rt +
+
+> N
+
+X
+
+> k=1
+
+κ1T −1−tκ3η2C2
+
+Bt2εtk
+
+> 2
+
+=γ1Rt +
+
+> N
+
+X
+
+> k=1
+
+· κ1T −1−tκ3η2C2
+
+Rt
+
+PNi=1 (Xti ) 12
+
+2 · 1
+
+RtY tk
+
+=γ1Rt + κ1T −1−tκ3η2C2
+
+(Rt)2 ·
+
+PNk=1 (Y tk )−1
+
+PNi=1 (Xti ) 12
+
+2 . (41) Then we get the first derivative of f (Rt) by 
+
+f ′
+
+(Rt) = γ1 − 2(Rt)3 · κ1T −1−tκ3η2C2 ·
+
+PNk=1 (Y tk )−1
+
+PNi=1 (Xti ) 12
+
+2 .
+
+(42) Let f ′
+
+(Rt) = 0 , we have 
+
+(Rt)∗ =
+
+ 2κ1T −1−tκ3η2C2
+
+γ1
+
+·
+
+PNk=1 (Y tk )−1
+
+PNi=1 (Xti ) 12
+
+2 ·
+
+
+
+> 13
+
+.
+
+(43) APPENDIX IV PROOF OF PROPOSITION 8
+
+Proof: According to the definition of the mean-field estimator ϕt, we have 
+
+ϕt =
+
+> N
+
+X
+
+> k=1
+
+log( Btkεtk), (44) For ease of reading, we rewrite Equ. (44) as 
+
+ϕt = Ψ 1(Bt
+
+> 1
+
+, ε t
+
+> 1
+
+, B t
+
+> 2
+
+, ε t
+
+> 2
+
+, · · · , B tN , ε tN ). (45) By inserting Equ. (18) and Equ. (19) of Proposition 6 into Equ. (45), we have 
+
+ϕt = Ψ 2(ϕt, R t), (46) where ϕt is a function of (ϕt, R t). Further, by inserting Equ. (20) of Proposition 7 into Equ. (46), we have 
+
+ϕt = Ψ 4(ϕt), (47) where ϕt is literally a function of itself. Next, we examine whether a fix point exists for Ψ4. We bound ϕt as [0 , C ]. On the one hand, ϕt >= 0 holds when 
+
+Btk · εtk >= 1 for all edge nodes k ∈ [1 , N ], which is a common assumption in practice [7]. On the other hand, 
+
+ϕt <= C holds since data volume and privacy budget of an edge node are limited according to Equ. (11). In general, the domain and range of Ψ4 can be bounded as Π = [0 , C ].Since Ψ is a continuous mapping from Π to Π, according to Brouwer’s fixed-point theorem, Ψ4 has a fix point in Π
+
+for ϕt.

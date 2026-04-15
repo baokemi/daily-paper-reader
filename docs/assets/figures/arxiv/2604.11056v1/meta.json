@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-001.webp",
+      "caption": "Figure 6: Entropy dynamics analysis of 7B models.",
+      "page": 21,
+      "index": 1,
+      "width": 442,
+      "height": 406
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-002.webp",
+      "caption": "Figure 1: Tokens in Bold exhibit high entropy. High-entropy and low-entropy tokens hold different credit upper bounds in an information-theoretic view. We decompose token updates in RLVR into four quadrants to study the token-level credit assignment mechanism. See Appendix I for full entropy examples.",
+      "page": 2,
+      "index": 2,
+      "width": 943,
+      "height": 320
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-003.webp",
+      "caption": "Table 1: Main results in percentage (%) on mathematics reasoning benchmarks with Qwen2.5-Math-7B. The best results are in bold, and the second-best results are underlined. The settings for all subsequent tables are consistent with this format. The avg is computed by averaging the Avg@k across all benchmarks.",
+      "page": 7,
+      "index": 3,
+      "width": 937,
+      "height": 380
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-004.webp",
+      "caption": "Table 2: Main results in percentage (%) on mathematics reasoning benchmarks with DeepScaleR-1.5B-8k.",
+      "page": 7,
+      "index": 4,
+      "width": 937,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-005.webp",
+      "caption": "Table 8: Extended efficiency evidence on MATH and Olympiad for DeepScaleR-1.5B-8k. Higher Avg@4 is better; lower token counts indicate lower inference cost. The table is derived from the additional rebuttal measurements used to corroborate the AIME24 Pareto analysis.",
+      "page": 22,
+      "index": 5,
+      "width": 827,
+      "height": 225
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-006.webp",
+      "caption": "Figure 8: Advantage value distributions. Comparison of token-level credit assignment among different methods.",
+      "page": 22,
+      "index": 6,
+      "width": 453,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-007.webp",
+      "caption": "Figure 7: Hyperparameter analysis. We evaluate the impact of α ∈ {0.1, 0.2, 0.3, 0.4, 0.5, 1} on 7B models. Left: training efficiency comparison. Right: evaluation on various benchmarks.",
+      "page": 22,
+      "index": 7,
+      "width": 935,
+      "height": 227
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-008.webp",
+      "caption": "Table 4: Comparison of token-level credit assignment methods. “Polarity-Aware” indicates whether the method applies different modulations to positive vs. negative samples. “Theory Grounding” denotes whether the design is motivated by a formal theoretical result.",
+      "page": 14,
+      "index": 8,
+      "width": 893,
+      "height": 193
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-009.webp",
+      "caption": "Table 5: Training hyperparameters for the four-quadrant experiments.",
+      "page": 14,
+      "index": 9,
+      "width": 422,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-010.webp",
+      "caption": "Table 10: Per-domain accuracy (%) on MMLU-Pro with Qwen2.5-7B. Best results in bold.",
+      "page": 23,
+      "index": 10,
+      "width": 447,
+      "height": 494
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-011.webp",
+      "caption": "Figure 3: Performance–efficiency trade-off for 1.5B models on AIME24.",
+      "page": 8,
+      "index": 11,
+      "width": 448,
+      "height": 384
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-012.webp",
+      "caption": "Figure 4: Token entropy distribution. While lowentropy distributions remain aligned, a sharp divergence emerges between positive and negative samples in the high-entropy quadrant.",
+      "page": 19,
+      "index": 12,
+      "width": 435,
+      "height": 591
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-013.webp",
+      "caption": "Figure 11: Visualization of token entropy in incorrect and correct responses.",
+      "page": 24,
+      "index": 13,
+      "width": 916,
+      "height": 1369
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-014.webp",
+      "caption": "Figure 5: Test time compute performance of four-quadrant training objectives. The x-axis represents varying k ∈ {1, 2, 4, 8, 16, 32, 64, 128, 256} values, covering the full spectrum of Pass@k.",
+      "page": 20,
+      "index": 14,
+      "width": 935,
+      "height": 268
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11056v1/fig-015.webp",
+      "caption": "Figure 2: The training dynamics and evaluation of four quadrant decomposition. (a) Training solve rate. (b) Training entropy. (c) Avg@32 on AIME24. (d) Pass@32 on AIME24. The x-axis denotes training steps.",
+      "page": 5,
+      "index": 15,
+      "width": 943,
+      "height": 559
+    }
+  ]
+}

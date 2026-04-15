@@ -1,0 +1,855 @@
+Title: Inertial Mining: Equilibrium Implementation of the Bitcoin Protocol
+
+URL Source: https://arxiv.org/pdf/2604.06092v1
+
+Published Time: Wed, 08 Apr 2026 01:21:41 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# Inertial Mining: Equilibrium Implementation of the Bitcoin Protocol ∗
+
+## Manuel Mueller-Frank † Minghao Pan ‡ Omer Tamuz §
+
+Abstract 
+
+The value of proof-of-work cryptocurrencies critically depends on miners having incentives to follow the protocol. However, the Bitcoin mining protocol proposed by Nakamoto (2008) and implemented in practice is well known not to constitute an equilibrium: Eyal and Sirer (2018) construct a profitable deviation called “selfish mining” which relies on strategically delaying disclosure of newly mined blocks rather than publishing them immediately. We propose inertial mining, a novel mining protocol. When miners follow inertial mining, they produce the outcome intended by Nakamoto, i.e., a single longest chain. But unlike the Bitcoin mining protocol, inertial mining constitutes an equilibrium (assuming no miner controls more than half of the mining power). Indeed, neither selfish mining nor any other deviation is profitable. Furthermore, inertial mining only changes miners’ behavior in the event of off-path forks, and can be implemented in Bitcoin without any changes to its consensus mechanism or blockchain architecture. 
+
+## 1 Introduction 
+
+Nakamoto (2008) introduced Bitcoin, a digital money that functions without a cen-tral entity controlling the monetary base and intermediating transactions. Although 
+
+> ∗
+
+We thank Matt Weinberg for useful comments and suggestions. 
+
+> †
+
+IESE Business School. Email: mmuellerfrank@iese.edu. 
+
+> ‡
+
+Caltech. Email: mpan2@caltech.edu. 
+
+> §
+
+Caltech. Email: tamuz@caltech.edu. Omer Tamuz was supported by a National Science Foun-dation CAREER award (DMS-1944153) and a MURI grant. 
+
+1
+
+> arXiv:2604.06092v1 [cs.CR] 7 Apr 2026
+
+Bitcoin so far failed to gain significant traction as a medium of exchange, it did so as an alternative financial asset and a digital store of value. Its market capitalization first surpassed $1 billion in 2013, $100 billion in 2017, and $1 trillion in 2021. 1 There is a growing literature that analyzes Bitcoin from an economic and game-theoretic perspective. See, for example, Biais et al. (2019), Schilling and Uhlig (2019), Leshno and Strack (2020), Huberman et al. (2021), and Pagnotta (2022). For a survey, see Halaburda et al. (2022). The main feature that makes Bitcoin attractive as a reserve asset is its decentral-ized nature, which implies that no entity, country or otherwise, can censor transac-tions. Decentralization, as well as the absence of a central intermediary that selects and processes valid transactions, introduces two major challenges. First, it requires consensus among all participants about the allocation of Bitcoin ownership. Second, it requires that all entities that participate in the transaction selection and execution do not engage in malicious activity. Satoshi Nakamoto addressed these complications via the so-called Nakamoto consensus mechanism. The initial understanding of Nakamoto consensus was that it is an equilibrium for consensus participants to act honestly and follow the standard Bitcoin mining protocol 
+
+described by Nakamoto. The seminal paper by Eyal and Sirer (2018), however, es-tablishes that the standard protocol is not an equilibrium, and constructs a profitable deviation strategy they call “selfish mining”. As far as we know, it has since been an open question whether an equilibrium exists that replicates the outcome intended by Nakamoto. The contribution of this paper is to propose the inertial mining protocol .Inertial mining constitutes an equilibrium for the Nakamoto consensus mechanism, coincides with the Nakamoto protocol on-path, and thus produces the same outcome. In order to enable decentralization, Nakamoto proposed a partitioning of the trans-action history into discrete blocks that are assembled in regular intervals. 2 Each block is appended to one previously assembled block resulting in a set of directed paths of blocks that point to the genesis block. One such directed path (or chain of blocks) is called a blockchain . In Bitcoin, a transaction is considered part of the realized trans-action history if and only if it is included in a block that belongs to the longest chain. 3
+
+Blocks are added to the chain by so-called miners, i.e., agents that participate in the   
+
+> 1See www.coingecko.com/en/coins/bitcoin.
+> 2In Bitcoin the expected time between blocks is approximately ten minutes.
+> 3This is a simplification made for expositional convenience. Formally, the valid chain is the
+> most-worked chain. Note that our main result carries forward for the “most-worked” chain selection
+
+2consensus mechanism. The power to assemble transactions into a block is chosen by proof-of-work, a contest that can be described as follows. Each miner i controls αi computational mining power (henceforth mining power)— normalized so that the sum of computational powers across agents equals one. The miners all use their mining power to solve a computational puzzle specific to the last block in the longest chain. When a miner succeeds (miner i succeeds with probability 
+
+αi) he publishes it in a new block which is propagated in the network. If the solution is valid, then all other miners add the new block to the end of the chain and start mining the next block upon it. Agents are incentivized to follow the above-described standard Bitcoin mining protocol via so-called block rewards . In each valid mined block, a predetermined amount of Bitcoin is newly issued and assigned to the respective miner. 4 These block rewards incentivize honest mining as the property rights to the newly issued coins are only commonly accepted if the mined block ends up in the longest chain. We assume that miners are long-lived and adopt the standard assumption that the payoff of a given miner is equal to the share of blocks he mined in the longest chain. Note that if all miners follow the standard mining protocol, then all blocks are consecutively mined on one chain and asymptotically each miner i’s payoff is equal to his mining power αi.If a miner i has mining power αi at least a half, equilibrium fails for a trivial reason: it can eventually overtake any public chain by extending his own private branch. Eyal and Sirer (2018) showed that there is a profitable deviation even if αi
+
+is below one half (but not too low, see more below). The core idea is that a selfish miner withholds mined blocks, privately builds a parallel chain to the public longest chain, and selectively discloses it if his private chain generates a lead over the public one. This way the miners that follow the standard mining protocol waste resources and the selfish miner ends up with a payoff strictly larger than his computational power. They called this deviation selfish mining .Our contribution is to construct an honest mining equilibrium such that no miner has an incentive to deviate, assuming max i αi ă 1{2. The inertial mining protocol 
+
+> rule.
+> 4Total miner revenue is the sum of block rewards and transaction fees that senders pay for inclusion of their transaction in a block, and the transaction fee typically has a 1% to 10% share of miner revenue, which we abstract away from in our model.
+
+3we propose works as follows. Consider miners who are working on the last block in the current longest chain. If a new block gets appended to this chain, the miners will switch to working on the new last block, as in the standard mining protocol. However, if a new chain is published that does not extend the current longest chain, the miners will only switch to it if it is longer by at least I ą 0 blocks. The number 
+
+I is a parameter of the inertial mining protocol. To ensure that a specific symmetric strategy profile is an equilibrium, I needs to be chosen to be large enough, as a function of the miners’ distribution of mining power. The closer the mining power of the largest miner is to half, the larger I needs to be. When there is a miner with power half or more, no choice of I constitutes an equilibrium. Inertial mining differs from the standard mining protocol in its prescription of which chain to append to if there is more than one public chain, but results in one single chain as equilibrium outcome and thus achieves the intended outcome of the standard mining. Importantly, it does this robustly as an equilibrium, with miners having no incentive to deviate. It is straightforward to see that under inertial mining, selfish mining is no longer a profitable deviation. The main technical contribution of this paper is to show that no other possible deviation is profitable. This is challenging because the set of possible deviations is large. Our proof addresses this by assigning each honest block that is displaced from the equilibrium chain to a particular strate-gically mined “killer” block, and then showing that no such block can be expected to displace enough honest blocks to outweigh the miner’s equilibrium share. 
+
+1.1 Related literature 
+
+This paper contributes to the growing literature on the incentive properties and equi-librium analysis of proof-of-work (PoW) blockchains. Our starting point is the vul-nerability first identified by Eyal and Sirer (2018): Bitcoin’s standard mining protocol does not constitute an equilibrium since a miner with less than majority hash power may profitably deviate by withholding blocks and releasing them strategically. This selfish mining strategy creates intentional and persistent forks. Sapirshtein et al. (2016) strengthen this critique by characterizing optimal withholding and disclosure strategies against honest miners following the standard protocol and showing that such strategies can strictly dominate the original selfish-mining deviation. The fact that the canonical Bitcoin mining protocol is strategically fragile motivates the cen-4tral question we study: whether there exists an equilibrium of a PoW blockchain that generates a single longest chain on the equilibrium path, as intended by Nakamoto (2008). Our main result answers this question affirmatively. A closely related strand of work studies strategic mining in PoW blockchains but proposes to eliminate selfish mining by changing the consensus mechanism or the blockchain design itself. Heilman (2014) proposes the Freshness Preferred mining protocol, under which miners break ties by favoring blocks with more recent ver-ifiable timestamps, thereby reducing the profitability of delayed block release and selfish mining. Because this approach relies on introducing unforgeable timestamps as a novel feature, it necessitates a redesign of blockchain. Solat and Potop-Butucaru (2017) propose changing Bitcoin’s block-validation and chain-extension rules by re-quiring honest miners to create and mine on a special “ZeroBlock” whenever no valid block arrives within a predetermined interval based on expected block-finding and propagation times. Pass and Shi (2017) propose a redesigned blockchain architec-ture, FruitChains, that weakens the ability of strategic miners to benefit from fork manipulation and thereby improves robustness to selfish mining. While these contri-butions demonstrate that selfish-mining incentives can be mitigated, they all rely on changing the consensus mechanism and/or the architecture of the blockchain itself. By contrast, our approach does not modify Bitcoin’s underlying architecture or mech-anism; instead, we propose an alternative mining protocol which can be implemented in the same technical environment as the standard Bitcoin protocol. Our paper is also related to the economics literature that models PoW consensus as a strategic interaction among rational miners. Relative to Eyal and Sirer (2018) and our paper, this literature typically restricts the strategy space by allowing miners to choose only which block to mine on, but not when to disclose newly found blocks. This rules out selfish mining by construction. Within such a framework, Biais et al. (2019) show that mining on the longest chain can be a Markov perfect equilibrium with convergence to a single chain, although other equilibria with persistent disagreement and forks also exist. Pagnotta (2022) embeds PoW mining incentives in a general-equilibrium environment in which the cryptocurrency’s price and security are jointly determined. He shows that multiple equilibria can arise with different price-security combinations. Our paper differs from this literature by explicitly allowing the timing of block disclosure to be strategic. More broadly, our analysis relates to the literature on attacks against Nakamoto 5consensus and on the economic limits of PoW security. A related strand studies double-spend attacks; see, for example, Bonneau (2016) and Gans and Halaburda (2024). Budish (2025) argues that the permissionless security of Nakamoto consensus is intrinsically costly because the flow cost of security must scale with the value at risk from attack. Leshno, Shi, and Pass (2024) develop an alternative consensus design that preserves permissionless entry while delivering stronger economically meaningful security guarantees. These papers focus on different vulnerabilities or on alternative institutional designs, whereas our focus is the equilibrium resolution of selfish mining within PoW. Finally, the motivation for our analysis is further strengthened by recent work emphasizing that selfish mining is not merely a theoretical possibility. Li, Campa-jola, and Tessone (2024) provide empirical evidence consistent with selfish-mining behavior in several PoW blockchains, with especially strong evidence for Monacoin and Bitcoin Cash. More conceptually, the absence of a known equilibrium in PoW that implements a single longest chain on the equilibrium path has been emphasized in discussions surrounding Ethereum’s transition away from PoW; see Buterin (2017) and Hall, Shiaeles, and Li (2024). Our contribution to this debate is to show that such an equilibrium does exist: inertial mining sustains a single longest chain on the equi-librium path without requiring any modification of Bitcoin’s consensus mechanism or blockchain architecture. 
+
+## 2 The Model 
+
+2.1 The mining game 
+
+We start by formally defining a game that captures the strategic interactions involved in Bitcoin mining. This model is widely used in the computer science literature (Eyal and Sirer, 2018; Sapirshtein et al., 2016; Bahrani and Weinberg, 2024). A block is a pair px, y q, where x, y take values in a set of labels, which we take to be the unit interval r0, 1s. The label of the block px, y q is x, and y is the label of the block’s parent block. A chain is a finite or countable sequence of blocks C “px1, y 1q, px2, y 2q, . . . such that xi ‰ xj for i ‰ j, x1 “ y1 “ 0, and for i ą 1 it holds that yi “ xi´1. We say that pxi, y iq is the predecessor block of pxi`1, y i`1q, and that the latter is a successor of the former. For i ă j we say that pxi, y iq is an ancestor of 6pxj , y j q.There is a finite set of players N . Each player i is exogenously assigned mining power αi ą 0, with ř 
+
+> i
+
+αi “ 1. There are discrete time periods t P t 1, 2, . . . u.Each player i has a finite set of mined blocks M it at the end of period t. We denote by Mt “ Y iM it the set of all mined blocks. There is a set of public blocks Pt
+
+at the end of period t, which is a subset of Mt. At the beginning of period t, player 
+
+i can observe their own past blocks M it´1 as well as the past public blocks Pt´1, but not the other players’ mined blocks. Thus, the history available to player i at the beginning of period t consists of their own actions up to that point, and in addition 
+
+P0, P 1, . . . , P t´1, M i
+
+> 0
+
+, M i
+
+> 1
+
+, . . . , M it´1. Beyond this, players do not observe the actions of other players. We set M i 
+
+> 0
+
+“ H for all i ‰ i0, and M i0 
+
+> 0
+
+“ tp 0, 0qu . I.e., at the start of the game players have no mined blocks, except for some player i0 who has the genesis block 
+
+p0, 0q. We also set P0 “ tp 0, 0qu , so that this block is public. At each time period nature chooses one of the players, where the probability that 
+
+i is chosen is i’s mining power αi. Nature’s choices are independent across periods. At the beginning of each time period each player i has to choose an action bit Pr0, 1s. As we shall see, this will be interpreted as the label of the block to which the player wants to add a block. If player i is chosen at period t, they mine a new block 
+
+mt “ p x, b itq, where x is chosen independently and uniformly at random from the set of labels r0, 1s. That is, if they mine mt “ p x, b itq then M it “ M it´1 Y t mtu. Otherwise, 
+
+M it “ M it´1. Note that since block labels are chosen uniformly at random from r0, 1s,each block will almost surely have a unique label. Besides choosing bit, players can, at the end of any time period, decide to publish 
+
+any blocks in M it . That is, each player chooses a subset Bit Ă M it , and we set 
+
+Pt “ Pt´1 Y pY iBit q.In addition, players observe a public randomization device: an i.i.d. process pΞtqt.This will be useful to coordinate on tie-breaking. 5 In summary, in period t, player 
+
+i observes Ξ1, . . . , Ξt´1, P1, . . . , P t´1, and M i
+
+> 1
+
+, M i
+
+> 2
+
+, . . . , M it´1; chooses bit; then, with probability αi, mines a block px, b itq, which is added to M it´1 to form M it ; and finally can choose to publish any subset Bit of M it .Denote by P “ Y tPt the set of all published blocks. Consider the set of all chains 
+
+> 5In practice, the chain itself can be used as such a device, by the use of standard secret-sharing techniques, applied to the block labels.
+
+7made out of blocks in P , and in particular the set of longest chains; these could be infinite. If there is no unique longest chain in P , then all players’ utility is 0. If there is a unique longest chain of published blocks we denote it by C˚. The utility of a player is the (asymptotic) fraction of blocks of C˚ owned by the player: 
+
+ui “ lim inf 
+
+> t
+
+|C˚ X M it ||C˚ X Mt| .
+
+Utility depends on the fraction of blocks rather than the absolute number. This reflects a common assumption in the literature, which stems from the fact that the number of blocks (like the number of shares in a company) is arbitrary and can be scaled by a technical change in the protocol. Our choice of utility reflects an assumption that miners are long-lived; indeed, due to immense fixed and variable costs, Bitcoin mining is conducted primarily by compa-nies (and some governments) rather than individuals. The computer science literature likewise focuses on the asymptotic fraction rather than (say) the discounted fraction (see Eyal and Sirer, 2018; Sapirshtein et al., 2016; Bahrani and Weinberg, 2024), but we do expect that similar results hold for more standard discounted utilities. As our objective is resolve the selfish mining issue first uncovered in this literature, we naturally use the same utility function. 6
+
+2.2 The standard Bitcoin mining protocol and a profitable deviation 
+
+The standard Bitcoin mining protocol is simple, and is defined as follows: bit is chosen to be the label of the last block in the longest chain in Pt´1. If there are multiple longest chains, then players choose uniformly at random among the last blocks of the longest chains, using the public randomization device. Whenever a player mines a block, they immediately publish it. The seminal paper of Eyal and Sirer (2018) proves that the standard Bitcoin min-ing strategy profile is not an equilibrium. They introduce selfish mining, a profitable deviation strategy, which we describe now. Suppose all agents follow the protocol, except i, who implements selfish mining. Consider the first time t in which i finds a block. Then up to time t all found blocks 
+
+> 6The only modification relative to Eyal and Sirer (2018) is our focus on the liminf of the fraction of own blocks in the longest chain as opposed to the limit. This is necessary as for general strategies the limit of the fraction might not exist.
+
+8form one chain. The selfish miner i appends his block to the last block of the longest public chain but does not communicate his block to other miners. He continues mining on his private chain and strategically discloses a subset of his private chain conditional on the number of blocks found by the other miners who always append to the longest public chain. Precisely, his disclosure strategy is as follows. In case of failing to generate a two-block lead over the public chain, the player publishes the block found in period t when the lead of his private chain drops to zero, i.e., when it has the same length of the public chain. In case of generating a private chain lead of two blocks or more, the selfish miner discloses the earlier blocks of the private chain so that from the moment of disclosure onward all other miners append to the last disclosed block of the chain mined by the selfish miner. This causes the miners who follow the Bitcoin mining protocol to waste their found blocks, increasing the share of blocks belonging to the selfish miner. While some blocks of the selfish miner are also lost, in some cases this is profitable. The profitability of selfish mining crucially depends on the selfish miner’s mining share αi and the behavior of other miners in case of a tie in length between the public chain and the disclosed chain of the selfish miner. Following Eyal and Sirer (2018), let 
+
+γ P r 0, 1s denote the probability of miners j ‰ i appending to the disclosed block of the selfish miner in case of a tie. Recall that our analysis concentrates on the case of 
+
+γ “ 12 . To see the intuition behind selfish mining, consider the extreme case of γ “ 1.In this case, even initially withholding a block found in period t does not come with the risk of it not being included in the longest chain: if miner i fails to generate a two-block lead, he publishes the block i found at time t and all other miners subsequently append to his block, leaving stale the honest block found in period t ` 1. Thus, selfish mining results in a strictly higher payoff than honest mining for any mining share 
+
+αi ą 0, given the extreme case of γ “ 1. Eyal and Sirer (2018) establish the following result. 
+
+Proposition 1. For a given γ, a selfish miner i with computational power αi achieves a payoff larger than αi if αi ą 1´γ 
+
+> 3´2γ
+
+.
+
+This result implies that in our setting, the threshold above which selfish mining is a profitable deviation from the Bitcoin mining protocol is αi ą 14
+
+92.3 The Inertial Mining Protocol 
+
+Suppose αi ă 1{2 for all i. We propose the following symmetric strategy profile, and prove that it is an equilibrium. The protocol is parametrized by I ě 1, and defined as follows. If Pt´1 consists of a single chain, choose bit to be the label of the last block in this chain. Otherwise, let C1, . . . , C n be the chains in Pt´1, ordered by increasing lengths 
+
+ℓ1 ď ℓ2 ď ¨ ¨ ¨ ď ℓn. If ℓn ě ℓn´1 ` I, choose bit to be the label of the last block in Cn.Otherwise, let Ci1 , . . . , C ik be the chains that contain bit´1, and choose bit uniformly at random among these chains, using the public randomization device Ξt, so that all players choose the same bit. Finally, all blocks are published as soon as they are mined. A few notes are in order: 1. On path, all blocks are published immediately, and so behavior is identical to the one resulting from all miners adopting the standard Bitcoin mining protocol. 2. The difference between inertial mining and standard mining occurs when more than one chain is longest. In Bitcoin miners switch to the longest chain (as-suming no ties). In inertial mining they switch away from the chain they are currently mining only if the competing chain is longer by I.3. The case I “ 1 is similar to the standard Bitcoin protocol: if there is a unique longest chain then players mine that chain. However, tie-breaking works differ-ently if there is no unique longest chain. 4. It is straightforward to see that if I is large enough then selfish mining is not profitable. The challenge is to prove that no other deviation is profitable; this is non-trivial, since the strategy space is rather rich. The analysis is further complicated by the asymptotic nature of the utility, which implies that no one-deviation principle holds. 5. It is important that when publishing at time t, Ξt`1 is not yet known, so that tie-breaking is uniformly random, conditioned on the information available to players. 
+
+Claim 1. Under inertial mining, the utility of each player i is almost surely αi.
+
+10 Since under inertial mining there is a unique chain that contains every mined block, Claim 1 follows immediately from the strong law of large numbers. 
+
+## 3 Results and Analysis 
+
+Our main result is the following: 
+
+Theorem 1. Given pαiqi with max i αi ă 1{2, the inertial mining protocol is an equilibrium of the mining game for sufficiently large I.
+
+We leave for future work an explicit calculation of how large I needs to be, but conjecture that this is small enough to be practical, assuming max i αi is not extremely close to one half. The remainder of this section is devoted to the proof of this theorem. Suppose all players are playing according to the inertial mining protocol, except perhaps player i who is using some other strategy. We prove that player i’s utility is at most αi, which by Claim 1 shows that there is no profitable deviation. Without loss of generality we assume that player i’s strategy is not randomized, since if there is a mixed profitable deviation then there is also a pure one. We assume that there is a longest published chain C˚, since otherwise player i has utility zero, and such their strategy is not profitable. We henceforth fix the strategies of all the players, including the deviating player i, and calculate probabilities and expectation with respect to the distribution over outcomes generated by these strategies and the randomness in the mining process. Since all players other than i behave identically, we will assume that there is only one player other than i, and denote this player j. This is done for notational convenience only. The mining power of this player is 1 ´ αi. Recall that bjt is the block to which player j is trying to mine a successor at time t. With more than two players, all players j different than i choose the same bjt , and so there is no loss of generality in assuming that there are only two players. Denote by Hit “ p Ξ1, . . . , Ξt´1, P 1, . . . , P t´1, M i
+
+> 1
+
+, M i
+
+> 2
+
+, . . . , M it´1q the history ob-served by player i at the beginning of period t.Recall that player i’s utility is 
+
+ui “ lim inf 
+
+> t
+
+|C˚ X M it ||C˚ X Mt| .
+
+11 We need to show that Eruis ď αi. We claim that it suffices to show that Prui ą αis “ 
+
+0.
+
+Claim 2. Suppose that i has a strategy that Eruis ą αi. Then i has a (perhaps different) strategy such that Prui ą αis “ 1.
+
+Informally, this holds because if player i has a strategy that yields payoff greater than αi with positive probability, then the player has a different strategy that yields payoff greater than αi with probability one. The idea is that since the payoff does not depend on what fraction of blocks the player had at any finite time, the player can always “start from scratch” and draw a new ui if they think it is unlikely to be above αi.
+
+Proof of Claim 2. Suppose that Prui ą αis “ p ą 0, and let A be the event tui ą αiu.Then pt “ ErA | Hit s is a bounded martingale, and hence converges almost surely to the indicator of the event A. Consider the following alternative strategy for player i:follow the original strategy, unless there is some time s such that ps ă p{2. If no such time exists then lim t pt “ 1, the event A occurs and the utility is strictly above αi. If there is a time s such that ps ă p{2, the player “starts from scratch”, implementing the original strategy but treating the block bjs as the genesis block. Since the payoff can also be written as 
+
+ui “ lim inf 
+
+> t
+
+|C˚ X p M it zM it1 q| |C˚ X p MtzMt1 q| 
+
+for any time t1, the player now again has chance p to have payoff strictly greater than 
+
+αi. Repeating this whenever Prui ą αi | Hit s goes below p{2 yields, by the law of large numbers, a strategy such that ui ą αi almost surely. Denote by Kj “ M j zC˚ the set of killed blocks . These are the blocks of player j
+
+that are not in the longest chain. Since player j follows the inertial mining protocol, he will always add blocks to the tree originating in the genesis block p0, 0q. Hence each block px, y q P Kj will have at least one ancestor in C˚. We denote by apx, y q P C˚
+
+the closest ancestor of px, y q that is in C˚ (see Figure 1). We say mt, the block mined at time t, is dishonestly mined if either it is not published at time t, or its predecessor is not bjt . Otherwise, we say mt is honestly mined . Note that all blocks mined by j are honestly mined. We say a dishonestly 12 mined block is an initial dishonestly mined (henceforth, initial) block if its predecessor is honestly mined. The depth ∆px, y q of a block px, y q that is a descendant of the genesis block p0, 0q
+
+is the length of the chain starting at p0, 0q and ending at px, y q. Note that on C˚ there is a unique block at each depth. It follows from the definition of inertial mining that 
+
+∆pbj
+
+> 1
+
+q ď ∆pbj
+
+> 2
+
+q ď ¨ ¨ ¨ , and that in periods in which j mines a block this inequality is strict. Of course, it is also strict if i mines honestly, and in some other cases. The following claim is an immediate consequence of the definitions. 
+
+Claim 3. Suppose that the block mt was honestly mined. Then ∆pbjt`1q ą ∆pbjt q. It follows that blocks mined by j have distinct depths. 
+
+Given a block px, y q that is a descendant of the genesis block, denote by cousin px, y q
+
+the block pw, z q on C˚ satisfying ∆px, y q “ ∆pw, z q (see Figure 1). 
+
+Claim 4. Let px, y q P Kj be a killed block. The block cousin px, y q is dishonestly mined by i.Proof. Note that if mt is honestly mined then ∆pmtq “ ∆pbjt q ` 1, regardless if it was mined by i or j. It thus follows from Claim 3 that any two honestly mined blocks cannot have the same depth. Since every block in Kj is honestly mined, it must be that cousin px, y q is dishonestly mined. Fix a parameter I, and also fix J P t 1, . . . , I ´ 1u. We will show that conclusion of the theorem holds if J is large enough, and I ´ J is also large enough. Suppose px, y q P Kj is a killed block. Let pw, z q be the ancestor block of cousin px, y q
+
+such that all the blocks between pw, z q and cousin px, y q (including pw, z q itself) are dishonestly mined, yet the immediate predecessor of pw, z q is honestly mined. Then 
+
+pw, z q must be an initial dishonestly mined block. We define the killer of the killed block px, y q as follows. If ∆pcousin px, y qq ď ∆pw, z q ` J, then we set killer px, y q “ 
+
+cousin px, y q to be the killer of px, y q. Otherwise, we set killer px, y q “ p w, z q. See Figure 1. The definition of killer px, y q is the key to our proof: it sets up an accounting system that attributes every killed block to some (dishonestly mined) killer. The proof then shows that no block can be expected to kill enough blocks to make dishonest mining worthwhile. 13 p0, 0q
+
+apx, y q
+
+pw, z q
+
+cousin px1, y 1q
+
+cousin px2, y 2q
+
+cousin px3, y 3q
+
+C˚
+
+px0, y 0q
+
+px1, y 1q
+
+px2, y 2q
+
+px3, y 3q
+
+Figure 1: Illustration of the definitions of apx, y q, cousin px, y q and 
+
+killer px, y q. The block apx, y q is the closest ancestor of px, y q that lies on the longest chain C˚. The block cousin pxi, y iq is the unique block on C˚ with the same depth as pxi, y iq. Suppose J “ 1.Then killer px1, y 1q “ cousin px1, y 1q and pw, z q is the killer of px0, y 0q,
+
+px2, y 2q and px3, y 3q.Let Kt be the number of blocks killed by mt, the block mined at time t:
+
+Kt “ |tp x, y q P Kj : killer px, y q “ mtu| .
+
+Let 
+
+killer ´1pmtq :“ tp x, y q : mt “ killer px, y qu .
+
+Let Lt “ 1mtPM iXC˚ the indicator of the event that the block mined at time t will belong to i and will be included in the longest chain. Define the random variable 
+
+St “ αiKt ` p 1 ´ αiqLt,
+
+which we call the payoff of the block (potentially mined by i) at time t.The next proposition is the key technical component in the proof of Theorem 1. 14 Proposition 2. If J and I ´ J are sufficiently large then 
+
+E“St
+
+ˇˇ Hit
+
+‰ ď αip1 ´ αiq
+
+almost surely. 
+
+That is, given any history, the expected payoff is at most αip1 ´ αiq.
+
+Proof. Since St “ 0 if mt R M i, we need to show that ErSt | Hit , m t P M is ď 1 ´ αi.We will consider the cases that the predecessor block of mt is either honestly or dishonestly mined. 
+
+Case 1. Suppose that given Hit “ hit, the predecessor block of mt is dishonest, so that mt cannot be initial. Then, by definition, mt can only possibly kill its cousin. Let 
+
+pw, z q be the closest (youngest) initial dishonestly mined block among the ancestors of mt. For example, this is the case for mt “ cousin pxi, y iq in Figure 1. 
+
+Case 1.1. Suppose that ∆pw, z q ` J ă ∆pmtq. For example, this is the case of 
+
+mt “ cousin px2, y 2q or mt “ cousin px3, y 3q in Figure 1. Then by definition mt cannot kill any block, so that 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i‰ “ p 1 ´ αiqE“mt P C˚ ˇˇ Hit “ hit, m t P M i‰ ď 1 ´ αi.
+
+Case 1.2. Suppose that ∆pw, z q` J ě ∆pmtq, and assume that bjt is not an ancestor of mt. Since the predecessor of pw, z q is honestly mined, we have 
+
+∆pbjt q ě ∆pw, z q ě ∆pmtq ´ J. 
+
+If mt is included in C˚, then eventually player j mines after mt, and we let t1 be the first time when player j ever mines at some descendant of mt. By the definition of inertial mining, it must be that ∆pbjt1 q ě ∆pbjt1´1q ` I.Now, the chain starting at mt and ending at bjt1 must be made of blocks mined by 
+
+i; this follows from the minimality of t1. The length of this chain is ∆pbjt1 q ´ ∆pmtq,which by the argument of the previous paragraph is at least ∆pbjt1´1q ` I ´ ∆pmtq.Hence we have that the number of blocks Ait1 mined by i between time t and t1 is at least 
+
+Ait1 ě ∆pbjt1´1q ` I ´ ∆pmtq.
+
+15 On the other hand, bjt1´1 must be deeper than bit by at least Ajt1 , the number of blocks produced by j in this time interval. We thus have that 
+
+Ait1 ´ Ajt1 ě `∆pbjt1´1q ` I ´ ∆pmtq˘ ´ `∆pbjt1´1q ´ ∆pbjt q˘ ě I ´ J. 
+
+That is, i produced at least I ´ J blocks more than j in the time interval rt, t 1s.The difference between the number of blocks mined by i and j behaves like a ran-dom walk that moves to the right with probability αi, and to the left with probability 
+
+1´αi. We define εk to be the probability that such an αi-biased random walk starting from k ever hits I. A standard calculation yields that 
+
+εk “
+
+$&% 
+
+> αI´ki
+> p1´αiqI´k
+
+if I ą k
+
+1 otherwise. Then the probability that there exists some t1 ą t such that i produced at least I ´ J
+
+blocks more than j in the time interval rt, t 1s is exactly εJ . Since the existence of such 
+
+t1 is necessary for mt P C˚, we have 
+
+Ppmt P C˚|Hit “ hit, m t P M iq ď εJ .
+
+Since mt can only possibly kill its cousin, and mt P C˚ is necessary for killing, we have 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i‰ ď Ppmt P C˚|Hit “ hit, m t P M iq
+
+When I ´ J is large enough, we arrive at the desired bound 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i‰ ď 1 ´ αi
+
+Case 1.3. Suppose now that d pw, z q ` J ě ∆pmtq, and that bjt is an ancestor of mt.If miner i chooses to publish mt at time t, we have St ď 1 ´ αi, because mt cannot kill any blocks. Our goal is then to show that 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t‰ ď 1 ´ αi.
+
+For k ě 0, let Ek be the event that the k blocks mined starting at time t`1 are mined by player i and then player j gets the following one. Then PrEks “ αkp1 ´ αq and 
+
+Ek is independent of tHit , m t P M i, not publishing mt at time tu. Under E0, mt P C˚
+
+16 only if mt is published at t ` 1 and wins tie breaking, or descendants of mt are being extended by I blocks longer than bjt1 at time t1 for some t1 ą t. A union bound yields 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t, E 0
+
+‰
+
+ď E“mt P C˚ ˇˇ Hit “ hit, m t P M i, not publishing mt at time t, E 0
+
+‰
+
+ď 12 ` εJ .
+
+where we use the fact that mt can only kill a block if it survives in the first inequality. Under each Ek for k ě 1, mt may survive by publishing before time t ` k ` 1, in which case St “ 1 ´ αi. If mt is not published before time t ` k ` 1, then again mt can only survive if either mt is published at t ` k ` 1 and wins tie breaking, or extended by I blocks longer than bjt1 at time t1 for some t1 ą t ` k. Then 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt by time t ` k, E k
+
+‰
+
+ď E“mt P C˚ ˇˇ Hit “ hit, m t P M i, not publishing mt by time t ` k, E k
+
+‰
+
+ď 12 ` εk`J ,
+
+where the bound εk`J is because at time t ` k ` 1, the descendants of mt is at most 
+
+k ` J ahead of bjt`k`1.Summing up over Ek, we have 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t‰
+
+ď p 1 ´ αiqr 12 ` εJ s ` 
+
+> 8
+
+ÿ
+
+> k“1
+
+αki p1 ´ αiq max t1 ´ αi, 12 ` εk`J uď p 1 ´ αiqr 12 ` εJ s ` 
+
+> 8
+
+ÿ
+
+> k“1
+
+αki p1 ´ αiqp 1 ´ αi ` εk`J q“ p 1 ´ αiqp 12 ` αiq ` p 1 ´ αiq
+
+> 8
+
+ÿ
+
+> k“0
+
+αki εk`J
+
+Choosing I ´ J large enough yields 
+
+ErSt|Hit “ hit, m t P M i, not publishing mt at time ts ď 1 ´ αi.
+
+Case 2. Suppose that under history hit the immediate predecessor of mt is honest; this is the case of block pw, z q in Figure 1. If mt is published at time t, then no block is killed by mt and St ď 1 ´ αi. Next, we shall show that 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t‰ ď 1 ´ αi.
+
+17 We can write the payoff St “ S1 
+
+> t
+
+` S2 
+
+> t
+
+, where 
+
+S1 
+
+> t
+
+: “ αi
+
+> 8
+
+ÿ
+
+> k“J`1
+
+1a block of depth ∆pmtq` k is killed by mt
+
+S2 
+
+> t
+
+: “ p 1 ´ αiq1mtPC˚ ` αi1a block of depth ∆pmtq is killed by mt
+
+Here we use the fact that blocks of depth between ∆pmtq ` 1 and ∆pmtq ` J
+
+cannot be killed by mt, and for each depth there is at most one honest block of that depth and can be possibly killed. Suppose that a block px, y q of depth of ∆pmtq ` k is killed by mt, where k ě J ` 1.Let px1, y 1q “ cousin px, y q P C˚. Let t1 be the first time when player j mines after descendants of px1, y 1q. Then t1 ě k ` t. As all the blocks on the chain between 
+
+px, y q and bjt1 are mined by i, together with Claim 3, we know that between time t
+
+and t1, player i mines weakly more blocks than player j. The probability that such 
+
+t1 exists conditional on mt P M i is at most ε˚ 
+
+> k
+
+, defined as the probability that there exists k1 ą k such that the αi-biased random walk starting from 1 hits 0 at time k1.Therefore, 
+
+E“S1
+
+> t
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t‰ ď αi
+
+> 8
+
+ÿ
+
+> k“J`1
+
+ε˚
+
+> k
+
+Note that ε˚ 
+
+> k
+
+decays exponentially with k. Choosing J large enough, the conditional 
+
+S1 
+
+> t
+
+can be made arbitrarily small. For the second part, we use the same computation as in Case 1.3 to get 
+
+E“S2
+
+> t
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t‰
+
+ď p 1 ´ αiqr 12 ` ε1s ` 
+
+> 8
+
+ÿ
+
+> k“1
+
+αki p1 ´ αiq max t1 ´ αi, 12 ` εk`1u.
+
+ď p 1 ´ αiqp 12 ` αiq ` p 1 ´ αiq
+
+> 8
+
+ÿ
+
+> k“0
+
+αki εk`1.
+
+By choosing I large enough, the conditional S2 
+
+> t
+
+can be made arbitrarily close to 
+
+p1 ´ αiqp 12 ` αiq. Summing over the bounds on the conditional S1 
+
+> t
+
+and S2 
+
+> t
+
+, and by choosing I and I ´ J large enough, we have 
+
+E“St
+
+ˇˇ Hit “ hit, m t P M i, not publishing mt at time t‰ ď 1 ´ αi.
+
+18 Next, we prove a lemma that bounds the probability that a honest block is killed by another block created later. 
+
+Lemma 1. For s ą t,
+
+P“mt is killed by ms
+
+ˇˇ Hit
+
+‰ ď ε˚
+
+> s´t
+
+,
+
+where, as above, ε˚ 
+
+> k
+
+is the probability that there exists k1 ą k such that the αi-biased random walk starting from 1 hits 0 at time k1.
+
+Before proving this lemma, we note that as ε˚ 
+
+> k
+
+decays exponentially in k, we get a universal upper bound on the number of blocks mined before time t and killed by blocks mined after t as a corollary. 
+
+Corollary 1. There exists a constant C such that for any t: 
+
+ÿ
+
+> kět`1
+
+E“|M jt X killer ´1pmkq| ‰ ă C
+
+Proof of Corollary 1. We write the left hand side as a double summation: 
+
+ÿ
+
+> kět`1
+
+E“|M jt X killer ´1pmkq| ‰ “ ÿ
+
+> t1ďt
+
+ÿ
+
+> sět`1
+
+Prmt1 is killed by mss
+
+.
+
+Proof of Lemma 1. Suppose that mt is killed by ms, where s ą t. By definition of killing, ∆pmtq ď ∆pmsq. As s ą t, ms cannot kill mt by tie-breaking. Let t1 ą s be the first time when player j mines after a descendant of ms. Then descendants of ms
+
+are extended by I blocks longer than bjt1 at time t1. This necessarily implies that the number of blocks player i mines between s and t1 is at least I more than the number of blocks player j mines between t and t1. In particular, player i mines weakly more blocks than player j do between t and t1. The probability that there such t1 ą s exists is at most ε˚ 
+
+> s´t
+
+defined in Case 2 of proof of Proposition 2. We also need a bound on the number of killed blocks; this implies that the blockchain has a linear growth rate. 
+
+Lemma 2. If J and I ´ J are sufficiently large, then for every t:
+
+E“Kt
+
+ˇˇ Hit
+
+‰ ď p 1 ´ αiqαi
+
+19 almost surely. 
+
+Proof. It suffices to show 
+
+E“Kt
+
+ˇˇ Hit , m t P M i‰ ď 1 ´ α
+
+.Suppose that mt is not an initial dishonestly mined block. Then by definition, 
+
+mt can kill at most one block. Moreover, mt can only kill a block when mt P C˚.Therefore, Proposition 2 implies that 
+
+E“Kt|Hit , m t P M i, m t is not initial ‰ ď 1 ´ αi
+
+Suppose now that mt is initial. By definition, mt can either kill its cousin, or kill blocks with depth at least ∆pmtq ` J. Using notations from Case 2 of proof of Proposition 2, the number of blocks mt kill that have depth at least ∆pmtq ` J is 
+
+α´1S1 
+
+> t
+
+. Since mt can only kill its cousin when mt P C˚, we have 
+
+1mt kills its cousin ď S2 
+
+> t
+
+.
+
+Hence, Kt ď α´1S1 
+
+> t
+
+` S2 
+
+> t
+
+. For J and I ´ J large enough, we have seen in the proof of Proposition 2 that the conditional S1 
+
+> t
+
+can be made arbitrarily small and S2 
+
+> t
+
+strictly bounded away from 1 ´ α. Thus, we have 
+
+E“Kt|Hit , m t P M i, m t is initial ‰ ď E“α´1S1 
+
+> t
+
+` S2 
+
+> t
+
+|Hit , m t P M i, m t is initial ‰ ď 1 ´ αi.
+
+We will need to following general lemma regarding the limit of the ratio of two stochastic processes. Its proof is deferred to the appendix. 
+
+Lemma 3. Suppose that tXtu and tYtu are two random sequences and a ą 0 are constants such that 1. Xt, Y t P r 0, 1s.2. lim inf t EraY t ´ Xts ě 0.3. lim inf t ErYts ą 0.
+
+20 Then it is impossible that 
+
+lim inf 
+
+> t
+
+Xt
+
+Yt
+
+ą a a.s. Here we define the lim inf to be 0 if Yt is eventually 0.
+
+We are now ready to prove Theorem 1. We first choose J and I ´ J large enough for the conclusions from Proposition 2 and Lemma 2 to be true. We let 
+
+Xt :“ 1
+
+t |C˚ X M it |, Y t :“ 1
+
+t |C˚ X Mt|, α :“ αi,
+
+and check the conditions of Lemma 3 in the following. The first condition in the lemma is trivially satisfied as t “ | Mt| ě | M it |. It remains to check the other two conditions. Note that 
+
+E“|C˚ X M it |‰ “ ErL1 ` ¨ ¨ ¨ Lts
+
+by the law of total expectation. Likewise, 
+
+E“|C˚ X M jt |‰ “ E“|M jt z Y kě1 killer ´1pmkq| ‰
+
+ě E“|M jt |‰ ´ ErK1 ` ¨ ¨ ¨ ` Kts ´ ÿ
+
+> kět`1
+
+E“|M jt X killer ´1pmkq| ‰ (1) 
+
+ě p 1 ´ αiqt ´ ErK1 ` ¨ ¨ ¨ ` Kts ´ C. 
+
+The first inequality follows from the fact that the number of blocks killed by the blocks i mined up to time t upper bounds the number of blocks in M jt killed by these blocks. The second inequality follows from Corollary 1, where C is a constant independent of t. It follows that 
+
+EraY t ´ Xts ě αi
+
+ˆ
+
+p1 ´ αiq ´ 1
+
+t ErK1 ` ¨ ¨ ¨ ` Kts ` 1
+
+t ErL1 ` ¨ ¨ ¨ ` Lts ´ Ct
+
+˙
+
+´ 1
+
+t ErL1 ` ¨ ¨ ¨ ` Lts“ 1
+
+t
+
+> t
+
+ÿ
+
+> s“1
+
+”
+
+αip1 ´ αiq ´ ErαiKs ` p 1 ´ αiqLss
+
+ı
+
+´ Ct .
+
+From Proposition 2 and law of iterated expectations, we know each summand is non-negative. Thus, lim inf t EraY t ´ Xts ě 0.21 Lastly, continuing with (1) and using Lemma 2 and law of iterated expectations, we have 
+
+ErYts ě E“|C˚ X M jt |‰
+
+ě p 1 ´ αiq ´ 1
+
+t ErK1 ` ¨ ¨ ¨ ` Kts ´ Ct
+
+ě p 1 ´ αiq ´ p 1 ´ αiqαi ´ Ct .
+
+Taking lim inf then yields lim inf t ErYts ě p 1 ´ αiq2.
+
+The result from Lemma 3 states that it is impossible that 
+
+lim inf 
+
+> t
+
+Xt
+
+Yt
+
+ą α, 
+
+which translates to it impossible that 
+
+ui “ lim inf 
+
+> t
+
+|C˚ X M it ||C˚ X Mt| ą α. 
+
+By Claim 2, it is impossible that Eruis ą αi as desired. 
+
+## 4 Conclusion 
+
+In this paper, we revisit a central vulnerability of Bitcoin’s consensus mechanism: there exists a profitable deviation from the standard Bitcoin mining protocol, selfish mining, that results in time-persistent forks of the Bitcoin blockchain. This is not purely a theoretical concern: Li et al. (2024) provide empirical evidence consistent with selfish mining in several proof-of-work blockchains (most prominent for Monacoin and Bitcoin Cash). The lack of a known equilibrium for proof-of-work blockchains that generates a single longest chain on the equilibrium path has been highlighted by Ethereum’s founder Buterin (2017) and by Hall et al. (2024) in the context of Ethereum’s transition from proof-of-work to proof-of-stake. A number of previous papers apply varying approaches to the issue of selfish mining (see,e.g., Heilman, 2014; Solat and Potop-Butucaru, 2017; Pass and Shi, 2017). To the best of our knowledge, all previously proposed solutions require changes to the consensus mechanism and/or the design of the blockchain itself. Our contribution is to propose an alternative mining protocol, inertial mining, that constitutes an equilibrium and results in one longest chain on the equilibrium path, as intended by Nakamoto. 22 As a direction for future research, we note that Proof-of Stake chains suffer from incentive problems that are similar to the selfish-mining deviations of Bitcoin (Brown-Cohen et al., 2019). It would be interesting to understand if a similar approach can be applied there to design equilibrium protocols. 
+
+## References 
+
+M. Bahrani and S. M. Weinberg. Undetectable selfish mining. In Proceedings of the 25th ACM Conference on Economics and Computation , pages 1017–1044, 2024. B. Biais, C. Bisière, M. Bouvard, and C. Casamatta. The Blockchain Folk Theorem. 
+
+The Review of Financial Studies , 32(5):1662–1715, May 2019. doi: 10.1093/rfs/ hhy095. J. Bonneau. Why buy when you can rent? Bribery attacks on bitcoin-style consensus. In Financial Cryptography and Data Security , Lecture Notes in Computer Science, pages 19–26. Springer, 2016. J. Brown-Cohen, A. Narayanan, A. Psomas, and S. M. Weinberg. Formal barriers to longest-chain proof-of-stake protocols. In Proceedings of the 2019 ACM Conference on Economics and Computation , pages 459–473, 2019. E. Budish. Trust at scale: The economic limits of cryptocurrencies and blockchains. 
+
+The Quarterly Journal of Economics , 140(1):1–62, 2025. V. Buterin. Proof of stake faq. Blog post, 2017. I. Eyal and E. G. Sirer. Majority is not enough: Bitcoin mining is vulnerable. Com-munications of the ACM , 61(7):95–102, 2018. J. S. Gans and H. Halaburda. “zero cost” majority attacks on permissionless proof of work blockchains. Management Science , 70(6):4155–4165, 2024. doi: 10.1287/ mnsc.2023.02426. H. Halaburda, G. Haeringer, J. S. Gans, and N. Gandal. The microeconomics of cryptocurrencies. Journal of Economic Literature , 60(3):971–1013, Sept. 2022. doi: 10.1257/jel.20201593. 23 O. J. Hall, S. Shiaeles, and F. Li. A study of Ethereum’s transition from proof-of-work to proof-of-stake in preventing smart contracts criminal activities. Network , 4(1): 33–47, 2024. E. Heilman. One weird trick to stop selfish miners: Fresh bitcoins, a solution for the honest miner. In Financial Cryptography and Data Security Workshops . Springer, 2014. doi: 10.1007/978-3-662-44774-1_12. G. Huberman, J. D. Leshno, and C. Moallemi. Monopoly without a monopolist: An economic analysis of the bitcoin payment system. The Review of Economic Studies ,88(6):3011–3040, 2021. J. D. Leshno and P. Strack. Bitcoin: An axiomatic approach and an impossibility theorem. American Economic Review: Insights , 2(3):269–286, 2020. J. D. Leshno, E. Shi, and R. Pass. On the viability of open-source financial rails: Economic security of permissionless consensus. arXiv preprint arXiv:2409.08951 ,2024. S.-N. Li, C. Campajola, and C. J. Tessone. Statistical detection of selfish mining in proof-of-work blockchain systems. Scientific Reports , 14:6251, 2024. S. Nakamoto. Bitcoin: A peer-to-peer electronic cash system. 2008. E. S. Pagnotta. Decentralizing money: Bitcoin prices and blockchain security. The Review of Financial Studies , 35(2):866–907, Feb. 2022. doi: 10.1093/rfs/hhaa149. R. Pass and E. Shi. Fruitchains: A fair blockchain. In Proceedings of the ACM Symposium on Principles of Distributed Computing , pages 315–324, 2017. doi: 10.1145/3087801.3087809. A. Sapirshtein, Y. Sompolinsky, and A. Zohar. Optimal selfish mining strategies in bitcoin. International conference on financial cryptography and data security , pages 515–532, 2016. L. Schilling and H. Uhlig. Some simple bitcoin economics. Journal of Monetary Economics , 106:16–26, 2019. 24 S. Solat and M. Potop-Butucaru. Brief announcement: Zeroblock: Timestamp-free prevention of block-withholding attack in bitcoin. In Networked Systems . Springer, 2017. doi: 10.1007/978-3-319-69084-1_25. 
+
+## A Missing proof 
+
+Proof of Lemma 3. Define Zt :“ Xt ´ aY t. Because Xt ě 0 and Yt ď 1, we can establish a deterministic lower bound: Zt ě ´ aY t ě ´ max p0, a q.Assume for the sake of contradiction that 
+
+P
+
+„
+
+lim inf 
+
+> tÑ8
+
+Xt
+
+Yt
+
+ą a
+
+ȷ
+
+“ 1.
+
+Let L “ lim inf tÑ8 Xt 
+
+> Yt
+
+and define the random margin ε :“ 12 min p1, L ´ aq. Then 
+
+ε ą 0 almost surely, and there is a random variable N taking values in N such that for t ě 0 we have XN `t  
+
+> YN`t
+
+ě a ` ε. We can equivalently write this as 
+
+ZN `t “ XN `t ´ aY N `t ě εY N `t.
+
+Combining this with the deterministic lower bound on Zt, we have for all t that 
+
+Zt ě εY t1ttěN u ´ a1ttăN u.
+
+Taking the expectation and then lim sup of both sides and using p1q in the assump-tions, we obtain: 
+
+0 ě lim sup ErZts ě lim sup `E“εY t1ttěN u
+
+‰ ´ aPpN ą tq˘ “ lim sup E“εY t1ttěN u
+
+‰.
+
+As Yt ě 0, this implies that lim tÑ8 E“εY t1ttěN u
+
+‰ “ 0. This in particular implies that εY t1ttěN u converges to 0 in probability. It follows that Yt converges to 0 in probability. Because the sequence Yt is uniformly bounded, it guarantees convergence in expectation: 
+
+lim  
+
+> tÑ8
+
+ErYts “ 0.
+
+However, this contradicts (3) in our initial hypothesis. Therefore, our assumption must be false, and it is impossible that lim inf tÑ8 xt 
+
+> yt
+
+ą a almost surely. 25

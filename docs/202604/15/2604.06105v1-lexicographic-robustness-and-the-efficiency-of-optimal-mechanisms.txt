@@ -1,0 +1,3322 @@
+Title: Lexicographic Robustness and the Efficiency of Optimal Mechanisms
+
+URL Source: https://arxiv.org/pdf/2604.06105v1
+
+Published Time: Wed, 08 Apr 2026 01:22:19 GMT
+
+Number of Pages: 70
+
+Markdown Content:
+# Lexicographic Robustness and the Efficiency of Optimal Mechanisms ∗
+
+## Ashwin Kambhampati †
+
+## April 8, 2026 
+
+Abstract 
+
+A central challenge in mechanism design is to identify mechanisms whose perfor-mance is robust under uncertainty about the environment. The maxmin optimality criterion is commonly used for this purpose, but it often yields a large and economi-cally uninformative set of mechanisms. This paper proposes a lexicographic approach to refining the maxmin criterion and characterizes the efficiency of optimal mechanisms. In canonical screening and auction environments, the strongest refinement — proper robustness — selects ex post efficient mechanisms. By contrast, in a public good provi-sion environment, it identifies the precise form of optimal inefficiencies, which become severe in large economies. 
+
+Keywords: robust mechanism design, screening, auctions, public goods, lexicographic probability systems, equilibrium refinements. 
+
+JEL codes: D81, D82. 
+
+> ∗
+
+This paper subsumes “Proper Robustness and the Efficiency of Monopoly Screening,” first circulated on October 11, 2024. I thank Qingmin Liu, Marzena Rostek, and three anonymous referees for detailed feedback on the original manuscript that led to significant broadening of its scope. For encouragement and insightful discussions, I thank my colleagues at the U.S. Naval Academy, Aislinn Bohren, Tilman B¨ orgers, Benjamin Brooks, Hector Chade, Yeon-Koo Che, Tommaso Denti, Francesc Dilm´ e, Laura Doval, Navin Kartik, Peter Klibanoff, Elliot Lipnowski, Andrew Mackenzie, George Mailath, Alessandro Pavan, Doron Ravid, Juuso Toikka, Rakesh Vohra, Mark Whitmeyer, and Kun Zhang. Kai Hao Yang expertly discussed the paper at the 2026 ASSA Annual Meeting in the “Robustness and Mechanism Design” Econometric Society session organized by Ian Ball. Refine.ink was used to proofread the paper for consistency and clarity. The views expressed here are solely my own and do not in any way represent the views of the U.S. Naval Academy, U.S. Navy, or the Department of Defense. 
+
+> †
+
+Department of Economics, United States Naval Academy; kambhamp@usna.edu .
+
+> arXiv:2604.06105v1 [econ.TH] 7 Apr 2026
+
+# Contents 
+
+1 Introduction 1
+
+1.1 Related literature . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41.2 Roadmap . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+
+2 Modeling framework 7
+
+2.1 Lexicographic expected utility . . . . . . . . . . . . . . . . . . . . . . . . . . 82.2 Robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 92.3 Perfectly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 92.4 Properly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 2.5 Remarks about the criteria . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 
+
+3 Screening 15 
+
+3.1 Environment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15 3.2 Robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17 3.3 Perfectly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 3.4 Properly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 3.5 Bayesian foundations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 
+
+4 Auction design 22 
+
+4.1 Environment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22 4.2 Robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24 4.3 Perfectly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 25 4.4 Properly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 27 4.5 Bayesian foundations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29 
+
+5 Public good provision 30 
+
+5.1 Environment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31 5.2 Robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 5.3 Perfectly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 33 5.4 Properly robust mechanisms . . . . . . . . . . . . . . . . . . . . . . . . . . . 34 5.5 Asymptotic inefficiency . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35 
+
+6 Discussion 37 A Proofs 38 1 Introduction 
+
+A central challenge in mechanism design is to identify mechanisms whose performance is robust to uncertainty about the environment. In the subjective expected utility (Bayesian) approach, optimal (profit-maximizing) screening, auction, and public good mechanisms typi-cally distort allocations away from efficiency in order to extract information rents (Mussa and Rosen (1978), Myerson (1981), Rob (1989)). These distortions, however, depend sensitively on the designer’s prior beliefs about agents’ types. When such beliefs are misspecified or poorly justified, Bayesian-optimal mechanisms lose their appeal, especially when the struc-ture of these mechanisms is complicated and sensitive to maintained assumptions. A common approach to modeling concern for misspecification is to assume the designer adopts the maxmin criterion: the designer chooses a mechanism that maximizes her minimum payoff over a set of possible type distributions. While sometimes illuminating, the maxmin criterion is often too weak to generate economically informative predictions. In several canonical environments, it selects a large set of mechanisms, including mechanisms that are weakly dominated and that involve seemingly arbitrary inefficiencies. This paper proposes a lexicographic approach to refining the maxmin criterion and uses it to characterize the efficiency properties of optimal mechanisms. Under the strongest proposed refinement, ex post efficiency emerges in screening and auction environments. On the other hand, substantial inefficiencies arise under private provision of public goods. The key economic force behind these results is the relationship between allocation monotonicity and payoff monotonicity for the designer under the efficient allocation rule. The approach to modeling uncertainty is based on the non-Archimedean variant of subjec-tive expected utility introduced by Blume, Brandenburger, and Dekel (1991a) to characterize equilibrium refinements (see Blume, Brandenburger, and Dekel (1991b)). Specifically, the designer is assumed to evaluate mechanisms using a lexicographic probability system (LPS), an ordered collection of beliefs over type profiles. The first belief captures the designer’s pri-mary assessment of the environment. Higher-order beliefs are then used to rank mechanisms that perform equally well according to lower-order beliefs. Three increasingly strong notions of robustness are introduced, corresponding to increas-ingly demanding restrictions on the designer’s LPS. First, a mechanism is robust if it is optimal with respect to an adversarial LPS — an LPS whose first-order belief places positive probability only on worst-case type profiles. Second, a mechanism is perfectly robust if it is optimal with respect to an adversarial LPS with full support — an adversarial LPS in which every type profile appears with positive probability in some belief in the LPS. Third, a mechanism is properly robust if it is optimal with respect to a full support LPS that is also 1strongly adversarial — a full support LPS in which type profiles that are more harmful to the designer are given lexicographic priority throughout the belief hierarchy. This formulation of robustness is appealing for at least three reasons. First, the restric-tions on the designer’s LPS parallel those justifying Nash (Nash (1950)), perfect (Selten (1975)) and proper (Myerson (1978)) equilibrium strategies. Hence, they inherit well-known foundations in finite settings: robust mechanisms are optimal against a specific worst-case conjecture; perfect mechanisms are further optimal against a tremble away from a worst-case conjecture; and properly robust mechanisms are further optimal against a tremble away from a worst-case conjecture in which lower-payoff type profiles are much more likely than higher-payoff type profiles. Second, the LPS approach provides a transparent link to Bayesian optimality. Proposition 1 identifies the sense in which optimality with respect to an LPS corresponds to optimality in the limit of a sequence of Bayesian priors. Hence, whenever a mechanism is optimal with respect to an LPS, one can describe a precise limiting Bayesian intuition for its selection, thereby facilitating transparent comparison to the extensive litera-ture on Bayesian mechanism design. Third, the formulation provides a common belief-based framework nesting existing refinements of maxmin optimality. Proposition 2 verifies that robustness is equivalent to maxmin optimality. Proposition 3 shows that, in finite settings, perfect robustness is equivalent to maxmin optimality together with admissibility. Proposi-tion 4 shows that, in finite settings, proper robustness is equivalent to the leximin criterion (Rawls (1971), Sen (1970)). Thus, perfect and proper robustness are belief-based analogs of the admissibility and leximin refinements of the maxmin criterion. After introducing the general modeling framework and optimality criteria in Section 2, the paper analyzes the efficiency implications of the refinements in three canonical envi-ronments. Sections 3 and 4 consider private good environments: a screening model and a single-unit auction model. In both settings, robustness alone has limited bite, whereas perfect robustness yields sharp results in binary-type settings. However, with more than two types, the structure of perfectly robust mechanisms is largely unconstrained: distortions arise almost arbitrarily for type profiles whose maximal type lies between the highest type and the lowest type. By contrast, proper robustness has sharp implications. In the screen-ing model of Section 3, the unique properly robust mechanism is efficient and maximal: the allocation rule is ex post efficient and implemented by the revenue-maximal transfer rule compatible with that allocation rule (Proposition 7). In the auction model studied in Sec-tion 4, properly robust mechanisms are likewise efficient and maximal. Moreover, proper robustness refines the tie-breaking rule when multiple bidders have the same maximal bid: ties must be broken uniformly except for type profiles containing the largest feasible type (Proposition 10). Section 5 shows that the efficiency result is not universal. In a public good 2provision model, proper robustness instead selects a unique inefficient mechanism, and the resulting inefficiency becomes severe in large economies. The economic force behind the private good efficiency results is the tension between the incentive to extract rent from higher types and the offsetting uncertainty aversion captured by a strongly adversarial LPS. In standard screening and auction models with quasilinear utility and strictly increasing differences, an allocation rule is implementable if and only if it is increasing in its arguments (Rochet, 1987). In applications, revenue-maximizing transfer rules that implement such allocation rules often involve binding downward-adjacent incen-tive compatibility constraints. Distortions for lower types are then attractive because they reduce the information rent left to higher types. If increasing allocations imply that the designer’s payoff is increasing in type profiles in a suitable sense, then a strongly adversarial LPS prioritizes lower type profiles over higher ones. Hence, it penalizes mechanisms that reduce the designer’s payoff at those profiles in order to improve performance elsewhere, acting in direct opposition to the usual rent-extraction motive. Efficiency at the bottom then cascades upward, resulting in an efficient allocation rule. Sections 3.5 and 4.5 further interpret this intuition by exploiting the connection between lexicographic optimality and Bayesian optimality. In the screening environment, the unique properly robust mechanism arises as the limit of a sequence of Bayesian-optimal mechanisms in which lower-value buyers receive disproportionately more probability mass than higher-value buyers. In the auction environment, properly robust mechanisms similarly arise as limits of Bayesian-optimal auc-tions under sequences of priors in which each bidder’s virtual valuation converges to their true valuation. Along both sequences, the rent-extraction benefit of distortions vanishes, and allocations converge to efficiency. The public good analysis illustrates how the efficiency result breaks when increasing allocations do not imply increasing payoffs for the designer. In the model considered, each agent has either a high valuation or a low valuation, and it is efficient to provide a costly public good if and only if the sum of valuations exceeds the cost of production. The incentive compatibility constraints again imply that the probability of public good provision must increase in each agent’s type. But if there are sufficiently many high types, each high-type agent knows that their report does not influence the decision to produce the public good under the efficient allocation rule. Hence, the designer cannot extract any more revenue from them than she could if they were a low type. Robustness considerations thus lead a profit-maximizing designer to downwardly distort the probability with which the public good is produced at lower type profiles at which it is still efficient to produce it with probability one. Doing so allows the designer to extract more revenue at higher type profiles, which become lexicographically salient precisely because they yield low revenue absent such distortions. 3Strikingly, as the number of agents grows large and the cost of providing the public good scales appropriately, the public good is provided in the properly robust mechanism if and only if the fraction of high-type agents approaches one (Proposition 14). In this sense, proper robustness leads to the most severe feasible downward distortions in the large-economy limit. 
+
+## 1.1 Related literature 
+
+The screening model in Section 3 nests (discrete-type versions of) the product design model of Mussa and Rosen (1978), the nonlinear pricing model of Maskin and Riley (1984), the single-agent pricing model of Riley and Zeckhauser (1983), and, with some simple transfor-mations, the monopoly regulation model of Baron and Myerson (1982). A key finding in this literature is that there is “no distortion at top”, i.e., the highest type receives an undis-torted allocation, whereas the allocations of buyers with lower valuations can be distorted downwards. The results in this paper demonstrate that robustness considerations “reverse” this intuition; distorting the allocation of the lowest type is suboptimal under any robustly optimal mechanism and this property cascades upwards in any properly robust mechanism. The single-unit auction model in Section 4 is nearly identical to that of Myerson (1981). The only departure (beyond the assumption of discrete types) is in the imposition of dom-inant strategy incentive compatibility and ex post individual rationality constraints rather than Bayesian incentive compatibility and individual rationality constraints. However, as is well-known, imposing dominant strategy incentive compatibility and ex post individual ra-tionality is without loss of optimality in Myerson (1981)’s problem. The results in Section 4 provide foundations for auctions in which an agent with a maximum bid always receives the good and pays a price between the second-highest bid and the next-highest feasible bid. As the grid of types becomes dense in an interval, the mechanism thus resembles a second-price auction (Vickrey (1961)). The public good model in Section 5 differs from those in the classic mechanism design literature on public good provision (e.g., Clarke (1971) and Groves (1973)) due to the de-signer’s objective to maximize profit rather than efficiency. Nevertheless, the inefficiency results are reminiscent of those of Rob (1989) and Mailath and Postlewaite (1990). Rob (1989) considers a setting in which a profit-maximizing firm decides whether or not to build a pollution-generating plant, and compensates residents for pollution damages. Each resident holds private information about their individual damage and has the power to veto the con-struction of the plant. Hence, the firm chooses a mechanism subject to (Bayesian) incentive compatibility and individual rationality constraints. Mailath and Postlewaite (1990) study the properties of the entire set of public good provision mechanisms that satisfy Bayesian 4incentive compatibility, individual rationality, and budget balance (no objective function for the designer is specified). Both Rob (1989) and Mailath and Postlewaite (1990) then iden-tify conditions on the per-capita cost of providing the public good and on the distribution over type profiles under which the probability of public good provision approaches zero as the number of agents grows large. In contrast, Section 5 considers the robust design of profit-maximizing mechanisms under dominant strategy incentive compatibility and ex post individual rationality constraints. Given the non-Bayesian setting, the inefficiency result is stated in ex post terms — as the number of agents grows large, the public good is produced if and only if the fraction of agents with the highest feasible value approaches one. Others have studied non-Bayesian variants of canonical screening problems. Bergemann and Schlag (2011) and Carrasco, Farinha Luz, Kos, Messner, Monteiro, and Moreira (2018) study the problem of selling a single indivisible good to a buyer of unknown type. 1 Berge-mann and Schlag (2011) assume that the seller has knowledge that the true distribution lies in some neighborhood of a baseline distribution, whereas Carrasco, Farinha Luz, Kos, Messner, Monteiro, and Moreira (2018) assume that the seller knows the first N moments of the distribution. 2 The main result in Bergemann and Schlag (2011) is that the seller chooses a posted price to maximize her Bayesian payoff against a worst-case distribution. Carrasco, Farinha Luz, Kos, Messner, Monteiro, and Moreira (2018) show that the seller’s worst-case payoff is a linear combination of the known moments of the distribution over types. Proposition 5 of this paper is consistent with Bergemann and Schlag (2011)’s result; if any distribution is possible, i.e., the seller entertains an arbitrarily large neighborhood around the known distribution, then the seller maximizes her payoff against the point mass on the lowest buyer valuation type. The purpose of reprising (a version of) this result in this paper, however, is to demonstrate that if the seller’s uncertainty set is large, then maxmin predictions are weak. Bergemann and Schlag (2011) and Carrasco, Farinha Luz, Kos, Mess-ner, Monteiro, and Moreira (2018) escape this issue by imposing additional assumptions on the seller’s knowledge beyond the set of feasible types. This paper offers a complementary   
+
+> 1Bergemann and Schlag (2008) and Bergemann and Schlag (2011) also study the form of mechanisms that minimize worst-case regret (Savage (1951)). A foundational issue with the regret minimization criterion is that it is dependent on irrelevant alternatives (Chernoff (1954)). Proper robustness does not suffer this drawback. Madar´ asz and Prat (2017) study local preference uncertainty that may cause non-local incentive compatibility constraints to bind in an optimal mechanism. Che (2022) extends the analysis of Carrasco, Farinha Luz, Kos, Messner, Monteiro, and Moreira (2018) to the case of multiple buyers.
+> 2Carroll (2017) considers a multi-dimensional screening setting in which the marginal distributions over values are known, but not the joint distribution. His main result is that bundling is suboptimal. Che and Zhong (2025) consider alternative uncertainty sets that lead to the (sub-)optimality of bundling.
+
+5modeling approach. 3
+
+Within the broader literature on robust mechanism design, the point of view taken in this paper is inspired by B¨ orgers (2017). B¨ orgers (2017) critiques the maxmin foundations for dominant strategy mechanisms provided by Chung and Ely (2007) on the grounds that such maxmin mechanisms are weakly dominated in the space of Bayesian mechanisms. 4 Others have built upon this implicitly lexicographic approach; Dworczak and Pavan (2022) assume that an information designer primarily optimizes against a worst-case distribution. Among the set of worst-case optimal mechanisms, the designer chooses a mechanism that maximizes her payoff under a baseline distribution called a “conjecture”. In the language of this paper, Dworczak and Pavan (2022)’s approach corresponds to assuming the designer chooses a mechanism that is optimal with respect to an adversarial LPS containing exactly two prior distributions. In contemporaneous work, Mishra, Patil, and Pavan (2025) use the Dworczak and Pavan (2022) approach to study optimal procurement in a continuum-type version of the screening model of Section 3. Because the regulator’s conjecture has full support, the resulting optimal mechanisms are perfectly robust (the union of the supports of the beliefs in the LPS equals the set of feasible types). Hence, Corollary 2 of Mishra, Patil, and Pavan (2025), which considers an analogous space of uncertainty, can be compared directly to the consequences of perfect robustness described in Proposition 6 — in both settings, efficiency must arise not only “at the top”, but also “at the bottom”, in contrast to the predictions of the standard screening model. 5 Example 3 shows that, as in the standard screening model, optimality need not coincide with efficiency under perfect robustness. It is, in fact, straightforward to show that it is impossible to justify the efficient mechanism with a full support LPS that has only two beliefs. The key insight of this paper for the screening environment is that when the designer’s LPS can contain arbitrarily many beliefs and must be strongly adversarial, the unique optimal mechanism is efficient. As previously discussed, the restrictions placed on the seller’s LPS correspond to those used to characterize the strategies that survive tremble-based refinements in normal-form 
+
+> 3In contemporaneous work, Ball and Kattwinkel (2025) identify conditions on sets of feasible priors such that a maxmin optimal mechanism’s guarantee is approximately obtained for priors outside the set that are nearby in the weak topology.
+> 4In contemporaneous work, B¨ orgers, Li, and Wang (2025) characterize mechanisms that are undominated across type profiles, without imposing maxmin selection of mechanisms. Mishra and Patil (2025) characterize undominated mechanisms in a monopoly regulation setting and use their characterization to identify maxmin optimal mechanisms.
+> 5Mishra, Patil, and Pavan (2025) consider a setting with linear utility so that random mechanisms are payoff equivalent to deterministic mechanisms. Hence, the deterministic qualifier in the hypothesis of Propo-sition 6 is not restrictive for this comparison.
+
+6games (Blume, Brandenburger, and Dekel (1991b)). Indeed, the terms “perfect robustness” and “proper robustness” are directly inspired by the notions of (trembling hand) perfect equilibrium (Selten (1975)) and proper equilibrium (Myerson (1978)). Predating Blume, Brandenburger, and Dekel (1991a) and Blume, Brandenburger, and Dekel (1991b), Dresher (1961) (Chapter 3, Section 18) proposes an approach to selecting strategies in two-player, zero-sum games that involves maximizing the (guaranteed) gain resulting from a strategic opponent’s “mistakes”. Van Damme (1983) observes that this procedure identifies proper equilibrium strategies in such games (see Chapter 3, Theorem 3.5.5). Choosing an optimal mechanism with respect to the criterion considered in this paper thus coheres with what would arise following the protocol of Dresher (1961), once the problem is formulated as a zero-sum game between the designer and an adversary who chooses the distribution over types. 
+
+## 1.2 Roadmap 
+
+The rest of the paper proceeds as follows. Section 2 introduces the general modeling frame-work, the three notions of lexicographic robustness, and the corresponding relationships to maxmin optimality, admissibility, and the leximin criterion. Sections 3, 4, and 5 analyze the screening, auction, and public good models. A reader interested in a particular application may skip directly to the relevant section upon review of Section 2. Proofs of all results are in Appendix A. For the reader’s convenience, Supplemental Appendix B provides omitted calculations for the examples. 
+
+# 2 Modeling framework 
+
+There is a finite set of type profiles Θ, with |Θ| = N < ∞, and a topological space of mechanisms M. A principal chooses a randomization over mechanisms (henceforth, simply a mechanism) σ ∈ ∆( M), where ∆( X) is the space of Borel probability measures on any topological space X and any finite space X is henceforth equipped with the discrete topology. Given mechanism m ∈ M , the principal’s utility under type profile θ ∈ Θ is determined by the function v : M × Θ → R. Let V : ∆( M) × Θ → R denote the extension of v taking expectations over M. Equip ∆( M) with the coarsest topology making the map σ 7 → V (σ, θ )continuous for each θ ∈ Θ. 72.1 Lexicographic expected utility 
+
+The principal’s attitude towards uncertainty is described by the non-Archimedean variant of subjective expected utility proposed by Blume, Brandenburger, and Dekel (1991a). Specifi-cally, the principal possesses a lexicographic probability system and ranks mechanisms using a corresponding vector of expected utilities. A lexicographic probability system (LPS) 
+
+is a vector of beliefs μ = ( μ1, . . . , μ K ), where K is a strictly positive integer and μk ∈ ∆(Θ) for each k ∈ { 1, . . . , K }. Fixing an LPS μ = ( μ1, . . . , μ K ), each mechanism σ ∈ ∆( M) gives rise to a K-vector of expected payoffs: the principal’s k-th order payoff from σ ∈ ∆( M)is X
+
+> θ∈Θ
+
+μk(θ)V (σ, θ ).
+
+Then, a mechanism σ ∈ ∆( M) is μ-optimal if, for all σ′ ∈ ∆( M), 
+
+X
+
+> θ∈Θ
+
+μk(θ)V (σ, θ )
+
+!Kk=1 
+
+≥L
+
+X
+
+> θ∈Θ
+
+μk(θ)V (σ′, θ )
+
+!Kk=1 
+
+,
+
+where ≥L is the lexicographic order. 6 Compactly, a μ-optimal decision σ ∈ ∆( M) solves lex max 
+
+> σ′∈∆( M)
+
+X
+
+> θ∈Θ
+
+μk(θ)V (σ′, θ )
+
+!Kk=1 
+
+. (1) Due to the relationship between LPSs and the vanishing “trembles” used in the liter-ature on equilibrium refinements, there is a precise sense in which μ-optimal mechanisms outperform others in the limit of particular sequences of Bayesian priors converging to the first-order belief μ1. Specifically, given any LPS μ = ( μ1, . . . , μ K ) and vector r ∈ (0 , 1) K−1,define a probability measure on the set of type profiles Θ by the nested convex combination 
+
+r□μ := (1 − r1)μ1+
+
+r1 [(1 − r2)μ2 + r2 [(1 − r3)μ3 + r3 [· · · + rK−2 [(1 − rK−1)μK−1 + rK−1μK ] · · · ]]] .
+
+The following result, whose proof is immediate from the literature (Blume, Brandenburger, and Dekel, 1991b; Mailath, Samuelson, and Swinkels, 1997), relates μ to r□μ and will be useful to provide “Bayesian” intuitions in applications. 
+
+Proposition 1 (Relationship to Bayesian optimality) 
+
+A mechanism σ ∈ ∆( M) is μ-optimal if and only if for any mechanism σ′ ∈ ∆( M) that is                
+
+> 6For a, b ∈RK,a≥Lbif whenever bk> a k, there exists a j < k such that aj> b j.
+
+8not μ-optimal and any sequence (rℓ)ℓ ∈ ((0 , 1) K−1)N with rℓ → (0 , 0, . . . , 0) , there exists an 
+
+L ∈ N such that 
+
+X
+
+> θ∈Θ
+
+(rℓ□μ)( θ)V (σ, θ ) > X
+
+> θ∈Θ
+
+(rℓ□μ)( θ)V (σ′, θ ) for all ℓ ≥ L.
+
+## 2.2 Robust mechanisms 
+
+It will be of interest to restrict the principal’s LPS and study the implications of these restrictions on the form of lexicographically optimal mechanisms. The first such restriction captures the principal’s Knightian uncertainty. 
+
+Definition 1 
+
+An LPS μ = ( μ1, . . . , μ K ) is adversarial with respect to σ ∈ ∆( M) if μ1(θ) > 0 implies 
+
+V (σ, θ ) ≤ V (σ, θ ′) for all θ′ ∈ Θ.
+
+In words, an LPS is adversarial given a mechanism if its first belief places positive proba-bility only on type profiles that minimize the principal’s payoff. A robust mechanism is then defined as a mechanism that is optimal with respect to such an LPS. 
+
+Definition 2 
+
+A mechanism σ ∈ ∆( M) is robust if there exists an LPS, μ, that is adversarial with respect to σ and for which σ is μ-optimal. 
+
+It is nearly immediate that a robust mechanism is maxmin optimal; a maxmin optimal 
+
+mechanism σ ∈ ∆( M) is a mechanism that solves the optimization problem max  
+
+> σ′∈∆( M)
+
+min  
+
+> θ′∈Θ
+
+V (σ′, θ ′). (2) Exploiting the minimax theorem, the following proposition further confirms that maxmin optimality implies robustness in the sense of this paper. 
+
+Proposition 2 (Robustness and maxmin criterion) 
+
+A mechanism is robust if and only if it is maxmin optimal. 
+
+## 2.3 Perfectly robust mechanisms 
+
+In settings in which multiple maxmin optimal mechanisms exist, B¨ orgers (2017) argues that a principal should select a robust mechanism that is also admissible , i.e., weakly undominated. Indeed, admissibility is often imposed as a choice axiom in decision theory. See, e.g., Luce and Raiffa (1957) p. 287, Axiom 5 and p. 77 for an argument for its imposition in the particular context of two-player, zero-sum games. 9Definition 3 
+
+A mechanism σ′ ∈ ∆( M) weakly dominates the mechanism σ ∈ ∆( M) if 
+
+V (σ′, θ ) ≥ V (σ, θ ) for all θ ∈ Θ
+
+and the inequality is strict for some θ ∈ Θ. A mechanism σ ∈ ∆( M) is admissible if there does not exist a mechanism σ′ ∈ ∆( M) that weakly dominates it. 
+
+The following belief-based characterization of admissibility will be useful. The proof is essentially immediate from the literature, but since the result is usually stated in terms of pure strategies a short proof is provided in the Appendix. 
+
+Lemma 1 (Weak dominance and optimality) 
+
+If there exists a belief ρ ∈ ∆(Θ) with ρ(θ) > 0 for all θ ∈ Θ against which the mechanism 
+
+σ ∈ ∆( M) is optimal, i.e., 
+
+X
+
+> θ∈Θ
+
+ρ(θ)V (σ, θ ) ≥ X
+
+> θ∈Θ
+
+ρ(θ)V (σ′, θ ) for all σ′ ∈ ∆( M),then σ is admissible. The converse statement holds if M is finite: If |M| < ∞ and σ ∈
+
+∆( M) is admissible, then there exists a belief ρ ∈ ∆(Θ) with ρ(θ) > 0 for all θ ∈ Θ against which σ is optimal. 
+
+It is worth mentioning that, in infinite-dimensional settings, admissible mechanisms need not be a best response to any full-support belief even under natural assumptions, e.g., com-pactness of M and continuity of v(·, θ ). See, for instance, Example 2 in Section 2.2 of Cheng and B¨ orgers (2026). The next restriction concerns the supports of the beliefs in the principal’s LPS and will be sufficient to rule out inadmissible mechanisms. 
+
+Definition 4 
+
+An LPS μ = ( μ1, . . . , μ K ) has full support if, for each θ ∈ Θ, there exists a k ∈ { 1, . . . , K }
+
+such that μk(θ) > 0.
+
+Then, a mechanism is defined to be perfectly robust if it is optimal against a full support LPS that is adversarial. 
+
+Definition 5 
+
+A mechanism σ ∈ ∆( M) is perfectly robust if there exists a full support LPS, μ, that is adversarial with respect to σ and for which σ is μ-optimal. 
+
+10 The following proposition establishes that requiring a principal to choose an optimal mechanism with respect to a full support and adversarial LPS, i.e., a perfectly robust mech-anism, ensures that the principal chooses a maxmin optimal mechanism that is admissible. In addition, if the set of mechanisms is finite, then maxmin optimality and admissibility together imply perfect robustness. 
+
+Proposition 3 (Perfect robustness and admissibility) 
+
+If a mechanism is perfectly robust, then it is maxmin optimal and admissible. The converse holds if M is finite: If |M| < ∞ and a mechanism is both maxmin optimal and admissible, then it is perfectly robust. 
+
+The proof is straightforward. Because any perfectly robust mechanism is robust, Propo-sition 2 implies that such a mechanism is maxmin optimal. Moreover, if the mechanism is inadmissible, then there exists another mechanism that weakly dominates it by Lemma 1. Necessarily, this mechanism must be lexicographically preferred to the original mechanism under any full support LPS. Hence, admissibility is necessary for perfect robustness. To show that maxmin optimality and admissibility are sufficient for perfect robustness when the set of mechanisms is finite, an LPS with two beliefs is constructed. The first belief is an adversarial belief against which the mechanism is optimal (whose existence is ensured by the minimax theorem). The second belief is a full support belief over the set of type profiles against which the mechanism is optimal (whose existence is ensured by Lemma 1). 
+
+## 2.4 Properly robust mechanisms 
+
+The final restriction on beliefs ensures that the principal’s higher-order uncertainty is con-sistent with her lower-order uncertainty. To define these restrictions, it will be useful to introduce an order on type profiles. Given an LPS μ and type profiles θ, θ ′ ∈ Θ, write 
+
+θ > μ θ′ and say that θ is “infinitely more likely” than θ′ if min {k ∈ { 1, . . . , K } : μk(θ) > 0} < min {k ∈ { 1, . . . , K } : μk(θ′) > 0}.
+
+The weak order is defined in the usual way: if it is not the case that θ′ >μ θ, then θ ≥μ θ′.A strongly adversarial LPS satisfies the following property: if type profile θ′ is not in-finitely more likely than type profile θ, then the principal must receive a higher expected payoff under type profile θ′ than under type profile θ.
+
+Definition 6 
+
+An LPS μ = ( μ1, . . . , μ K ) is strongly adversarial with respect to σ ∈ ∆( M) if, for all 
+
+θ ∈ Θ,
+
+V (σ, θ ) ≤ V (σ, θ ′) for all θ′ ∈ Θ with θ ≥μ θ′.
+
+11 Notice that, if μ1(θ) > 0, then θ ≥μ θ′ for all θ′ ∈ Θ. So, if μ is strongly adversarial, then it is adversarial: 
+
+V (σ, θ ) ≤ V (σ, θ ′) for all θ′ ∈ Θ. That is, requiring that an LPS is strongly adversarial is stronger than requiring that it is adversarial. A mechanism is defined to be properly robust if it is optimal against a full support LPS that satisfies this stronger requirement. 
+
+Definition 7 
+
+A mechanism σ ∈ ∆( M) is properly robust if there exists a full support LPS, μ, that is strongly adversarial with respect to σ and for which σ is μ-optimal. 
+
+It is next shown that proper robustness is a belief-based analog of the leximin criterion, first introduced by Rawls (1971) and Sen (1970). To define the leximin criterion in the current setting, note that the mechanism σ ∈ ∆( M) is associated with an N -vector of expected payoffs ( V (σ, θ )) θ∈Θ. Let V(i)(σ) denote the i-th order statistic of this vector, i.e., the i-th lowest value in ( V (σ, θ )) θ∈Θ. Then, a mechanism σ ∈ ∆( M) is leximin optimal 
+
+if, for all σ′ ∈ ∆( M),  V(i)(σ)Ni=1 ≥L
+
+ V(i)(σ′)Ni=1 ,
+
+where ≥L is the lexicographic order. Compactly, a leximin optimal mechanism σ ∈ ∆( M)solves lex max 
+
+> σ′∈∆( M)
+
+ V(i)(σ′)Ni=1 .
+
+Modifying Savage (1954)’s framework to allow for discontinuous preferences over subjec-tive lotteries, Mackenzie (2024) recently observed that the leximin criterion reflects an axiom of maximal risk aversion in an appropriately defined subjective lexicographic expected utility framework. Mackenzie (2024) remarks that there is a sense in which the subjective lexico-graphic expected utility model he studies (which involves a unique probability measure and lexicographic utilities) is the “dual” of the lexicographic expected utility model of Blume, Brandenburger, and Dekel (1991a) (which involves a unique utility function and lexicographic probabilities). The leximin criterion may also be interpreted as a lexicographically ordered form of downside-risk aversion. In particular, the maxmin criterion evaluates mechanisms solely according to their worst payoff and can therefore be viewed as a 0-th quantile criterion (Rostek (2010)). As noted by Rostek (2010), this corresponds to maximal concern for down-side risk (see also Manski (1988)). The leximin criterion refines the maxmin comparison of mechanisms by proceeding sequentially through each mechanism’s ordered payoff vector: it first compares the worst payoff, then the second-worst payoff, and so on. In this sense, as 12 noted by Chambers (2007), leximin orderings are examples of lexicographic quantiles. Fi-nally, it is worth noting that there is a literature in operations research identifying algorithms to solve multicriteria optimization problems, an instance of which is lexicographic maxmin optimization (see, e.g., Chapter 5 of Ehrgott (2005)). The following result establishes that proper robustness is a belief-based analog of the leximin criterion. Specifically, if a mechanism is properly robust, then it is leximin optimal. Moreover, the converse holds if the set of mechanisms is finite. 
+
+Proposition 4 (Proper robustness and leximin optimality) 
+
+If a mechanism is properly robust, then it is leximin optimal. The converse holds if M is finite: If |M| < ∞ and a mechanism is leximin optimal, then it is properly robust. 
+
+It is intuitive that a properly robust mechanism is leximin optimal; such a mechanism is a best response to an LPS in which type profiles that are worse for the principal given her mechanism are prioritized over those that are better for the principal. Hence, the mechanism ought to perform better than any other mechanism when the type profiles are sorted in a way that is least advantageous to that mechanism. On the other hand, the converse result is nontrivial and, perhaps, unexpected. The proof shows that, if a mechanism is leximin optimal, then it is possible to construct a full support and strongly adversarial LPS against which the mechanism is optimal. The constructed LPS has length equal to the number of payoff values taken on by the mechanism across type profiles. Each belief μk is chosen to have support equal to the set of type profiles yielding a payoff less than or equal to the k-th lowest value. It is argued that there must exist such a belief under which the mechanism is a best response; if not, then by Lemma 1 there would exist a weakly dominating mechanism over the set of type profiles yielding a payoff less than the k-th lowest value. Perturbing the original mechanism in the direction of this dominating mechanism yields a mechanism that is leximin preferred to the original mechanism, contradicting its supposed leximin optimality. Proceeding in an iterative fashion generates a strongly adversarial and full support LPS against which the mechanism is optimal. 
+
+## 2.5 Remarks about the criteria 
+
+Having defined all three optimality criteria, it is useful to summarize the relationship between them. Because any adversarial LPS with full support is an adversarial LPS, any perfectly robust mechanism is robust. Moreover, any properly robust mechanism is perfectly robust because any strongly adversarial LPS with full support is an adversarial LPS with full sup-port. Hence, the set of properly robust mechanisms is a subset of the set of perfectly robust mechanisms which itself is a subset of the set of robust mechanisms. 13 Note that, if a mechanism is robust, then it is a part of a saddle point in a fictitious zero-sum game between the principal and an adversarial opponent (“Nature”) that chooses the measure over type profiles. The restrictions on the principal’s LPS sustaining a perfectly robust mechanism correspond to those that sustain a (trembling-hand) perfect equilibrium strategy in this game. Precisely, if a decision-maker’s strategy is a part of a perfect equilib-rium in a finite game, then she must play a strategy that is optimal with respect to a full support LPS whose first-order belief coheres with the other’s chosen strategy (see Proposi-tion 4 of Blume, Brandenburger, and Dekel (1991b)). It follows that any robust mechanism that is not perfectly robust cannot be played in a perfect equilibrium of the game between the principal and Nature. Similarly, the restrictions on the principal’s LPS sustaining a properly robust mechanism correspond to those that sustain a proper equilibrium strategy. In particular, if a decision-maker’s strategy is a part of a proper equilibrium in such a game, then she must play a strategy that is optimal with respect to a full support LPS whose higher-order beliefs respect the preferences of the other player (see Proposition 5 of Blume, Brandenburger, and Dekel (1991b)). In the context of zero-sum games, the restriction to preference-respecting LPSs corresponds to the requirement that the principal play a best response to a strongly adversarial LPS. It follows that any perfectly robust mechanism that is not properly robust cannot be played in a proper equilibrium of the game between the principal and Nature. It is immediate from the preceding observations that, if the set of mechanisms is assumed to be finite (or discretized), then the sets of robust, perfect, and proper mechanisms are non-empty by the existence of Nash, perfect, and proper equilibria (Nash, 1950; Selten, 1975; Myerson, 1978). Note, however, that perfection or properness of a mechanism does not immediately guarantee that it is played in some perfect or proper equilibrium. The reason is that no restrictions are placed on the perfection or properness of the measure chosen by Nature in response to the principal’s mechanism. This is a natural relaxation given that Nature is an artificial player used to facilitate understanding of the principal’s attitude towards uncertainty. In the applications that follow, the necessary directions in Propositions 3 and 4 are used to derive necessary conditions for optimality. The converse directions, by contrast, provide finite (discretized) representation results linking admissibility and leximin optimality to belief-based foundations. Because the settings studied in Sections 3, 4, and 5 feature infinite-dimensional mechanism spaces, the application-specific results cannot be obtained by invoking those converses. Instead, they are established by constructing justifying LPSs, which in turn yield Bayesian interpretations through Proposition 1. 14 3 Screening 
+
+This section analyzes a general, single-agent screening model. The model is then simplified in various ways and extended to multi-agent settings in Sections 4 and 5. 
+
+## 3.1 Environment 
+
+The principal is a seller who transacts with a buyer. The seller chooses a quality q ∈ Q ,where Q ⊆ R+ contains zero, at a cost determined by the function c : Q → R+. The seller’s ex post payoff from selling a good of quality q ∈ Q at a price of p ∈ R is given by 
+
+p − c(q).
+
+The buyer has private information about her payoff type θ ∈ Θ, where Θ := {θ1, . . . , θ N } ⊆ R
+
+and 0 < θ 1 < · · · < θ N . Specifically, the buyer’s ex post payoff from purchasing a good of quality q ∈ Q at a price of p ∈ R is 
+
+u(q, θ ) − p, 
+
+where u : Q × Θ → R+ satisfies u(0 , θ ) = 0 for all θ ∈ Θ. Moreover, u is increasing in q and has strictly increasing differences: if q′ > q and θ′ > θ , then 
+
+u(q′, θ ′) − u(q, θ ′) > u (q′, θ ) − u(q, θ ).
+
+The buyer’s payoff from not transacting with the seller is the same for all types and normal-ized to zero. For simplicity, it is assumed that there exists a unique efficient quality for each type: for each i = 1 , . . . , N ,
+
+{q∗ 
+
+> i
+
+} := arg max 
+
+> q∈Q
+
+u(q, θ i) − c(q).
+
+This property holds if, for instance, Q is an interval, u and c are continuous, and the surplus function u(·, θ i) − c(·) is strictly quasiconcave for each i = 1 , . . . , N .The seller has commitment power and can sell different qualities at different prices. By the Revelation Principle, without loss of optimality, the seller can restrict attention to direct mechanisms. A (direct) mechanism is an allocation rule and transfer rule, 
+
+Q : Θ → ∆( Q) and P : Θ → R,
+
+that together are incentive compatible and individually rational : for all θ ∈ Θ, 
+
+U (Q(θ), θ ) − P (θ) ≥ U (Q(θ′), θ ) − P (θ′) for all θ′ ∈ Θ15 and 
+
+U (Q(θ), θ ) − P (θ) ≥ 0,
+
+where U : ∆( Q) × Θ → R is the extension of u taking expectations over allocations. Let M
+
+denote the space of all mechanisms. Given a mechanism ( Q, P ) ∈ M and a type θ ∈ Θ, the seller obtains a payoff of 
+
+v(( Q, P ), θ ) = P (θ) − C(Q(θ)) ,
+
+where C : ∆( Q) → R is the extension of c taking expectations over allocations. It can easily be seen that any randomization over mechanisms σ ∈ ∆( M) is payoff equivalent to some mechanism ( Q, P ) ∈ M .7 Notice also that any stochastic transfer rule is equivalent to a deterministic transfer rule; any stochastic transfer to type θ can be replaced with its mean and yield both the seller and buyer equivalent expected payoffs. Henceforth, with no loss of generality, the seller uses a mechanism ( Q, P ) ∈ M with the understanding that each ( Q, P )is technically a class of payoff equivalent mechanisms. 8
+
+Any mechanism ( Q, P ) ∈ M in which, for all θ ∈ Θ, Q(θ) is the Dirac measure on some quality q ∈ Q is called a deterministic mechanism . An allocation Q(θi) ∈ ∆( Q) is effi-cient for type θi if Q(θi) is the Dirac measure on the efficient quality q∗ 
+
+> i
+
+. An allocation rule 
+
+Q : Θ → ∆( Q) is efficient if it is efficient for all types θ ∈ Θ. Because u satisfies strictly increasing differences, the Monotone Selection Theorem (Milgrom and Shannon (1994)) en-sures that efficient allocations are increasing in type: q∗ 
+
+> 1
+
+≤ q∗ 
+
+> 2
+
+≤ · · · ≤ q∗ 
+
+> N
+
+. Hence, the unique efficient allocation rule is implementable (Rochet (1987)). Given an efficient allocation rule, the pointwise revenue maximizing prices are characterized by the binding downward-adjacent incentive compatibility constraints and the individual rationality constraint for the lowest type. Specifically, the mechanism ( Q, P ) ∈ M is efficient and maximal if and only if Q                                        
+
+> 7For each θ∈Θ,
+> V(σ, θ ) =
+> Z
+> M
+> v(( Q, P ), θ )dσ =
+> Z
+> M
+> P(θ)dσ −
+> Z
+> M
+> Z
+> Q
+> c(q)dQ (θ)dσ.
+> So, σis payoff equivalent to the mechanism ( ˆQ, ˆP)∈ M in which, for all θ∈Θ, ˆQ(θ)( E) =
+> Z
+> M
+> Z
+> E
+> dQ (θ)dσ for all Borel E⊆ Q and ˆP(θ) =
+> Z
+> M
+> P(θ)dσ for all θ∈Θ. That is, V(σ, θ ) = v(( ˆQ, ˆP), θ ) for all θ∈Θ.
+> 8In robust moral hazard problems with technological uncertainty, there are “hedging” advantages to randomizing over mechanisms that are not present here (see, e.g., Kambhampati (2023) and Kambhampati, Peng, Tang, Toikka, and Vohra (2025)). On the other hand, Strausz (2006) presents an example in which randomization within a mechanism (i.e., in the codomain of Q) is strictly optimal in a Bayesian model, even under standard assumptions on uand c.
+
+16 is efficient and P satisfies 
+
+P (θ1) = U (Q(θ1), θ 1) and 
+
+P (θj ) = U (Q(θ1), θ 1) + 
+
+> j
+
+X
+
+> i=2
+
+(U (Q(θi), θ i) − U (Q(θi−1), θ i)) for j ∈ { 2, ..., N }. (3) Finally, it will be useful to let δi ∈ ∆(Θ) denote the measure that places probability one on buyer type θi.While the model has been described using the product design language of Mussa and Rosen (1978), it is worth noting some alternative interpretations. First, if the variable 
+
+q is interpreted as “quantity”, then the model is one of nonlinear pricing (Maskin and Riley (1984)). Second, with some simple transformations, the model can be applied to the problem of regulating a monopolist with an unknown marginal cost (Baron and Myerson (1982)). Additional applications and extensions are discussed in, e.g., Chapter 2 of Laffont and Martimort (2002). 
+
+## 3.2 Robust mechanisms 
+
+The first result establishes that few restrictions are placed on the seller’s mechanism if the only requirement is that she choose a best response to an adversarial LPS; any mechanism that is “efficient at the bottom” and does not yield excessive rent is robustly optimal. 
+
+Proposition 5 (Screening: characterization of robust mechanisms) 
+
+A mechanism (Q, P ) ∈ M is robust if and only if 1. it is efficient for the lowest type, θ1;2. the seller extracts full surplus from the lowest type, 
+
+P (θ1) = u(q∗ 
+
+> 1
+
+, θ 1); 
+
+3. and the seller attains the lowest payoff from the lowest type, 
+
+v(( Q, P ), θ ) ≥ v(( Q, P ), θ 1) for all θ ∈ Θ.
+
+A simple example illustrates the multiplicity of robustly optimal mechanisms. 
+
+Example 1. Suppose Θ = {θ1, θ 2}, Q = R, u(q, θ ) = θq , and c(q) = 12 q2. Then, the efficient quality for type θi is q∗ 
+
+> i
+
+:= θi. Proposition 5 establishes that a mechanism is robustly 17 optimal if and only if Q(θ1) is the Dirac measure on θ1, P (θ1) = u(q∗ 
+
+> 1
+
+, θ 1) = θ21 , the incentive compatibility constraints are satisfied, 0 ≥ θ1EQ(θ2)[q] − P (θ2) and θ2EQ(θ2)[q] − P (θ2) ≥ θ2θ1 − θ21 ,
+
+and a profitability constraint is satisfied, 
+
+P (θ2) − 12EQ(θ2)[q2] = v(Q(θ2), P (θ2)) ≥ v(Q(θ1), P (θ1)) = 12θ21 .
+
+Notice that the quality for type θ2 need not be efficient and can be distorted upwards or downwards: for any Dirac measure Q(θ2) on q2 ∈ R+ such that 
+
+q22 − 2θ2q2 + 2 θ2θ1 − θ21 ≤ 0,
+
+there exists a price P (θ2) ∈ R such that ( Q, P ) satisfies both the incentive compatibility and profitability constraints (e.g., set P (θ2) so that the downward-adjacent incentive com-patibility constraint binds). For instance, if θ1 = 1 and θ2 = 2, then any Dirac measure on 
+
+q2 ∈ [1 , 3] is a part of a robustly optimal mechanism. ♢
+
+As discussed in Section 2.3, one objection to the maxmin criterion is that it permits the use of weakly dominated mechanisms. In Example 1 (and more generally), it turns out that any robust mechanism that is not equal to the efficient and maximal mechanism is weakly dominated. 
+
+Example 2. Return to the setting of Example 1. The unique efficient and maximal mech-anism, ( Q∗, P ∗) ∈ M , sets Q∗(θ1) equal to the Dirac measure on q∗ 
+
+> 1
+
+= θ1, Q∗(θ2) equal to the Dirac measure on q∗ 
+
+> 2
+
+= θ2, P ∗(θ1) = p∗ 
+
+> 1
+
+:= θ21 , and P ∗(θ2) = p∗ 
+
+> 2
+
+:= θ21 + θ22 − θ2θ1.From Proposition 5, any robust mechanism must coincide with the efficient and maximal mechanism for type θ1. Hence, for any robust mechanism ( Q, P ) ∈ M ,
+
+v(( Q∗, P ∗), θ 1) = v(( Q, P ), θ 1).
+
+Because N = 2, the weak dominance claim is thus equivalent to the claim that, for any robust mechanism ( Q, P )̸ = ( Q∗, P ∗), 
+
+v(( Q∗, P ∗), θ 2) > v (( Q, P ), θ 2).
+
+Fixing ( q∗ 
+
+> 1
+
+, p ∗
+
+> 1
+
+), it is straightforward to show that ( q∗ 
+
+> 2
+
+, p ∗
+
+> 2
+
+) uniquely maximizes the seller’s payoff from θ2 subject to the downward-adjacent incentive compatibility constraint (see Supplemental Appendix B.1). Hence, the inequality is satisfied. ♢
+
+18 3.3 Perfectly robust mechanisms 
+
+An immediate implication of Proposition 3 is that, in Example 1, any perfectly robust mechanism must be efficient and maximal. The following result establishes existence and confirms that, in any setting with two types, the unique perfectly robust mechanism is indeed the efficient and maximal mechanism. More generally, efficiency must always arise “at the top” and “at the bottom” in any deterministic and perfectly robust mechanism. 
+
+Proposition 6 (Screening: characterization of perfectly robust mechanisms) 
+
+If there are two types ( N = 2 ), then the unique perfectly robust mechanism is the efficient and maximal mechanism. More generally, in any deterministic and perfectly robust mechanism 
+
+(Q, P ) ∈ M , Q is efficient for θ1 and θN , and P satisfies (3) .
+
+With more than two types, perfectly robust mechanisms need not be efficient “in the middle”. The following example — a minimal departure from Example 1 — demonstrates that intermediate types can be maximally distorted subject to monotonicity constraints on the allocation rule. 
+
+Example 3. Suppose Θ = {θ1, θ 2, θ 3}, Q = R, u(q, θ ) = θq , and c(q) = 12 q2. Consider a mechanism ( Q, P ) ∈ M in which both Q(θ1) and Q(θ2) are the Dirac measure on q∗ 
+
+> 1
+
+= θ1
+
+and Q(θ3) is the Dirac measure on q∗ 
+
+> 3
+
+= θ3. Moreover, suppose that P is determined by (3). Supplemental Appendix B.2 verifies that ( Q, P ) ∈ M is μ-optimal with respect to the adversarial and full support LPS μ = ( δ1, δ 3, δ 2). Hence, ( Q, P ) is perfectly robust. Notice that the allocation to the middle type is completely distorted subject to monotonicity of the allocation rule. This distortion is optimal because profit from type θ3 is lexicographi-cally prioritized over profit from type θ2. Hence, distorting type θ2’s allocation reduces the information rent left to type θ3. ♢
+
+## 3.4 Properly robust mechanisms 
+
+Are the beliefs sustaining the inefficient mechanism in Example 3 reasonable? If the seller were truly concerned with the robustness of her mechanism, then she might be relatively more concerned about a buyer type that is more harmful for her bottom line than a type that is less harmful. In particular, the LPS μ′ = ( δ1, δ 2, δ 3) seems more consistent with uncertainty aversion than μ = ( δ1, δ 3, δ 2) because the seller obtains a strictly higher payoff from θ3 than θ2. The main result of the analysis of the screening model is that, when the seller must best-respond to a full support and strongly adversarial LPS (such as μ′ = ( δ1, δ 2, δ 3) in Example 3), a sharp prediction arises: the seller’s unique optimal mechanism is the efficient and maximal mechanism. 19 Proposition 7 (Characterization of properly robust mechanisms) 
+
+The unique properly robust mechanism is the efficient and maximal mechanism. 
+
+Proposition 7 implies that, in Example 3, the efficient and maximal mechanism is prop-erly robust. In particular, Supplemental Appendix B.3 verifies that it is μ-optimal with respect to the full support and strongly adversarial LPS μ = ( δ1, δ 2, δ 3). The logic is simple: against δ1, any μ-optimal mechanism must have Q(θ1) equal to the Dirac measure on q∗ 
+
+> 1
+
+with prices extracting full surplus. Within the set of mechanisms with this property, any optimal mechanism against δ2 must set Q(θ2) equal to the Dirac measure on q∗ 
+
+> 2
+
+with prices extract-ing as much surplus as possible subject to the downward-adjacent incentive compatibility constraint. Repeating the argument for the highest type establishes the result. Proposition 7 establishes further that no other mechanism is properly robust. The proof proceeds by considering a relaxed mechanism space in which only individual rationality constraints and downward-adjacent incentive compatibility constraints must be satisfied. For any properly robust mechanism in this relaxed mechanism space, it is shown that the seller’s payoff must be increasing in the type of the buyer. An inductive argument starting from the lowest type and proceeding upwards then implies that any mechanism that is a best response to a full support and strongly adversarial LPS must be efficient and maximal. Of course, this mech-anism satisfies all omitted incentive compatibility constraints. Hence, it is properly robust in the fully constrained problem. The force of Proposition 7 comes from the interaction between strongly adversarial be-liefs and the structure of incentive compatibility constraints screening problems with strictly increasing differences. To see the logic most transparently, restrict attention to determinis-tic allocation rules. Incentive compatibility implies that any such rule must be increasing. The proof shows that, if the allocation rule is properly robust, then the seller’s payoff must likewise be increasing in type. A strongly adversarial LPS therefore lexicographically pri-oritizes the lowest type, then the second-lowest type, and so on. Under maximal transfers, the downward-adjacent incentive compatibility constraints bind and distortions for lower types are attractive because they reduce the information rents left to higher types. Proper robustness exactly offsets this force: because the LPS places lexicographic priority on lower types, it penalizes mechanisms that reduce their payoffs in order to extract more surplus from higher types. In this sense, the refinement cuts against the natural rent-extraction logic of the screening problem, and this is what drives the efficiency result. By contrast, consider a “reverse-adversarial” LPS in which the highest type receives lexicographic priority, followed by the second-highest type, and so on. Under such an LPS, the seller would first maximize her payoff from the highest type. This would reinforce, rather than counteract, the standard rent-extraction motive, leading the seller to maximally distort the allocations of all lower 20 types, similarly to the way in which the middle type’s allocation is distorted in Example 3. 
+
+## 3.5 Bayesian foundations 
+
+The proof of Proposition 7 establishes that the unique properly robust mechanism is a best response to the LPS μ = ( δ1, δ 2, . . . , δ N ). By construction, it is therefore Bayesian optimal against δ1. However, many other mechanisms are optimal against δ1. For simplicity of exposition, suppose that the seller restricts herself to using deterministic mechanisms. Then, provided that P is determined by (3), a (deterministic) allocation rule is a part of a 
+
+ρ-optimal mechanism if and only if it solves max 
+
+> Q:Θ →Q
+> N
+
+X
+
+> i=1
+
+ρ(θi) [ u(Q(θi), θ i) − c(Q(θi)) − d(θi)] subject to 
+
+d(θi) = 
+
+
+
+h(θi) ( u(Q(θi), θ i+1 ) − u(Q(θi), θ i)) if ρ(θi) > 00 otherwise 
+
+Q(·) increasing, (4) where h(θi) = PNj=i+1 ρ(θj )/ρ (θi) is the inverse hazard rate for type θi and d(θi) is a term that distorts the allocation to type θi. Notice, for any full-support prior, quality distortions must arise for all types below θN and these distortions depend on the shape of the corresponding inverse hazard rates. However, for ρ = δ1, there are no restrictions on the form of an optimal mechanism other than efficiency for the lowest type and full-surplus extraction from that type (because no other type appears in the objective function). As observed in Proposition 1, there is a precise sense in which properly robust mechanisms outperform others in the limit of particular sequences of Bayesian priors converging to δ1.To illustrate the result, suppose |Θ| = 3 and consider a sequence ( r1 
+
+> ℓ
+
+, r 2 
+
+> ℓ
+
+)ℓ ∈ ((0 , 1) 2)N for which ( r1 
+
+> ℓ
+
+, r 2 
+
+> ℓ
+
+) → (0 , 0). For μ = ( δ1, δ 2, δ 3), the Bayesian prior ( rℓ□μ) sets (rℓ□μ)( θ1) = 1 − r1 
+
+> ℓ
+
+, (rℓ□μ)( θ2) = r1 
+
+> ℓ
+
+(1 − r2 
+
+> ℓ
+
+), and (rℓ□μ)( θ3) = r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+.
+
+The implied inverse hazard rates are 
+
+hℓ(θ1) = r1
+
+> ℓ
+
+1 − r1
+
+> ℓ
+
+, hℓ(θ2) = r2
+
+> ℓ
+
+1 − r2
+
+> ℓ
+
+, and hℓ(θ3) = 0 .
+
+If ( Q′, P ′) ∈ M is a deterministic mechanism that is not efficient and maximal, then because max θ hℓ(θ) → 0 as ℓ → ∞ , the efficient and maximal mechanism will yield expected profits 21 closer to the rℓ□μ-optimal mechanism than ( Q′, P ′) for ℓ sufficiently large. This sketch formalizes the following “Bayesian” intuition: if lower value buyers are much more likely than higher value buyers, then inverse hazard rates converge to zero. Correspondingly, quality distortions vanish. 
+
+# 4 Auction design 
+
+Notice that the screening model of Section 3 nests a single-agent auction model; simply set 
+
+Q = {0, 1} and suppose that the cost of production is constant in q ∈ Q . Proposition 5 then implies that the unique robust mechanism is a take-it-or-leave-it offer at the lowest type value. This section considers the extension of this model to the case in which there are multiple bidders, as in Myerson (1981). This introduces significant complexity into the analysis given the large set of feasible type profiles. Nevertheless, sharp predictions arise under perfection when there are binary types, and under properness in general. 
+
+## 4.1 Environment 
+
+The principal is now an auctioneer endowed with a single indivisible good and there are 
+
+I ≥ 2 agents i = 1 , 2, . . . , I . Each agent i has private information about their payoff from obtaining the good θi ∈ Θi := {θ1, . . . , θ N } ⊆ R, where 0 < θ 1 < · · · < θ N and N ≥ 2. Let the set of type profiles be denoted by Θ := QIi=1 Θi, the minimal element of Θ be denoted by θ := ( θ1, . . . , θ 1), and the maximal element of Θ be denoted by θ := ( θN , . . . , θ N ). The ex post payoff of agent i with type θi is given by 
+
+qiθi − pi,
+
+where qi ∈ [0 , 1] is the probability with which the agent receives the good and pi ∈ R is the transfer from agent i to the auctioneer. The auctioneer’s ex post payoff is her revenue 
+
+> I
+
+X
+
+> i=1
+
+pi.
+
+The auctioneer has commitment power. By the Revelation Principle, without loss of optimality, she can restrict attention to direct mechanisms. A (direct) mechanism consists of an allocation rule and a transfer rule. An allocation rule is a function 
+
+Q : Θ → [0 , 1] I such that 
+
+> I
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1,
+
+22 where Qi(θ) is the i-th component of the vector Q(θ) and denotes the probability with which agent i receives the good under type profile θ ∈ Θ. A transfer rule is a function 
+
+P : Θ → RI ,
+
+where P i(θ) is the i-th component of the vector P (θ) and denotes the transfer from agent i
+
+to the auctioneer. A mechanism is (dominant strategy) incentive compatible and (ex post) individually rational if, for all θ ∈ Θ and all i = 1 , 2, . . . , I ,
+
+Qi(θi, θ −i)θi − P i(θi, θ −i) ≥ Qi(ˆθi, θ −i)θi − P i(ˆθi, θ −i) for all ˆθi̸ = θi
+
+and 
+
+Qi(θi, θ −i)θi − P i(θi, θ −i) ≥ 0.
+
+Let M denote the set of all mechanisms that are incentive compatible and individually rational. 9 Given a mechanism ( Q, P ) ∈ M and a type profile θ ∈ Θ, the auctioneer obtains a payoff of 
+
+v(( Q, P ), θ ) = 
+
+> I
+
+X
+
+> i=1
+
+P i(θ).
+
+As in the screening environment, it is easy to show that any randomization over mechanisms is payoff equivalent to a mechanism in M. Henceforth, the auctioneer chooses an element of M.The allocation rule Q : Θ → [0 , 1] I is efficient for type profile θ if PIi=1 Qi(θ) = 1 and 
+
+Qi(θ) > 0 only if θi ≥ θj for all j̸ = i. The allocation rule Q : Θ → [0 , 1] I is efficient if it is efficient for all type profiles θ ∈ Θ. The mechanism ( Q, P ) ∈ M is efficient and maximal 
+
+if Q is efficient and P satisfies, for all i = 1 , 2, . . . , I and all θ−i ∈ Θ−i,
+
+P i(θ1, θ −i) = Qi(θ1, θ −i)θ1 and 
+
+P i(θk, θ −i) = Qi(θ1, θ −i)θ1 +
+
+> k
+
+X
+
+> j=2
+
+(Qi(θj , θ −i) − Qi(θj−1, θ −i)) θj for k ∈ { 2, ..., N }. (5) In contrast to the screening model, there are multiple efficient and maximal mechanisms. Each is distinguished by the way in which ties are broken. For instance, the efficient and maximal mechanism with uniform tie-breaking sets 
+
+Qi(θ) = 
+
+  
+
+> 1
+> |arg max
+> j∈I
+> θj|
+
+if θi = max( θ)0 otherwise 
+
+> 9As is well-known and as discussed in Section 1.1, restricting attention to dominant strategy incentive compatible and ex post individually rational mechanisms is without loss of optimality in the Bayesian independent private values model of Myerson (1981).
+
+23 for i = 1 , 2, . . . , I . But, ties can be broken in other ways. Extending the notation from the screening model, let δθ ∈ ∆(Θ) denote the measure that places probability one on type profile θ ∈ Θ. 
+
+## 4.2 Robust mechanisms 
+
+It is again established that there are few restrictions placed on the designer’s mechanism if the only requirement is that she chooses a best response to an adversarial LPS; any mechanism that is “efficient at the bottom” and does not yield excessive rent is robustly optimal. 
+
+Proposition 8 (Auction: characterization of robust mechanisms) 
+
+A mechanism (Q, P ) ∈ M is robust if and only if 1. it is efficient for the lowest type profile, θ;2. the seller extracts full surplus under the lowest type profile, 
+
+> I
+
+X
+
+> i=1
+
+P i(θ) = max( θ); 
+
+3. and the auctioneer obtains the lowest payoff from the lowest type profile, 
+
+v(( Q, P ), θ ) ≥ v(( Q, P ), θ ) for all θ ∈ Θ.
+
+A simple example illustrates the multiplicity of robustly optimal mechanisms. 
+
+Example 4. Suppose there are two agents ( I = 2) and two types ( N = 2). Proposition 8 establishes that a mechanism ( Q, P ) ∈ M is robustly optimal if and only if 
+
+Q1(θ) + Q2(θ) = 1 , P 1(θ) + P 2(θ) = θ1,
+
+and the profitability constraints are satisfied: 
+
+P 1(θ1, θ 2)+ P 2(θ1, θ 2) ≥ θ1, P 1(θ2, θ 1)+ P 2(θ2, θ 1) ≥ θ1, and P 1(θ2, θ 2)+ P 2(θ2, θ 2) ≥ θ1.
+
+For instance, let ( Q, P ) ∈ M be the mechanism in which P is determined by (5) and Q is given by  Q1(θ), Q 2(θ) =
+
+12, 12
+
+
+
+,
+
+ Q1(θ1, θ 2), Q 2(θ1, θ 2) =
+
+
+
+0, 12 + 12
+
+θ1
+
+θ2
+
+
+
+,
+
+ Q1(θ2, θ 1), Q 2(θ2, θ 1) =
+
+12 + 12
+
+θ1
+
+θ2
+
+, 0
+
+
+
+, and 
+
+ Q1(θ2, θ 2), Q 2(θ2, θ 2) =
+
+12
+
+θ1
+
+θ2
+
+, 12
+
+θ1
+
+θ2
+
+
+
+.
+
+24 By Proposition 8, this mechanism is robustly optimal; it is efficient for the lowest type profile 
+
+θ, P 1(θ) + P 2(θ) = θ1, and revenue is equal to θ1 at every type profile. Nevertheless, the mechanism is inefficient for all type profiles other than θ because it does not allocate the good with probability one. Moreover, it is weakly dominated by the efficient and maximal mechanism with uniform tie-breaking. ♢
+
+## 4.3 Perfectly robust mechanisms 
+
+By Proposition 3, requiring the auctioneer to choose a perfectly robust mechanism rules out selection of a weakly dominated mechanism. And, again, a nearly immediate implication of Proposition 3 is that, in Example 4, any perfectly robust mechanism must be efficient and maximal. The following result establishes existence and confirms that, in any setting with two types, a mechanism is perfectly robust mechanism if and only if it is efficient and maximal. More generally, efficiency must always arise “at the top” and “at the bottom”. 
+
+Proposition 9 (Auction: characterization of perfectly robust mechanisms) 
+
+If there are two types ( N = 2 ), then a mechanism is perfectly robust if and only if it is efficient and maximal. More generally, in any perfectly robust mechanism (Q, P ) ∈ M , P satisfies 
+
+(5) and the allocation rule is efficient for any type profile θ ∈ Θ with max( θ) ∈ { θ1, θ N }.
+
+Perfectly robust mechanisms again need not be efficient “in the middle”. The following examples demonstrate that inefficiency can arise either because the auctioneer withholds the good, or because she misallocates the good to a bidder that does not have the highest value. These inefficiencies are precisely those that arise in the standard independent private values auction model (see, e.g., Myerson (1981) and Ausubel and Cramton (1999)). Note, however, that misallocation inefficiency can only arise in that model if there are asymmetric distributions over values, or Myerson (1981)’s regularity condition is violated. 
+
+Example 5 (Withholding inefficiency) . Suppose there are two agents ( I = 2), three types (N = 3), and θn = n. Consider the mechanism ( Q, P ) ∈ M in which P satisfies (5) and, for 
+
+i = 1 , 2 and j̸ = i,
+
+Qi(θi, θ j ) = 
+
+
+
+1 if θi > θ j 
+
+> 12
+
+if θi = θj = θ1 or θi = θj = θ3, 
+
+> 14
+
+if θi = θj = θ2, and 0 if θi < θ j .Note that ( Q, P ) is inefficient because it allocates the good with probability 1 /2 under (θ2, θ 2). Nevertheless, it is perfectly robust. Supplemental Appendix B.4 verifies that it is 25 μ-optimal against the adversarial and full support LPS μ = ( δθ, μ 2, μ 3, μ 4, δ θ), where 
+
+μ2 = 13 ◦ (θ2, θ 2) + 13 ◦ (θ3, θ 2) + 13 ◦ (θ2, θ 3),μ3 = 12 ◦ (θ1, θ 2) + 12 ◦ (θ2, θ 1), and 
+
+μ4 = 12 ◦ (θ1, θ 3) + 12 ◦ (θ3, θ 1).
+
+The inefficiency arises because, under μ, extracting rent from ( θ3, θ 2) and ( θ2, θ 3) is just as valuable to the seller as obtaining additional revenue at ( θ2, θ 2). Note that Q1(θ2, θ 2) + 
+
+Q2(θ2, θ 2) ≥ 1/2 is necessary for μ to be adversarial with respect to the mechanism, though it is not necessary for μ-optimality. ♢
+
+Example 6 (Misallocation inefficiency) . Suppose there are two agents ( I = 2) and three types (N = 3). Consider the mechanism ( Q, P ) ∈ M in which P satisfies (5) and the allocation rule Q is defined as follows: 
+
+Q1(θ1, θ 2) = 
+
+
+
+1 if θ1 > θ 2 and ( θ1, θ 2)̸ = ( θ2, θ 1)0 otherwise and Q2(θ1, θ 2) = 1 − Q1(θ1, θ 2).
+
+Notice that ties are always broken in favor of agent 2. Moreover, under the type profile (θ2, θ 1), the good is allocated to agent 2 even though θ2 > θ 1. Hence, ( Q, P ) is inefficient: the good is sometimes allocated to a bidder whose value is strictly smaller than the other bidder. Nevertheless, it is perfectly robust. In particular, Supplemental Appendix B.5 verifies that it is μ-optimal with respect to the full support and adversarial LPS 
+
+μ = ( δθ, δ (θ3,θ 1), δ (θ3,θ 2), μ 4, μ 5),
+
+where 
+
+μ4 = 13 ◦ (θ1, θ 2) + 13 ◦ (θ1, θ 3) + 13 ◦ (θ2, θ 1)and 
+
+μ5 = 13 ◦ (θ2, θ 2) + 13 ◦ (θ2, θ 3) + 13 ◦ (θ3, θ 3).
+
+The inefficiency arises because, to maximize revenue at ( θ3, θ 1), it is optimal to distort agent 1’s allocation completely whenever agent 2’s type is θ1 and agent 1’s type is strictly less than 
+
+θ3. This leads to inefficiency at ( θ2, θ 1). ♢
+
+26 4.4 Properly robust mechanisms 
+
+The LPSs sustaining the inefficient mechanisms in Examples 5 and 6 may be regarded as implausible. In Example 5, ( θ2, θ 3) and ( θ3, θ 2) yield the auctioneer a revenue of 14 θ2 + 34 θ3,whereas ( θ2, θ 2) yields a revenue of 12 θ2 < 14 θ2 + 34 θ3. Nevertheless, ( θ2, θ 2) is not infinitely more likely than either ( θ3, θ 2) or ( θ2, θ 3). Similarly, in Example 6, ( θ3, θ 1) and ( θ3, θ 2) yield the auctioneer a revenue of θ3, whereas ( θ2, θ 2) yields a revenue of θ1 < θ 3. Nevertheless, (θ3, θ 1) and ( θ3, θ 2) are infinitely more likely than ( θ2, θ 2). The main result of this section is that, when the auctioneer must choose a best response to a full support and strongly adversarial LPS, only efficient and maximal mechanisms are optimal. In fact, a mechanism is optimal if and only if it is efficient and maximal with ties broken uniformly for any type profile whose largest type is strictly smaller than θN .
+
+Proposition 10 (Auction: characterization of properly robust mechanisms) 
+
+A mechanism (Q, P ) ∈ M is properly robust if and only if it is efficient and maximal with ties broken uniformly for any type profile that does not contain the highest type, i.e., for any 
+
+θ ∈ Θ such that max( θ) < θ N ,
+
+Qi(θ) = 
+
+  
+
+> 1
+> |arg max
+> j∈I
+> θj|
+
+if θi = max( θ)0 otherwise. 
+
+The first part of the proof constructs an LPS μ that has full support and is strongly adversarial with respect to the mechanisms identified in the statement of Proposition 10. The first belief in μ is the point mass on the lowest type profile. The second belief in μ is a uniform probability measure over the set of type profiles in which the maximum type is 
+
+θ2 and the second-highest type is θ1. The third belief in μ is a uniform probability measure over the set of type profiles in which some agent has type strictly larger than θ2 and the second-highest type is θ1. The fourth belief in μ is a uniform probability measure over the set of type profiles in which two or more agents have type θ2 and all others have type θ1.This construction is iterated until the highest type θN is reached. The second part of the proof confirms that every efficient and maximal mechanism is 
+
+μ-optimal. Because μ is strongly adversarial with respect to the mechanisms identified in Proposition 10 and those mechanisms are efficient and maximal, they are properly robust. On the other hand, because μ is not strongly adversarial with respect to efficient and maximal mechanisms that do not satisfy the restrictions on the tie-breaking rule stated in Proposition 10, this argument does not establish that they are properly robust. The third part of the proof shows that any properly robust mechanism must be effi-cient and maximal with ties broken uniformly whenever the highest type does not appear. 27 By Proposition 4, proper robustness of a mechanism requires lexicographic optimality of its sorted payoff vector across all type profiles. Any deviation from efficiency or uniform tie breaking reduces revenue at some type profile in a way that cannot be offset by gains elsewhere. Introducing inefficiency might increase revenue in Bayesian settings by allowing the auctioneer to extract rent from higher types. But, under lexicographic evaluation of mechanisms, such profiles are of lower priority, making inefficiency suboptimal. The intu-ition behind the optimality of uniform tie-breaking is subtler: if ties at any type profile 
+
+θ ∈ Θ such that max( θ) < θ N are broken unevenly, then some agent receives the good with a strictly higher-than-average probability, reducing the maximal rent that can be extracted from him at profiles where his value is slightly higher. To lexicographically maximize payoffs, the auctioneer is therefore better off equalizing allocation probabilities across tied agents. This logic does not extend to type profiles in which the maximum type is θN . Hence, for such profiles, properness does not restrict how ties are broken. This concludes the proof. Observe that the efficient and maximal mechanism with uniform tie-breaking is properly robust. It is implemented by a sealed-bid or ascending clock auction in which the agent with the maximum bid receives the good, with ties broken uniformly at random when there are multiple bidders with the same maximum bid. The winning bidder pays the auctioneer an amount equal to his bid if there are multiple bidders with the same maximum bid. Otherwise, he pays the auctioneer an amount between the second-highest bid θn and the next-highest bidding increment θn+1 ,  1
+
+J + 1 
+
+
+
+θn +
+
+
+
+1 − 1
+
+J + 1 
+
+
+
+θn+1 ,
+
+where J is the number of bidders with the second-highest bid. Observe that as the maximal distance between adjacent types converges to zero, the transfer rule converges to that under a second-price auction with uniform tie-breaking (equivalently, that under the Vickrey-Clarke-Groves mechanism with the Clarke pivot rule (Vickrey, 1961; Clarke, 1971; Groves, 1973)). 28 4.5 Bayesian foundations 
+
+Assuming that prices are determined by (5), an allocation rule is a part of a Bayesian-optimal mechanism with respect to the prior ρ ∈ ∆(Θ) if and only if it solves max 
+
+> Q:Θ →[0 ,1] I
+> I
+
+X
+
+> i=1
+> N
+
+X
+
+> j=1
+
+X
+
+> θ−i∈Θ−i
+
+ρ(θj , θ −i)Qi(θj , θ −i)vi(θj , θ −i)subject to 
+
+vi(θj , θ −i) = 
+
+
+
+θj − (θj+1 − θj )    
+
+> PNk=j+1 ρ(θk,θ −i)
+> ρ(θj,θ −i)
+
+if ρ(θ) > 00 otherwise 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−iIX
+
+> i=1
+
+Qi(θ) ≤ 1 for all i and θ ∈ Θ, (6) where vi(θ) is the “virtual value” of type i under type profile θ. Ignoring the monotonicity constraint on Qi(·, θ −i), it is immediate that any ρ-optimal mechanism allocates the good with probability one to bidder i if vi(θ) > max {0, max j̸ =i vj (θ)}. If multiple bidders have the same greatest strictly-positive virtual value, then the good is allocated with probability one and ties can be broken arbitrarily. Finally, if the maximum virtual value equals zero, then there are no restrictions on how the good is allocated. Suppose there are two agents ( I = 2) and three types ( N = 3). The proof of Proposition 10 establishes that any properly robust mechanism is μ-optimal with respect to the LPS 
+
+μ = ( μ1, μ 2, μ 3, μ 4, μ 5, μ 6), where 
+
+μ1 = δθ, μ2 = 12 ◦ (θ1, θ 2) + 12 ◦ (θ2, θ 1), μ3 = 12 ◦ (θ1, θ 3) + 12 ◦ (θ3, θ 1),μ4 = δ(θ2,θ 2), μ5 = 12 ◦ (θ2, θ 3) + 12 ◦ (θ3, θ 2), and μ6 = δθ.
+
+In fact, any efficient and maximal mechanism is μ-optimal and, therefore, Bayesian optimal against δθ. However, inefficient mechanisms are also Bayesian optimal against δθ; by the analysis in the preceding paragraph, v1(θ) = v2(θ) = θ1 > 0 and v1(θ) = v2(θ) = 0 for all 
+
+θ̸ = θ. So, any feasible allocation rule that allocates the good with probability one given θ
+
+is a part of a ρ-optimal mechanism. As observed in Proposition 1, there is a precise sense in which properly robust mecha-nisms outperform others in the limit of particular sequences of Bayesian priors converging to δθ. To illustrate the result in the context of the single-unit auction, consider a sequence (rℓ)ℓ ∈ ((0 , 1) 5)N for which ( r1 
+
+> ℓ
+
+, r 2 
+
+> ℓ
+
+, r 3 
+
+> ℓ
+
+, r 4 
+
+> ℓ
+
+, r 5 
+
+> ℓ
+
+) → (0 , 0, 0, 0, 0). The corresponding Bayesian 29 prior ( rℓ□μ) is displayed below: (rℓ□μ)( θ1, θ 1) = 1 − r1 
+
+> ℓ
+
+(rℓ□μ)( θ2, θ 1) = 12 r1 
+
+> ℓ
+
+(1 − r2 
+
+> ℓ
+
+) (rℓ□μ)( θ3, θ 1) = 12 r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+(1 − r3 
+
+> ℓ
+
+)(rℓ□μ)( θ1, θ 2) = 12 r1 
+
+> ℓ
+
+(1 − r2 
+
+> ℓ
+
+) (rℓ□μ)( θ2, θ 2) = r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+r3 
+
+> ℓ
+
+(1 − r4 
+
+> ℓ
+
+) (rℓ□μ)( θ3, θ 2) = 12 r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+r3 
+
+> ℓ
+
+r4 
+
+> ℓ
+
+(1 − r5 
+
+> ℓ
+
+)(rℓ□μ)( θ1, θ 3) = 12 r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+(1 − r3 
+
+> ℓ
+
+) ( rℓ□μ)( θ2, θ 3) = 12 r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+r3 
+
+> ℓ
+
+r4 
+
+> ℓ
+
+(1 − r5 
+
+> ℓ
+
+) ( rℓ□μ)( θ3, θ 3) = r1 
+
+> ℓ
+
+r2 
+
+> ℓ
+
+r3 
+
+> ℓ
+
+r4 
+
+> ℓ
+
+r5 
+
+> ℓ
+
+.
+
+The virtual values for i = 1 , 2 are then 
+
+viℓ(θ1, θ 1) = θ1 − (θ2 − θ1)
+
+ 12 r1
+
+> ℓ
+
+((1 −r2   
+
+> ℓ)+ r2
+> ℓ(1 −r3
+> ℓ)
+
+) 
+
+> (1 −r1
+> ℓ)
+
+
+
+viℓ(θ2, θ 1) = θ2 − (θ3 − θ2)
+
+r2  
+
+> ℓ(1 −r3
+> ℓ)1−r2
+> ℓ
+
+
+
+viℓ(θ1, θ 2) = θ1 − (θ2 − θ1)
+
+r2      
+
+> ℓr3
+> ℓ
+> 
+> (1 −r4
+> ℓ)+ 12r4
+> ℓ(1 −r5
+> ℓ)
+> 
+> 12 (1 −r2
+> ℓ)
+
+
+
+viℓ(θ2, θ 2) = θ2 − (θ3 − θ2)
+
+ 12 r4  
+
+> ℓ(1 −r5
+> ℓ)1−r4
+> ℓ
+
+
+
+viℓ(θ1, θ 3) = θ1 − (θ2 − θ1)
+
+r3 
+
+> ℓr4
+> ℓ
+
+(12 (1 −r5  
+
+> ℓ)+ r5
+> ℓ
+
+)  
+
+> 12(1 −r3
+> ℓ)
+
+
+
+viℓ(θ2, θ 3) = θ2 − (θ3 − θ2)
+
+ r5  
+
+> ℓ
+> 12(1 −r5
+> ℓ)
+
+
+
+and 
+
+viℓ(θ3, θ 3) = viℓ(θ3, θ 2) = viℓ(θ3, θ 1) = θ3.
+
+Note that, as ℓ → ∞ , vi(θi, θ −i) converges to θi. So, for ℓ sufficiently large, the set of solutions to (6) when ρ = ( rℓ□μ) is the set of efficient and maximal mechanisms. This sketch formalizes the following “Bayesian” intuition: if lower type profiles are much more likely than higher type profiles, then virtual values converge to actual values. Correspondingly, distortions vanish in any corresponding sequence of Bayesian-optimal mechanisms. Note that the role of proper robustness in refining the tie-breaking rule cannot be demonstrated via such an example — against the justifying LPS constructed in the proof of Proposition 10, any efficient and maximal mechanism is μ-optimal. On the other hand, as previously remarked, μ is only strongly adversarial with respect to efficient and maximal mechanisms satisfying the tie-breaking restrictions stated in Proposition 10. 
+
+# 5 Public good provision 
+
+This section departs from the auction model in Section 4 by assuming that the good to be allocated is public. As discussed in Section 1.1, the focus is again on the efficiency of profit-maximizing mechanisms, rather than efficient mechanism design. It is shown that robust mechanisms are generally inefficient (Corollary 1), and that robustness and perfect robustness generally permit a large set of mechanisms. Nevertheless, proper robustness pins down a unique mechanism. An asymptotic exercise in the spirit of Rob (1989) and Mailath and Postlewaite (1990) establishes that, if the economy grows large and the per-capita cost of the public good remains constant, a stark form of inefficiency arises. 30 5.1 Environment 
+
+There is a single profit-maximizing firm that can produce a public good consumed by I ≥ 2agents i = 1 , 2, . . . , I . Each agent i has private information about their payoff from the production of the public good θi ∈ Θi := {θℓ, θ h}, where θh > 0 and θh > θ ℓ (note that 
+
+θℓ need not be positive). Let the set of type profiles be denoted by Θ := QIi=1 Θi, let 
+
+θ := ( θℓ, . . . , θ ℓ), and let θ := ( θh, . . . , θ h). The ex post payoff of agent i with type θi is given by 
+
+qθ i − pi,
+
+where q ∈ [0 , 1] is the probability with which the public good is produced and pi ∈ R is the transfer from agent i to the firm. The firm’s ex post payoff is given by 
+
+> I
+
+X
+
+> i=1
+
+pi
+
+!
+
+− qc, 
+
+where c := γI is the total cost of producing the public good and γ ∈ (θℓ, θ h) is the per-capita cost. The firm has commitment power. By the Revelation Principle, without loss of optimality, it can restrict attention to direct mechanisms. A (direct) mechanism is an allocation rule and transfer rule, 
+
+Q : Θ → [0 , 1] and P : Θ → RI ,
+
+that together are (dominant strategy) incentive compatible and (ex post) individ-ually rational : for all θ ∈ Θ and all i = 1 , 2, . . . , I ,
+
+Q(θi, θ −i)θi − P i(θi, θ −i) ≥ Q(ˆθi, θ −i)θi − P i(ˆθi, θ −i) for ˆθi̸ = θi
+
+and 
+
+Q(θi, θ −i)θi − P i(θi, θ −i) ≥ 0.
+
+Let M denote the set of all mechanisms. Given a mechanism ( Q, P ) ∈ M and a type profile 
+
+θ ∈ Θ, the firm obtains a payoff of 
+
+v(( Q, P ), θ ) = 
+
+> I
+
+X
+
+> i=1
+
+P i(θ)
+
+!
+
+− Q(θ)c. 
+
+As in the previous environments, it is easy to show that randomization over mechanisms results in a mechanism that is payoff equivalent to one in M; henceforth, without loss of generality, the firm chooses an element of M.The allocation rule Q : Θ → [0 , 1] is efficient for type profile θ if PIi=1 θi > c and 
+
+Q(θ) = 1, PIi=1 θi < c and Q(θ) = 0, or PIi=1 θi = c. The allocation rule Q : Θ → [0 , 1] 31 is efficient if it is efficient for all type profiles. The mechanism ( Q, P ) ∈ M is efficient and maximal if Q is the efficient allocation rule for which Q(θ) = 0 if PIi=1 θi = c and P
+
+satisfies, for all i = 1 , 2, . . . , I and all θ−i ∈ Θ−i,
+
+P i(θℓ, θ −i) = Q(θℓ, θ −i)θℓ and P i(θh, θ −i) = Q(θℓ, θ −i)θℓ +( Q(θh, θ −i)−Q(θℓ, θ −i)) θh. (7) Again, let δθ ∈ ∆(Θ) denote the measure that places probability one on type profile θ.The following notation will be useful. Let 
+
+Sk := Iθ ℓ + k(θh − θℓ) − c
+
+be the surplus generated when the public good is produced in any type profile in which k
+
+agents have type θh. Let 
+
+k∗ := min {k ∈ { 1, . . . , I } : Sk > 0}
+
+be the lowest number of agents with valuation θh such that strictly positive surplus is gen-erated from producing the public good. Note that, because c = γI , it is efficient to produce the public good whenever the fraction of agents with value θh exceeds a threshold ρ ∈ (0 , 1) that does not depend on the number of agents: 
+
+Sk = Iθ ℓ + k(θh − θℓ) − γI ≥ 0 ⇐⇒ kI ≥ ρ := γ − θℓ
+
+θh − θℓ
+
+.
+
+## 5.2 Robust mechanisms 
+
+The following proposition characterizes the set of robust mechanisms. 
+
+Proposition 11 (Public good: characterization of robust mechanisms) 
+
+A mechanism (Q, P ) ∈ M is robust if and only if the firm’s ex post payoff is always at least zero: for all θ ∈ Θ,
+
+v(( Q, P ), θ ) = 
+
+> I
+
+X
+
+> i=1
+
+P i(θ)
+
+!
+
+− Q(θ)c ≥ 0.
+
+An immediate corollary of Proposition 11 is that the efficient and maximal mechanism is robust if and only if Iθ h > c ≥ (I − 1) θh + θℓ (recall the maintained assumption that 
+
+c ∈ (Iθ ℓ, Iθ h)). To see why, consider the efficient allocation rule in which the public good is provided if and only if all agents have the maximum valuation, i.e., θ = θ. If transfers are determined by (7), then the firm obtains a payoff of Iθ h − c > 0 under θ. Under all other type profiles, the firm obtains a payoff of zero. So, the firm always obtains at least a payoff of zero and Proposition 11 implies that the mechanism is robust. On the other 32 hand, if c < (I − 1) θh + θℓ, then under the type profile θ = θ, the public good is produced independently of an individual agent’s report in any efficient allocation rule. Hence, to preserve incentive compatibility, no agent can be charged a price larger than θℓ for reporting their value truthfully. The firm thus obtains a payoff no higher than Iθ ℓ − c < 0. This result is stated below for convenience. 
+
+Corollary 1 ((Sub-)optimality of efficient and maximal mechanism) 
+
+The efficient and maximal mechanism is robust if and only if c ∈ [( I − 1) θh + θℓ, Iθ h).
+
+Corollary 1 isolates the economic force behind inefficiency in the model: under public good incentive compatibility and individual rationality constraints, efficient provision need not permit sufficient revenue extraction by the designer “at the top”. The binary type space is not central to the logic; its role is to permit a transparent closed-form characterization of the unique properly robust mechanism. It is again easy to show that there are often many robust mechanisms, and that some are weakly dominated. 
+
+Example 7. Consider the set of mechanisms ( Q, P ) ∈ M for which Q(θ) = 0 for all θ̸ = θ and 
+
+Q(θ) ∈ [0 , 1), with P i(θ) = 0 for all θ̸ = θ and P 
+
+> i
+
+P i(θ) ≥ Q(θ)c. Note that this set includes the mechanism ( Q, P ) ∈ M in which the public good is never produced: Q(θ) = P i(θ) = 0 for all θ ∈ Θ and all i. By Proposition 11, any mechanism in the set is robust because it yields the firm a payoff of zero under every type profile. However, any such mechanism is weakly dominated by the mechanism ( ˆQ, ˆP ) ∈ M in which ˆQ(θ) = 1 if and only if θ = θ
+
+and ˆP satisfies (7) with ˆQ replacing Q. In particular, ( ˆQ, ˆP ) yields a payoff of zero for all 
+
+θ̸ = θ and extracts full surplus Iθ h − c > 0 under the profile θ = θ. ♢
+
+## 5.3 Perfectly robust mechanisms 
+
+By Proposition 3, requiring the firm to choose a perfectly robust mechanism rules out se-lection of a weakly dominated mechanism. Hence, the set of weakly dominated mechanisms constructed in Example 7 cannot be perfectly robust. The following proposition establishes that, when c ∈ [( I − 1) θh + θℓ, Iθ h), the efficient and maximal mechanism is the unique perfectly robust mechanism. More generally, efficiency must always arise “at the top” and “at the bottom”. 
+
+Proposition 12 (Public good: characterization of perfectly robust mechanisms) 
+
+If c ∈ [( I − 1) θh + θℓ, Iθ h), then the efficient and maximal mechanism is the unique perfectly robust mechanism. More generally, in any perfectly robust mechanism (Q, P ) ∈ M , the 
+
+33 allocation rule Q is efficient for any type profile θ ∈ Θ such that PIi=1 θi ≤ c or θ = θ, and the transfer rule P satisfies (7) .
+
+The following example demonstrates that, outside the case in which c ∈ [( I − 1) θh +
+
+θℓ, Iθ h), perfection need not impose much discipline on the set of selected mechanisms. 
+
+Example 8. Suppose there are two agents ( I = 2) and c ∈ (2 θℓ, θ h + θℓ). Proposition 11 and Proposition 12 together imply that, in any perfectly robust mechanism ( Q, P ) ∈ M ,
+
+Q(θ) = 0, Q(θ) = 1, and 
+
+Q(θh, θ ℓ) + Q(θℓ, θ h) ≤ 2θh − cθh − θℓ
+
+,
+
+where the final condition ensures that the firm’s ex post payoff is positive under type profile 
+
+θ. It turns out that these necessary conditions for perfect robustness are, in fact, sufficient for perfect robustness in this example. To see why, fix any such a mechanism ( Q, P ) ∈ M 
+
+and consider the adversarial and full support LPS 
+
+μ = ( δθ, α ◦ (θh, θ ℓ) + α ◦ (θℓ, θ h) + (1 − 2α) ◦ θ),
+
+where 
+
+α := 
+
+
+
+2 + θh + θℓ − cθh − θℓ
+
+−1
+
+.
+
+Supplemental Appendix B.6 verifies that ( Q, P ) is μ-optimal. Hence, ( Q, P ) is perfectly robust. ♢
+
+## 5.4 Properly robust mechanisms 
+
+The following proposition identifies the unique properly robust mechanism. In the statement of the proposition and throughout, the empty product equals one by convention. 
+
+Proposition 13 (Public good: characterization of properly robust mechanisms) 
+
+The unique properly robust mechanism is the mechanism (Q, P ) ∈ M for which 
+
+Q(θ) = 
+
+ 
+
+> qK
+> qI
+
+if |{ i : θi = θh}| = K and PIi=1 θi > c 
+
+0 otherwise 
+
+,
+
+where 
+
+qK := 
+
+> K
+
+X
+
+> k=k∗
+
+1
+
+SkKY
+
+> j=k+1
+
+j(θh − θℓ)
+
+Sj
+
+!
+
+for K ∈ { k∗, . . . , I },and P satisfies (7) .
+
+34 Inspecting the statement of Proposition 13 reveals that the properly robust mechanism is inefficient whenever c < (I − 1) θh + θℓ. In particular, the probability with which the public good is produced is strictly smaller than one when PIi=1 θi = ( I − 1) θh + θℓ even though the sum of valuations strictly exceeds the cost of production. The allocation rule is depicted for a particular parameterization in Figure 1 and its asymptotic properties are explored in Section 5.5. The proof of Proposition 13 proceeds by first showing that any properly robust mechanism is anonymous, i.e., depends only on the number of agents with type θh. Necessity of the conditions defining the mechanism in the statement of Proposition 13 is then established by showing that leximin optimality requires equalizing the firm’s payoff across type profiles in which strictly positive surplus is generated. By Proposition 4, it follows that these conditions are also necessary for proper robustness. Sufficiency is established by constructing a strongly adversarial and full support LPS with two beliefs against which the mechanism is optimal. The first belief, μ1, has support equal to the set of type profiles that do not generate strictly positive surplus. The second belief, μ2, has support equal to the set of type profiles generating strictly positive surplus. This construction yields an immediate Bayesian foundation for the unique properly robust mechanism — it is optimal against any convex combination of μ1
+
+and μ2. As in the auction model of Section 4, other mechanisms are also optimal against this convex combination. But because μ is not strongly adversarial with respect to these other mechanisms, they are not properly robust. 
+
+## 5.5 Asymptotic inefficiency 
+
+The unique properly robust allocation rule in an economy with I agents is characterized by an ( I + 1)-vector of probabilities ( QIk)k, where QIk is the probability with which the public good is produced under QI given any type profile in which there are exactly k agents with type θh. This ( I + 1)-vector can be summarized by the function f I : [0 , 1] → [0 , 1] defined by 
+
+f I (x) = QI
+
+> ⌊xI ⌋
+
+,
+
+where ⌊xI ⌋ denotes the greatest integer less than xI . That is, f I (x) denotes the probability with which the good is produced when there are k = ⌊xI ⌋ agents with type θh. Equivalently, 
+
+f I (x) is the maximum probability with which the public good is produced when the fraction of agents with type θh is less than x ∈ [0 , 1]. From Proposition 13, for all I, f I (1) = 1 and f I (x) = 0 if x ≤ ρ, where ρ is the efficient threshold. The following proposition establishes further that, for any x ∈ (ρ, 1), the probability of provision when less than x fraction of agents have type θh goes to zero as 35 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+Fraction of θh agents x = kI
+
+> Probability of provision
+
+Efficient threshold ρ
+
+I = 5 
+
+I = 15 
+
+I = 55         
+
+> Figure 1: Asymptotic inefficiency under properly robust mechanism ( θh= 1 ,θℓ= 0 , and γ=12).
+
+the number of agents grows large. Moreover, for any ε > 0, convergence is uniform on the interval [0 , 1 − ε] at an exponential rate. 
+
+Proposition 14 (Public good: asymptotic inefficiency of properly robust mechanism) 
+
+For any threshold x ∈ [0 , 1) , the probability with which the public good is produced in the unique properly robust allocation rule when the fraction of agents with type θh is less than x
+
+vanishes as the number of agents grows large. That is, f I : [0 , 1] → [0 , 1] converges pointwise to the function f ∞(x) : [0 , 1] → [0 , 1] defined by 
+
+f ∞(x) = 
+
+
+
+0 if x ∈ [0 , 1) 1 if x = 1 
+
+.
+
+Moreover, for any ε ∈ (0 , 1) , convergence is uniform on [0 , 1 − ε] at exponential rate λε := 
+
+ε(− ln(1 − ρ)) : for all I,
+
+sup 
+
+> x∈[0 ,1−ε]
+
+|f I (x) − f ∞(x)| ≤ exp( −λεI).
+
+For any type profile in which the fraction of agents with type θh is in the interval ( ρ, 1), providing the public good with probability one is efficient. Proposition 14 indicates that, for such profiles, the public good is provided with vanishing probability as the number of agents grows large. Given the non-Bayesian uncertainty of the firm, the nature of the inefficiency result is ex post. Hence, it differs from those in Rob (1989) and Mailath and Postlewaite (1990), which identify conditions on the sequence of distributions over type profiles under 36 which the probability of provision vanishes as the number of agents grows large. Nevertheless, a straightforward consequence of the proof of Proposition 13 is that, under the sequence of Bayesian priors that rationalize the corresponding sequence of properly robust mechanisms, the probability of provision also approaches zero. 
+
+# 6 Discussion 
+
+This paper contributes both a belief-based framework for robust mechanism design and a collection of application-specific results. Proper robustness provides a belief-based charac-terization of the leximin criterion within an LPS framework that also nests the admissibility refinement of the maxmin criterion. In the applications, the framework has sharp efficiency implications: in the private good screening and auction environments studied, proper ro-bustness selects efficient and maximal mechanisms, while in the public good environment it selects a unique inefficient mechanism. Strikingly, whenever the efficient and maximal mech-anism is not robust in the public good environment, the inefficiency of the unique optimal mechanism grows large in large economies. The key economic driver of (in)efficiency is the relationship between allocation monotonicity and payoff monotonicity for the designer under the efficient allocation rule. There are several natural directions for future research. First, the mechanism design applications considered all feature bilateral risk-neutrality, a quasilinear utility function for the agent that satisfies strictly increasing differences, and independent values. Identifying the form of lexicographically robust mechanisms under relaxations of each assumption is an important task for several economic applications, e.g., optimal insurance provision, optimal bundling, the optimal design of common value auctions, and the optimal design of match-ing markets. Second, while the analysis has focused on the efficiency of profit-maximizing mechanisms, profit is not the only sensible objective for the principal. When the efficient allocation rule is not implementable, it is of particular interest to understand the form of lexicographically robust, second-best mechanisms. Third, while the assumption that the set of type profiles is discrete allows for a transparent illustration of the solution concepts, extending the approach to settings in which there are a continuum of types may facilitate analytical tractability. For instance, in settings in which payoff (revenue) equivalence holds, the transfer rule is pinned down by the allocation rule up to a constant, thereby reducing the design problem to the choice of allocation rule and the constant. Brandenburger, Frieden-berg, and Keisler (2008) provide a natural extension of the definition of a full support LPS to infinite-dimensional settings — an LPS has full support if the union of the supports of the beliefs it contains equals the entire set of type profiles. Moreover, it is straightforward 37 to define an adversarial LPS as one whose first-order belief has support contained within the set of payoff-minimizing type profiles. On the other hand, it is unclear how to extend the definition of a strongly adversarial LPS in a conceptually satisfactory way. This extension is therefore left for future work. 
+
+# A Proofs 
+
+## A.1 Proof of Proposition 1 
+
+Immediate from Proposition 4 of Mailath, Samuelson, and Swinkels (1997), which itself is almost immediate from Proposition 1 of Blume, Brandenburger, and Dekel (1991b). 
+
+## A.2 Proof of Proposition 2 
+
+If a mechanism σ ∈ ∆( M) is robust, then there exists an LPS μ that is adversarial with respect to σ against which σ is μ-optimal. Because μ1(θ) > 0 only if θ ∈ arg min θ′∈Θ V (σ, θ ′), the first-order payoff of the principal under σ is min θ′∈Θ V (σ, θ ′). Moreover, because σ is 
+
+μ-optimal, no other mechanism σ′ ∈ ∆( M) can obtain a higher first-order payoff than min θ′∈Θ V (σ, θ ′). Because min θ′∈Θ V (σ′, θ ′) is smaller than the first-order payoff of σ′ under 
+
+μ, it follows that min  
+
+> θ′∈Θ
+
+V (σ′, θ ′) ≤ min  
+
+> θ′∈Θ
+
+V (σ, θ ′).
+
+Since σ′ was chosen arbitrarily, it follows that no other mechanism can obtain a higher minimum payoff, i.e., σ is maxmin optimal. Suppose σ ∈ ∆( M) is maxmin optimal. Then, ¯v := max  
+
+> σ′∈∆( M)
+
+min 
+
+> ν′∈∆(Θ)
+
+X
+
+> θ′∈Θ
+
+ν′(θ′)V (σ′, θ ′)is well-defined and, by Sion (1958)’s minimax theorem, ¯v ≥ min  
+
+> ν′∈∆(Θ)
+
+sup 
+
+> σ′∈∆( M)
+
+X
+
+> θ′∈Θ
+
+ν′(θ′)V (σ′, θ ′). (8) Now, let ν ∈ arg min ν′∈∆(Θ) sup σ′∈∆( M)
+
+P 
+
+> θ′∈Θ
+
+ν′(θ′)V (σ′, θ ′) and consider the LPS μ = ( ν). Observe that for any σ′ ∈ ∆( M), the first-order payoff under μ is no larger than ¯ v by (8). Because σ yields at least ¯ v against any distribution, it follows that σ is μ-optimal. Moreover, 
+
+μ is adversarial with respect to σ; ¯ v is the lowest payoff that σ yields across all beliefs. Hence, 
+
+σ is robust. 38 A.3 Proof of Lemma 1 
+
+The first statement is proven by proof of its contrapositive. Suppose σ ∈ ∆( M) is inadmis-sible. Then, there exists a σ′ ∈ ∆( M) that weakly dominates σ:
+
+V (σ′, θ ) ≥ V (σ, θ ) for all θ ∈ Θ,
+
+with strict inequality for some θ. Hence, for any belief ρ ∈ ∆(Θ) for which ρ(θ) > 0 for all 
+
+θ ∈ Θ, X
+
+> θ∈Θ
+
+ρ(θ)V (σ′, θ ) > X
+
+> θ∈Θ
+
+ρ(θ)V (σ, θ ).
+
+It follows that σ ∈ ∆( M) is not optimal against any such ρ ∈ ∆(Θ). For the converse, suppose |M| < ∞ and σ ∈ ∆( M) is admissible. Enlarge M to 
+
+M′ := M ∪ { m}, where the new “pure” mechanism m is defined to yield the same type-profile-contingent payoff vector as the “mixed” mechanism σ:
+
+v(m, θ ) := V (σ, θ ) for all θ ∈ Θ.
+
+By admissibility of σ in M, m is admissible in M′ — any type-profile-contingent payoff vector generated by an element of ∆( M′) is also generated by an element of ∆( M). By finiteness of 
+
+M′, the standard pure-strategy characterization of admissibility (see, e.g., Myerson (1991) Theorem 1.7) implies that there exists a belief ρ ∈ ∆(Θ) with ρ(θ) > 0 for all θ ∈ Θ such that m is optimal against ρ. Because v(m, θ ) = V (σ, θ ) for all θ ∈ Θ, it follows that σ is optimal against ρ in the original problem. 
+
+## A.4 Proof of Proposition 3 
+
+It is first proven that if a mechanism σ ∈ ∆( M) is perfectly robust, then it is maxmin optimal and admissible. Suppose σ ∈ ∆( M) is perfectly robust. Then, by definition, there exists an LPS, μ, that is adversarial with respect to σ and such that σ is μ-optimal. Hence, it is robust. By Proposition 2, it is thus maxmin optimal. To prove that such a mechanism is admissible, observe that if σ ∈ ∆( M) is not admissible, then there exists a mechanism 
+
+σ′ ∈ ∆( M) that weakly dominates it. Hence, σ′ is lexicographically preferred to σ given any full support LPS μ. It follows that σ cannot be a best response to any full support LPS and, hence, cannot be perfectly robust. For the converse, suppose that |M| < ∞ and σ ∈ ∆( M) is maxmin optimal. Then, by the same argument in the second paragraph of the proof of Proposition 2, there exists a ν ∈ ∆(Θ) against which σ is optimal that has the property that ν(θ) > 0 only if V (σ, θ ) ≤ V (σ, θ ′)for all θ′ ∈ Θ. If, in addition, σ ∈ ∆( M) is admissible, then, by Lemma 1, there exists 39 a full support measure ρ ∈ ∆(Θ) against which σ is a best response. Thus, σ ∈ ∆( M) is 
+
+μ-optimal for μ = ( ν, ρ ). Because μ has full support and is adversarial with respect to σ, it follows that σ is perfectly robust. 
+
+## A.5 Proof of Proposition 4 
+
+Throughout, let Π (k)(σ) denote the k-th lowest value in the set {V (σ, θ ) : θ ∈ Θ} and let Θ(k)(σ) := {θ ∈ Θ : V (σ, θ ) = Π (k)(σ)} be the set of type profiles yielding the k-th lowest value. First, suppose σ ∈ ∆( M) is properly robust. Then, there is an LPS μ = ( μ1, . . . , μ K )that has full support and is strongly adversarial with respect to σ, and for which σ is μ-optimal. Let J := |{ V (σ, θ ) : θ ∈ Θ}| . For each ℓ = 1 , . . . , J , define kℓ := min {k :
+
+∃θ ∈ Θ(ℓ) such that μk(θ) > 0}. Under any full support and strongly adversarial LPS, 
+
+kℓ is strictly increasing in ℓ and, for any index k < k ℓ, the support of μk is a subset of Θ(1) (σ) ∪ · · · ∪ Θ(ℓ−1) (σ). If J = 1, then V (σ, θ ) = Π (1) (σ) for all θ ∈ Θ. Because σ is μ-optimal and μ has full support, it follows that, for any σ′ ∈ ∆( M), either V (σ, θ ) = V (σ′, θ )for all θ ∈ Θ or there exists a θ ∈ Θ such that V (σ′, θ ) < Π(1) (σ) = V (σ, θ ). In either case,  V(i)(σ)Ni=1 ≥L
+
+ V(i)(σ′)Ni=1 . If J > 1, then the principal’s expected payoff under 
+
+μk for any k = 1 , . . . , k 2 − 1 is Π (1) (σ). Because σ is μ-optimal, it follows that, for any 
+
+σ′ ∈ ∆( M), either V (σ, θ ) = V (σ′, θ ) for all θ ∈ Θ(1) (σ) or there exists a θ ∈ Θ(1) (σ) such that V (σ′, θ ) < Π(1) (σ) = V (σ, θ ). In the latter case,  V(i)(σ)Ni=1 >L
+
+ V(i)(σ′)Ni=1 . So, only mechanisms σ′ ∈ ∆( M) satisfying V (σ, θ ) = V (σ′, θ ) for all θ ∈ Θ(1) (σ) could possibly be leximin preferred to σ ∈ ∆( M). Suppose σ′ ∈ ∆( M) is a mechanism such that V (σ, θ ) = 
+
+V (σ′, θ ) for all θ ∈ Θ(1) (σ) ∪ · · · ∪ Θ(j−1) (σ). It is shown that either V (σ, θ ) = V (σ′, θ ) for all θ ∈ Θ(1) (σ) ∪ · · · ∪ Θ(j)(σ) or  V(i)(σ)Ni=1 >L
+
+ V(i)(σ′)Ni=1 . To prove the inductive step, observe first that, by the induction hypothesis, σ and σ′ yield the same payoff under μk for any k = 1 , . . . , k j − 1 (because the support of μk is a subset of Θ (1) (σ) ∪ · · · ∪ Θ(j−1) (σ)). If 
+
+j < J , then for any k ∈ { kj , . . . , k j+1 −1}, σ obtains expected payoff no larger than Π (j) under 
+
+μk, because the support of μk is a subset of Θ (1) (σ) ∪ · · · ∪ Θ(j)(σ). If j = J, then the same conclusion holds for every k ∈ { kJ , . . . , K }, because Θ (1) (σ) ∪ · · · ∪ Θ(J)(σ) = Θ. Because σ
+
+is μ-optimal, it follows that, for any σ′ satisfying the induction hypothesis, either V (σ, θ ) = 
+
+V (σ′, θ ) for all θ ∈ Θ(j)(σ) or there exists θ ∈ Θ(j)(σ) such that V (σ′, θ ) < Π(j)(σ) = V (σ, θ ). In the latter case,  V(i)(σ)Ni=1 >L
+
+ V(i)(σ′)Ni=1 . The desired result that σ is leximin optimal then follows by induction. Now, suppose |M| < ∞ and σ ∈ ∆( M) is leximin optimal. To show that σ is properly robust, it suffices to exhibit a full support and strongly adversarial LPS μ against which σ
+
+40 is μ-optimal. Let K = |{ V (σ, θ ) : θ ∈ Θ}| and construct μ = ( μ1, . . . , μ K ) as follows. For each k = 1 , . . . , K , let μk ∈ ∆(Θ) be a belief with support Θ (1) (σ) ∪ · · · ∪ Θ(k)(σ) such that 
+
+P 
+
+> θ∈Θ
+
+μk(θ)V (σ, θ ) ≥ P 
+
+> θ∈Θ
+
+μk(θ)V (σ′, θ ) for all σ′ ∈ ∆( M). If no such belief exists, then, by Lemma 1 applied to the restricted decision problem with type profiles Θ (1) (σ) ∪ · · · ∪ Θ(k)(σ), there exists a σ′ ∈ ∆( M) that weakly dominates σ on Θ (1) (σ) ∪ · · · ∪ Θ(k)(σ). That is, 
+
+V (σ′, θ ) ≥ V (σ, θ ) for all θ ∈ Θ(1) (σ) ∪ · · · ∪ Θ(k)(σ) with the inequality strict for some 
+
+θ ∈ Θ(1) (σ) ∪ · · · ∪ Θ(k)(σ). But, then, there exists an ε > 0 such that σ′′ := (1 − ε) ◦ σ + ε ◦ σ′
+
+is strictly leximin preferred to σ, contradicting the leximin optimality of σ. To see why such an ε > 0 exists, observe that V(i)(σ) > Π(k)(σ) for all i > Pkj=1 |Θ(j)(σ)|. So, for 
+
+ε > 0 sufficiently small, V(i)(σ′′ ) > Π(k)(σ) for all i > Pkj=1 |Θ(j)(σ)|. Moreover, for all 
+
+i ≤ Pkj=1 |Θ(j)(σ)|, V(i)(σ′′ ) ≥ V(i)(σ) with the inequality strict for some i ≤ Pkj=1 |Θ(j)(σ)|.Thus, ( V(i)(σ′′ )) Ni=1 >L (V(i)(σ)) Ni=1 , i.e., σ is not leximin preferred to σ′′ . By construction, μ
+
+has full support and is strongly adversarial with respect to σ. Moreover, σ is μ-optimal. It follows that σ is properly robust. 
+
+## A.6 Proof of Proposition 5 
+
+To prove sufficiency, suppose ( Q, P ) ∈ M is a mechanism for which v(( Q, P ), θ ) ≥ v(( Q, P ), θ 1)for all θ ∈ Θ. Then, the LPS μ = ( δ1) is adversarial with respect to ( Q, P ). If, in addition, (Q, P ) is efficient for the lowest type, θ1, and P (θ1) = u(q∗ 
+
+> 1
+
+, θ 1), then it maximizes the seller’s first-order payoff. Hence, ( Q, P ) is μ-optimal and, thus, robustly optimal. To prove necessity, suppose that under ( Q, P ) ∈ M there exists a type θ > θ 1 such that 
+
+v(( Q, P ), θ ) < v (( Q, P ), θ 1). Then, under any LPS μ that is adversarial with respect to (Q, P ), the seller’s first-order payoff is strictly smaller than v(( Q, P ), θ 1). So, ( Q, P ) cannot be μ-optimal; the seller obtains a first-order payoff of v(( Q, P ), θ 1) from the mechanism (Q′, P ′) ∈ M under which Q′(θ) = Q(θ1) and P ′(θ) = P (θ1) for all θ ∈ Θ. It remains to establish efficiency for the lowest type, θ1, and P (θ1) = u(q∗ 
+
+> 1
+
+, θ 1). Suppose (Q, P ) ∈ M violates one of the two conditions and v(( Q, P ), θ ) ≥ v(( Q, P ), θ 1) for all θ ∈ Θ. Then, under any LPS μ that is adversarial with respect to ( Q, P ), the seller’s first-order payoff is no larger than v(( Q, P ), θ 1). But, if ( Q′, P ′) sets Q′(θ) equal to the Dirac measure on q∗ 
+
+> 1
+
+and P ′(θ) = u(q∗ 
+
+> 1
+
+, θ 1) for all θ ∈ Θ, then ( Q′, P ′) ∈ M and v(( Q′, P ′), θ ) > v (( Q, P ), θ 1)for all θ ∈ Θ. Hence, ( Q′, P ′) yields a strictly higher first-order payoff than ( Q, P ) against 
+
+μ. It follows that ( Q, P ) is not lexicographically preferred to ( Q′, P ′) and, thus, cannot be robustly optimal. 41 A.7 Proof of Proposition 6 
+
+Suppose N = 2. Because every perfectly robust mechanism is robust, Proposition 5 estab-lishes that any perfectly robust mechanism must maximize profit from type θ1. Among all mechanisms with this property, the efficient and maximal mechanism maximizes v(( Q, P ), θ 2). Hence, any other mechanism is weakly dominated and therefore, by Proposition 3, cannot be perfectly robust. To establish that the efficient and maximal mechanism is, in fact, perfectly robust, it suffices to observe that it is μ-optimal with respect to the adversarial and full support LPS μ = ( δ1, δ 2). It is next shown that, if ( Q, P ) ∈ M is perfectly robust and deterministic, then P satisfies (3). By construction, if P satisfies (3), then for any transfer rule P ′̸ = P that implements 
+
+Q, P (θ) ≥ P ′(θ) for all θ ∈ Θ with the inequality strict for some θ′ ∈ Θ. It follows that 
+
+v(( Q, P ), θ ) ≥ v(( Q, P ′), θ ) with the inequality strict for some θ ∈ Θ. That is, ( Q, P ) weakly dominates ( Q, P ′). Because admissibility is a necessary condition for perfect robustness (Proposition 3), it follows that P must satisfy (3) for ( Q, P ) to be perfectly robust. It remains to show that, if ( Q, P ) ∈ M is perfectly robust and deterministic, then 
+
+Q is efficient for types θ1 and θN . Because every perfectly robust mechanism is robust, Proposition 5 ensures that Q is efficient for type θ1. Suppose, towards contradiction, that Q
+
+is not efficient for type θN . Define an allocation rule Q′ by setting Q′(θN ) equal to the Dirac measure on q∗ 
+
+> N
+
+and, for each θ̸ = θN , setting Q′(θ) = Q(θ) if Q(θ) is a Dirac measure on a quality strictly below q∗ 
+
+> N
+
+, and setting Q′(θ) equal to the Dirac measure on q∗ 
+
+> N
+
+otherwise. Let 
+
+P ′ satisfy (3) with Q′ replacing Q. Then ( Q′, P ′) ∈ M weakly dominates ( Q, P ): revenue from θN strictly increases, while revenue from all other types remains at least the same. Hence, by Proposition 3, ( Q, P ) cannot be perfectly robust. 
+
+## A.8 Proof of Proposition 7 
+
+Suppose ( Q, P ) ∈ M is the efficient and maximal mechanism. To prove that it is properly robust, consider the LPS μ = ( δ1, δ 2, . . . , δ N ). By construction, μ has full support. μ
+
+is also strongly adversarial with respect to ( Q, P ). To see why, take any θ, θ ′ ∈ Θ. By construction of μ, θ ≥μ θ′ implies θ′ ≥ θ. Because the seller’s payoff under ( Q, P ) is increasing in the buyer’s type, θ′ ≥ θ implies v(( Q, P ), θ ) ≤ v(( Q, P ), θ ′). Hence, θ ≥μ θ′
+
+implies v(( Q, P ), θ ) ≤ v(( Q, P ), θ ′), so μ is strongly adversarial with respect to ( Q, P ). To show that ( Q, P ) is μ-optimal, proceed by induction on the vector of payoffs obtained from an arbitrary mechanism ( Q′, P ′) ∈ M . For the base case, note that ( Q(θ1), P (θ1)) maximizes profit against δ1. Hence, ( Q′, P ′) cannot obtain a higher first-order payoff than ( Q, P ) against 
+
+μ. Now, suppose Q′ is efficient for types θ1, . . . , θ k and P ′ is revenue maximizing given Q′
+
+42 for types θ1, . . . , θ k. That is, 
+
+P ′(θ1) = u(q∗ 
+
+> 1
+
+, θ 1) and P ′(θj ) = u(q∗ 
+
+> 1
+
+, θ 1) + 
+
+> j
+
+X
+
+> i=2
+
+u(q∗ 
+
+> i
+
+, θ i) − u(q∗
+
+> i−1
+
+, θ i) for j ∈ { 2, ..., k }.Any mechanism in this class that maximizes the seller’s ( k + 1)-th order payoff cannot yield a higher payoff than the solution to the relaxed problem max  
+
+> Q∈∆( Q),p ∈R
+
+p − C(Q)subject to 
+
+U (Q, θ k+1 ) − p ≥ ¯u := u(q∗
+
+> k
+
+, θ k+1 ) − P (θk).
+
+(9) In any solution to (9), p is determined by the binding constraint. Substituting the binding constraint into the objective function and eliminating the constant ¯ u yields the surplus maximization problem max  
+
+> Q∈∆( Q)
+
+U (Q, θ k+1 ) − C(Q),
+
+whose value is no higher than what is attained under the efficient allocation for type θk+1 .It follows that ( Q′, P ′) cannot attain a higher ( k + 1)-th order payoff than any mechanism that is efficient and maximal for types θ1, . . . , θ k+1 . The μ-optimality of ( Q, P ) follows from induction. To establish uniqueness, let M′ ⊇ M denote the set of pairs ( Q, P ), where Q : Θ → ∆( Q)and P : Θ → R, that are individually rational and satisfy the downward-adjacent incentive compatibility constraints: for all i = 2 , . . . , N ,
+
+U (Q(θi), θ i) − P (θi) ≥ U (Q(θi−1), θ i) − P (θi−1).
+
+It is shown that if ( Q, P ) is properly robust in the relaxed mechanism space M′ (i.e., there exists a full support LPS μ that is strongly adversarial with respect to ( Q, P ) and ( Q, P )is lexicographically preferred to any ( Q′, P ′) in M′), then it is the efficient and maximal mechanism. Because the efficient and maximal mechanism is in M, the desired result follows. Now, fix a properly robust mechanism ( Q, P ) ∈ M ′. It is first shown that v(( Q, P ), θ )must be increasing in θ ∈ Θ. Suppose, towards contradiction, that v(( Q, P ), θ ) is not 
+
+increasing. Then, there exists an integer j ∈ { 1, . . . , N − 1} such that v(( Q, P ), θ j+1 ) <v(( Q, P ), θ j ). Let J denote the smallest such integer. Now, consider the pair of functions (Q′, P ′) that is identical to ( Q, P ) for types θ1, . . . , θ J , but sets Q′(θ) = Q(θJ ) and P ′(θ) = 
+
+P (θJ ) for each θ ∈ { θJ+1 , . . . , θ N }. Notice that ( Q′, P ′) is individually rational and satisfies all downward-adjacent incentive compatibility constraints, i.e., ( Q′, P ′) ∈ M ′. In addition, (Q, P ) is not lexicographically preferred to ( Q′, P ′) against any full support LPS that is 43 strongly adversarial with respect to ( Q, P ). To see why, fix such an LPS, μ, and let κ := min {k : μk(θJ+1 ) > 0}. For any type θ ≤ θJ , v(( Q′, P ′), θ ) = v(( Q, P ), θ ). In addition, if θ > θ J and μk(θ) > 0 for some k ∈ { 1, . . . , κ }, then v(( Q, P ), θ ) ≤ v(( Q, P ), θ J+1 ) <v(( Q, P ), θ J ) = v(( Q′, P ′), θ ). So, by v(( Q, P ), θ J+1 ) < v (( Q′, P ′), θ J+1 ), 
+
+X
+
+> θ∈Θ
+
+μκ(θ)v(( Q, P ), θ ) < X
+
+> θ∈Θ
+
+μκ(θ)v(( Q′, P ′), θ )and, for any strictly positive integer k < κ ,
+
+X
+
+> θ∈Θ
+
+μk(θ)v(( Q, P ), θ ) ≤ X
+
+> θ∈Θ
+
+μk(θ)v(( Q′, P ′), θ ).
+
+It follows that ( Q, P ) is not lexicographically preferred to ( Q′, P ′). Hence, it is not properly robust. Observe now that if ( Q, P ) ∈ M ′ is properly robust, then Q(θ1) is the Dirac measure on 
+
+q∗ 
+
+> 1
+
+and P (θ1) = u(q∗ 
+
+> 1
+
+, θ 1) (because any properly robust mechanism is robust and, therefore, maximizes profit from θ1 by the argument in Proposition 5). It is shown that if Q(θi) is the Dirac measure on q∗ 
+
+> i
+
+and P (θi) is pinned down by (3) for types θ ∈ { θ1, . . . , θ k}, then 
+
+Q(θk+1 ) is the Dirac measure on q∗ 
+
+> k+1
+
+and P (θk+1 ) is pinned down by (3) in any properly robust mechanism ( Q, P ) ∈ M ′. Suppose, towards contradiction, that the implication does not hold. Consider the mechanism ( Q′, P ′) ∈ M ′ that coincides with ( Q, P ) ∈ M ′ for any type θ ∈ { θ1, . . . , θ k}, but which is efficient and maximal. Then, under ( Q′, P ′) ∈M′, v(( Q′, P ′), θ i) = v(( Q, P ), θ i) for i = 1 , . . . , k and v(( Q′, P ′), θ i) > v (( Q, P ), θ k+1 ) for 
+
+i = k + 1 , . . . , N . If v(( Q, P ), θ k+1 ) < v (( Q, P ), θ k+2 ), then let J = k + 1. Otherwise, let 
+
+J ∈ { k + 2 , . . . , N } be the largest integer such that v(( Q, P ), θ k+1 ) = v(( Q, P ), θ k+2 ) = · · · =
+
+v(( Q, P ), θ J ). If ( Q, P ) ∈ M ′ is properly robust, then v(( Q, P ), θ ) is increasing in θ by the previous paragraph. So, for any type θ > θ J , θ < μ θj for all j = 1 , 2, . . . , J under any full support LPS μ that is strongly adversarial with respect to ( Q, P ). Because v(( Q′, P ′), θ i) = 
+
+v(( Q, P ), θ i) for i = 1 , . . . , k and v(( Q′, P ′), θ i) > v (( Q, P ), θ i) for i = k + 1 , . . . , J , it follows that ( Q, P ) is not lexicographically preferred to ( Q′, P ′) under μ. In particular, for 
+
+κ := min {ℓ : μℓ(θk+1 ) > 0},
+
+X
+
+> θ∈Θ
+
+μκ(θ)v(( Q, P ), θ ) < X
+
+> θ∈Θ
+
+μκ(θ)v(( Q′, P ′), θ )and, for any strictly positive integer ℓ < κ ,
+
+X
+
+> θ∈Θ
+
+μℓ(θ)v(( Q, P ), θ ) ≤ X
+
+> θ∈Θ
+
+μℓ(θ)v(( Q′, P ′), θ ).
+
+Hence, ( Q, P ) is not properly robust. The result then follows from induction. 44 A.9 Proof of Proposition 8 
+
+To prove sufficiency, suppose ( Q, P ) ∈ M is a mechanism for which v(( Q, P ), θ ) ≥ v(( Q, P ), θ )for all θ ∈ Θ. Then, the LPS μ = ( δθ) is adversarial with respect to ( Q, P ). If, in addition, (Q, P ) is efficient for the lowest type profile and extracts full surplus under that profile, then it maximizes the auctioneer’s first-order payoff. Hence, ( Q, P ) is μ-optimal and, thus, robustly optimal. To prove necessity, suppose that under ( Q, P ) ∈ M there exists a type profile θ̸ = θ such that v(( Q, P ), θ ) < v (( Q, P ), θ ). Then, under any LPS μ that is adversarial with respect to ( Q, P ), the auctioneer’s first-order payoff is strictly smaller than v(( Q, P ), θ ). So, ( Q, P )cannot be μ-optimal; the auctioneer obtains a first-order payoff of v(( Q, P ), θ ) from the mechanism ( ˆQ, ˆP ) ∈ M under which ˆQi(θ) = Qi(θ) and ˆP i(θ) = P i(θ) for all i = 1 , . . . , I 
+
+and θ ∈ Θ. It remains to establish the necessity of efficiency and full surplus extraction for the lowest type profile θ. Suppose ( Q, P ) ∈ M violates any of these two conditions and v(( Q, P ), θ ) ≥
+
+v(( Q, P ), θ ) for all θ ∈ Θ. Then, under any LPS μ that is adversarial with respect to (Q, P ), the seller’s first-order payoff is no larger than v(( Q, P ), θ ). But, if ( ˆQ, ˆP ) ∈ M 
+
+always allocates the good to, say, agent 1 with probability one at a price equal to θ1, then 
+
+v(( ˆQ, ˆP ), θ ) > v (( Q, P ), θ ) for all θ ∈ Θ. (Formally, for all θ ∈ Θ, set ˆQ1(θ) = 1 and ˆQj (θ) = 0 for all j̸ = 1. Then, set ˆP1(θ) = θ1 and ˆPj (θ) = 0 for all j̸ = 1.) Hence, ( ˆQ, ˆP )yields a strictly higher first-order payoff than ( Q, P ) against μ. It follows that ( Q, P ) is not lexicographically preferred to ( ˆQ, ˆP ) and, thus, cannot be robustly optimal. 
+
+## A.10 Proof of Proposition 9 
+
+It is first shown that, if ( Q, P ) ∈ M is perfectly robust, then P satisfies (5). By construction, if P satisfies (5), then for any transfer rule P ′̸ = P that implements Q, P (θ) ≥ P ′(θ) for all 
+
+θ ∈ Θ with the inequality strict for some θ′ ∈ Θ. It follows that v(( Q, P ), θ ) ≥ v(( Q, P ′), θ )with the inequality strict for some θ ∈ Θ. That is, ( Q, P ) weakly dominates ( Q′, P ′). Because admissibility is a necessary condition for perfect robustness (Proposition 3), it follows that 
+
+P must satisfy (5) for ( Q, P ) to be perfectly robust. Because every perfectly robust mechanism is robust, Proposition 8 already ensures that any perfectly robust mechanism ( Q, P ) ∈ M is efficient for type profile θ (and, therefore, for any type profile θ ∈ Θ satisfying max( θ) = θ1). To show that any perfectly robust mechanism ( Q, P ) ∈ M is efficient for any type profile θ ∈ Θ satisfying max( θ) = θN ,take any perfectly robust mechanism ( Q, P ) ∈ M . It has already been shown that P must satisfy (5). Suppose, towards contradiction, that there exists a type profile θ ∈ Θ such that 45 max( θ) = θN and either PIi=1 Qi(θ) < 1 or Qi(θ) > 0 for some i satisfying θi < θ N . Let j
+
+be an agent for whom θj = θN . Define a mechanism ( ˆQ, ˆP ) ∈ M as follows. For every type profile ˜θ satisfying ˜θj = θN , set ˆQj (˜θ) = 1 and ˆQi(˜θ) = 0 for all i̸ = j. For every type profile ˜θ for which ˜θj̸ = θN , set ˆQ(˜θ) = Q(˜θ). Finally, let ˆP satisfy (5) with ˆQ replacing Q. Note that ˆQ remains increasing in each agent’s type. Hence, ( ˆQ, ˆP ) ∈ M . Moreover, revenue may only change at a type profile ˜θ with ˜θj = θN . But, (5) implies 
+
+v(( ˆQ, ˆP ), ˜θ) − v(( Q, P ), ˜θ) ≥
+
+> I
+
+X
+
+> i=1
+
+˜θi  ˆQi(˜θ) − Qi(˜θ).
+
+Therefore, 
+
+v(( ˆQ, ˆP ), ˜θ) − v(( Q, P ), ˜θ) ≥ θN
+
+
+
+1 −
+
+> I
+
+X
+
+> i=1
+
+Qi(˜θ)
+
+
+
++ X
+
+> i̸=j
+
+(θN − ˜θi)Qi(˜θ) ≥ 0.
+
+At the original type profile θ, the inequality is strict. Hence ( ˆQ, ˆP ) weakly dominates ( Q, P ), contradicting Proposition 3. It follows that any perfectly robust mechanism must be efficient at every type profile θ satisfying max( θ) = θN .Because every perfectly robust mechanism is robust, Proposition 8 already ensures that any perfectly robust mechanism ( Q, P ) ∈ M is efficient for type profile θ. To show that any perfectly robust mechanism ( Q, P ) ∈ M is efficient for type profile θ, take any perfectly robust mechanism ( Q, P ) ∈ M . It was already shown that P must satisfy (5). Suppose, towards contradiction, that PIi=1 Qi(θ) < 1. Consider the mechanism ( ˆQ, ˆP ) ∈ M in which the allocation rule ˆQ sets ˆQ1(θ) = 1 − P 
+
+> i> 1
+
+Qi(θ) and is otherwise identical to Q, and ˆP satisfies (5) replacing Q with ˆQ. It is immediate that ( ˆQ, ˆP ) weakly dominates ( Q, P ). Hence, by Proposition 3, ( Q, P ) cannot be perfectly robust. Suppose N = 2. It has been established that, if ( Q, P ) ∈ M is perfectly robust, then Q is efficient for every type profile θ ∈ Θ satisfying either max( θ) = θ1 or max( θ) = θN . If N = 2, then every type profile θ ∈ Θ satisfies max( θ) = θ1 or max( θ) = θN . Hence, Q must be efficient. Having already established that P must satisfy (5), it follows that every perfectly robust mechanism is efficient and maximal. To establish that any efficient and maximal mechanism ( Q, P ) ∈ M is perfectly robust, consider the adversarial and full support LPS 
+
+μ = ( δθ, μ 2, δ θ), where μ2 is the uniform probability measure over the set of type profiles 
+
+θ ∈ Θ\{ θ, θ }. It is straightforward to verify that ( Q, P ) is μ-optimal. 46 A.11 Proof of Proposition 10 
+
+A.11.1 Construction of a full support and strongly adversarial LPS 
+
+Fix an efficient and maximal mechanism ( Q, P ) ∈ M that breaks ties uniformly for all type profiles θ with max( θ) < θ N . It suffices to exhibit an LPS μ that has full support and is strongly adversarial with respect to ( Q, P ) against which ( Q, P ) is μ-optimal to establish that such a mechanism is properly robust. Construct a full support and strongly adversarial LPS μ of length 1 + ( N − 1)(2( I − 1) + 1) as follows. Let μ1 be the point mass on θ. For each 
+
+k = 2 , . . . , N and ℓ = 1 , . . . , I −1, let b(k) = 2+( k −2)(2( I −1)+1); let Θ kℓ be the set of type profiles θ satisfying max( θ) = θk, |arg max 
+
+> i∈I
+
+θi| = 1, and |{ i ∈ I : θi = θk−1}| = ℓ; and let ˆΘkℓ
+
+be the set of type profiles θ satisfying max( θ) > θ k, |arg max 
+
+> i∈I
+
+θi| = 1, θ(I−1) = θk−1 (where 
+
+θ(I−1) is the second-highest value in θ), and |{ i ∈ I : θi = θk−1}| = ℓ. If Θ kI−ℓ is non-empty, define μb(k)+2( ℓ−1) to be the uniform probability measure with support Θ kI−ℓ. Otherwise, set 
+
+μb(k)+2( ℓ−1) = μb(k)+2( ℓ−1) −1. If ˆΘkI−ℓ is non-empty, define μb(k)+2( ℓ−1)+1 to be the uniform probability measure with support ˆΘkI−ℓ. Otherwise, set μb(k)+2( ℓ−1)+1 = μb(k)+2( ℓ−1) . Finally, let μb(k)+2( I−1) be the uniform probability measure over the set of type profiles with max( θ) = 
+
+θk and |arg max 
+
+> i∈I
+
+θi| > 1. It is immediate that μ has full support. Towards showing that μ is strongly adversarial with respect to ( Q, P ), define 
+
+vk,I −ℓ := 
+
+ 1
+
+I − ℓ + 1 
+
+
+
+θk−1 +
+
+
+
+1 − 1
+
+I − ℓ + 1 
+
+
+
+θk.
+
+Let ( v(k))N I 
+
+> k=1
+
+denote the N I -dimensional vector of payoff order statistics associated with any efficient and maximal mechanism ( Q, P ) ∈ M that breaks ties uniformly for all type profiles 
+
+θ with max( θ) < θ N . When N = 2, this vector takes on three values 
+
+θ1 < v 2,I −1 < θ 2,
+
+with θ1 = 1 occurring once, v2,I −1 occurring I times, and θ2 occurring PIm=2 
+
+  Im
+
+ times. For 
+
+N > 2, the vector takes on values 
+
+θ1 < v 2,I −1 < θ 2 < v 3,I −1 < · · · < v 3,1 < · · · < θ N −1 < v N,I −1 < · · · < v N, 1 < θ N ,
+
+with θ1 occurring once, v2,I −1 occurring I times, vk,I −ℓ occurring I I−1
+
+> I−ℓ
+
+(k−2) ℓ−1 times, and θk
+
+for k ≥ 2 occurring PIm=2 
+
+  Im
+
+(k − 1) I−m times. To see that μ is strongly adversarial, observe that ( Q, P ) maximizes profit at θ, and that each belief from μ1 through μb(2)+2(( I−1) −1) is the point mass on θ; under each such belief, ( Q, P ) yields revenue θ1. In addition, for each ( k, ℓ )47 such that k = 2 and ℓ = 1, or k > 2 and ℓ = 1 , . . . , I − 1, ( Q, P ) obtains a payoff of vk,I −ℓ
+
+against μb(k)+2( ℓ−1) . Moreover, the payoff of ( Q, P ) against μb(k)+2( ℓ−1)+1 is its payoff against 
+
+μb(k)+2( ℓ−1) . Finally, against μb(k)+2( I−1) , ( Q, P ) obtains a payoff of θk. It follows that μ is strongly adversarial with respect to ( Q, P ). 
+
+A.11.2 μ-optimality of candidate mechanism 
+
+To show that ( Q, P ) is μ-optimal and therefore properly robust, consider any mechanism ( ˆQ, ˆP ) ∈ M in which ˆP satisfies (5) with ˆQ replacing Q (it is without loss of generality to fix such a transfer rule because it maximizes revenue pointwise). The point mass on θ
+
+is repeated until μb(2)+2(( I−1) −1) . Hence, in order to be μ-optimal, ( ˆQ, ˆP ) must maximize profit under θ. For each θ ∈ Θkℓ , let i∗ 
+
+> θ
+
+denote the agent i with θi = θk. For ( k, ℓ ) such that k = 2 and ℓ = 1, or k > 2 and ℓ = 1 , . . . , I − 1, any mechanism ( ˆQ, ˆP ) ∈ M with 
+
+P 
+
+> j∈arg max
+> i∈I
+> θi
+
+ˆQj (θ) = 1 for any type profile θ satisfying max( θ) = θk−1 obtains no higher revenue than ( Q, P ) against μb(k)+2( ℓ−1) :
+
+X
+
+> θ∈ΘkI−ℓ
+
+1
+
+|ΘkI−ℓ|
+
+" IX
+
+> i=1
+
+ˆP i(θ)
+
+#
+
+≤ X
+
+> θ∈ΘkI−ℓ
+
+ˆQi∗ 
+
+> θ
+
+(θk−1, θ −i∗ 
+
+> θ
+
+)θk−1 + (1 − ˆQi∗ 
+
+> θ
+
+(θk−1, θ −i∗ 
+
+> θ
+
+)) θk
+
+|ΘkI−ℓ|
+
+= θk − (θk − θk−1)
+
+P
+
+> θ∈ΘkI−ℓ
+
+ˆQi∗ 
+
+> θ
+
+(θk−1, θ −i∗ 
+
+> θ
+
+)
+
+|ΘkI−ℓ|
+
+= θk − (θk − θk−1) 
+
+> 1
+> I−ℓ+1
+
+|ΘkI−ℓ||ΘkI−ℓ|
+
+=
+
+ 1
+
+I − ℓ + 1 
+
+
+
+θk−1 +
+
+
+
+1 − 1
+
+I − ℓ + 1 
+
+
+
+θk.
+
+The first inequality holds with equality if and only if, for any type profile θ ∈ ΘkI−ℓ, ˆQi∗ 
+
+> θ
+
+(θ) = 1. The second equality holds because P 
+
+> j∈arg max
+> i∈I
+> θi
+
+ˆQj (θ) = 1 for any type profile θ satisfying max( θ) = θk−1. For each θ ∈ ΘkI−ℓ, lowering the unique θk agent to θk−1 produces a profile in which there are exactly I − ℓ + 1 agents with type θk−1, at which the maintained condition ensures that allocation probabilities across these I − ℓ + 1 agents sum to one. Each such lowered profile is generated exactly I − ℓ + 1 times — once for each possible choice of the agent designated as i∗
+
+> θ
+
+. Consequently, summing Qi∗ 
+
+> θ
+
+(θk−1, θ −i∗ 
+
+> θ
+
+) over θ ∈ ΘkI−ℓ yields total mass 1 
+
+> I−ℓ+1
+
+|ΘkI−ℓ|. Now, consider μb(k)+2( ℓ−1)+1 . Suppose ( ˆQ, ˆP ) satisfies the condition that, for any type profile θ ∈ ΘkI−ℓ, ˆQi∗ 
+
+> θ
+
+(θ) = 1. Then, it follows immediately from ˆP satisfying (5) with ˆQ replacing Q that the revenue from ( ˆQ, ˆP ) is exactly vk,I −ℓ. Finally, for k = 2 , . . . , N ,observe that no mechanism in M can obtain a higher payoff than θk against μb(k)+2( I−1) 
+
+because θk is the highest type in all type profiles in the support of μb(k)+2( I−1) . And, any 48 ( ˆQ, ˆP ) that obtains θk must set P  
+
+> i∈arg max jθj
+
+Qi(θ) = 1 for any θ ∈ supp( μb(k)+2( I−1) ). It follows from iterative optimization that ( Q, P ) must be μ-optimal. 
+
+A.11.3 Converse 
+
+By Proposition 4, any properly robust mechanism ( ˆQ, ˆP ) ∈ M must have a corresponding vector of payoff order-statistics (ˆ v(k))N I 
+
+> k=1
+
+such that (ˆ v(k))N I 
+
+> k=1
+
+≥L (v(k))N I
+
+> k=1
+
+,
+
+where ( v(k))N I 
+
+> k=1
+
+is the vector of payoff order-statistics associated with any efficient and max-imal mechanism that breaks ties uniformly for all type profiles θ with max( θ) < θ N . It is shown that this lexicographic inequality can hold only if ( ˆQ, ˆP ) is itself efficient and maximal with ties broken uniformly for all such type profiles. Proposition 9 and the observation that any properly robust mechanism is perfectly robust imply that any ( ˆQ, ˆP ) ∈ M satisfying the desired inequality must have ˆP satisfy (5) and ˆQ be efficient at the lowest type profile θ. Suppose, towards contradiction, that ˆQ does not break ties uniformly under θ. Since PIi=1 ˆQi(θ) = 1, there exists an agent i with ˆQi(θ) > 1
+
+I .
+
+Consider the type profile θ ∈ Θ in which θi = θ2 and θj = θ1 for all j̸ = i. Because ˆP satisfies (5), the auctioneer’s revenue at θ is no higher than ˆQi(θ)θ1 +  1 − ˆQi(θ)θ2 < v 2,I −1.
+
+Hence, (ˆ v(k))N I
+
+> k=1
+
+̸ ≥L (v(k))N I
+
+> k=1
+
+,
+
+a contradiction. Therefore, ˆQ must break ties uniformly under θ. It follows that ( ˆQ, ˆP )coincides with ( Q, P ) on all profiles in Θ 2
+
+> I−1
+
+. Since |Θ2
+
+> I−1
+
+| = I, the I + 1 lowest payoffs under ( ˆQ, ˆP ) coincide with those under ( Q, P ). The next step is to show, inductively over k = 2 , . . . , N − 1, that ˆQ must be efficient and break ties uniformly at every profile whose highest type is θk. Fix such a k, and suppose that ˆQ is efficient and breaks ties uniformly at every profile whose highest type is at most 
+
+θk−1. Then all entries of the benchmark ordered payoff vector ( v(k))N I 
+
+> k=1
+
+that are strictly below θk are already matched by ( ˆQ, ˆP ). Now, consider any profile θ with max( θ) = θk and 
+
+| arg max i θi| ≥ 2. If ˆQ is not efficient at θ, then because ˆP satisfies (5), the auctioneer’s 49 revenue at θ is strictly less than θk. But in the benchmark vector, all such profiles yield payoff θk. Hence (ˆ v(k))N I
+
+> k=1
+
+̸ ≥L (v(k))N I
+
+> k=1
+
+,
+
+a contradiction. Therefore, ˆQ must be efficient at every profile with highest type θk. Next, fix ℓ ∈ { 1, . . . , I − 2} and consider a profile θ with max( θ) = θk and exactly I − ℓ + 1 agents of type θk. Uniform tie-breaking at such a profile requires that each of these I − ℓ + 1 agents receive the good with probability 1 /(I − ℓ + 1). Suppose, towards contradiction, that ties are not broken uniformly at θ. Then there exists one of the agents with type θk, say agent 
+
+i, for whom ˆQi(θ) > 1
+
+I − ℓ + 1 .
+
+Let ˆθ be the profile obtained from θ by replacing agent i’s type θk with θk+1 . Because ˆP
+
+satisfies (5), the auctioneer’s revenue at ˆθ is no higher than ˆQi(θ)θk +  1 − ˆQi(θ)θk+1 < v k+1 ,I −ℓ.
+
+But in the benchmark vector, every such profile yields vk+1 ,I −ℓ. Since all lower payoffs have already been matched by the induction hypothesis, this again implies (ˆ v(k))N I
+
+> k=1
+
+̸ ≥L (v(k))N I
+
+> k=1
+
+,
+
+a contradiction. Therefore, ties must be broken uniformly at every profile whose highest type is θk. By induction on k = 2 , . . . , N − 1, it follows that ˆQ must be efficient and break ties uniformly at every type profile θ with max( θ) < θ N .Finally, consider any type profile with max( θ) = θN . If ˆQ is not efficient at such a profile, then because ˆP satisfies (5), the auctioneer’s revenue is strictly lower than under ( Q, P ). Since all lower entries of the benchmark ordered payoff vector have already been matched, this violates (ˆ v(k))N I 
+
+> k=1
+
+≥L (v(k))N I
+
+> k=1
+
+.
+
+Hence, ˆQ must also be efficient at profiles whose highest type is θN . In conclusion, any properly robust mechanism ( ˆQ, ˆP ) ∈ M must be efficient and maximal, with ties broken uniformly for all type profiles θ satisfying max( θ) < θ N .50 A.12 Proof of Proposition 11 
+
+To prove sufficiency, suppose ( Q, P ) ∈ M is a mechanism such that, for all θ ∈ Θ, 
+
+> I
+
+X
+
+> i=1
+
+P i(θ)
+
+!
+
+− Q(θ)c ≥ 0.
+
+Then, the LPS μ = ( δθ) is adversarial with respect to ( Q, P ) and the mechanism is μ-optimal. To prove necessity, suppose towards contradiction that there exists θ ∈ Θ such that 
+
+> I
+
+X
+
+> i=1
+
+P i(θ)
+
+!
+
+− Q(θ)c < 0.
+
+Then, under any LPS μ that is adversarial with respect to ( Q, P ), the firm obtains a negative first-order payoff. But then, ( Q, P ) cannot be μ-optimal; the firm obtains a first-order payoff of zero under the mechanism in which, for all θ ∈ Θ and all i, Q(θ) = P i(θ) = 0. 
+
+## A.13 Proof of Proposition 12 
+
+It is first shown that, if ( Q, P ) ∈ M is perfectly robust, then P satisfies (7). By construction, if P satisfies (7), then for any transfer rule P ′̸ = P that implements Q, P (θ) ≥ P ′(θ) for all 
+
+θ ∈ Θ with the inequality strict for some θ′ ∈ Θ. It follows that v(( Q, P ), θ ) ≥ v(( Q, P ′), θ )with the inequality strict for some θ ∈ Θ. That is, ( Q, P ) weakly dominates ( Q′, P ′). Because admissibility is a necessary condition for perfect robustness (Proposition 3), it follows that 
+
+P must satisfy (7) for ( Q, P ) to be perfectly robust. It is next shown that the allocation rule Q is efficient for any type profile θ ∈ Θ such that PIi=1 θi ≤ c or θ = θ. Because every perfectly robust mechanism is robust, Proposition 11 already ensures that any perfectly robust mechanism ( Q, P ) ∈ M is efficient for any type profile θ ∈ Θ such that PIi=1 θi < c . In particular, if Q(θ) > 0 for such a type profile, then, by the individual rationality constraints, the firm obtains a payoff no higher than the negative number Q(θ)
+
+PIi=1 θi − c
+
+
+
+< 0. Moreover, for any mechanism ( Q, P ) ∈ M such that Q(θ) > 0 for some type profile θ ∈ Θ satisfying PIi=1 θi = c, there exists another mechanism ( ˆQ, ˆP ) ∈ M that weakly dominates ( Q, P ). In particular, set ˆQ(θ) = 0 and ˆQ(ˆθ) = Q(ˆθ) for ˆθ̸ = θ and define ˆP using (7) replacing Q with ˆQ. Because c < Iθ h, there exists an agent i for whom θi = θℓ. Under the type profile ˆθ in which ˆθj = θj for all j̸ = i and ˆθi = θh, the firm’s payoff strictly increases. For every other type profile, the firm’s payoff does not strictly decrease. It follows that ( ˆQ, ˆP ) weakly dominates ( Q, P ). Hence, ( Q, P ) could not have been perfectly robust by Proposition 3. Finally, if ( Q, P ) ∈ M satisfied Q(θ) < 1, then the mechanism ( ˆQ, ˆP ) ∈ M defined by ˆQ(θ) = 1 with ˆP satisfying (7) replacing Q with 51 ˆQ weakly dominates ( Q, P ) ∈ M . Hence, ( Q, P ) could not have been perfectly robust by Proposition 3. To see that the efficient and maximal allocation is perfectly robust when c ∈ [( I −
+
+1) θh + θℓ, Iθ h), observe that it is optimal against any adversarial and full support belief 
+
+μ = ( μ1, δ θ), where μ1 is a full support distribution over Θ \{ θ}. It is the unique perfectly robust mechanism by the necessary conditions for perfection previously established. 
+
+## A.14 Proof of Proposition 13 
+
+The proof proceeds by first showing that any properly robust mechanism must be anonymous, i.e., Q(θ) = Q(ˆθ) if |{ i : θi = θh}| = |{ i : ˆθi = θh}| . Then, the conditions provided for ( Q, P ) ∈ M in the statement of the proposition are shown to be both necessary and sufficient for proper robustness. 
+
+A.14.1 Anonymity 
+
+Let ( Q, P ) ∈ M be properly robust. By Proposition 4, ( Q, P ) is leximin optimal. This observation is used to show that v(( Q, P ), θ ) = v(( Q, P ), ˆθ) if |{ i : θi = θh}| = |{ i : ˆθi = θh}| .Suppose towards contradiction that there exist distinct type profiles θ, ˆθ ∈ Θ satisfying 
+
+|{ i : θi = θh}| = |{ i : ˆθi = θh}| and v(( Q, P ), θ )̸ = v(( Q, P ), ˆθ). Among all such pairs, choose 
+
+θ and ˆθ such that min {v(( Q, P ), θ ), v (( Q, P ), ˆθ)} is minimized. Without loss of generality, suppose that v(( Q, P ), θ ) < v (( Q, P ), ˆθ). Choose a permutation of agents π such that θπ(i) =ˆθi for all i. Because θ and ˆθ contain the same number of agents of each type, π may be taken to be an involution, i.e., π−1 = π, by pairing the coordinates on which θ and ˆθ differ. Define ( Qπ, P π) ∈ M by Qπ(θ′) = Q(θ′
+
+> π
+
+) and P iπ(θ′) = P π(i)(θ′
+
+> π
+
+) for each type profile θ′. Now consider the mechanism ( ¯Q, ¯P ) ∈ M that is payoff equivalent to the random mechanism 
+
+σ = 12 ◦ (Q, P ) + 12 ◦ (Qπ, P π).
+
+Then, because π sends θ to ˆθ and ˆθ back to θ,
+
+v(( Qπ, P π), θ ) = v(( Q, P ), ˆθ) and v(( Qπ, P π), ˆθ) = v(( Q, P ), θ ).
+
+Hence 
+
+v(( ¯Q, ¯P ), θ ) = v(( ¯Q, ¯P ), ˆθ) = 12v(( Q, P ), θ ) + 12v(( Q, P ), ˆθ) > v (( Q, P ), θ ),
+
+while every other type-profile payoff is replaced by the average of its original value and the value at its permuted counterpart. Let m be the smallest index with v(m)(Q, P ) = 52 v(( Q, P ), θ ). By the minimal choice of θ and ˆθ, no type profile with payoff strictly below 
+
+v(( Q, P ), θ ) has its payoff changed under ( ¯Q, ¯P ). That is, the ordered payoff vector is unchanged below index m. On the other hand, the payoff at θ is strictly increased from 
+
+v(( Q, P ), θ ) to the midpoint of v(( Q, P ), θ ) and v(( Q, P ), ˆθ). Therefore, the ordered payoff vector under ( ¯Q, ¯P ) coincides with that under ( Q, P ) up to index m − 1 and is strictly higher at index m. It follows that ( v(i)( ¯Q, ¯P )) 2I 
+
+> i=1
+
+>L (v(i)(Q, P )) 2I
+
+> i=1
+
+, contradicting the leximin optimality of ( Q, P ). The preceding paragraph establishes that in any properly robust mechanism ( Q, P ) ∈ M ,for each k ∈ { 0, . . . , I }, there exists a number πk such that v(( Q, P ), θ ) = πk for any θ with 
+
+|{ i : θi = θh}| = k. It remains to show that Q(θ) = Q(ˆθ) if |{ i : θi = θh}| = |{ i : ˆθi = θh}| .Let θS denote the type profile in which the agents S ⊆ { 1, . . . , I } have type θh and all others have type θℓ. Because any properly robust mechanism is perfectly robust, Proposition 12 implies that P must be determined by (7). So, if |{ i : θiS = θh}| = k, then the firm’s payoff under θS is 
+
+v(( Q, P ), θ S ) = Q(θS )Sk − (θh − θℓ) X
+
+> i∈S
+
+Q(θS\{ i}) = πk.
+
+The desired result is proven by induction on k. Consider any k < k ∗ and θ ∈ Θ for which 
+
+|{ i : θi = θh}| = k (recall, k∗ is the smallest integer under which surplus Sk is strictly positive). Because any properly robust mechanism is robust, Proposition 11 implies that 
+
+v(( Q, P ), θ ) ≥ 0. If k is such that Sk < 0, then it must be that Q(θ) = 0 to satisfy 
+
+v(( Q, P ), θ ) ≥ 0. If k is such that Sk = 0, then any mechanism ( Q, P ) ∈ M in which 
+
+Q(θ) > 0 and P satisfies (7) is weakly dominated by the mechanism ( Q′, P ′) ∈ M in which 
+
+Q′(θ) = 0 and Q′(θ′) = Q(θ) for all θ′̸ = θ with P ′ satisfying (7) replacing Q with Q′.Thus, by Proposition 3, ( Q, P ) cannot be perfectly robust and, hence, cannot be properly robust. It follows that Q(θ) = 0 for any θ such that |{ i : θi = θh}| < k ∗, i.e., Q(θ) = Q(ˆθ)if |{ i : θi = θh}| = |{ i : ˆθi = θh}| = k < k ∗. Now, consider the case in which k = k∗.Because Q(θ) = 0 for any θ such that |{ i : θi = θh}| < k , v(( Q, P ), θ ) = Q(θ)Sk∗ = πk∗ if 
+
+|{ i : θi = θh}| = k∗. Hence, Q(θ) = πk∗ /S k∗ for any θ satisfying |{ i : θi = θh}| = k∗, i.e., 
+
+Q only depends on θ through |{ i : θi = θh}| = k∗. For the inductive step, let k > k ∗ and suppose Q(θ) = Q(ˆθ) = Qk−1 if |{ i : θi = θh}| = |{ i : ˆθi = θh}| = k − 1. Let S ⊆ { 1, . . . , I }
+
+satisfy |S| = k. By the induction hypothesis, 
+
+v(( Q, P ), θ S ) = Q(θS )Sk − (θh − θℓ)kQ k−1 = πk.
+
+Hence, 
+
+Q(θS ) = πk + ( θh − θℓ)kQ k−1
+
+Sk
+
+:= Qk.
+
+53 Thus, Q(θ) = Q(ˆθ) = Qk if |{ i : θi = θh}| = |{ i : ˆθi = θh}| = k. The desired result follows from induction. 
+
+A.14.2 Necessity 
+
+Because any properly robust mechanism is perfectly robust, Proposition 12 implies that 
+
+P must be determined by (7). Section A.14.1 established that, in any properly robust mechanism ( Q, P ) ∈ M , Q(θ) = Q(ˆθ) = Qk if |{ i : θi = θh}| = |{ i : ˆθi = θh}| = k.Moreover, it was shown that Qk = 0 if k < k ∗. Here, it is further shown that if ( Q, P ) ∈ M 
+
+is properly robust and K ∈ { k∗, . . . , I }, then QK = qK /q I , where qK is defined in the statement of Proposition 13. By Proposition 4, if a mechanism is properly robust, then it is leximin optimal. Because Qk = 0 for k < k ∗, the lowest order statistics of the payoff vector are fixed at zero. Therefore, leximin optimality first requires maximizing the minimum payoff among k ≥ k∗. That is, Qk∗ , . . . , Q I must be chosen to maximize min  
+
+> k∈{ k∗,...,I }
+
+QkSk − k(θh − θℓ)Qk−1
+
+subject to Qk∗−1 = 0 and the monotonicity constraint 0 ≤ Qk∗ ≤ · · · ≤ QI ≤ 1. This problem is equivalently formulated as max  
+
+> t,Q k∗,...,Q I
+
+t
+
+subject to 
+
+QkSk − k(θh − θℓ)Qk−1 ≥ t for all k = k∗, . . . , I ,
+
+Qk∗−1 = 0 , and 0 ≤ Qk∗ ≤ · · · ≤ QI ≤ 1.
+
+(10) For each t ≥ 0, define the component-wise minimal sequence ( Qk∗ (t), . . . , Q I (t)) satisfying the constraints in (10) by 
+
+Qk∗ (t) = tSk∗
+
+and, for k > k ∗,
+
+Qk(t)Sk − k(θh − θℓ)Qk−1(t) = t, or equivalently Qk(t) = t + k(θh − θℓ)Qk−1(t)
+
+Sk
+
+.
+
+Iterating this recursion yields 
+
+QK (t) = tq K , where qK =
+
+> K
+
+X
+
+> k=k∗
+
+1
+
+SkKY
+
+> j=k+1
+
+j(θh − θℓ)
+
+Sj
+
+!
+
+for K ∈ { k∗, . . . , I }.
+
+54 Now let ( Qk∗ , . . . , Q I ) be any feasible solution to (10) with objective value t. By construction of the minimal sequence, QK ≥ QK (t) for each K ∈ { k∗, . . . , I }. In particular, 
+
+QI ≥ QI (t) = tq I .
+
+Since feasibility also requires QI ≤ 1, it follows that 
+
+t ≤ 1
+
+qI
+
+.
+
+Moreover, equality holds if and only if QI = 1 and QK = QK (t) = qK /q I for every K ∈{k∗, . . . , I }. Thus, the conditions stated in the proposition are necessary. 
+
+A.14.3 Sufficiency 
+
+To prove that the mechanism defined in the proposition is properly robust, a full support and strongly adversarial LPS μ against which the mechanism is optimal is constructed. Define 
+
+μ = ( μ1, μ 2) such that the support of μ1 is {θ ∈ Θ : P 
+
+> i
+
+θi ≤ c} and the support of μ2 is 
+
+{θ ∈ Θ : P 
+
+> i
+
+θi > c }. For k ≥ k∗, define Θ k := {θ ∈ Θ : |{ i : θi = θh}| = k} and, for each 
+
+θ ∈ Θk, set 
+
+μ2(θ) = 1
+
+|Θk|
+
+wk
+
+qI
+
+, where wk := 1
+
+SkIY
+
+> j=k+1
+
+j(θh − θℓ)
+
+Sj
+
+.
+
+Note that wkSk = ( k + 1)( θh − θℓ)wk+1 . It is immediate that μ has full support. It is strongly adversarial because the mechanism defined in the proposition yields 0 on {θ ∈ Θ : P 
+
+> i
+
+θi ≤ c}
+
+and 1 /q I > 0 on {θ ∈ Θ : P 
+
+> i
+
+θi > c }. So, type profiles in {θ ∈ Θ : P 
+
+> i
+
+θi ≤ c} are infinitely more likely than those in {θ ∈ Θ : P 
+
+> i
+
+θi > c } and payoffs are lower in the former set. It remains to verify μ-optimality. Any ( Q, P ) ∈ M that maximizes expected utility with respect to μ1 must set Q(θ) = 0 if P 
+
+> i
+
+θi < c . Because μ2 assigns equal weight to all profiles with the same number of θh types and the feasible set M is convex and permutation-invariant, for any feasible mechanism there exists an anonymous mechanism yielding the same μ2-expected payoff. Hence, it suffices to restrict attention to anonymous allocation rules with transfers given by (7) (and Qk = 0 for all k < k ∗). Any such allocation rule is characterized by the increasing probability sequence ( Qk∗ , . . . , Q I ) and yields a μ2-expected 55 payoff of 
+
+X
+
+> θ∈Θ
+
+μ2(θ)v(( Q, P ), θ ) = 
+
+> I
+
+X
+
+> k=k∗
+
+X
+
+> θ∈Θk
+
+1
+
+|Θk|
+
+wk
+
+qI
+
+(QkSk − k(θh − θℓ)Qk−1)= 1
+
+qIIX
+
+> k=k∗
+
+wk (QkSk − k(θh − θℓ)Qk−1)= 1
+
+qI
+
+> I
+
+X
+
+> k=k∗
+
+wkSkQk −
+
+> I
+
+X
+
+> k=k∗
+
+wkk(θh − θℓ)Qk−1
+
+!
+
+= 1
+
+qI
+
+
+
+> I
+
+X
+
+> k=k∗
+
+wkSkQk −
+
+> I−1
+
+X
+
+> k=k∗
+
+(k + 1)( θh − θℓ)wk+1 
+
+| {z } 
+
+> =wkSk
+
+Qk
+
+
+
+= 1
+
+qI
+
+wI SI QI = QI
+
+qI
+
+≤ 1
+
+qI
+
+.
+
+Because the mechanism defined in the proposition yields 1 /q I for all θ ∈ supp( μ2), it must therefore yield 1 /q I against μ2. Hence, it must be μ-optimal. 
+
+## A.15 Proof of Proposition 14 
+
+By Proposition 13, f I (1) = 1 for any number of agents I. So, f I (x) converges to 1 for x = 1. Moreover, by Proposition 13, f I (x) = 0 for all I and any x ≤ ρ. So, f I (x) converges to 0 for any x ∈ [0 , ρ ]. It thus suffices to show that f I (x) converges to 0 for all x ∈ (ρ, 1). By Proposition 13, for any K ∈ { k∗, . . . , I },
+
+qII =
+
+> I
+
+X
+
+> k=k∗
+
+1
+
+SkIY
+
+> j=k+1
+
+j(θh − θℓ)
+
+Sj
+
+!
+
+≥
+
+> K
+
+X
+
+> k=k∗
+
+1
+
+SkIY
+
+> j=k+1
+
+j(θh − θℓ)
+
+Sj
+
+!
+
+=
+
+> I
+
+Y
+
+> j=K+1
+
+j(θh − θℓ)
+
+Sj
+
+!
+
+qIK .
+
+So, 
+
+QIK = qIK
+
+qII
+
+≤
+
+> I
+
+Y
+
+> j=K+1
+
+Sj
+
+j(θh − θℓ) =
+
+> I
+
+Y
+
+> j=K+1
+
+
+
+1 − ρI j
+
+
+
+≤
+
+> I
+
+Y
+
+> j=K+1
+
+(1 − ρ) = (1 − ρ)I−K .
+
+Now, fix x ∈ (ρ, 1). Then, lim  
+
+> I→∞
+
+f I (x) = lim  
+
+> I→∞
+
+QI 
+
+> ⌊xI ⌋
+
+≤ lim 
+
+> I→∞
+
+(1 − ρ)I−⌊ xI ⌋ = 0 ,
+
+thereby establishing pointwise convergence to f ∞. For the uniform convergence claim, fix 
+
+ε ∈ (0 , 1). Note that, for any x ∈ [0 , 1 − ε], ⌊xI ⌋ ≤ (1 − ε)I. Therefore, 
+
+I − ⌊ xI ⌋ ≥ εI. 
+
+56 For x ∈ [0 , 1 − ε], f ∞(x) = 0. So, for x ∈ [0 , 1 − ε], it follows that 
+
+|f I (x) − f ∞(x)| = f I (x) = QI 
+
+> ⌊xI ⌋
+
+≤ (1 − ρ)I−⌊ xI ⌋ ≤ (1 − ρ)εI = exp   − ε(− ln(1 − ρ)) I.
+
+Defining λε := ε(− ln(1 − ρ)) and taking the supremum over x ∈ [0 , 1 − ε] yields sup 
+
+> x∈[0 ,1−ε]
+
+|f I (x) − f ∞(x)| ≤ exp( −λεI).
+
+# References 
+
+Ausubel, L.M. and Cramton, P. “The optimality of being efficient.” Available at SSRN 169768 , (1999). Ball, I. and Kattwinkel, D. “Robust robustness.” arXiv preprint arXiv:2408.16898 , (2025). Baron, D.P. and Myerson, R.B. “Regulating a monopolist with unknown costs.” Economet-rica , (1982), pp. 911–930. Bergemann, D. and Schlag, K. “Robust monopoly pricing.” Journal of Economic Theory ,Vol. 146 (2011), pp. 2527–2543. Bergemann, D. and Schlag, K.H. “Pricing without priors.” Journal of the European Economic Association , Vol. 6 (2008), pp. 560–569. Blume, L., Brandenburger, A., and Dekel, E. “Lexicographic probabilities and choice under uncertainty.” Econometrica , (1991a), pp. 61–79. Blume, L., Brandenburger, A., and Dekel, E. “Lexicographic probabilities and equilibrium refinements.” Econometrica , (1991b), pp. 81–98. B¨ orgers, T. “(No) Foundations of dominant-strategy mechanisms: a comment on Chung and Ely (2007).” Review of Economic Design , Vol. 21 (2017), pp. 73–82. B¨ orgers, T., Li, J., and Wang, K. “Undominated Mechanisms.” Tech. rep., University of Michigan and Singapore Management University, 2025. Brandenburger, A., Friedenberg, A., and Keisler, H.J. “Admissibility in games.” Economet-rica , Vol. 76 (2008), pp. 307–352. Carrasco, V., Farinha Luz, V., Kos, N., Messner, M., Monteiro, P., and Moreira, H. “Optimal selling mechanisms under moment conditions.” Journal of Economic Theory , Vol. 177 (2018), pp. 245–279. Carroll, G. “Robustness and separation in multidimensional screening.” Econometrica ,Vol. 85 (2017), pp. 453–488. Chambers, C.P. “Ordinal aggregation and quantiles.” Journal of Economic Theory , Vol. 137 (2007), pp. 416–431. 57 Che, E. “Robustly Optimal Auction Design under Mean Constraints.” In “Proceedings of the 23rd ACM Conference on Economics and Computation,” EC ’22, pp. 153–181. 2022. Che, Y.K. and Zhong, W. “Robustly Optimal Mechanisms for Selling Multiple Goods.” 
+
+Review of Economic Studies , Vol. 92 (2025), pp. 2923–2951. Cheng, X. and B¨ orgers, T. “Dominance and Optimality.” Journal of Economic Theory ,(2026), p. 106128. Chernoff, H. “Rational selection of decision functions.” Econometrica , (1954), pp. 422–443. Chung, K.S. and Ely, J.C. “Foundations of dominant-strategy mechanisms.” Review of Economic Studies , Vol. 74 (2007), pp. 447–476. Clarke, E.H. “Multipart pricing of public goods.” Public Choice , (1971), pp. 17–33. Dresher, M. Games of strategy: Theory and Applications . Prentice-Hall, 1961. Dworczak, P. and Pavan, A. “Preparing for the worst but hoping for the best: Robust (bayesian) persuasion.” Econometrica , Vol. 90 (2022), pp. 2017–2051. Ehrgott, M. Multicriteria Optimization . Springer, 2005. Groves, T. “Incentives in teams.” Econometrica , (1973), pp. 617–631. Kambhampati, A. “Randomization is optimal in the robust principal-agent problem.” Jour-nal of Economic Theory , Vol. 207 (2023), p. 105585. Kambhampati, A., Peng, B., Tang, Z., Toikka, J., and Vohra, R. “Randomization and the Robustness of Linear Contracts.” Tech. rep., United States Naval Academy, 2025. Laffont, J.J. and Martimort, D. The Theory of Incentives: The Principal-Agent Model .Princeton University Press, 2002. Luce, R.D. and Raiffa, H. Games and Decisions: Introduction and Critical Survey . John Wiley and Sons, Inc., 1957. Mackenzie, A. “Subjective Lexicographic Expected Utility.” Tech. rep., Rutgers University, 2024. Madar´ asz, K. and Prat, A. “Sellers with misspecified models.” The Review of Economic Studies , Vol. 84 (2017), pp. 790–815. Mailath, G.J. and Postlewaite, A. “Asymmetric information bargaining problems with many agents.” The Review of Economic Studies , Vol. 57 (1990), pp. 351–367. Mailath, G.J., Samuelson, L., and Swinkels, J.M. “How proper is sequential equilibrium?” 
+
+Games and Economic Behavior , Vol. 18 (1997), pp. 193–218. Manski, C.F. “Ordinal utility models of decision making under uncertainty.” Theory and Decision , Vol. 25 (1988), pp. 79–104. Maskin, E. and Riley, J. “Monopoly with incomplete information.” The RAND Journal of Economics , Vol. 15 (1984), pp. 171–196. Milgrom, P. and Shannon, C. “Monotone comparative statics.” Econometrica , (1994), pp. 58 157–180. Mishra, D. and Patil, S. “Undominated monopoly regulation.” Journal of Economic Theory ,Vol. 228 (2025), p. 106049. Mishra, D., Patil, S., and Pavan, A. “Robust procurement design.” arXiv preprint arXiv:2512.08177 , (2025). Mussa, M. and Rosen, S. “Monopoly and product quality.” Journal of Economic Theory ,Vol. 18 (1978), pp. 301–317. Myerson, R.B. “Refinements of the Nash equilibrium concept.” International Journal of Game Theory , Vol. 7 (1978), pp. 73–80. Myerson, R.B. “Optimal auction design.” Mathematics of Operations Research , Vol. 6 (1981), pp. 58–73. Myerson, R.B. Game Theory: Analysis of Conflict . Harvard University Press, 1991. Nash, Jr., J.F. “Equilibrium points in n-person games.” Proceedings of the National Academy of Sciences of the United States of America , Vol. 36 (1950), pp. 48–49. Rawls, J. A Theory of Justice: Original Edition . Harvard University Press, 1971. Riley, J. and Zeckhauser, R. “Optimal selling strategies: When to haggle, when to hold firm.” The Quarterly Journal of Economics , Vol. 98 (1983), pp. 267–289. Rob, R. “Pollution claim settlements under private information.” Journal of Economic Theory , Vol. 47 (1989), pp. 307–333. Rochet, J.C. “A necessary and sufficient condition for rationalizability in a quasi-linear context.” Journal of Mathematical Economics , Vol. 16 (1987), pp. 191–200. Rostek, M. “Quantile maximization in decision theory.” The Review of Economic Studies ,Vol. 77 (2010), pp. 339–371. Savage, L.J. “The theory of statistical decision.” Journal of the American Statistical asso-ciation , Vol. 46 (1951), pp. 55–67. Savage, L.J. The Foundations of Statistics . New York: John Wiley, 1954. Selten, R. “Reexamination of the perfectness concept for equilibrium points in extensive games.” International Journal of Game Theory , Vol. 4 (1975), pp. 25–55. Sen, A. Collective Choice and Social Welfare . San Francisco: Holden Day, 1970. Sion, M. “On general minimax theorems.” Pacific Journal of Mathematics , Vol. 8 (1958), pp. 171–176. Strausz, R. “Deterministic versus stochastic mechanisms in principal–agent models.” Journal of Economic Theory , Vol. 128 (2006), pp. 306–314. Van Damme, E. Refinements of the Nash equilibrium concept . Springer-Verlag, 1983. Vickrey, W. “Counterspeculation, auctions, and competitive sealed tenders.” The Journal of Finance , Vol. 16 (1961), pp. 8–37. 59 B Example calculations 
+
+## B.1 Example 2 
+
+This appendix verifies the claim that, fixing ( q∗ 
+
+> 1
+
+, p ∗
+
+> 1
+
+), ( q∗ 
+
+> 2
+
+, p ∗
+
+> 2
+
+) uniquely maximizes the seller’s payoff from θ2 subject to the downward-adjacent incentive compatibility constraint. Observe that stochastic mechanisms are strictly suboptimal in the example given the linearity of u
+
+and the strict convexity of c. So, it suffices to show that ( q∗ 
+
+> 2
+
+, p ∗
+
+> 2
+
+) is the unique solution to the relaxed problem max 
+
+> q2,p 2
+
+p2 − 12q22
+
+subject to 
+
+u(q2, θ 2) − p2 ≥ u(q∗ 
+
+> 1
+
+, θ 2) − p∗
+
+> 1
+
+.
+
+In any solution, the incentive compatibility constraint binds, yielding p2 = u(q2, θ 2) + p∗ 
+
+> 1
+
+−
+
+u(q∗ 
+
+> 1
+
+, θ 2). Eliminating constants from the objective function, it follows that any optimal quality must solve max 
+
+> q2
+
+θ2q2 − 12q22 .
+
+The unique solution is q2 = θ2, which yields p2 = θ21 + θ22 − θ2θ1. So, ( q∗ 
+
+> 2
+
+, p ∗
+
+> 2
+
+) uniquely maximizes the seller’s payoff from θ2.
+
+## B.2 Example 3 
+
+This appendix verifies that ( Q, P ) ∈ M is μ-optimal with respect to the adversarial and full support LPS μ = ( δ1, δ 3, δ 2). First, observe that ( Q(θ1), P (θ1)) uniquely attains the highest possible payoff against δ1. Second, from standard constraint simplification arguments, any mechanism that is full-information optimal for the lowest type cannot attain a payoff against 
+
+δ3 higher than the value of the following relaxed problem: max  
+
+> (q2,p 2),(q3,p 3)
+
+p3 − 12q23
+
+subject to 
+
+u(q3, θ 3) − p3 ≥ u(q2, θ 3) − p2
+
+u(q2, θ 2) − p2 ≥ u(q∗ 
+
+> 1
+
+, θ 2) − u(q∗ 
+
+> 1
+
+, θ 1)
+
+q3 ≥ q2 ≥ q∗ 
+
+> 1
+
+.
+
+It is immediate that, in any solution, the second incentive constraint binds. If not, then 
+
+p2 can be strictly increased, satisfy all constraints, and strictly increase the value of the 1objective function. So, 
+
+p2 = u(q∗ 
+
+> 1
+
+, θ 1) + u(q2, θ 2) − u(q∗ 
+
+> 1
+
+, θ 2)in any solution. The relaxed problem thus reduces to max  
+
+> q2,(q3,p 3)
+
+p3 − 12q23
+
+subject to 
+
+u(q3, θ 3) − p3 ≥ u(q2, θ 3) − u(q2, θ 2) − (u(q∗ 
+
+> 1
+
+, θ 1) − u(q∗ 
+
+> 1
+
+, θ 2)) 
+
+q3 ≥ q2 ≥ q∗ 
+
+> 1
+
+.
+
+Notice that the incentive constraint must bind in any solution. Moreover, the right-hand side of the incentive constraint is minimized subject to q2 ≥ q∗ 
+
+> 1
+
+if and only if q2 = q∗ 
+
+> 1
+
+because 
+
+u(q2, θ 3) − u(q2, θ 2) = ( θ3 − θ2)q2.
+
+Hence, in any solution, it must be that q2 = q∗ 
+
+> 1
+
+and 
+
+p3 = u(q∗ 
+
+> 1
+
+, θ 1) + u(q3, θ 3) − u(q∗ 
+
+> 1
+
+, θ 3).
+
+Substituting p3 into the objective function and eliminating constants yields the surplus max-imization problem max 
+
+> q3
+
+p3 − 12q23 ,
+
+whose solution is q3 = θ3. It follows that ( Q, P ) uniquely maximizes the seller’s second-order payoff (it is uniquely optimal in the relaxed problem and is feasible in the constrained problem). Therefore, it is optimal against ( δ1, δ 3, δ 2). 
+
+## B.3 Example 3 continued 
+
+This appendix verifies that the efficient and maximal mechanism is μ-optimal with respect to the full support and strongly adversarial LPS μ = ( δ1, δ 2, δ 3). Let ( q∗ 
+
+> i
+
+, p ∗ 
+
+> i
+
+) denote the quality-price pair of the good purchased by type θi in the efficient and maximal mechanism. Observe again that ( q∗ 
+
+> 1
+
+, p ∗
+
+> 1
+
+) is uniquely optimal against δ1. Moreover, observe that any mechanism that is optimal against δ1 cannot attain a payoff against δ2 higher than the value of the following relaxed problem: max 
+
+> q2,p 2
+
+p2 − 12q22
+
+subject to 
+
+u(q2, θ 2) − p2 ≥ u(q∗ 
+
+> 1
+
+, θ 2) − p∗
+
+> 1
+
+.
+
+2In any solution, the incentive constraint binds, yielding p2 = u(q2, θ 2) + p∗ 
+
+> 1
+
+− u(q∗ 
+
+> 1
+
+, θ 2). Elim-inating constants from the objective function, it follows that any optimal quality must solve max 
+
+> q2
+
+θ2q2 − 12q22 .
+
+The unique solution is q2 = θ2, which yields p2 = u(q∗ 
+
+> 1
+
+, θ 1)+( u(q∗ 
+
+> 2
+
+, θ 2)−u(q∗ 
+
+> 1
+
+, θ 2)). So, ( q∗ 
+
+> 2
+
+, p ∗
+
+> 2
+
+)uniquely maximizes the seller’s payoff. Finally, observe that any mechanism that is optimal against δ2 subject to optimality against δ1 cannot attain a payoff against δ3 higher than the value of the following relaxed problem: max 
+
+> q3,p 3
+
+p3 − 12q23
+
+subject to 
+
+u(q3, θ 3) − p3 ≥ u(q∗ 
+
+> 2
+
+, θ 3) − p∗
+
+> 2
+
+.
+
+In any solution, the incentive constraint binds, yielding p3 = u(q3, θ 3) − u(q∗ 
+
+> 2
+
+, θ 3) + p∗
+
+> 2
+
+. Elim-inating constants from the objective function, it follows that any optimal quality must solve max 
+
+> q3
+
+θ3q3 − 12q23 .
+
+The unique solution is q3 = θ3, which yields p3 = u(q∗ 
+
+> 1
+
+, θ 1)+( u(q∗ 
+
+> 2
+
+, θ 2)−u(q∗ 
+
+> 1
+
+, θ 2))+( u(q∗ 
+
+> 3
+
+, θ 3)−
+
+u(q∗ 
+
+> 2
+
+, θ 3)). So, ( q∗ 
+
+> 3
+
+, p ∗
+
+> 3
+
+) uniquely maximizes the seller’s payoff. It follows that the efficient and maximal mechanism is μ-optimal. 
+
+## B.4 Example 5 
+
+This appendix verifies that the mechanism in Example 5 is μ-optimal with respect to the adversarial and full support LPS μ = ( δθ, μ 2, μ 3, μ 4, δ θ). Throughout, impose the necessary condition for optimality that P satisfies (5). It is then immediate that a mechanism ( Q, P ) ∈M maximizes the first-order payoff if and only if 
+
+Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 .
+
+Now, fix any mechanism ( Q, P ) ∈ M that is optimal against δθ. To maximize the second-order payoff, it must solve max 
+
+> Q:Θ →[0 ,1] 2
+
+13v(( Q, P ), (θ3, θ 2)) + 13v(( Q, P ), (θ2, θ 3)) + 13v(( Q, P ), (θ2, θ 2)) subject to 
+
+Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all i and θ ∈ Θ, 3where 
+
+v(( Q, P ), (θ3, θ 2)) = Q1(θ1, θ 2) +  Q1(θ2, θ 2) − Q1(θ1, θ 2) 2 +  Q1(θ3, θ 2) − Q1(θ2, θ 2) 3+ Q2(θ3, θ 1) +  Q2(θ3, θ 2) − Q2(θ3, θ 1) 2,v(( Q, P ), (θ2, θ 3)) = Q2(θ2, θ 1) +  Q2(θ2, θ 2) − Q2(θ2, θ 1) 2 +  Q2(θ2, θ 3) − Q2(θ2, θ 2) 3+ Q1(θ1, θ 3) +  Q1(θ2, θ 3) − Q1(θ1, θ 3) 2, and 
+
+v(( Q, P ), (θ2, θ 2)) = Q1(θ1, θ 2) +  Q1(θ2, θ 2) − Q1(θ1, θ 2) 2+ Q2(θ2, θ 1) +  Q2(θ2, θ 2) − Q2(θ2, θ 1) 2.
+
+It is immediate that any solution must satisfy 
+
+Q1(θ1, θ 2) = Q1(θ1, θ 3) = Q2(θ3, θ 1) = Q2(θ2, θ 1) = 0 and Q1(θ3, θ 2) = Q2(θ2, θ 3) = 1 .
+
+Substituting these equalities into the objective function yields a constant. Therefore, no further restrictions are required for optimality. Now, fix any mechanism ( Q, P ) ∈ M that is μ-optimal against the first two beliefs. To maximize the third-order payoff, it must solve max 
+
+> Q:Θ →[0 ,1] 2
+
+12
+
+h
+
+v(( Q, P ), (θ1, θ 2)) 
+
+i
+
++ 12
+
+h
+
+v(( Q, P ), (θ2, θ 1)) 
+
+i
+
+subject to 
+
+Q1(θ1, θ 2) = Q1(θ1, θ 3) = Q2(θ3, θ 1) = Q2(θ2, θ 1) = 0 
+
+Q1(θ3, θ 2) = Q2(θ2, θ 3) = 1 
+
+Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all i and θ ∈ Θ, where 
+
+v(( Q, P ), (θ1, θ 2)) = Q1(θ1, θ 2) + Q2(θ1, θ 1) +  Q2(θ1, θ 2) − Q2(θ1, θ 1) 2and 
+
+v(( Q, P ), (θ2, θ 1)) = Q1(θ1, θ 1) +  Q1(θ2, θ 1) − Q1(θ1, θ 1) 2 + Q2(θ2, θ 1).
+
+Imposing Q1(θ1, θ 2) = Q2(θ2, θ 1) = 0 and Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1, the objective function reduces to 
+
+−1 + 2  Q2(θ1, θ 2) + Q1(θ2, θ 1).
+
+Hence, any solution must satisfy 
+
+Q2(θ1, θ 2) = Q1(θ2, θ 1) = 1 .
+
+4Notice that monotonicity immediately implies 
+
+Q2(θ1, θ 3) = Q1(θ3, θ 1) = 1 .
+
+Hence, any mechanism that is μ-optimal with respect to the first three beliefs is also μ-optimal with respect to the first four beliefs. The fifth-order problem remains: max  
+
+> Q:Θ →[0 ,1] 2
+
+3 Q1(θ3, θ 3) + Q2(θ3, θ 3)
+
+subject to 
+
+Q1(θ1, θ 2) = Q1(θ1, θ 3) = Q2(θ3, θ 1) = Q2(θ2, θ 1) = 0 
+
+Q2(θ1, θ 3) = Q1(θ3, θ 1) = Q2(θ1, θ 2) = Q1(θ2, θ 1) = Q1(θ3, θ 2) = Q2(θ2, θ 3) = 1 
+
+Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all i and θ ∈ Θ. Any allocation rule satisfying the constraints that sets 
+
+Q1(θ3, θ 3) + Q2(θ3, θ 3) = 1 is optimal. In summary, it has been shown that any mechanism ( Q, P ) ∈ M in which P satisfies (5) and Q satisfies 
+
+Q1(θ1, θ 2) = Q1(θ1, θ 3) = Q2(θ3, θ 1) = Q2(θ2, θ 1) = 0 ,Q2(θ1, θ 3) = Q1(θ3, θ 1) = Q2(θ1, θ 2) = Q1(θ2, θ 1) = Q1(θ3, θ 2) = Q2(θ2, θ 3) = 1 ,Q1(θ3, θ 3) + Q2(θ3, θ 3) = Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i, and 
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all i and θ ∈ Θis μ-optimal. In particular, the mechanism in Example 5, which sets Q1(θ2, θ 2) = Q2(θ2, θ 2) =  
+
+> 14
+
+, is μ-optimal. 5B.5 Example 6 
+
+This appendix verifies that the mechanism in Example 6 is μ-optimal with respect to the full support and adversarial LPS 
+
+μ = ( δθ, δ (θ3,θ 1), δ (θ3,θ 2), μ 4, μ 5),
+
+where 
+
+μ4 = 13 ◦ (θ1, θ 2) + 13 ◦ (θ1, θ 3) + 13 ◦ (θ2, θ 1)and 
+
+μ5 = 13 ◦ (θ2, θ 2) + 13 ◦ (θ2, θ 3) + 13 ◦ (θ3, θ 3).
+
+Throughout, impose the necessary condition for optimality that P satisfies (5). It is then immediate that a mechanism ( Q, P ) ∈ M maximizes the first-order payoff if and only if 
+
+Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 .
+
+Now, fix any mechanism ( Q, P ) ∈ M that is optimal against δθ. To maximize the second-order payoff, it must solve max  
+
+> Q:Θ →[0 ,1] 2
+
+v(( Q, P ), (θ3, θ 1)) subject to 
+
+Q1(θ1, θ 1) + Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all θ ∈ Θ, where 
+
+v(( Q, P ), (θ3, θ 1)) = Q1(θ1, θ 1)θ1 +  Q1(θ2, θ 1) − Q1(θ1, θ 1)θ2 +  Q1(θ3, θ 1) − Q1(θ2, θ 1)θ3
+
++ Q2(θ3, θ 1)θ1.
+
+It is immediate that any solution must satisfy 
+
+Q1(θ3, θ 1) = 1 and Q2(θ3, θ 1) = Q1(θ2, θ 1) = Q1(θ1, θ 1) = 0 .
+
+By the first-order optimality condition, it then follows that 
+
+Q2(θ1, θ 1) = 1 .
+
+Monotonicity then implies 
+
+Q2(θ1, θ 2) = Q2(θ1, θ 3) = 1 .
+
+6Hence, by feasibility, 
+
+Q1(θ1, θ 3) = Q1(θ1, θ 2) = 0 .
+
+Now, fix any mechanism ( Q, P ) ∈ M that is μ-optimal against the first two beliefs. To maximize the third-order payoff, it must solve max  
+
+> Q:Θ →[0 ,1] 2
+
+v(( Q, P ), (θ3, θ 2)) subject to 
+
+Q1(θ1, θ 3) = Q1(θ1, θ 2) = Q2(θ3, θ 1) = Q1(θ2, θ 1) = Q1(θ1, θ 1) = 0 
+
+Q2(θ1, θ 2) = Q2(θ1, θ 3) = Q1(θ3, θ 1) = Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all θ ∈ Θ, where 
+
+v(( Q, P ), (θ3, θ 2)) = Q1(θ1, θ 2)θ1 +  Q1(θ2, θ 2) − Q1(θ1, θ 2)θ2 +  Q1(θ3, θ 2) − Q1(θ2, θ 2)θ3
+
++ Q2(θ3, θ 1)θ1 +  Q2(θ3, θ 2) − Q2(θ3, θ 1)θ2.
+
+Imposing Q1(θ1, θ 2) = Q2(θ3, θ 1) = 0 and collecting terms yields 
+
+v(( Q, P ), (θ3, θ 2)) = θ3Q1(θ3, θ 2) + θ2Q2(θ3, θ 2) − (θ3 − θ2)Q1(θ2, θ 2).
+
+It is immediate that any solution must satisfy 
+
+Q1(θ3, θ 2) = 1 and Q2(θ3, θ 2) = Q1(θ2, θ 2) = 0 .
+
+Now, fix any mechanism ( Q, P ) ∈ M that is μ-optimal against the first three beliefs. To maximize the fourth-order payoff, Q must solve max 
+
+> Q:Θ →[0 ,1] 2
+
+13v(( Q, P ), (θ1, θ 2)) + 13v(( Q, P ), (θ1, θ 3)) + 13v(( Q, P ), (θ2, θ 1)) subject to 
+
+Q2(θ3, θ 2) = Q1(θ2, θ 2) = Q1(θ1, θ 3) = Q1(θ1, θ 2) = Q2(θ3, θ 1) = Q1(θ2, θ 1) = Q1(θ1, θ 1) = 0 
+
+Q1(θ3, θ 2) = Q2(θ1, θ 2) = Q2(θ1, θ 3) = Q1(θ3, θ 1) = Q2(θ1, θ 1) = 1 
+
+Qi(·, θ −i) increasing for all i and θ−i ∈ Θ−i
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all θ ∈ Θ, 7where 
+
+v(( Q, P ), (θ1, θ 2)) = Q1(θ1, θ 2)θ1 + Q2(θ1, θ 1)θ1 +  Q2(θ1, θ 2) − Q2(θ1, θ 1)θ2,v(( Q, P ), (θ1, θ 3)) = Q2(θ1, θ 1)θ1 +  Q2(θ1, θ 2) − Q2(θ1, θ 1)θ2 +  Q2(θ1, θ 3) − Q2(θ1, θ 2)θ3
+
++ Q1(θ1, θ 3)θ1, and 
+
+v(( Q, P ), (θ2, θ 1)) = Q1(θ1, θ 1)θ1 +  Q1(θ2, θ 1) − Q1(θ1, θ 1)θ2 + Q2(θ2, θ 1)θ1.
+
+Imposing Q1(θ2, θ 1) = Q1(θ1, θ 1) = Q1(θ1, θ 3) = Q1(θ1, θ 2) = 0 and Q2(θ1, θ 3) = Q2(θ1, θ 2) = 
+
+Q2(θ1, θ 1) = 1 the objective function reduces to 13θ1 + 13θ1 + 13Q2(θ2, θ 1)θ1.
+
+It is immediate that the allocation rule maximizes the fourth-order payoff if and only if it satisfies the constraints and 
+
+Q2(θ2, θ 1) = 1 .
+
+Monotonicity then implies 
+
+Q2(θ2, θ 2) = Q2(θ2, θ 3) = 1 .
+
+Hence, by feasibility, 
+
+Q1(θ2, θ 3) = 0 .
+
+Now, fix any mechanism ( Q, P ) ∈ M that is μ-optimal against the first four beliefs. The only remaining free variables are Q1(θ3, θ 3) and Q2(θ3, θ 3). These values enter into the auctioneer’s objective function under μ5 only through v(( Q, P ), (θ3, θ 3)). Hence, to maximize the fifth-order payoff, it suffices to solve max 
+
+> Q1(θ3,θ 3),Q 2(θ3,θ 3)≥0
+
+13(Q1(θ3, θ 3) + Q2(θ3, θ 3)) θ3
+
+subject to 
+
+> 2
+
+X
+
+> i=1
+
+Qi(θ) ≤ 1 for all θ ∈ Θ. Any Q1(θ3, θ 3), Q 2(θ3, θ 3) ≥ 0 such that Q1(θ3, θ 3) + Q2(θ3, θ 3) = 1 solves this problem. Observe that the allocation rule in Example 6 satisfies this condition. Hence, it is μ-optimal. 8B.6 Example 8 
+
+This appendix verifies that the mechanism ( Q, P ) ∈ M in Example 8 is μ-optimal with respect to the adversarial and full support LPS 
+
+μ =
+
+
+
+δθ, α ◦ (θh, θ ℓ) + α ◦ (θℓ, θ h) + (1 − 2α) ◦ θ
+
+
+
+,
+
+where 
+
+α := 
+
+
+
+2 + θh + θℓ − cθh − θℓ
+
+−1
+
+.
+
+Throughout, impose the necessary condition for optimality that P satisfies (7). It is then immediate that a mechanism ( Q, P ) ∈ M maximizes the first-order payoff if and only if 
+
+Q(θ) = 0 .
+
+Now, fix any mechanism ( Q, P ) ∈ M that is optimal against δθ. To maximize the second-order payoff, it must solve max  
+
+> Q:Θ →[0 ,1]
+
+αv (( Q, P ), (θh, θ ℓ)) + αv (( Q, P ), (θℓ, θ h)) + (1 − 2α)v(( Q, P ), θ )subject to 
+
+Q(θ) = 0 
+
+Q(·, θ 2) and Q(θ1, ·) increasing ,
+
+where 
+
+v(( Q, P ), (θh, θ ℓ)) = ( θh + θℓ − c)Q(θh, θ ℓ),v(( Q, P ), (θℓ, θ h)) = ( θh + θℓ − c)Q(θℓ, θ h), and 
+
+v(( Q, P ), θ ) = (2 θh − c)Q(θ) − (θh − θℓ) Q(θh, θ ℓ) + Q(θℓ, θ h).
+
+Using the definition of α, the coefficients on Q(θh, θ ℓ) and Q(θℓ, θ h) cancel, so the problem becomes equivalent to max  
+
+> Q:Θ →[0 ,1]
+
+(1 − 2α)(2 θh − c)Q(θ).
+
+Since 1 − 2α > 0 and 2 θh − c > 0, any solution must satisfy 
+
+Q(θ) = 1 .
+
+It has thus has been shown that any mechanism ( Q, P ) ∈ M in which P satisfies (7) and Q
+
+satisfies 
+
+Q(θ) = 0 and Q(θ) = 1 is μ-optimal. Because the mechanism in the example satisfies these conditions, it is therefore 
+
+μ-optimal. 9

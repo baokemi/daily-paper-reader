@@ -1,0 +1,158 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-001.webp",
+      "caption": "Figure 1. Overview of HaloProbe. Given an image and a prompt, an LVLM generates a caption. HaloProbe adopts a Bayesian formulation that combines internal features (e.g., attention and logit statistics) with external caption features (e.g., object repetition and its token position) through a balanced estimator and a prior estimator to produce tokenlevel hallucination scores. HaloProbe enables reliable hallucination detection and downstream hallucination mitigation without modifying model internals.",
+      "page": 1,
+      "index": 1,
+      "width": 473,
+      "height": 571
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-002.webp",
+      "caption": "Figure 15. Qualitative comparison of image descriptions using LLaVA-1.5-7B. The Beam Search baseline hallucinates objects not present in the image. In contrast, HaloProbe + Beam Search selects the beam with the fewest hallucinated words and the highest number of correctly mentioned",
+      "page": 25,
+      "index": 2,
+      "width": 1075,
+      "height": 748
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-003.webp",
+      "caption": "Figure 16. Qualitative comparison of image descriptions using LLaVA-1.5-7B. The Beam Search baseline hallucinates objects not present in the image. In contrast, HaloProbe + Beam Search selects the beam with the fewest hallucinated words and the highest number of correctly mentioned",
+      "page": 26,
+      "index": 3,
+      "width": 1075,
+      "height": 629
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-004.webp",
+      "caption": "Table 8. Input features for the hallucination detection balanced estimator and the prior network. The balanced estimator uses normalized features including attention statistics, logit-based features, and token metadata. The prior network uses only repetition and token position normalized to [0, 1]. The reported dimensionality corresponds to the LLaVA-1.5 model, which consists of 32 layers and 32 attention heads.",
+      "page": 15,
+      "index": 4,
+      "width": 739,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-005.webp",
+      "caption": "Figure 11. Qualitative comparison of image description results using LLaVA-1.5-7B. The Baseline model hallucinates objects that are not present in the image, while HaloProbe + Post-Process effectively removes such hallucinations while preserving most of the correctly mentioned objects",
+      "page": 21,
+      "index": 5,
+      "width": 1075,
+      "height": 668
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-006.webp",
+      "caption": "Figure 10. ROC and Precision-Recall curves of HaloProbe for token-level hallucination detection, illustrating performance under class imbalance.",
+      "page": 21,
+      "index": 6,
+      "width": 994,
+      "height": 424
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-007.webp",
+      "caption": "Table 1. Performance comparison of different object hallucination detection methods on LLaVA-1.5-7B backbone. Missing values are indicated with “–”.",
+      "page": 7,
+      "index": 7,
+      "width": 523,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-008.webp",
+      "caption": "Figure 12. Qualitative comparison of image description results using LLaVA-1.5-7B. The Baseline model hallucinates objects that are not present in the image, while HaloProbe + Post-Process effectively removes such hallucinations while preserving most of the correctly mentioned objects",
+      "page": 22,
+      "index": 8,
+      "width": 1075,
+      "height": 598
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-009.webp",
+      "caption": "Figure 6. Qualitative comparison of image description results. Given the same user prompt, the baseline model LLaVA-1.5 produces a coherent description with a low repetition score, while the intervention induces severe repetitive generation, reflected by a high RE-4 score.",
+      "page": 18,
+      "index": 9,
+      "width": 1067,
+      "height": 529
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-010.webp",
+      "caption": "Figure 13. Qualitative comparison of image description results using LLaVA-1.5-7B. The Baseline model hallucinates objects that are not present in the image, while HaloProbe + Post-Process effectively removes such hallucinations while preserving most of the correctly mentioned objects",
+      "page": 23,
+      "index": 10,
+      "width": 1075,
+      "height": 598
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-011.webp",
+      "caption": "Table 2. Comparison of mitigation methods across different decoding strategies on three vision-language models. Lower Cs and Ci values and higher F1 scores indicate better performance. The best results are shown in bold, and the second-best results are underlined.“–” indicates unavailable or non-comparable results and ”*” indicates reproduced results.",
+      "page": 8,
+      "index": 11,
+      "width": 927,
+      "height": 448
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-012.webp",
+      "caption": "Figure 2. Illustration of Simpson’s paradox induced by token position. (a) Token-position–conditioned image attention, averaged over heads, layers, and samples, for correct and hallucinated object tokens. Image attention is computed by averaging attention values from layers 5 to 18 of LLaVA-1.5-7B and over 5K samples from the MS COCO dataset. Across most positions, hallucinated tokens receive higher conditional attention than correct tokens. (b) Class-conditional token position distributions, showing that hallucinated tokens tend to appear at later positions than correct tokens. When conditioning is removed by marginalizing over token position using the distributions in (b), the expected attention values (dashed lines in (a)) reverse, with correct object tokens exhibiting higher overall attention.",
+      "page": 4,
+      "index": 12,
+      "width": 475,
+      "height": 609
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-013.webp",
+      "caption": "Figure 3. Distribution of object repetition counts (r ∈ {1, 2, 3, 4}) conditioned on class. Hallucinated objects are typically mentioned only once, while correct objects are more frequently repeated within a caption.",
+      "page": 4,
+      "index": 13,
+      "width": 431,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-014.webp",
+      "caption": "Figure 7. Qualitative comparison of image description results. Given the same user prompt, the baseline model LLaVA-1.5 produces a coherent description with a low repetition score, while the intervention induces severe repetitive generation, reflected by a high RE-4 score.",
+      "page": 19,
+      "index": 14,
+      "width": 1067,
+      "height": 508
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-015.webp",
+      "caption": "Figure 14. Qualitative comparison of image descriptions using LLaVA-1.5-7B. The Beam Search baseline hallucinates objects not present in the image. In contrast, HaloProbe + Beam Search selects the beam with the fewest hallucinated words and the highest number of correctly mentioned",
+      "page": 24,
+      "index": 15,
+      "width": 1075,
+      "height": 623
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-016.webp",
+      "caption": "Figure 8. Averaged image attention for first-occurrence object tokens, averaged over early and late transformer layers. Early (first 10) layers exhibit a rapid decay in image attention as generation progresses, while late (last 10) layers maintain relatively stable attention across token positions. Attention in early layers is largely non-discriminative between correct and hallucinated tokens, whereas in late layers, hallucinated tokens counterintuitively receive higher image attention than correct tokens. Compared with Fig. 4a, this result indicates that LVLM layers behave differently and that averaging attention across all layers can obscure meaningful patterns.",
+      "page": 20,
+      "index": 16,
+      "width": 643,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-017.webp",
+      "caption": "Table 12. Results on the POPE benchmark using LLaVA-1.5. Higher values indicate better performance. The best results are shown in bold.",
+      "page": 20,
+      "index": 17,
+      "width": 639,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-018.webp",
+      "caption": "Figure 9. Consistent performance of HaloProbe across token positions.",
+      "page": 20,
+      "index": 18,
+      "width": 719,
+      "height": 438
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06165v2/fig-019.webp",
+      "caption": "Figure 4. Illustration of Simpson’s paradox induced by object repetition. (a) Token-position-conditioned image attention for correct and hallucinated object tokens, shown separately for first and non-first occurrences. First mentions consistently exhibit higher image attention, even when the object is hallucinated, while non-first mentions attend less to the image. Conditioning on object occurrence largely removes the apparent attention gap between correct and hallucinated tokens. (b) Class-conditional probability of first occurrence as a function of token position, showing that hallucinated objects are more likely to appear as first mentions.",
+      "page": 5,
+      "index": 19,
+      "width": 464,
+      "height": 598
+    }
+  ]
+}

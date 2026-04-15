@@ -1,0 +1,206 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-001.webp",
+      "caption": "Figure 22: Model predictions for spatial grounding task. Red boxes indicate localized distresses.",
+      "page": 57,
+      "index": 1,
+      "width": 654,
+      "height": 843
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-002.webp",
+      "caption": "Figure 5: Number of distress classes per dataset.",
+      "page": 25,
+      "index": 2,
+      "width": 790,
+      "height": 434
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-003.webp",
+      "caption": "Figure 6: (Left) Global distress type frequencies. (Right) Percentage distribution of distress categories by dataset.",
+      "page": 26,
+      "index": 3,
+      "width": 897,
+      "height": 389
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-004.webp",
+      "caption": "Figure 7: Distribution of single-turn vs. multi-turn conversations.",
+      "page": 26,
+      "index": 4,
+      "width": 456,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-005.webp",
+      "caption": "Figure 19: Qualitative comparison of VLM responses for distress listing task. Red highlights indicate correct matches with ground truth.",
+      "page": 53,
+      "index": 5,
+      "width": 650,
+      "height": 850
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-006.webp",
+      "caption": "Figure 14: Zero-shot vs. fine-tuned performance on spatial grounding (mIoU). Fine-tuning on PaveInstruct yields substantial improvements across all VLMs.",
+      "page": 47,
+      "index": 6,
+      "width": 800,
+      "height": 382
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-007.webp",
+      "caption": "Figure 11: Representative instruction-response pairs from PaveInstruct across multiple task families.",
+      "page": 30,
+      "index": 7,
+      "width": 851,
+      "height": 1085
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-008.webp",
+      "caption": "Figure 10: Distribution of answer formats in PaveInstruct.",
+      "page": 29,
+      "index": 8,
+      "width": 802,
+      "height": 427
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-009.webp",
+      "caption": "Figure 12: PaveGPT architecture",
+      "page": 34,
+      "index": 9,
+      "width": 808,
+      "height": 512
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-010.webp",
+      "caption": "Figure 1: Sample annotated images across each of the individual datasets in PaveInstruct.",
+      "page": 10,
+      "index": 10,
+      "width": 730,
+      "height": 961
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-011.webp",
+      "caption": "Figure 20: Results on multiple-choice VQA for maintenance recommendation. Red highlights indicate correct matches with ground truth.",
+      "page": 54,
+      "index": 11,
+      "width": 649,
+      "height": 841
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-012.webp",
+      "caption": "Table 3: Key hyperparameters used for fine-tuning PaveGPT.",
+      "page": 35,
+      "index": 12,
+      "width": 472,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-013.webp",
+      "caption": "Figure 13: PCI prediction Mean Absolute Error (MAE) comparison. Lower values indicate better performance.",
+      "page": 46,
+      "index": 13,
+      "width": 796,
+      "height": 464
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-014.webp",
+      "caption": "Table 2: Dataset Annotation Formats and Task Types",
+      "page": 18,
+      "index": 14,
+      "width": 775,
+      "height": 484
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-015.webp",
+      "caption": "Figure 3: PaveInstruct Dataset Creation Pipeline",
+      "page": 23,
+      "index": 15,
+      "width": 845,
+      "height": 473
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-016.webp",
+      "caption": "Figure 9: Distribution of answer word counts.",
+      "page": 28,
+      "index": 16,
+      "width": 794,
+      "height": 427
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-017.webp",
+      "caption": "Figure 17: Radar chart comparing fine-tuned VLMs across six key evaluation metrics on PaveInstruct.",
+      "page": 50,
+      "index": 17,
+      "width": 797,
+      "height": 546
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-018.webp",
+      "caption": "Table 4: Benchmark results comparing state-of-the-art VLMs on pavement condition assessment. Zero-shot (gray rows) shows baseline performance; Trained (white rows) shows performance after fine-tuning on PaveInstruct. Perception evaluates distress detection and spatial localization; Understanding covers VQA and PCI score prediction; Explanatory assesses caption quality and reasoning ability via LLM-based evaluation. Best in bold, second-best underlined. ↑/↓: higher/lower is better. –: not evaluable in zero-shot.",
+      "page": 49,
+      "index": 18,
+      "width": 814,
+      "height": 384
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-019.webp",
+      "caption": "Figure 16: Heatmap of fine-tuned model performance across evaluation metrics. Darker colors indicate higher scores.",
+      "page": 49,
+      "index": 19,
+      "width": 796,
+      "height": 475
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-020.webp",
+      "caption": "Figure 18: Comparison of InternVL-3.5-8B performance before and after fine-tuning on PaveInstruct across diverse task types: one-word classification, distress enumeration, and coordinate-based identification. Red highlights indicate correct alignment with ground truth, demonstrating substantial improvements from domain-specific instruction tuning.",
+      "page": 51,
+      "index": 20,
+      "width": 652,
+      "height": 856
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-021.webp",
+      "caption": "Figure 2: Overview of the PaveInstruct task taxonomy",
+      "page": 17,
+      "index": 21,
+      "width": 785,
+      "height": 785
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-022.webp",
+      "caption": "Figure 8: Distribution of conversation turns per dialogue.",
+      "page": 27,
+      "index": 22,
+      "width": 816,
+      "height": 440
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-023.webp",
+      "caption": "Figure 21: Qualitative comparison on PCI estimation with ASTM D6433-compliant reasoning. Red highlights indicate correct matches.",
+      "page": 56,
+      "index": 23,
+      "width": 652,
+      "height": 850
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-024.webp",
+      "caption": "Figure 4: Instruction count per source dataset.",
+      "page": 24,
+      "index": 24,
+      "width": 777,
+      "height": 433
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08212v1/fig-025.webp",
+      "caption": "Figure 15: Performance improvement (∆%) from fine-tuning on PaveInstruct across spatial grounding, reasoning, and captioning tasks compared to zero-shot settings.",
+      "page": 48,
+      "index": 25,
+      "width": 800,
+      "height": 254
+    }
+  ]
+}

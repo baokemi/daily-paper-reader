@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-001.webp",
+      "caption": "Fig. 8. Comparing centralized vs BSP and federated Learning. For BSP, FedAvg, and FedProx 8 clients 40%, skewness on the less common labels was used. The cfraction for FedAvg and FedProx is set to 0.75 here.",
+      "page": 6,
+      "index": 1,
+      "width": 1076,
+      "height": 645
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-002.webp",
+      "caption": "Fig. 1. Basic steps of Federated Learning",
+      "page": 2,
+      "index": 2,
+      "width": 529,
+      "height": 371
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-003.webp",
+      "caption": "Fig. 2. Basic steps of Federated Averaging",
+      "page": 2,
+      "index": 3,
+      "width": 529,
+      "height": 395
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-004.webp",
+      "caption": "Fig. 9. FedAvg vs FedProx for different Deep Learning Models. 8 clients with a cfraction of 0.75, as well as 40% skewness on the less common labels were used here.",
+      "page": 7,
+      "index": 4,
+      "width": 529,
+      "height": 318
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-005.webp",
+      "caption": "Fig. 10. Effect of varying Cfraction ∈ {0.5, 0.75, 1}. 8 clients, and 40% skewness on the less common labels were used.",
+      "page": 7,
+      "index": 5,
+      "width": 529,
+      "height": 670
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-006.webp",
+      "caption": "Fig. 15. Both graphs show the training communication costs in KiloBytes on our dataset: (a) shows the cost in comparison to a BSP-max (in red), where the communication between the server and the client is happening after each training batch, which is very costly compared to our BSP (in Blue) or FedAvg/FedProx. (b) shows the communication difference between our BSP (where communication happens after training on all the batches of a client) and FedAvg/FedProx with Cfraction ∈ {0.5, 0.75}",
+      "page": 10,
+      "index": 6,
+      "width": 529,
+      "height": 773
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-007.webp",
+      "caption": "Fig. 3. Residual block used by ResNet architecture",
+      "page": 3,
+      "index": 7,
+      "width": 529,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-008.webp",
+      "caption": "Fig. 12. (a) shows the effect of convergence for different batch sizes, with 4 clients and 40% skewness on common labels. (b) shows the runtime for 100 rounds for different batch sizes. The training runs are for LeNet.",
+      "page": 8,
+      "index": 8,
+      "width": 475,
+      "height": 709
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-009.webp",
+      "caption": "Fig. 11. Effect of varying number of clients ∈ {10, 25, 50}. cfraction of 0.5, and 40% skewness on the less common labels were used here, however, since the number of clients is more than the number of unique labels, the distribution over the clients ends up more IID.",
+      "page": 8,
+      "index": 9,
+      "width": 529,
+      "height": 670
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-010.webp",
+      "caption": "Fig. 4. Some UC Merced Land Use Dataset examples, showing both the original single label (s.l) as well as the multilabel(m.l).",
+      "page": 4,
+      "index": 10,
+      "width": 529,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-011.webp",
+      "caption": "Fig. 5. Example of the different augmentation methods on the same image, in the first row from left to right: original image, impulse noise, motion blur. In the second row: snow, and pixelation.",
+      "page": 4,
+      "index": 11,
+      "width": 488,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-012.webp",
+      "caption": "TABLE I EXPERIMENTAL SETUP: PARAMETERS",
+      "page": 12,
+      "index": 12,
+      "width": 922,
+      "height": 1150
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-013.webp",
+      "caption": "Fig. 14. (a) shows the effect of varying data skewness ∈ {40, 60, 80}% on less common labels on LeNet. 8 clients with a cfraction of 0.75 were used. (b) shows the difference between the max F1 scores achieved by BSP and FedAvg.",
+      "page": 9,
+      "index": 13,
+      "width": 529,
+      "height": 1086
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-014.webp",
+      "caption": "Fig. 13. Effect of varying data skewness ∈ {0, 20, 40}% on common labels on LeNet. 4 clients with a cfraction of 0.75 were used.",
+      "page": 9,
+      "index": 14,
+      "width": 529,
+      "height": 670
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-015.webp",
+      "caption": "Fig. 6. UC Merced Land Use Dataset multilabel distribution: the total number of label occurrences in the 2100 images of the Dataset. We define ”common labels” as labels that are present in more than 10 % ( 210 data points), whereas ”less common labels” are in less than 10 %.",
+      "page": 5,
+      "index": 15,
+      "width": 474,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11562v1/fig-016.webp",
+      "caption": "Fig. 7. UC Merced Land Use Dataset multilabel cosinus similarity matrix; shows that ”less common” labels are for the most part decorrelated, whereas ”common labels” are much more correlated. The darker purple a matrix field gets (closer to 1), the more correlation (co-occurrences) between two labels there are, whereas the bluer (at zero), the 2 labels never exist in the same image.",
+      "page": 5,
+      "index": 16,
+      "width": 474,
+      "height": 421
+    }
+  ]
+}

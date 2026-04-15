@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-001.webp",
+      "caption": "Table 2. Quantitative comparison on the OACIRR benchmark. “Avg.” represents the average results across all evaluation metrics.",
+      "page": 6,
+      "index": 1,
+      "width": 1026,
+      "height": 440
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-002.webp",
+      "caption": "Table 5. Statistics of OACIRR Training Dataset.",
+      "page": 15,
+      "index": 2,
+      "width": 496,
+      "height": 757
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-003.webp",
+      "caption": "Table 6. Statistics of OACIRR Evaluation Benchmark.",
+      "page": 15,
+      "index": 3,
+      "width": 487,
+      "height": 475
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-004.webp",
+      "caption": "Figure 5. Ablation study on the Modulation Scalar β.",
+      "page": 7,
+      "index": 4,
+      "width": 496,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-005.webp",
+      "caption": "Table 3. Ablation study on the architecture of the CAAM.",
+      "page": 7,
+      "index": 5,
+      "width": 487,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-006.webp",
+      "caption": "Figure 2. The multi-stage construction pipeline for the OACIRR dataset.",
+      "page": 3,
+      "index": 6,
+      "width": 1014,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-007.webp",
+      "caption": "Table 8. Zero-shot cross-task generalization on standard CIR benchmarks.",
+      "page": 18,
+      "index": 7,
+      "width": 1026,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-008.webp",
+      "caption": "Figure 6. Qualitative comparison of our AdaFocal and the Baseline on the OACIRR benchmark. Green boxes indicate the ground-truth target, yellow boxes indicate instance-correct but semantically incorrect results, and all other retrieved images are marked with red boxes.",
+      "page": 8,
+      "index": 8,
+      "width": 1034,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-009.webp",
+      "caption": "Table 1. Comparative analysis of existing Multimodal Image Retrieval datasets.",
+      "page": 4,
+      "index": 9,
+      "width": 1026,
+      "height": 220
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-010.webp",
+      "caption": "Figure 3. Instance distribution of the OACIRR benchmark.",
+      "page": 4,
+      "index": 10,
+      "width": 486,
+      "height": 274
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-011.webp",
+      "caption": "Table 10. Robustness of AdaFocal to Scale and Shift perturbations of bounding boxes on the OACIRR benchmark.",
+      "page": 19,
+      "index": 11,
+      "width": 1026,
+      "height": 180
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-012.webp",
+      "caption": "Table 7. Quantitative comparison on the OACIRR benchmark under different evaluation settings and OACIR-specific baselines. “Avg.” represents the average results across all evaluation metrics. The best result is highlighted in bold, and the second best is underlined. Baseline denotes the standard CIR baseline, Baseline† denotes the ROI-cropped baseline, and SPRC† denotes plug-and-play CIR baseline.",
+      "page": 17,
+      "index": 12,
+      "width": 1026,
+      "height": 688
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-013.webp",
+      "caption": "Figure 8. Qualitative comparison of our AdaFocal and the Baseline on the OACIRR benchmark. Green boxes indicate the ground-truth target, yellow boxes indicate instance-correct but semantically incorrect results, and all other retrieved images are marked with red boxes.",
+      "page": 20,
+      "index": 13,
+      "width": 1036,
+      "height": 395
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-014.webp",
+      "caption": "Figure 7. A curated collage of representative instances from the OACIRR benchmark.",
+      "page": 20,
+      "index": 14,
+      "width": 1036,
+      "height": 747
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05393v1/fig-015.webp",
+      "caption": "Figure 4. Overall architecture of our proposed AdaFocal framework.",
+      "page": 5,
+      "index": 15,
+      "width": 1014,
+      "height": 454
+    }
+  ]
+}

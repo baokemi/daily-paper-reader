@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-001.webp",
+      "caption": "Figure 1: Motivation of our method. The base LVLM hallucinates the scene context and incorrectly describes the toaster as being on a kitchen counter. Continuous calibration refines all tokens indiscriminately, leading to over-refinement without correcting the error. In contrast, our HTDC selectively calibrates only hallucination-prone tokens based on tokenlevel hesitation scores, yielding a more accurate description.",
+      "page": 1,
+      "index": 1,
+      "width": 455,
+      "height": 457
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-002.webp",
+      "caption": "Table 3: Experimental results on POPE benchmark.",
+      "page": 6,
+      "index": 2,
+      "width": 936,
+      "height": 679
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-003.webp",
+      "caption": "Figure 3: Qualitative comparison on complex reasoning (MMVet). VCD’s continuous intervention destroys the initial OCRbased reasoning chain, whereas HTDC preserves stable generation and accurate reasoning capabilities.",
+      "page": 7,
+      "index": 3,
+      "width": 498,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-004.webp",
+      "caption": "Figure 2: Overview of HTDC. At each decoding step, the model first performs standard full-branch inference and estimates a hesitation weight 𝑤𝑡 from intermediate-layer dynamics. When 𝑤𝑡 > 𝑤min, two auxiliary probes are activated: a visual perturbation probe (𝑉 0) and a semantic nullification probe (𝑋0). Their score differences with respect to the full branch are then used for differential calibration, yielding the final prediction. A hysteresis margin 𝜖 is further applied to avoid unstable switching.",
+      "page": 3,
+      "index": 4,
+      "width": 912,
+      "height": 489
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-005.webp",
+      "caption": "Figure 4: Impact of key hyperparameters on the CHAIR benchmark, including (a) dynamic vs. static gating strategy, (b) visual noise scale (𝜎), and (c) layer selection depth (𝑘).",
+      "page": 8,
+      "index": 5,
+      "width": 988,
+      "height": 310
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-006.webp",
+      "caption": "Table 1: Experimental results on the CHAIR benchmark.",
+      "page": 5,
+      "index": 6,
+      "width": 890,
+      "height": 234
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12115v1/fig-007.webp",
+      "caption": "Table 2: Experimental results on MME benchmark.",
+      "page": 5,
+      "index": 7,
+      "width": 494,
+      "height": 302
+    }
+  ]
+}

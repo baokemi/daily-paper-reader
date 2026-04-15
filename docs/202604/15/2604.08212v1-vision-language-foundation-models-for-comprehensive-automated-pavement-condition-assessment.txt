@@ -1,0 +1,1944 @@
+Title: Vision-Language Foundation Models for Comprehensive Automated Pavement Condition Assessment
+
+URL Source: https://arxiv.org/pdf/2604.08212v1
+
+Published Time: Fri, 10 Apr 2026 01:04:56 GMT
+
+Number of Pages: 70
+
+Markdown Content:
+# Vision-Language Foundation Models for Comprehensive Automated Pavement Condition Assessment 
+
+Blessing Agyei Kyem a, Joshua Kofi Asamoah a, Anthony Dontoh b,Armstrong Aboah a, ∗
+
+> aDepartment of Civil, Construction and Environmental Engineering, North Dakota State University, Fargo, 58102, ND, USA
+> bDepartment of Civil, Construction and Environmental Engineering, University of Memphis, Memphis, 38152, TN, USA
+
+Abstract 
+
+General-purpose vision-language models demonstrate strong performance in everyday domains but struggle with specialized technical fields requiring pre-cise terminology, structured reasoning, and adherence to engineering stan-dards. This work addresses whether domain-specific instruction tuning can enable comprehensive pavement condition assessment through vision-language models. PaveInstruct, a dataset containing 278,889 image-instruction-response pairs spanning 32 task types, was created by unifying annotations from nine heterogeneous pavement datasets. PaveGPT, a pavement foundation model trained on this dataset, was evaluated against state-of-the-art vision-language models across perception, understanding, and reasoning tasks. Instruction tuning transformed model capabilities, achieving improvements exceeding 20% in spatial grounding, reasoning, and generation tasks while produc-ing ASTM D6433-compliant outputs. These results enable transportation agencies to deploy unified conversational assessment tools that replace mul-tiple specialized systems, simplifying workflows and reducing technical ex-pertise requirements. The approach establishes a pathway for developing instruction-driven AI systems across infrastructure domains including bridge        
+
+> ∗Corresponding author
+> Email addresses: blessing.agyeikyem@ndsu.edu (Blessing Agyei Kyem),
+> joshua.asamoah@ndsu.edu (Joshua Kofi Asamoah), adontoh@memphis.edu (Anthony Dontoh), armstrong.aboah@ndsu.edu (Armstrong Aboah)
+> arXiv:2604.08212v1 [cs.CV] 9 Apr 2026
+
+inspection, railway maintenance, and building condition assessment. 
+
+Keywords: Vision-language models, Instruction tuning, Condition assessment, Infrastructure monitoring, Multimodal learning, Spatial grounding, Foundation models, ASTM D6433 
+
+1. Introduction 
+
+Recent advances in large open-source vision-language models (VLMs), in-cluding QwenVL [1, 2, 3], LLaVA [4, 5] have demonstrated strong capability in multimodal perception and language-guided reasoning tasks. While these models exhibit notable performance in open-domain environments, their di-rect application to specialized technical fields remains limited. Although proprietary models such as ChatGPT, Gemini, and Grok demonstrate strong multimodal capabilities in some technical fields, their limited transparency, inability to fine-tune, and data privacy concerns make them unsuitable for infrastructure assessment where regulatory compliance and reproducibility are essential. In high-precision domains such as medicine and autonomous driving, general-purpose VLMs have shown difficulty reasoning over domain-specific semantics, adhering to specialized terminology, and following struc-tured expert protocols. These limitations have motivated the creation of domain-tailored instruction datasets such as Path-VQA [6] and VQA-RAD [7] for clinical imaging, and nuScenes-QA [8], DriveLM [9], and BDD-X [10] for autonomous driving, leading to dedicated VLMs such as LLaVA-Med [11] and Med-PaLM [12]. These developments underscore a broader con-clusion: general-purpose VLMs are insufficient for expert-level reasoning in domain-critical applications, and performance gains require domain-aligned instruction datasets and supervision strategies. 
+
+Pavement condition assessment presents similar challenges because it in-volves fine-grained distress identification, severity quantification aligned with engineering standards, precise spatial localization, and structured report-ing to support maintenance decision-making. Existing instruction-tuning datasets such as LAION-5B [13], Conceptual Captions [14], COCO Captions [15], Visual Genome [16], and LLaVA-Instruct-150K [17] which are used to train these general-purpose VLMs contain minimal infrastructure content and do not encode pavement engineering terminology or reasoning processes. Consequently, current VLMs often misinterpret pavement distresses, provide nonspecific responses, and fail to follow standardized pavement evaluation 2procedures especially when tested in zeroshot scenarios. Although existing pavement datasets such as CrackSeg9k [18], DeepCrack [19], Crack500 [20], Pavementscapes [21], SVRDD [22], PaveDistress [23], and recent captioning datasets [24, 25] have advanced detection, segmentation, and classification, these datasets are useful for unimodal vision-only tasks and do not provide text or instruction-response supervision required for multimodal technical reasoning, step-wise PCI estimation, or ASTM standards-compliant distress communication. Thus, while some recent works have begun experimenting with VLMs for pavement analysis, they remain constrained by the lack of instruction-grounded, standards-aligned datasets. Recent work has applied VLMs to pavement tasks like zero-shot crack detection and few-shot damage assessment, revealing their potential [26]. RoadBench [27], for instance, offers a benchmark of synthetically captioned road images and introduces RoadCLIP, a non-generative, dual-encoder CLIP model for zero-shot classification and retrieval. However, these efforts face key limitations. First, they rely on prompting general-purpose models rather than fine-tuning domain-specific ones. Second, the captions in the dataset lack instruction-following, conversational structure and are not aligned with ASTM D6433 standards and guidelines. In addition, the models focus on nar-row tasks such as classification or semantic localization. As a result, they fall short of the structured reasoning and instruction-following required for com-prehensive pavement assessment, including distress detection, severity rating, PCI estimation, and maintenance suggestions. Bridging this gap requires in-struction datasets grounded in domain standards and specialized multimodal models capable of end-to-end reasoning across all pavement tasks. To address this gap, this study introduces PaveInstruct , a unique multi-modal instruction-following dataset for pavement condition assessment, and 
+
+PaveGPT , a domain-specialized foundation model trained on this dataset. PaveInstruct integrates pavement imagery with engineering-aligned prompts and structured responses covering distress identification and localization, ASTM-based severity assessment, chain-of-thought PCI estimation, format-ted condition reporting, and maintenance recommendations. By explicitly aligning model supervision with pavement engineering workflows, PaveGPT enables technical dialogue, evidence-grounded reasoning, and standards-compliant interpretation of pavement conditions. This work establishes the founda-tion for instruction-driven pavement intelligence and introduces a unique language-native model designed for automated pavement evaluation and de-cision support. 3The main contributions of the proposed approach are summarized below: 
+
+• PaveInstruct, a comprehensive instruction-following dataset containing 278,889 image-instruction response pairs spanning 32 task types across five major categories, is introduced and will be made publicly available for research purposes to advance vision-language models in infrastruc-ture domains. 
+
+• A systematic pipeline for integrating heterogeneous pavement datasets is developed, addressing annotation format unification, coordinate sys-tem harmonization, and task-specific instruction generation while pre-serving semantic richness and engineering validity across nine diverse data sources. 
+
+• PaveGPT, a domain-specialized vision-language foundation model, is presented and demonstrates strong performance across perception, un-derstanding, and reasoning tasks while maintaining computational effi-ciency suitable for practical deployment in pavement management sys-tems. 
+
+• Comprehensive empirical evidence is provided showing that domain-specific instruction tuning transforms general-purpose VLMs into ca-pable pavement assessment tools, achieving improvements exceeding 20% in spatial grounding, reasoning, and generation tasks, with con-sistent gains across different model architectures and sizes. 
+
+2. Related Works 
+
+This section reviews existing pavement datasets and instruction-following multimodal datasets to establish the gap that PaveInstruct addresses. While pavement datasets have advanced distress detection through classification, detection, and segmentation tasks, they lack the natural language supervision required for training conversational assessment models, which instruction-following datasets have successfully enabled in domains such as medicine and autonomous driving. 
+
+2.1. Existing Pavement datasets 
+
+Numerous pavement datasets have been developed for distress detec-tion, primarily targeting single computer vision tasks with fixed annotation 4formats. This section reviews classification, detection, and segmentation datasets, identifying their limitations for vision-language model training. 
+
+Classification Datasets. Early efforts produced image-level crack datasets to train classifiers distinguishing cracked vs. intact surfaces. For example, Özgenel et al. [28] compiled the Concrete Crack Images for Classification dataset with 40,000 227 ×227 pixel images (20k with cracks, 20k without) de-rived from concrete surfaces on a university campus data. Similarly, Maguire et al. [29] released the SDNET2018 dataset containing 56,000 annotated im-ages of concrete cracks and non-cracks on bridge decks, walls, and pavements. These large image-level datasets provided plentiful data for training deep classifiers, but they only offer coarse labels (crack present or not) without any spatial localization of distress within the image. 
+
+Object Detection Datasets. To enable spatial localization of pavement defects, several works have provided bounding-box annotations. Eisenbach et al. [30] introduced the German Asphalt Pavement Distress (GAPs) dataset, using vehicle-mounted cameras to collect road images labeled with boxes for six types of distresses. This was later extended by Stricker et al. [31] with an expanded GAPs dataset (GAPs v2) that increased the number of images and improved label quality. In Japan, Maeda et al. [32] organized the Road Dam-age Dataset 2018 (RDD2018) with 9,053 roadway images and bounding-box annotations for common road damages. The RDD series has since grown: RDD2020 [33] included 26,336 images from Japan, India, and Chile, and the latest RDD2022 spans 47,420 images from six countries (adding the US, Norway, and China) labeled across four distress categories (longitudi-nal, transverse, alligator cracks, and potholes). More recently, Yang et al. [34] published PaveTrack, a large-scale two-part dataset: pavement images with multi-class distress bounding boxes for object detection and other set of images for tracking the temporal evolution of cracks and potholes. Likewise, Ren et al. [22] developed the Street View Road Damage Dataset (SVRDD) using 8,000 panoramas from Baidu Street View, marking over 20,000 in-stances of pavement damage with bounding boxes. These detection-focused datasets substantially increased scale and diversity, covering multiple distress types and scenes. However, their annotations remain limited to predefined categories and do not capture fine-grained pixel details or any textual de-scriptions. 
+
+Segmentation Datasets . For pixel-precise delineation of cracks, a variety of segmentation datasets have been developed. One early example is Crack-Tree260 by Zou et al. [35], which provided 260 images with cracks manually 5outlined. Another is the CrackForest dataset (CFD) introduced by Shi et al. [36], comprising 118 road images with ground-truth binary masks for cracks. In the deep learning era, larger segmentation benchmarks emerged: Yang et al. [20] compiled the Crack500 dataset with 500 pavement images, each ex-pertly annotated at the pixel level. This dataset includes four common crack types (alligator, longitudinal, transverse, and block cracking) and presents realistic challenges like shadows and complex backgrounds. Similarly, Liu et al. [37] released the DeepCrack dataset, which contains 537 high-resolution images of concrete and asphalt surfaces with finely labeled crack masks. To facilitate benchmarking, recent work has even combined multiple segmenta-tion datasets. For instance, Kulkarni et al. [38] aggregated several sources into the CrackSeg9k collection (about 9,000 images) by unifying their anno-tations and addressing inconsistencies. Overall, segmentation datasets offer precise localization of distress, but each is typically focused on a narrow de-fect type (primarily cracks) and provides no semantic description beyond the mask itself. 
+
+PCI Datasets . In contrast to segmentation datasets, fewer public datasets provide pavement images paired with PCI labels. One notable example is the PCIer dataset [39], which contains pavement images categorized into color-coded condition ranges that correspond to PCI intervals, enabling learning-based condition assessment from visual inputs. More recently, the DSPS24 dataset [40] includes pavement surface images annotated with PCI scores and severity information, supporting supervised PCI estimation and condition classification. These datasets demonstrate that image-level PCI supervision is feasible and has begun to support learning-based condition prediction. However, their scale and diversity remain limited when compared to detection and segmentation benchmarks, and they typically provide coarse condition labels rather than fine-grained, distress-level reasoning. 
+
+2.2. Instruction-following multi-modal datasets 
+
+Instruction-following datasets provide paired examples of multimodal in-puts (e.g. images) with natural language instructions and responses. They enable VLMs to interpret questions, follow commands, and engage in inter-active dialogue across tasks. These datasets have proven critical for training general-purpose multimodal assistants, as they improve zero-shot reasoning and align models with user intent. 
+
+General-Domain Instruction Datasets. General purpose instruction datasets have been developed to help train multimodal LLMs to work across a 6variety of tasks. For instance, Liu et al. [41] introduced LLaVA-Instruct , us-ing GPT-4 to generate 158K image-based instruction-response pairs for train-ing VLMs. This approach produced one of the first multimodal instruction-following datasets and yielded the LLaVA assistant capable of open-ended image descriptions and question-answer pairs. Subsequent efforts scaled up both data and diversity. Chen et al. [42] presented ShareGPT4V, a re-source of 1.2 million high-detail image captions created with GPT-4 Vision. The ShareGPT4V data covers broad visual concepts (objects, spatial rela-tions, aesthetics) and significantly improved fine-tuning of VLMs on general benchmarks. Another notable work is M3IT by Li et al. [43], a multilingual multimodal instruction corpus spanning 40 tasks with 2.4 million vision-text instances and queries translated into 80 languages. Together, these large-scale datasets enable general VLMs to follow open-ended instructions across everyday images. However, they remain focused on common domains and may lack specialized expertise such as in medicine and autonomous driving. 
+
+Domain-Specific Instruction Datasets. Specialized domains have devel-oped instruction-following datasets that inject expert knowledge into VLM training. In medical imaging, He et al. [6] created PathVQA with 4,998 pathology images and 32,799 clinical question-answer pairs, while Lau et al. [7] introduced VQA-RAD containing 315 radiology images with 3,515 clinician-written QA pairs [7]. These datasets enabled models such as LLaVA-Med [11] and Med-Flamingo [44], which can reason through medical images using clinical terminology and generate diagnostic reasoning. In autonomous driving, Qian et al. [8] developed NuScenes-QA with 34,000 street scenes and 460,000 question-answer pairs covering spatial reasoning and safety con-ditions. Kim et al. [10] also contributed BDD-X with 7,000 driving videos and human-written action explanations, while Deruyttere et al. [45] pre-sented Talk2Car containing 12,000 natural language commands for vehicle control. These datasets enabled DriveVLM [46], a multimodal LLM which performs scene description and chain-of-thought navigation reasoning. Be-yond healthcare and transportation, Lobry et al. [47] introduced RSVQA for satellite image analysis using geographic metadata, while datasets such as ScienceQA [48] and AI2D [49] enable scientific diagram interpretation. Sim-ilarly, datasets such as DocVQA [50] and InfographicVQA [51] have enabled document understanding tasks. These domain-specific datasets share com-mon characteristics: technical terminology, spatial reasoning requirements, and expert-level decision protocols. The consistent pattern across domains demonstrates that instruction-following datasets enable specialized VLMs 7with practical expert-assistant capabilities, yet civil infrastructure and pave-ment assessment remain conspicuously absent from this paradigm. 
+
+3. Methodology 
+
+This section describes the creation of PaveInstruct and the development of PaveGPT for instruction-driven pavement assessment. The source datasets and systematic pipeline for generating instruction-response pairs are pre-sented first. The model architecture, training procedure, and comprehen-sive evaluation framework spanning perception, understanding, and reason-ing tasks are then introduced. 
+
+3.1. Source Datasets 
+
+Table 1 shows the datasets with raw annotations that served as our foun-dation to create the PaveInstruct dataset. The PaveInstruct dataset is built from several raw pavement datasets that contain original annotations in for-mats such as bounding boxes, segmentation masks, severity labels, and nu-meric PCI scores. These datasets were not created for instruction-following tasks, but they form the base from which instruction-response pairs were generated. Together, they cover a wide range of distress types, image per-spectives, locations, weather scenarios, and annotation styles. Many of these datasets focus on spatial localization of pavement dis-tresses. For example, the PID dataset includes bounding boxes for block cracks, transverse cracks, potholes, and even sealed variants such as sealed reflective and sealed transverse cracks. PaveTrack dataset adds patched pot-holes and clay-patched cracks, making it possible to distinguish between orig-inal distresses and repaired surfaces. These detailed labels create a strong foundation for generating instructions that reflect practical maintenance sce-narios. Other datasets contribute pixel-level segmentation masks and distress severity information. DSPS23 is a key example because it includes segmen-tation masks along with severity levels such as low, medium, and high. This supports instruction creation that aligns with standardized severity assess-ment. UAV-PDD2023, SVRDD, and UAPD add further diversity by provid-ing annotated images from top-down UAV views and front-facing street-level perspectives, which broadens the range of visual conditions used to generate instructions. 8Additional datasets supply pavement condition ratings that support PCI-focused instruction generation. DSPS24 provides raw numeric PCI scores from 0 to 100, which are suitable for general condition of a pavement sec-tion. PCIer, on the other hand, includes PCI condition categories such as Good, Fair, and Poor, enabling classification-based instruction formats. These datasets link visual features with engineering-based condition ratings. Although the raw datasets differ in format and task emphasis, together they support a wide set of instruction types across detection, segmentaion, severity interpretation, and PCI estimation. Each dataset offers unique ele-ments, such as patched classes, sealed crack variants, or severity levels, which help capture the complexity of real pavement evaluation. The varied image acquisition methods, including UAVs, smartphones, street-view platforms, and infrastructure-mounted sensors, further ensure that the instructions gen-erated from these sources reflect diverse and realistic field conditions. Figure 1 shows some of the images for different datasets used in PaveInstruct. 
+
+3.2. Instruction Generation Pipeline 
+
+Our instruction-generation process is inspired by the design principles of the LLaVA-Instruct-150K dataset [17], which we tailor to the pavement infrastructure domain. 
+
+Task Taxonomy and Generation Framework 
+
+The construction of our instruction-following dataset is grounded in a comprehensive taxonomy of task types that reflects the diverse cognitive, spatial, and professional competencies required for pavement understand-ing. These tasks are organized into five broad categories: Spatial Reasoning Tasks , Condition Assessment Tasks , Professional Workflow Tasks , Reasoning and Analysis Tasks , and Multi-Modal Interaction Tasks . This taxonomy is designed to capture the full spectrum of interactions between visual inputs, spatial cues, engineering-level judgments, and professional decision-making processes essential for comprehensive pavement infrastructure management. Figure 2 shows a summary of all the different task categories and their cor-responding sub-tasks. 
+
+Spatial Reasoning Tasks: These tasks elicit complex spatial understand-ing and localization capabilities from the model, encompassing both precise coordinate-based reasoning and complex spatial relationship analysis. They are critical for training models to perceive, ground, and reason about pave-9PID 
+
+PaveTrack 
+
+UAPD 
+
+DSPS23 
+
+DSPS24 
+
+RDD2022 
+
+SVRDD 
+
+UAV -
+
+PDD2023 
+
+PCIer Figure 1: Sample annotated images across each of the individual datasets in PaveInstruct. 
+
+ment distresses within diverse visual contexts. Below are some of the sub-tasks under the spatial reasoning. 10 Table 1: Summary of Pavement Distress Datasets 
+
+Dataset # Images Distress Types Data Source Geographic Regions Image Perspectives 
+
+PID [52] 7,237 Reflective cracks, Transverse cracks, Block cracks, Longitudinal cracks, Alligator cracks, PCC, Potholes Google Street View API United States Wide-view and top-down aerial view PaveTrack (US) [34] 5,987 Crack, Pothole, Patched crack, Patched pothole, Clay-patched crack, Manhole Mobile vehicle California (United States) Top-down aerial view UAPD [53] 3,151 Transverse cracks, Longitudinal cracks, Alligator cracks, Oblique cracks, Potholes, Repairs UAV-based Nanjing (China) Top-down aerial view DSPS23 [40] 108 Transverse cracks, Longitudinal cracks, Alligator cracks, Block cracks, Manhole, Patching Synthetic dataset — Top-down view DSPS24 [40] 7,000 Numerical PCI values (0–100) Infrastructure-mounted sensors Jefferson City – Missouri, Peoria, Washington – Illinois (United States) Top-down view RDD2022 [33] 47,420 Longitudinal cracks, Transverse cracks, Alligator cracks, Potholes, Other corruption Mixed: Smartphone, Drone, Google Street View Japan, India, Czech Republic, Norway, United States, China Wide, extra-wide, and top-down views SVRDD [22] 8,000 Longitudinal cracks, Transverse cracks, Alligator cracks, Longitudinal patches, Transverse patches, Manhole covers Baidu Street View Beijing (China) Street view (front-facing perspective) UAV-PDD2023 [54] 2,440 Longitudinal cracks, Transverse cracks, Alligator cracks, Oblique cracks, Patching, Potholes UAV aerial capture Tianjin (China) Top-down aerial view PCIer [39] 480 PCI condition classes: Good (70–100), Fair (50–69), Poor (25–49), Very Poor/Failed (0–24) Google Earth California (United States) Aerial view Other sources 7,590 Longitudinal cracks, Transverse cracks, Alligator cracks, Potholes, Ruts, Edge cracking, Patching Online source (Roboflow Universe) — Top-down and perspective aerial views 
+
+• Single Object Grounding: This task requires the model to precisely identify and localize individual pavement distresses through natural language queries, providing exact bounding box coordinates for specific distress instances. E.g. “find the largest pothole in the wheel path.” 
+
+• Multi-Object Enumeration: This capability involves systematic identi-fication and spatial enumeration of all instances within specific distress categories, including comprehensive listing with coordinate verification 11 and spatial distribution analysis. E.g: “list all alligator cracks with their coordinates" or “enumerate all potholes from largest to smallest with bounding boxes." 
+
+• Spatial Relationship Analysis: This task focuses on complex geometric reasoning about relationships between pavement elements, including proximity analysis, intersection detection, and relative positioning as-sessment of distress patterns. E.g: “which crack intersects with the patched area?" 
+
+• Visual Grounding and Referring Expression Comprehension: This ca-pability enables localization of pavement regions through complex natu-ral language descriptions that integrate spatial attributes, distress char-acteristics, and contextual positioning information. E.g: “the spalled area adjacent to the manhole cover." 
+
+• Dense Captioning and Region Description: This task involves gener-ating detailed, spatially-referenced technical descriptions for specific pavement regions, integrating coordinate-based localization with com-prehensive distress characterization. E.g: “Region [245,156,678,344]: Medium-severity alligator crack with interconnected pattern showing edge spalling." 
+
+• Counting with Grounding: This capability combines systematic quan-titative enumeration with spatial coordinate verification, ensuring ac-curate distress counting with precise location documentation for vali-dation purposes. E.g: “count all transverse cracks and provide their coordinates". 
+
+• Ranking and Size Analysis: This task focuses on comparative spatial assessment of distress instances based on size, area, and severity met-rics, requiring quantitative analysis and priority-based ordering capa-bilities. E.g: “rank all distresses by severity from low to high". 
+
+• Multi-Choice Grounding: This capability involves structured spatial reasoning questions with engineering-relevant alternatives, requiring precise visual discrimination and accurate localization among similar distress types. E.g: “Which distress is in the upper-left quadrant? (a) center pothole, (b) right-side crack, (c) top-left alligator crack." 12 • Attribute Grounding: This task emphasizes detailed analysis of distress-specific visual characteristics and material properties, connecting spa-tial localization with technical attribute identification and professional assessment criteria. E.g: “assess the patch material quality at coordi-nates [100,200,300,400]". 
+
+Condition Assessment Tasks: This category emphasizes systematic con-dition evaluation, diagnostic inference, and engineering-based assessment consistent with professional pavement management standards. These tasks are essential for replicating real-world pavement inspection and evaluation workflows. 
+
+• PCI Assessment and Estimation: This task involves systematic esti-mation of Pavement Condition Index values following ASTM D6433 methodology, including comprehensive reasoning chains that connect observed distresses to quantitative condition ratings. E.g: “provide a PCI rating with step-by-step ASTM D6433 reasoning." 
+
+• Severity Classification and Grounding: This capability focuses on de-tailed classification of individual distress severity levels using profes-sional criteria, requiring evidence-based justification through specific visual indicators and engineering assessment standards. E.g: “classify this alligator crack as Low/Medium/High severity and justify using ASTM criteria" or “assess the severity level of the pothole at coordi-nates [150,250,300,350]." 
+
+• Condition Classification: This task involves systematic assignment of overall pavement condition categories based on comprehensive distress analysis, incorporating structural integrity assessment and functional performance evaluation. E.g: “classify this pavement as Excellent/-Good /Fair/Poor/Failed based on visible distresses" or “determine the overall condition rating and provide supporting evidence." 
+
+• Performance Assessment: This capability emphasizes evaluation of current pavement functional capacity and prediction of performance degradation patterns based on observable distress characteristics and structural condition indicators. E.g: “assess how these distresses im-pact ride quality and vehicle operations". 13 • Quick Assessment: This task focuses on streamlined evaluation method-ologies designed for immediate field decision-making, providing rapid but accurate condition classifications for operational efficiency. E.g: “immediate repair needed? (Yes/No)". 
+
+• Detailed Engineering Analysis: This capability involves comprehensive technical evaluation that integrates multiple distress interactions, fail-ure mechanism analysis, and systematic engineering assessment method-ologies for complex pavement conditions. E.g: “analyze the interaction between fatigue cracking and environmental deterioration". 
+
+• Distress Identification: This task emphasizes systematic recognition and professional classification of specific pavement failure modes, re-quiring accurate application of technical nomenclature and diagnostic criteria. E.g: “identify and classify all visible distress types using ASTM terminology". 
+
+Professional Workflow Tasks: These tasks replicate professional pave-ment management workflows, incorporating industry-standard practices, doc-umentation requirements, and decision-making protocols used in real-world infrastructure management. 
+
+• Infrastructure Analysis: This capability involves comprehensive assess-ment of pavement infrastructure elements and their interaction with overall pavement condition, including evaluation of repair effectiveness and asset management implications. E.g: “evaluate the performance of existing patches". 
+
+• Treatment and Repair Recommendation: This task focuses on develop-ment of specific maintenance and rehabilitation strategies based on ob-served conditions, incorporating professional standards, cost-effectiveness analysis, and treatment prioritization methodologies. E.g: “recom-mend specific repair treatments for each identified distress". 
+
+• Safety and Functional Analysis: This capability emphasizes evaluation of distress impacts on vehicle operations, traffic safety, and functional capacity, including risk assessment and operational mitigation strategy development. E.g: “assess tire damage risk from these potholes". 14 • Field Practical Assessment: This task involves simulation of actual pavement inspection scenarios under real-world constraints, including equipment limitations, environmental factors, and practical decision-making requirements. E.g: “conduct inspection under time constraints". 
+
+• Checklist Filling: This capability focuses on systematic completion of standardized assessment documentation and regulatory compliance protocols, ensuring proper data collection and professional reporting standards. E.g: “complete ASTM D6433 survey form for this section". 
+
+• Maintenance Decision: This task emphasizes strategic decision-making processes involving resource allocation, timing optimization, and com-prehensive pavement management program development based on con-dition assessment findings. E.g: “prioritize repair schedule for budget allocation". 
+
+Reasoning and Analysis Tasks: This category focuses on demonstrating systematic analytical thinking and professional reasoning processes, training models to exhibit transparent decision-making methodologies consistent with engineering practice. 
+
+• Chain-of-Thought Reasoning: This capability involves systematic demon-stration of professional assessment methodology, showing explicit pro-gression from initial observation through analytical stages to final rec-ommendations with transparent reasoning chains. E.g: “walk through your assessment process step-by-step from initial observation to final PCI calculation". 
+
+• Complex Engineering Reasoning: This task focuses on detailed ana-lytical integration of multiple distress factors, material considerations, and structural implications to produce comprehensive condition assess-ments and strategic recommendations. E.g: “analyze how traffic load-ing, environmental factors, and material aging interact to produce this distress pattern". 
+
+• Comparative Analysis: This capability emphasizes systematic compar-ison methodologies for multiple distresses or pavement sections, in-cluding relative assessment, priority ranking, and resource allocation decision-making with quantitative justification. E.g: “compare repair urgency between the pothole and alligator crack". 15 • Corrective Reasoning: This task involves identification and correction of assessment errors and professional misconceptions, promoting quality assurance and accurate judgment development through error analysis and educational guidance. E.g: “this crack was misclassified as high severity - explain why it’s actually medium severity". 
+
+• Step-by-Step Reasoning: This capability focuses on methodical demon-stration of professional assessment protocols, showing systematic pro-gression through evaluation stages with explicit justification for each analytical decision point. E.g: “demonstrate the systematic procedure for PCI calculation with explicit steps". 
+
+• Counterfactual Analysis: This task emphasizes analytical examination of alternative scenarios and hypothetical conditions, requiring predic-tive reasoning about potential outcomes and alternative assessment in-terpretations under different circumstances. E.g: “what would happen if this alligator crack were left untreated for two years?". 
+
+Multi-Modal Interaction Tasks: These tasks encompass complex inter-action modalities that integrate visual analysis with diverse response formats, conversation patterns, and professional communication requirements. 
+
+• Multi-Length Caption Generation: This capability involves production of technical descriptions at varying complexity levels tailored to dif-ferent professional communication contexts, from brief field documen-tation to comprehensive inspection reporting requirements. E.g: brief field note “3 potholes, medium severity" 
+
+• Multi-Turn Professional Consultation: This task focuses on extended technical dialogues that simulate real engineering consultations, main-taining progressive complexity development and technical coherence across multiple conversational exchanges. E.g: progressive dialogue from “what distresses do you see?" to “which requires priority?" to “what treatment strategy?" to “what’s the implementation timeline?" 
+
+• Multi-Image Comparison: This capability emphasizes systematic com-parative analysis across multiple pavement images, requiring integra-tion of visual evidence from diverse sources and comprehensive condi-tion assessment across different infrastructure sections. E.g: “compare the deterioration levels between these three pavement sections". 16 • Scene Summarization: This task involves comprehensive synthesis of overall pavement condition based on multiple distress distributions and infrastructure elements, providing executive-level summaries suitable for management decision-making and strategic planning. E.g: “sum-marize critical maintenance needs across this pavement section." PaveInstruct 
+
+32 Task Types 
+
+5 Categorie s
+
+> Figure 2: Overview of the PaveInstruct task taxonomy
+
+17 3.2.1. Multi-Source Dataset Integration Pipeline 
+
+The creation of PaveInstruct requires systematic integration of annota-tions across heterogeneous data sources, each employing distinct annotation schemas optimized for specific computer vision tasks. This integration chal-lenge stems from the diverse origins and intended applications of the source datasets, which collectively span object detection, segmentation, condition assessment, and infrastructure management domains. We address this com-plexity through a structured four-stage pipeline that preserves annotation semantics while establishing consistency. Figure 3 shows the overall frame-work for PaveInstruct creation. 
+
+Stage 1: Annotation Format Unification 
+
+The initial stage addresses the fundamental heterogeneity of annotation formats across our nine source datasets. These datasets employ four dis-tinct annotation schemas: YOLO normalized coordinates, Pascal VOC XML structures, color-coded classification systems, and CSV-based condition rat-ings. Table 2 shows the different annotation formats for the datasets. Each format reflects the computational requirements and domain conventions of its respective research community, creating incompatibilities that must be resolved before instruction generation. 
+
+> Table 2: Dataset Annotation Formats and Task Types
+
+Dataset Annotation Format Task Type 
+
+PID [52] YOLO Distress Detection PaveTrack (US) [34] YOLO Distress Detection UAPD [53] Pascal VOC XML Distress Detection DSPS23 [40] COCO Severity Estimation DSPS24 [40] CSV PCI Assessment RDD2022 [33] YOLO Distress Detection SVRDD [22] YOLO Distress Detection UAV-PDD2023 [54] Pascal VOC XML Distress Detection PCIer [39] Color-coded Folders PCI Classification YOLO format datasets, including RDD2022, PaveTrack, and SVRDD, 18 encode bounding boxes as normalized center coordinates with relative width and height: 
+
+byolo = ( xc, y c, w, h ) ∈ [0 , 1] 4 (1) where xc, y c represent normalized center coordinates, and w, h denote relative width and height respectively. Pascal VOC datasets, such as UAPD and UAV-PDD2023, specify absolute pixel coordinates as corner points: 
+
+bvoc = ( xmin , y min , x max , y max ) ∈ R4 (2) where (xmin , y min ) and (xmax , y max ) represent top-left and bottom-right corner coordinates respectively. Color-coded datasets like PCIer represent condition classifications through chromatic encoding: 
+
+c = {Green, Blue, Y ellow, Red }7→ { Good, F air, P oor, F ailed } (3) CSV-based datasets such as DSPS24 provide direct numeric condition indices: 
+
+s ∈ [0 , 100] (4) where s represents the pavement condition index score. The unification process transforms these heterogeneous representations into a standardized annotation schema Aunif ied that preserves semantic con-tent while enabling consistent computational processing. We define the trans-formation function: 
+
+Aunif ied = U(Ayolo , Apascal , Acolor , Acsv ) (5) where U represents the unification operator that maps diverse annotation formats to a common representation space, and Ayolo , Apascal , Acolor , Acsv de-note annotations from YOLO, Pascal VOC, color-coded, and CSV formats respectively. This operator applies format-specific conversion functions while maintaining annotation integrity: 
+
+U = ϕyolo ◦ ϕpascal ◦ ϕcolor ◦ ϕcsv (6) 19 where ϕyolo , ϕ pascal , ϕ color , ϕ csv represent format-specific transformation func-tions. The YOLO-to-unified transformation ϕyolo converts normalized coor-dinates to absolute pixel coordinates: 
+
+ϕyolo (byolo ) =( xc · W − w · W/ 2, y c · H − h · H/ 2,xc · W + w · W/ 2, y c · H + h · H/ 2) (7) where (W, H ) denotes image dimensions in pixels. The Pascal VOC trans-formation ϕpascal preserves absolute coordinates while ensuring consistent in-dexing conventions. Color-coded transformations ϕcolor map chromatic clas-sifications to standardized condition categories, while CSV transformations 
+
+ϕcsv integrate numeric indices with spatial metadata when available. The resulting unified annotation schema maintains three core compo-nents: spatial localization data L ∈ R4 for distress positioning, semantic classification S for distress type identification, and condition assessment C
+
+for severity or PCI rating. This standardization enables consistent instruc-tion generation across all source datasets while preserving the semantic rich-ness inherent in each original annotation format. The unified representa-tion supports both spatial reasoning tasks that require precise localization and assessment tasks that emphasize condition evaluation and maintenance decision-making. 
+
+Stage 2: Coordinate System Harmonization 
+
+The second stage addresses geometric inconsistencies in bounding box coordinates arising from diverse image resolutions and aspect ratios across source datasets. Raw bounding box annotations are tied to original im-age dimensions, creating coordinate spaces that vary significantly between datasets. This variability impedes spatial reasoning tasks that require con-sistent geometric relationships for distress localization. Let borig ∈ R4 denote original bounding box coordinates and (Horig , W orig )
+
+represent original image dimensions. We implement a bounding box normal-ization process that transforms coordinates to a standardized reference frame while preserving spatial relationships. The coordinate transformation func-tion Tbbox maps original bounding boxes to normalized coordinate space: 
+
+bnorm = Tbbox (borig , H orig , W orig , H target , W target ) (8) where bnorm ∈ R4 represents normalized bounding box coordinates and 20 (Htarget , W target ) denotes target image dimensions. The transformation em-ploys scaling factors: 
+
+sx = Wtarget 
+
+Worig 
+
+, sy = Htarget 
+
+Horig 
+
+(9) to ensure proportional bounding box adjustment across coordinate sys-tems. The harmonization process computes spatial relationship matrices that capture geometric dependencies between bounding box pairs: 
+
+Rspatial ∈ Rn×n (10) where n represents the number of distress instances and Rspatial encodes proximity measures, overlap ratios, and directional relationships. This uni-fied coordinate system enables consistent spatial reasoning for instruction generation tasks requiring precise distress localization and cross-dataset ge-ometric analysis. 
+
+Stage 3: Task-Specific Instruction Generation 
+
+The third stage implements domain-constrained synthesis to generate instruction-response pairs based on the established task taxonomy and dif-ferent dataset-specific instruction modules. This process utilizes a large lan-guage model as controlled generation engine within systematic engineering frameworks, ensuring technical accuracy while maintaining instructional di-versity across both spatial reasoning and assessment task categories. We define the task-specific generation function ΓT that produces instruction-response pairs for task type T :
+
+(qi, ri) = Γ T (Vi, Aunif ied , ΨT , Lj ) (11) where qi represents the generated instruction, ri denotes the correspond-ing response, ΨT encodes task-specific system prompts, and Lj ∈ { short, medium, long }
+
+specifies instruction length variants. 
+
+Prompt Structure and Templates. Each task category employs special-ized system prompts that inject domain expertise and constrain generation within professional engineering workflows. The prompt structure ΨT system-atically integrates three components: 
+
+ΨT = Ω domain ⊕ ΣAST M ⊕ Θtask (12) 21 where Ωdomain enforces pavement engineering terminology, ΣAST M injects ASTM D6433 compliance requirements, and Θtask provides task-specific gen-eration constraints. To apply this structure in practice, we define six broad template families: captioning, chain-of-thought, grounding, PCI-specific, corrective, and multi-turn. Captioning templates generate short, medium, or long descriptions of visual content. Chain-of-thought prompts elicit step-by-step reasoning, es-pecially for PCI estimation and severity analysis. Grounding templates han-dle localization, spatial comparison, object ranking, and region descriptions. PCI-specific prompts include condition estimation, justification, checklist fill-ing, and treatment suggestions. Corrective prompts simulate user mistakes and trigger expert clarifications. Multi-turn templates model progressive engineering conversations from initial inspection to maintenance planning. These template families ensure that instruction generation is task-aligned, diverse, and reflective of real-world pavement evaluation workflows. Each template family supports multiple complexity levels, described next. 
+
+Variable Length Generation. The generation process produces instruc-tion variants across three complexity levels to ensure comprehensive model training: 
+
+IL = {ΓT (Vi, Aunif ied , ΨT , Lj )}Lj (13) where Lj ∈ { short, medium, long }.where short instructions focus on direct identification, medium instruc-tions incorporate contextual reasoning, and long instructions demand com-prehensive technical analysis with detailed justifications. 
+
+Multi-turn Conversation Creation. As one of the six template families, multi-turn prompts model engineering conversations across multiple dialogue turns. Progressive technical dialogues simulate real-world engineering con-sultations through structured conversation patterns: 
+
+Ck = Γ multi (Vi, Aunif ied , {Ψt}Tt=1 ) (14) where Ck represents conversation k with T turns, and {Ψt}Tt=1 denotes turn-specific prompts that progressively increase technical depth from initial observation through detailed analysis to maintenance recommendations. 
+
+Stage 4: Quality Assurance and Validation 
+
+22 Figure 3: PaveInstruct Dataset Creation Pipeline 
+
+To ensure the accuracy and engineering relevance of the generated instruction-response pairs, we implement a multi-stage quality assurance process that combines automated validation with expert human review. Each sample is first checked for structural integrity, including the presence of required fields such as bounding boxes, severity labels, or PCI values, depending on task type. Domain-specific consistency checks are then applied to verify that the terminology and reasoning used in responses align with ASTM D6433 standards and pavement engineering conventions. For instance, PCI predic-tions are validated to fall within the permissible range [0, 100] and to cor-respond logically with described distresses. Beyond these automated checks, we conduct targeted human validation by licensed pavement engineers and domain experts, who review a diverse subset of samples for technical correct-ness, language clarity, and alignment with real-world inspection practices. This expert review stage is critical for identifying subtle inconsistencies, hal-lucinated reasoning, or misclassifications that automated filters may miss. These layered validation procedures ensure that PaveInstruct provides high-quality, instruction-tuned supervision that reflects professional standards in pavement evaluation and maintenance planning. 23 3.2.2. PaveInstruct Dataset Statistics and Analysis 
+
+The final PaveInstruct dataset consists of 278,889 instruction–response pairs derived from nine core datasets, covering diverse distress types, image perspectives, and condition annotations. Figure 4 shows the distribution of instruction counts across the source datasets. SVRDD, RDD2022, and PID collectively contribute the largest share of instructions, reflecting their large image pools and high distress density. In contrast, DSPS23 and PCIer contain fewer samples due to limited original annotations or narrower task scopes. 
+
+> Figure 4: Instruction count per source dataset.
+
+Across datasets, the number of annotated distress classes varies, as shown in Figure 5. PID has the highest number of distinct distress types (8), fol-lowed closely by SVRDD and DSPS23, each with 6–7 categories. Notably, DSPS23’s original fine-grained labels for severity levels have been consoli-dated into core distress classes, such as alligator, block, longitudinal, and transverse cracks. In contrast, RDD2022 contains only 5 distress types, in-dicating a more focused annotation scope. 24 Figure 5: Number of distress classes per dataset. 
+
+Figure 6 shows the distribution of distress types in PaveInstruct. The left plot confirms that longitudinal, transverse, and alligator cracks are the most common, with longitudinal cracks appearing over 38,000 times. Less fre-quent distress types include oblique cracks, manholes, and reflective variants. The right plot shows that most datasets such as RDD2022, PID, and UAV-PDD23 are dominated by crack-related annotations. In contrast, SVRDD and DSPS23 contain a more balanced mix, including patches, potholes, man-holes, and surface defects. This label diversity enables both crack-focused and general pavement reasoning tasks. 25 Figure 6: (Left) Global distress type frequencies. (Right) Percentage distribution of dis-tress categories by dataset. 
+
+Instruction-response pairs in PaveInstruct span both single-turn and multi-turn interactions. As shown in Figure 7, 20.6% of samples are multi-turn professional consultations, simulating real-world inspection dialogues. The remaining 79.4% are single-turn Q&A, primarily used for direct spatial or diagnostic queries. 
+
+> Figure 7: Distribution of single-turn vs. multi-turn conversations.
+
+Figure 8 further breaks down the number of conversation turns in multi-26 turn samples. The majority of conversations consist of 2–3 turns, with a long tail of deeper dialogues extending to 7–8 turns, enabling progressive reasoning and contextual follow-up. 
+
+> Figure 8: Distribution of conversation turns per dialogue.
+
+The dataset also supports length variation across answers, reflecting dif-ferent instruction formats and reasoning depth. Figure 9 shows the distribu-tion of answer lengths. Most responses range between 50–150 words, with a smaller proportion of long-form answers exceeding 200 words, particularly in detailed PCI reasoning or engineering dialogues. 27 Figure 9: Distribution of answer word counts. 
+
+To support diverse training objectives, PaveInstruct instructions are grounded in a range of answer formats. Figure 10 illustrates the proportion of coordinate-based outputs (31%), descriptive text (19.2%), and other types including short answers, multiple choice, and chain-of-thought reasoning. This vari-ation ensures the dataset supports both visual grounding and structured reasoning tasks. 28 Figure 10: Distribution of answer formats in PaveInstruct. 
+
+Figure 11 presents representative instruction–response pairs sampled from PaveInstruct across different pavement images and task families. Each exam-ple reflects a distinct instruction type, including grounding, condition assess-ment, maintenance recommendation, captioning, corrective reasoning, PCI estimation, and ranking. While the images vary, all tasks follow a consistent format that links visual input to structured or explanatory responses. Some instructions focus on spatial understanding, such as locating a specific crack, while others require reasoning, such as justifying a PCI score or suggesting appropriate repairs. 29 Human 
+
+Locate the crack at the far left edge of 
+
+the image. 
+
+[0, 193, 89, 559]. This crack is 
+
+located along the far left edge of 
+
+the image, extending vertically 
+
+from approximately the middle 
+
+towards the bottom. The visual 
+
+cues confirming this identification 
+
+include the distinct linear 
+
+separation in the pavement surface, 
+
+which is characteristic of a vertical 
+
+crack. The edges of the crack 
+
+appear slightly jagged, indicating 
+
+some degree of weathering or 
+
+deterioration. 
+
+GPT 
+
+Single  Object  Grounding 
+
+What is the overall condition of this 
+
+pavement section based on the 
+
+observed distresses? 
+
+The overall condition of this 
+
+pavement section can be rated 
+
+as fair to moderate. The primary 
+
+distress observed is an oblique 
+
+crack located at coordinates 
+
+[876, 466, 1453, 990. This type 
+
+of crack often reflects loading 
+
+patterns and may indicate 
+
+localized structural weakness. 
+
+Additionally, there is a repaired 
+
+area at coordinates 
+
+[389, 76, 879, 514], suggesting 
+
+previous maintenance efforts. 
+
+GPT 
+
+Condition Assessment 
+
+Human  Human 
+
+GPT 
+
+The maintenance crew should 
+
+prioritize crack sealing for the 
+
+transverse cracks. These cracks, 
+
+are indicative of thermal stress 
+
+and require immediate attention 
+
+to prevent further deterioration. 
+
+The crew should apply a high -
+
+quality sealant that is compatible 
+
+with the existing pavement 
+
+material. It is crucial to clean the 
+
+cracks thoroughly before sealing 
+
+to ensure proper adhesion. 
+
+What would you tell a maintenance 
+
+crew about addressing the transverse 
+
+cracks observed at coordinates 
+
+[917, 963, 1238, 1005] and 
+
+[900, 385, 1129, 433]? 
+
+Field Practical Assessment 
+
+Human 
+
+Create a technical engineering caption 
+
+that focuses on distress severity 
+
+assessment and classification 
+
+The alligator cracking observed in 
+
+the image exhibits high severity, 
+
+characterized by a dense network of 
+
+interconnected cracks. Based on the 
+
+crack width and interconnection 
+
+patterns, this appears to be a result 
+
+of repeated heavy loads and material 
+
+fatigue. The high severity 
+
+classification is supported by the 
+
+extensive area affected and the 
+
+potential for further degradation. 
+
+GPT 
+
+Based on the provided image, I 
+
+believe the alligator cracking 
+
+observed should be classified as 
+
+medium severity rather than high 
+
+severity. The cracks don't seem 
+
+extensive enough to warrant such 
+
+a high classification. 
+
+I notice there's an incorrect 
+
+assumption in your question 
+
+regarding the severity classification 
+
+of the alligator cracking. Actually, 
+
+what we're seeing here is indeed 
+
+indicative of high severity alligator 
+
+cracking. The key distinction is in 
+
+the density and interconnectedness 
+
+of the cracks, which cover a 
+
+significant portion of the pavement 
+
+surface. The extensive network of 
+
+closely spaced cracks indicating 
+
+advanced deterioration. 
+
+GPT 
+
+Human  Human 
+
+The PCI value of 36.0 was 
+
+determined through systematic 
+
+assessment of observable distresses 
+
+per ASTM D6433. Key steps 
+
+included: (1) Identifying severe 
+
+alligator cracking (interconnected 
+
+network of wide cracks forming 
+
+polygonal patterns) as the primary 
+
+distress; (2) Classifying severity as 
+
+"High"  due to crack widths 
+
+exceeding ¼ inch, extensive spalling, 
+
+and structural degradation; (3) 
+
+Estimating extent at approximately 
+
+30% of the pavement area; (4) 
+
+Applying ASTM deduct value tables, 
+
+where high -severity alligator 
+
+cracking in this extent range yields 
+
+substantial deductions (~60 points); 
+
+(5) Accounting for secondary 
+
+distresses (faded markings, minor 
+
+surface defects) adding ~4 -8 points 
+
+in deductions; (6) Calculating 
+
+cumulative deducts of ~64 points 
+
+(100  - 64 = 36). This places the 
+
+pavement in the  "Very  Poor"  (25 -39) 
+
+condition class, consistent with the 
+
+observed advanced deterioration. 
+
+Explain how the PCI value of 36.0 
+
+was determined from the observed 
+
+pavement conditions. 
+
+GPT 
+
+Human 
+
+Preventive treatment. Given the single 
+
+instance of a longitudinal crack, preventive 
+
+measures such as crack sealing are appropriate 
+
+to prevent further deterioration. 
+
+Primary maintenance recommendation 
+
+for this section: (a) Routine maintenance 
+
+(b) Preventive treatment (c) Corrective 
+
+repair (d) Reconstruction required  Which crack is the largest in the 
+
+image, and what is its area? 
+
+The largest crack is located at 
+
+[260, 0, 381, 588] 
+
+Human 
+
+GPT  GPT 
+
+Multi -Length Caption Generation  Corrective  Reasonin g
+
+Step -by -Step  Reasoning 
+
+Quick  Assessmen t
+
+Ranking and Size Analysis Figure 11: Representative instruction-response pairs from PaveInstruct across multiple task families. 
+
+30 3.3. Problem Structure and Overview 
+
+Pavement infrastructure assessment encompasses diverse tasks including visual captioning, visual question answering, object detection, severity clas-sification, PCI estimation, and maintenance recommendation. Traditional approaches require separate specialized models for each task, creating opera-tional challenges for comprehensive evaluation. We address this limitation by developing PaveGPT, a unified vision-language foundation model for pave-ment assessment. We formulate the problem as follows. Given a pavement image I ∈ RH×W ×3 and a natural language instruction 
+
+Q, the goal is to generate an appropriate response R. Instructions can request operations such as “Describe the pavement condition,” “Locate all potholes with bounding boxes,” or “Estimate the PCI value.” The response space R
+
+is a union of multiple output modalities: 
+
+R = Rtext ∪ R bbox ∪ R numeric ∪ R class (15) where Rtext represents natural language responses, Rbbox ⊂ RN ×4 denotes bounding box coordinates, Rnumeric ∈ R captures continuous values like PCI scores, and Rclass represents discrete labels such as severity levels. The core challenge is learning a unified model fθ that maps instruction-image pairs to appropriate responses: 
+
+fθ : ( I, Q) → R (16) PaveGPT builds upon a vision-language architecture consisting of a vision transformer encoder Ev, a large language model backbone Mllm , and cross-modal projection layers P. The image is encoded into visual tokens V =
+
+Ev(I) ∈ RLv ×d and aligned to the language model’s embedding space through projection V′ = P(V). The instruction is tokenized as Q = [ q1, q 2, ..., q Lq ].PaveGPT generates responses autoregressively: 
+
+R = Mllm ([ V′, Q]; θ) (17) This architecture treats all outputs as sequences, enabling unified handling of diverse formats. Bounding box coordinates and PCI scores are generated as text tokens representing numerical values. We train PaveGPT through supervised fine-tuning on PaveInstruct. The training objective minimizes the negative log-likelihood of target responses: 
+
+L(θ) = −
+
+> N
+
+X
+
+> i=1
+
+log p(ri, 1, ..., r i,T i |I i, Qi; θ) (18) 31 where N is the total number of training samples, ri,t denotes the t-th token in the target response for sample i, and Ti is the response length. The autoregressive factorization is: 
+
+p(Ri|I i, Qi; θ) = 
+
+> Ti
+
+Y
+
+> t=1
+
+p(ri,t |I i, Qi, r i,<t ; θ) (19) The language model’s pre-trained knowledge of numerical reasoning and spatial relationships transfers to pavement-specific tasks. Our PaveInstruct dataset provides approximately 278,000 instruction-response pairs spanning 32 task types across five major categories, enabling PaveGPT to develop robust visual understanding that generalizes across task boundaries. The resulting foundation model seamlessly transitions between distress identi-fication, condition estimation, and maintenance recommendations through natural language interaction. 
+
+3.3.1. Overall Architecture 
+
+PaveGPT adopts the Qwen2.5-VL architecture, which follows a vision-language encoder-decoder design optimized for multimodal understanding. The model inherits three core components from Qwen2.5-VL: the vision transformer encoder, the large language model backbone, and the multimodal projection module. We adapt these components and conduct supervised fine-tuning on PaveInstruct to specialize the model for pavement infrastructure assessment. Figure 12 shows the overall architecture for PaveGPT. 
+
+3.3.2. Vision Encoder 
+
+The vision encoder Ev inherits the Vision Transformer (ViT) architec-ture from Qwen2.5-VL, which incorporates several optimizations for efficient processing. The encoder employs 2D-RoPE and window attention mecha-nisms that partition the image into non-overlapping windows for localized self-attention computation, reducing complexity while preserving spatial re-lationships crucial for distress localization. Given an RGB pavement image I ∈ RH×W ×3, the encoder applies dy-namic resolution processing to preserve fine-grained details. The image is partitioned into patches of size p × p, and each patch is linearly embedded to produce visual tokens: 
+
+V = Ev(I) ∈ RLv ×d (20) 32 where Lv = ⌊H/p ⌋ × ⌊ W/p ⌋ is the number of patches and d is the encoder’s hidden dimension. The encoder uses SwiGLU activations and RMSNorm for layer normalization, following modern transformer design principles. We initialize the vision encoder with Qwen2.5-VL’s pre-trained weights and keep it frozen during fine-tuning. This preserves the strong general visual representations learned during Qwen2.5-VL’s pre-training, which include low-level visual features (edges, textures, colors) and high-level concepts (objects, spatial relationships) that transfer effectively to pavement distress recogni-tion. The frozen encoder provides stable visual features or cues that the trainable projection module learns to align with pavement-specific language. 
+
+3.3.3. Cross-Modal Projection 
+
+The multimodal projection module P bridges the vision encoder’s out-put space and the language model’s input space. This alignment is critical for enabling the language backbone to process visual information effectively alongside text instructions. The projection is implemented as a learnable multilayer perceptron (MLP) that transforms visual embeddings V into the language model’s embedding space: 
+
+V′ = P(V) = MLP (V) ∈ RLv ×dllm (21) where dllm is the language model’s hidden dimension. The projected visual tokens V′ are then concatenated with the tokenized instruction Q to form the input sequence: 
+
+X = [ V′, Q] ∈ R(Lv +Lq )×dllm (22) During training, we update the projection MLP parameters while keep-ing the vision encoder frozen, allowing the model to learn pavement-specific visual-language alignment without disrupting the rich pre-trained visual rep-resentations. 
+
+3.3.4. Language Backbone 
+
+The language backbone Mllm is a decoder-only transformer initialized from Qwen2.5-VL’s large language model component. The backbone has been pre-trained on extensive general-domain corpora and multimodal instruction-following data, providing strong capabilities in natural language understand-ing, numerical reasoning, and structured output generation. The language model processes the concatenated sequence X = [ V′, Q]
+
+through multiple transformer decoder layers with causal self-attention. At 33 each generation step t, the model computes: 
+
+p(rt|I , Q, r <t ; θ) = softmax (WoMllm (X, r <t )) (23) where Wo projects the hidden states to vocabulary logits. This autoregres-sive generation enables the model to produce diverse output formats ranging from natural language descriptions to structured coordinates as token se-quences. Through supervised fine-tuning on PaveInstruct, the language backbone learns pavement engineering terminology, ASTM D6433 distress definitions, PCI calculation reasoning, and domain-specific spatial language for describ-ing distress locations. The pre-trained numerical reasoning capabilities trans-fer effectively to tasks requiring coordinate generation and PCI estimation. Pavement Image        
+
+> 𝐼 ∈ℝ𝐻 ×𝑊 ×3
+> Locate all distresses
+> with bounding boxe s
+> Instruction
+> 𝑝 ×𝑝
+> patches
+> Dynamic
+> Resolution
+
+ViT Block 
+
+> RMSNor m
+
+# ⋮
+
+ViT Block       
+
+> SwiGL U
+> RMSNor m
+> Visual tokens
+> VISION
+> ENCODER
+> CROSS -
+> MODAL
+> PROJECTION
+> Linea r
+> SwiGLU
+> RMSNor m
+> Causal Attention
+> Response
+> tokens
+> RMSNor m
+> LM hea d
+> Decoder Laye r
+> Feed Forward
+> RMSNor m
+> Decoder Laye r
+> (𝑋  = 𝑉 ′, 𝑄  )
+> Feed Forward
+> Causal Attention
+> RMSNor m
+
+## ⋮  
+
+> LLM BACKBONE
+> Window Attention
+> Window Attention
+> Multi -Modal
+> Responses ( ℛ)
+> Linea r
+> Activatio n
+> (𝑉 )
+> visual
+> embeddings
+> (𝑉 ′)
+> Text tokens ( 𝑄 )
+> aligned
+> visual
+> tokens
+> LLM
+> Tokenizer
+> Frozen (Pre -trained )Traine d
+
+Figure 12: PaveGPT architecture 
+
+3.3.5. Training and Optimization 
+
+PaveGPT is fine-tuned on the PaveInstruct training split using the au-toregressive objective defined in Equations 18 and 19. During supervised fine-tuning, the vision tower remains frozen, while the multimodal projec-tion MLP and the language backbone are updated. This setup keeps the 34 general visual representations of Qwen2.5-VL intact and directs learning to-ward cross-modal alignment and pavement-specific reasoning. We use the AdamW optimizer with separate learning rates for the two trainable modules: a small learning rate of 2 × 10 −7 for the language model parameters and a higher learning rate of 5 × 10 −4 for the multimodal MLP. The learning rate follows a cosine decay schedule with a warmup ratio of 0.03 and weight decay of 0.01. To stabilize optimization, we apply gradient clipping with a maximum norm of 1.0 and enable gradient checkpointing. Fine-tuning runs for 10 epochs with a per-device batch size of 16 and gradient accumulation over 4 steps. The maximum sequence length is set to 8,192 tokens so that the model can handle long instructions and multi-turn examples. Training was conducted on the iTiger HPC cluster utilizing 8 NVIDIA H100 GPUs for 2 consecutive days, resulting in a cumulative total of 384 GPU hours [55]. The main hyperparameters are summarized in Table 3. 
+
+> Table 3: Key hyperparameters used for fine-tuning PaveGPT.
+
+Parameter Value 
+
+Training epochs 10 Per-device train batch size 16 Gradient accumulation steps 4Learning rate (LLM) 2 × 10 −7
+
+Learning rate (MM-MLP) 5 × 10 −4
+
+Weight decay 0.01 Warmup ratio 0.03 Learning-rate scheduler Cosine decay Max sequence length 8,192 tokens 
+
+3.4. Evaluation Metrics 
+
+We evaluate PaveGPT across diverse pavement engineering tasks using a comprehensive framework of metrics tailored to different capability cate-gories. Our evaluation strategy is organized into four primary groups: Spatial Grounding Metrics for object localization tasks, Structured Region Analysis Metrics for classification and parsing tasks, Reasoning and Comparative As-sessment Metrics for complex analytical tasks, Vision-Language Generation Metrics for text generation tasks, and PCI Regression Metrics for pavement 35 condition index assessment. Each metric group employs specialized evalua-tion approaches suited to the unique characteristics and requirements of its respective task category. 
+
+3.4.1. Spatial Grounding Metrics 
+
+Spatial grounding tasks assess the model’s ability to localize pavement distresses by generating precise bounding box coordinates from natural lan-guage descriptions. These tasks include object detection grounding, referring expression comprehension, and spatial relationship analysis. We evaluate spatial grounding performance through metrics based on the overlap between predicted and ground truth bounding boxes. 
+
+Intersection over Union . The Intersection over Union (IoU) [56] metric serves as the foundation for all spatial grounding evaluation. It quantifies the spatial overlap between a predicted bounding box and its corresponding ground truth annotation. For a predicted bounding box Bpred = [ xp
+
+> 1
+
+, y p 
+
+> 1
+
+, x p
+
+> 2
+
+, y p 
+
+> 2
+
+]
+
+and ground truth box Bgt = [ xg
+
+> 1
+
+, y g 
+
+> 1
+
+, x g
+
+> 2
+
+, y g 
+
+> 2
+
+], where (x1, y 1) denotes the top-left corner and (x2, y 2) denotes the bottom-right corner, we compute IoU as: IoU (Bpred , Bgt ) = Area (Bpred ∩ B gt )
+
+Area (Bpred ∪ B gt ) (24) The intersection area is calculated as: Area (Bpred ∩ B gt ) = max(0 , x min − xmax ) × max(0 , y min − ymax ) (25) where xmin = min( xp
+
+> 2
+
+, x g
+
+> 2
+
+), xmax = max( xp
+
+> 1
+
+, x g
+
+> 1
+
+), ymin = min( yp 
+
+> 2
+
+, y g 
+
+> 2
+
+), and 
+
+ymax = max( yp 
+
+> 1
+
+, y g 
+
+> 1
+
+). The union area equals the sum of individual box ar-eas minus the intersection area. IoU values range from 0 (no overlap) to 1 (perfect overlap), with values above 0.5 indicating successful localization and values above 0.7 representing precise spatial grounding suitable for profes-sional applications. 
+
+Detection Performance Metrics . Building on the IoU foundation, we compute standard detection metrics to assess localization quality compre-hensively. Since our model generates bounding boxes as text without con-fidence scores, we use a fixed IoU threshold τ = 0 .5 to classify predictions. For each predicted box Bi 
+
+> pred
+
+(where i indexes predictions) and ground truth 36 box Bj 
+
+> gt
+
+(where j indexes ground truth annotations), a predicted box is clas-sified as a True Positive (TP) if there exists an unmatched ground truth box such that IoU (Bi
+
+> pred
+
+, Bj
+
+> gt
+
+) ≥ τ , with each ground truth box matched at most once. Predicted boxes that cannot be matched to any ground truth box with sufficient overlap are classified as False Positives (FP), representing spurious detections. Ground truth boxes that remain unmatched by any prediction are classified as False Negatives (FN), representing missed detections. Using these classifications, we compute precision [57] as the proportion of correct localizations among all predictions: Precision = TP TP + FP (26) Recall [57] measures the proportion of actual distresses successfully local-ized: Recall = TP TP + FN (27) The F1-Score [57] harmonically combines precision and recall to provide a balanced performance measure: F1-Score = 2 × Precision × Recall Precision + Recall (28) High precision indicates the model makes few spurious predictions, which is critical for avoiding unnecessary maintenance interventions. High recall ensures comprehensive distress detection with minimal omissions, which is essential for complete condition assessment. F1-scores above 0.7 indicate strong spatial grounding capabilities suitable for professional pavement in-spection. Finally, we compute the mean IoU across all matched prediction-ground truth pairs to assess average localization precision. Let Nmatch denote the total number of successfully matched pairs. The mean IoU is then: Mean IoU = 1
+
+Nmatch 
+
+> Nmatch
+
+X
+
+> i=1
+
+IoU (Bi
+
+> pred
+
+, Bi
+
+> gt
+
+) (29) This metric provides insight into localization quality beyond the binary detection metrics. 37 3.4.2. Structured Region Analysis Metrics 
+
+Region analysis tasks require the model to assess pavement conditions in a structured format, including distress type classification, severity level determination, and repair recommendation generation. The model generates free-text responses that must be parsed into structured fields before evalu-ation. We evaluate these tasks through field-specific accuracy metrics and format compliance measures. 
+
+Field-Specific Classification Accuracy . For each structured field f ∈{Distress, Severity, Repair }, we compute classification accuracy by compar-ing predicted labels against ground truth annotations. Let N denote the total number of evaluation samples, ˆyi,f denote the predicted label for field 
+
+f in sample i, and yi,f denote the corresponding ground truth label. The accuracy for field f is: Accuracy f = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+I(match f (ˆ yi,f , y i,f )) (30) where I(·) is the indicator function returning 1 for correct predictions and 0 otherwise. The matching function match f (·, ·) is field-dependent and defined as: match f (ˆ y, y ) = 
+
+(
+
+I(normalize (ˆ y) = normalize (y)) if f = Severity 
+
+I(similarity (ˆ y, y ) > 0.7) otherwise (31) where normalize (·) converts text to lowercase and removes whitespace, and similarity (·, ·) computes fuzzy string similarity as detailed below. This field-specific matching strategy balances evaluation rigor with appropriate flexibility for each field type. 
+
+Matching Strategies by Field Type . Different fields require different match-ing strategies to account for their distinct characteristics. For distress type and repair recommendation fields, we employ fuzzy string matching to ac-commodate minor textual variations while preserving semantic equivalence. The similarity between predicted and ground truth text is measured using the Levenshtein distance [58], which quantifies the minimum number of single-character edits (insertions, deletions, or substitutions) required to transform one string into another. 38 Formally, for strings ˆy and y of lengths m = |ˆy| and n = |y| respectively, the Levenshtein distance Lev (i, j ) is defined recursively as: Lev (i, j ) = 
+
+
+
+max( i, j ) if min( i, j ) = 0 min 
+
+
+
+Lev (i − 1, j ) + 1 
+
+Lev (i, j − 1) + 1 
+
+Lev (i − 1, j − 1) + I(ˆ y[i]̸ = y[j]) 
+
+otherwise (32) where i and j index character positions in ˆy and y respectively, ˆy[i] denotes the i-th character of ˆy, y[j] denotes the j-th character of y, and I(ˆ y[i]̸ = y[j]) 
+
+equals 0 if characters match and 1 otherwise. The three operations in the minimum correspond to deletion (removing a character from ˆy), insertion (adding a character to ˆy), and substitution (replacing a character in ˆy). The final Levenshtein distance is Lev (m, n ).We normalize this distance to obtain a similarity score bounded between 0 and 1: similarity (ˆ y, y ) = 1 − Lev (m, n )max( m, n ) (33) A prediction is considered correct if similarity (ˆ y, y ) > 0.7. This threshold allows for minor phrasing differences (such as "longitudinal crack" versus "longitudinal cracking") while maintaining semantic accuracy. In contrast, severity levels require exact matching after normalization to ensure consistent classification. After converting both prediction and ground truth to lowercase and removing whitespace, we apply strict equality: match (ˆ yi, severity , y i, severity ) = I(normalize (ˆ yi, severity ) = normalize (yi, severity )) 
+
+(34) This strict approach is necessary because severity levels (Low, Medium, High) directly impact maintenance priority decisions and must be precisely classified. 
+
+Format Compliance Assessment. Beyond content accuracy, the model must generate responses in the required structured format for automatic evalu-ation and system integration. The parsing success rate measures format 39 compliance: Parsing Rate =
+
+PNi=1 I(parsable (ˆ yi)) 
+
+N (35) where N is the total number of evaluation samples, ˆyi is the generated free-text response for sample i, and parsable (ˆ yi) returns true if all required fields were successfully extracted from the response. High parsing rates indicate the model reliably follows output specifications, which is essential for integration with pavement management systems. 
+
+3.4.3. Reasoning and Comparative Assessment Metrics 
+
+Complex reasoning tasks produce open-ended responses that require eval-uation beyond simple string matching. These tasks include comparative grounding (comparing multiple distresses), chain-of-thought analysis (ex-plaining reasoning steps), and maintenance decision-making (justifying treat-ment recommendations). We employ LLM-as-a-judge [59] evaluation to as-sess the semantic correctness, reasoning quality, and technical soundness of these responses. 
+
+LLM-as-a-Judge Evaluation Framework . We use a powerful language model (GPT-4o or Gemini 1.5 Pro) as an evaluator to assess response quality. For each evaluation sample j (where j ∈ { 1, . . . , M } and M is the total number of samples evaluated through LLM judging), the judge evaluates the model’s prediction Pj against ground truth Gj given question context Qj ,assigning a scalar score Sj ∈ [1 , 10] based on a detailed evaluation rubric. The rubric assesses five key dimensions: (1) factual correctness of technical claims, (2) logical coherence of reasoning chains, (3) completeness of analysis, (4) appropriate use of pavement engineering terminology, and (5) grounding in observable evidence. The mean judge score aggregates performance across all evaluated samples: Mean Judge Score = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+Sj (36) Scores of 6-8 indicate good technical reasoning quality, while scores above 8 represent excellent professional-grade analysis suitable for engineering de-cision support applications. 40 Binary Success Assessment . To complement the continuous judge scores with a clear success threshold, we define a binary pass metric. A response "passes" if it achieves a score of 7 or higher, corresponding to "Good" quality or better according to our evaluation rubric. The pass rate measures the proportion of predictions meeting this professional quality standard: Pass Rate = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+I(Sj ≥ 7) (37) where Sj is the judge score for sample j and I(·) is the indicator function. Pass rates above 70% indicate the model consistently produces reasoning suitable for real-world pavement management, where technical accuracy and logical soundness are critical for safety and resource allocation decisions. 
+
+Dimensional Quality Analysis . Beyond aggregate scores, we evaluate each of the five quality dimensions separately to identify specific strengths and weaknesses. These dimensions assess: (1) Factual Accuracy, (2) Logi-cal Coherence, (3) Technical Terminology, (4) Evidence Grounding, and (5) Completeness. For each dimension d and each sample j, the judge assigns a dimension-specific score Sj,d ∈ [1 , 10] . The mean score for dimension d is: Mean Score d = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+Sj,d (38) This dimensional breakdown provides actionable insights for model im-provement by revealing which aspects of reasoning require refinement. 
+
+3.4.4. Vision-Language Generation Metrics 
+
+For tasks involving natural language generation,specifically pavement cap-tioning and visual question answering, we employ established vision-language metrics. These metrics assess the quality of generated text through n-gram matching and semantic similarity with reference text. 
+
+Captioning Quality Metrics.. We evaluate caption quality using three com-plementary metrics that capture different aspects of text similarity. 
+
+BLEU-4. BLEU (Bilingual Evaluation Understudy) [60] measures n-gram precision between generated and reference captions. For n-gram order 41 n ∈ { 1, 2, 3, 4}, the precision Pn is computed as: 
+
+Pn =
+
+P 
+
+> ngram ∈C
+
+min( Count clip (ngram ), Count ref (ngram )) 
+
+P 
+
+> ngram ∈C
+
+Count (ngram ) (39) where C denotes the candidate caption, Count (ngram ) is the count of n-gram occurrences in the candidate, Count ref (ngram ) is the maximum count of the n-gram in any reference caption, and Count clip clips n-gram counts to their maximum reference occurrence. To prevent artificially high scores from overly short outputs, we apply a brevity penalty: BP =
+
+(
+
+1 if c > r e(1 −r/c ) if c ≤ r (40) where c is the candidate caption length (in words) and r is the reference caption length. The BLEU-4 score combines precision across n-gram orders 1 through 4: BLEU-4 = BP · exp 14
+
+> 4
+
+X
+
+> n=1
+
+log Pn
+
+!
+
+(41) BLEU-4 scores above 0.3 are considered good for technical domain text gen-eration. 
+
+ROUGE-L. ROUGE-L [61] measures the longest common subsequence (LCS) between candidate and reference text, capturing sentence-level struc-ture preservation. Let X denote the candidate caption and Y denote a ref-erence caption, with lengths |X| and |Y | measured in words. Let LCS (X, Y )
+
+denote the length of the longest common subsequence between X and Y . We compute LCS-based recall and precision: 
+
+Rlcs = LCS (X, Y )
+
+|Y | , Plcs = LCS (X, Y )
+
+|X| (42) These are combined into an F-measure with recall emphasis (using parameter 
+
+β = 1 .2): ROUGE-L = (1 + β2)Rlcs Plcs 
+
+Rlcs + β2Plcs 
+
+(43) Scores above 0.4 indicate strong structural alignment with reference descrip-tions. 42 CIDEr. CIDEr (Consensus-based Image Description Evaluation) [62] emphasizes distinctive n-grams through TF-IDF weighting, rewarding de-scriptions that capture salient details. For n-gram ωk (where k indexes all possible n-grams) in sentence sij (where i indexes images and j indexes ref-erence sentences for image i), the TF-IDF weight gk(sij ) is: 
+
+gk(sij ) = hk(sij )
+
+P 
+
+> ωl
+
+hl(sij ) log |I|
+
+P 
+
+> Ip∈I
+
+min(1 , P 
+
+> q
+
+hk(spq )) 
+
+!
+
+(44) where hk(sij ) counts occurrences of n-gram ωk in sentence sij , I is the set of all images in the dataset with |I| denoting the total number of images, Ip indexes each image in the dataset, q indexes reference sentences for image p, and the summation P 
+
+> ωl
+
+runs over all n-grams in the sentence. The CIDEr score for candidate caption ci (for image i) and reference set Si = {si1, s i2, . . . , s im }
+
+(containing m reference captions) averages cosine similarities of TF-IDF vec-tors: CIDEr n(ci, S i) = 1
+
+m
+
+> m
+
+X
+
+> j=1
+
+gn(ci) · gn(sij )
+
+∥gn(ci)∥∥ gn(sij )∥ (45) where gn(ci) is the TF-IDF vector for n-grams of length n in candidate caption ci, gn(sij ) is the TF-IDF vector for reference caption sij , and ∥ · ∥ 
+
+denotes the vector norm. The final score averages over multiple n-gram orders (typically n ∈ { 1, 2, 3, 4}), with higher values indicating better consensus with human descriptions. 
+
+Question Answering Accuracy Metrics . For visual question answering tasks, we employ two accuracy metrics with different stringency levels. Let N
+
+denote the total number of VQA evaluation samples, ˆyi denote the predicted answer for question i, and yi denote the ground truth answer. Exact match accuracy measures perfect agreement after text normalization: Exact Match = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+I[normalize (ˆ yi) = normalize (yi)] (46) where normalization includes converting to lowercase, removing articles (a, an, the), and stripping punctuation. This strict metric ensures precise answer correctness. To account for semantically equivalent but textually different answers, we also compute relaxed accuracy. For each sample i, we define a soft matching 43 indicator: SoftMatch i = I[similarity (ˆ yi, y i) > 0.8] ∨ I[ˆ yi ⊆ yi ∨ yi ⊆ ˆyi] (47) where similarity (·, ·) is the normalized Levenshtein distance defined in Equa-tion 10, ⊆ denotes substring containment, and ∨ denotes logical OR. The relaxed accuracy aggregates these matches: Relaxed Accuracy = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+SoftMatch i (48) This metric better captures semantic correctness in technical question answering, where multiple valid formulations exist for the same answer (such as "yes, severe alligator cracking" and "yes"). 
+
+3.4.5. PCI Regression Metrics 
+
+PCI estimation is evaluated using standard regression metrics that quan-tify prediction error magnitude and distribution. 
+
+Mean Absolute Error (MAE) . MAE measures the average absolute de-viation between predicted and actual PCI values: MAE = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+|ˆyi − yi| (49) where ˆyi is the predicted PCI value and yi is the ground truth PCI value for sample i. MAE provides an interpretable measure of average error mag-nitude in the same units as PCI (0-100 scale), with lower values indicating better performance. For PCI estimation, MAE below 10 points is considered good accuracy. 
+
+Mean Squared Error (MSE) . MSE quantifies the average squared devi-ation, penalizing larger errors more heavily: MSE = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(ˆ yi − yi)2 (50) The squared term makes MSE more sensitive to outliers than MAE, providing insight into prediction variance. The Root Mean Squared Error (RMSE) is often reported for interpretability: 44 RMSE = √MSE (51) Lower MSE and RMSE values indicate better model performance, with RMSE below 15 considered acceptable for practical PCI prediction applica-tions. 
+
+4. Results and Discussion 
+
+This section presents comprehensive evaluation results demonstrating the effectiveness of supervised instruction fine-tuning for pavement assessment. Quantitative benchmarks compare PaveGPT and fine-tuned baseline mod-els across perception, understanding, and reasoning tasks in both zero-shot and trained settings. Qualitative analysis examines model outputs across diverse task types, while computational efficiency metrics assess practical deployment feasibility. 
+
+4.1. Quantitative Analysis 
+
+Table 4 reports results across a comprehensive suite of perception, un-derstanding, and explanatory tasks, allowing a unified evaluation of different state-of-the-art VLMs within the context of pavement condition assessment. In the zero-shot setting, most models fail to produce meaningful outputs for tasks involving structured predictions such as distress localization, severity classification, and PCI estimation. In many cases, outputs are entirely miss-ing or do not follow expected formats, making them impossible to evaluate ( as indicated by the prevalence of “–” in zero-shot rows). Even where numerical values are generated, they tend to be unreliable and inconsistent with domain expectations. For example, PCI predictions from LLaMA-3.2 and MiniCPM in zero-shot mode yielded extremely high error values, highlighting the limi-tations of using existing general purpose VLMs alone for specialized technical domains. These failures reinforce the motivation for this work, which em-phasizes the need for targeted supervision strategies that guide models to understand and follow the conventions, formats, and reasoning styles used in professional pavement assessment. Figure 13 compares the PCI prediction accuracy across models, where MiniCPM-V-2.6 achieves the lowest MAE of 13.1, followed by LLaVA-1.5-7B at 14.4. 45 PaliGemma-3B 
+
+> LLaVA-1.6-7B
+> LLaVA-1.5-7B
+> LLaMA-3.2-11B
+> MiniCPM-V-2.6
+> InternVL-3.5-8B
+> PaveGPT
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> MAE (  lower is better)
+> 31.1
+> 24.7
+> 14.4
+> 16.5
+> 13.1
+> 17.5
+> 19.3
+
+Figure 13: PCI prediction Mean Absolute Error (MAE) comparison. Lower values indicate better performance. 
+
+Supervised fine-tuning on the PaveInstruct dataset leads to consistent and substantial performance improvements across all models and task categories. The dataset’s rich combination of instruction types, annotation formats, and task diversity allows models to learn how to respond accurately in a wide range of scenarios. On perception tasks, models like InternVL and MiniCPM show strong improvements in both regional distress understanding and spa-tial grounding. InternVL achieves the highest mIoU and box accuracy scores, indicating precise localization capabilities, while MiniCPM performs best on severity classification and region-level distress detection. Figure 14 shows the substantial improvement in spatial grounding performance (mIoU) when VLMs are fine-tuned on PaveInstruct compared to their zero-shot baselines. 46 PaliGemma-3B   
+
+> LLaVA-1.6-7B
+> LLaVA-1.5-7B
+> LLaMA-3.2-11B
+> MiniCPM-V-2.6
+> InternVL-3.5-8B
+> Model
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> 40
+> Spatial Grounding mIoU (%)
+> 1.5
+> 6.0 7.3
+> 5.9 7.2
+> 8.9
+> 10.5
+> 21.7
+> 23.4
+> 21.3
+> 27.5
+> 30.5
+> Zero-Shot
+> Fine-Tuned
+
+Figure 14: Zero-shot vs. fine-tuned performance on spatial grounding (mIoU). Fine-tuning on PaveInstruct yields substantial improvements across all VLMs. 
+
+In understanding tasks, MiniCPM also excels at question answering and PCI estimation, achieving the lowest prediction error and the highest corre-lation with ground truth PCI values. These results reflect the effectiveness of instruction tuning not just in boosting raw accuracy, but also in helping models produce well-structured, interpretable, and technically valid outputs. Performance gains are not restricted to a single architecture; both smaller and larger models benefit significantly, indicating that the improvements are not simply due to model scale, but rather the relevance and quality of the task supervision provided. Figure 15 illustrates the performance gains achieved by fine-tuning on PaveInstruct across spatial grounding, reasoning, and cap-tioning tasks, with all models showing consistent improvements. 47 PaliGemma-3B    
+
+> LLaVA-1.6-7B
+> LLaVA-1.5-7B
+> LLaMA-3.2-11B
+> MiniCPM-V-2.6
+> InternVL-3.5-8B
+> 0
+> 5
+> 10
+> 15
+> 20
+> Improvement (  %)
+> +8.9
+> +15.7 +16.2 +15.4
+> +20.3
+> +21.6
+> PaliGemma-3B
+> LLaVA-1.6-7B
+> LLaVA-1.5-7B
+> LLaMA-3.2-11B
+> MiniCPM-V-2.6
+> InternVL-3.5-8B
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> 12.5
+> 15.0
+> 17.5
+> 20.0
+> Improvement (  %)
+> +20.7
+> +9.8
+> +12.8
+> +11.8
+> +13.0 +13.5
+> PaliGemma-3B
+> LLaVA-1.6-7B
+> LLaVA-1.5-7B
+> LLaMA-3.2-11B
+> MiniCPM-V-2.6
+> InternVL-3.5-8B
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> 14
+> 16
+> Improvement (  %)
+> +17.0
+> +6.1
+> +9.4
+> +7.4
+> +9.0
+> +7.3
+
+Figure 15: Performance improvement ( ∆%) from fine-tuning on PaveInstruct across spatial grounding, reasoning, and captioning tasks compared to zero-shot settings. 
+
+In explanatory tasks, which include pavement captioning, models trained on PaveInstruct are able to generate more fluent, relevant, and context-sensitive outputs. MiniCPM achieves the highest scores across all generation metrics, including BLEU-4, ROUGE-L, and CIDEr, and also ranks highest in human-judged reasoning ability. These gains suggest that exposure to domain-specific language patterns helps models develop stronger conversa-tional and explanatory abilities. While PaveGPT does not lead in overall scores, it achieves the best performance in spatial localization, reflecting its focus on integrating vision and structure-aware output generation. Taken together, these findings support the overall goal of the paper, which is to move beyond narrow, single-task models and instead enable general-purpose VLMs to handle the full spectrum of tasks encountered in real-world pave-ment evaluation workflows. Instruction tuning, when built around authentic domain needs and standardized outputs, is key to unlocking this capability. Figure 16 presents a comprehensive heatmap visualization of model perfor-mance across all evaluation metrics, enabling direct comparison of relative strengths and weaknesses (darker values indicates stronger scores). 48 Region 
+
+> Distress
+> Region
+> Severity
+> Spatial
+> mIoU
+> Spatial
+> Acc@0.5
+> VQA
+> Relaxed
+> Class.
+> Severity
+> Reasoning
+> ROUGE-L
+> Captioning
+> ROUGE-L
+
+PaliGemma-3B 
+
+LLaVA-1.6-7B 
+
+LLaVA-1.5-7B 
+
+LLaMA-3.2-11B 
+
+MiniCPM-V-2.6 
+
+InternVL-3.5-8B 
+
+PaveGPT 
+
+15.0 29.2 10.5 8.2 34.0 62.0 21.6 18.3 
+
+21.3 32.4 21.7 17.7 35.2 66.9 24.3 18.9 
+
+33.8 42.6 23.4 19.4 45.1 71.2 28.4 22.3 
+
+24.0 36.8 21.3 17.7 40.4 67.1 25.5 19.7 
+
+31.3 44.1 27.5 25.8 49.3 70.8 27.1 23.3 
+
+30.5 43.0 30.5 30.0 48.3 70.5 28.0 22.4 
+
+22.5 37.5 32.7 32.4 34.6 64.3 22.8 17.7 
+
+10 
+
+20 
+
+30 
+
+40 
+
+50 
+
+60 
+
+70 Performance (%) Figure 16: Heatmap of fine-tuned model performance across evaluation metrics. Darker colors indicate higher scores. Table 4: Benchmark results comparing state-of-the-art VLMs on pavement condition as-sessment. Zero-shot (gray rows) shows baseline performance; Trained (white rows) shows performance after fine-tuning on PaveInstruct. Perception evaluates distress detection and spatial localization; Understanding covers VQA and PCI score prediction; Explana-tory assesses caption quality and reasoning ability via LLM-based evaluation. Best in 
+
+bold , second-best underlined. ↑/↓: higher/lower is better. –: not evaluable in zero-shot. 
+
+Perception Understanding Explanatory 
+
+Region Analysis Spatial Grounding Classification VQA PCI Prediction Captioning Reasoning 
+
+Method Setting Distress ↑ Severity ↑ Repair ↑ mIoU ↑ Accuracy ↑ Severity ↑ Exact Accuracy ↑
+
+Relaxed Accuracy ↑ MAE ↓ RMSE ↓ R2↑ BLEU-4 ↑ ROUGE-L ↑ CIDEr ↑ Judge Score ↑
+
+Pass Rate ↑
+
+PaliGemma-3B Zero-shot – – – 1.55 1.48 – – – – – – 0.00 1.30 0.00 6.38 62.5 PaliGemma-3B Trained 15.00 29.16 1.71 10.47 8.17 62.04 11.81 33.96 31.13 42.84 -0.73 6.04 18.30 8.05 5.12 30.0 LLaVA-1.5-7B Zero-shot – – – 7.29 7.28 – – – – – – 4.13 12.90 2.39 4.53 30.0 LLaVA-1.5-7B Trained 33.76 42.55 4.55 23.45 19.39 71.20 17.35 45.11 14.37 22.27 0.54 10.08 22.25 15.50 6.56 56.0 LLaVA-1.6-7B Zero-shot – – – 6.02 6.00 – – – – – – 1.82 12.75 0.84 4.56 18.0 LLaVA-1.6-7B Trained 21.25 32.37 1.14 21.73 17.72 66.87 12.38 35.18 24.68 37.22 -0.31 5.83 18.89 4.10 6.96 56.0 LLaMA-3.2-11B Zero-shot – – – 5.89 5.81 – – – 65.86 96.78 – 2.40 12.26 1.06 3.66 14.0 LLaMA-3.2-11B Trained 24.04 36.76 2.79 21.33 17.72 67.13 17.83 40.39 16.46 24.11 0.46 7.67 19.66 8.26 6.96 58.0 MiniCPM-V-2.6 Zero-shot – – – 7.19 7.09 – – – 20.85 31.20 – 2.74 14.31 1.24 5.71 39.3 MiniCPM-V-2.6 Trained 31.28 44.05 3.88 27.52 25.79 70.82 21.58 49.27 13.07 21.47 0.57 10.08 23.26 19.60 7.28 72.0 
+
+InternVL-3.5-8B Zero-shot – – – 8.89 8.86 – – – 31.59 38.49 – 2.73 15.15 1.95 4.86 20.0 InternVL-3.5-8B Trained 30.46 42.97 4.76 30.52 30.02 70.53 22.72 48.29 17.50 26.35 0.35 10.00 22.44 16.20 6.86 58.0 
+
+PaveGPT-7B Trained 22.54 37.54 2.74 32.68 32.38 64.30 15.07 34.61 19.32 27.14 0.31 6.21 17.68 6.33 6.14 40.0 
+
+Figure 17 provides a multi-dimensional comparison of fine-tuned VLMs 49 across six key metrics, highlighting that different models exhibit distinct performance trade-offs. Spatial 
+
+> mIoU
+> Region
+> Distress
+> VQA
+> Relaxed Accuracy
+> Classification
+> Severity
+> Reasoning
+> Judge Score
+> Captioning
+> ROUGE-L
+> 20
+> 40
+> 60
+> 80
+> PaliGemma-3B
+> LLaVA-1.6-7B
+> LLaVA-1.5-7B
+> LLaMA-3.2-11B
+> MiniCPM-V-2.6
+> InternVL-3.5-8B
+> PaveGPT
+
+Figure 17: Radar chart comparing fine-tuned VLMs across six key evaluation metrics on PaveInstruct. 
+
+4.2. Qualitative Results 4.2.1. Zero-Shot vs. Fine-Tuned Performance 
+
+To complement the quantitative analysis, we begin with a comparison be-tween zero-shot and fine-tuned model behavior. Figure 18 shows InternVL-3.5-8B’s predictions before and after tuning on PaveInstruct, spanning three task types: distress classification, distress listing, and coordinate-based dis-tress localization. In the zero-shot setting, the model produces vague or incorrect outputs. For instance, describing the pavement as having “uni-form texture” despite the presence of visible transverse cracking. It also misidentifies distress types and fails to follow expected response formats. Af-ter fine-tuning, the model correctly detects the transverse crack and lists relevant distresses. These improvements illustrate how instruction tuning enables models to internalize pavement-specific vocabulary, reasoning logic, 50 and structured response formats that are not present in general-domain pre-training. Image  Promp t Zero -shot  Instruction -
+
+Tuned 
+
+What type of 
+
+distress is visible 
+
+at coordinates 
+
+[283, 357, 644, 
+
+464]? (One word) 
+
+Ground Truth 
+
+Transverse 
+
+Crac k Cracking  Transverse 
+
+Crack 
+
+List visible 
+
+distresses and 
+
+severities. 
+
+No visible 
+
+distresses 
+
+identified. The 
+
+pavement surface 
+
+exhibits uniform 
+
+texture with no 
+
+observable 
+
+cracking, spalling, 
+
+potholing, 
+
+raveling, or other 
+
+deterioration 
+
+indicators. 
+
+The image shows 
+
+a section of 
+
+asphalt pavement. 
+
+The visible 
+
+distresses include: 
+
+Skid Deformation. 
+
+Surface 
+
+Roughness. These 
+
+distresses are 
+
+generally 
+
+moderate in 
+
+severity 
+
+No visible 
+
+distresses 
+
+detected.  The 
+
+pavement surface 
+
+exhibits uniform 
+
+texture with no 
+
+observable 
+
+cracking, spalling, 
+
+rutting, or other 
+
+distress features. 
+
+What type of 
+
+pavement distress 
+
+is located at 
+
+coordinates [497, 
+
+495, 627, 561]? 
+
+The pavement 
+
+distress located at 
+
+coordinates [497, 
+
+495, 627, 561] is 
+
+identified as a 
+
+transverse crack. 
+
+According to 
+
+ASTM D6433, 
+
+transverse cracks 
+
+are linear breaks 
+
+that occur 
+
+perpendicular to 
+
+the direction of 
+
+traffic flow. The 
+
+severity of the 
+
+crack appears to 
+
+be low to 
+
+moderate. 
+
+The pavement 
+
+distress located at 
+
+coordinates [497, 
+
+495, 627, 561] 
+
+appears to be a 
+
+longitudinal 
+
+cracking pattern. 
+
+This type of 
+
+distress is 
+
+characterized by 
+
+cracks that run 
+
+parallel to the 
+
+direction of 
+
+traffic. 
+
+Longitudinal 
+
+cracks can be 
+
+caused by various 
+
+factors. 
+
+The pavement 
+
+distress located at 
+
+coordinates [497, 
+
+495, 627, 561] is a 
+
+transverse crack. 
+
+Transverse cracks 
+
+are linear fractures 
+
+that occur 
+
+perpendicular to 
+
+the direction of 
+
+traffic flow. In 
+
+this specific 
+
+region, the crack 
+
+appears to be 
+
+relatively narrow 
+
+but continuous 
+
+across the 
+
+pavement width. 
+
+Figure 18: Comparison of InternVL-3.5-8B performance before and after fine-tuning on PaveInstruct across diverse task types: one-word classification, distress enumeration, and coordinate-based identification. Red highlights indicate correct alignment with ground truth, demonstrating substantial improvements from domain-specific instruction tuning. 
+
+51 4.2.2. Fine-Tuned Model Comparisons Across Tasks 
+
+Building on the improvements seen after fine-tuning, we now take a closer look at how PaveGPT and other VLMs perform across a range of pavement assessment tasks. All models here have been trained on PaveInstruct and are evaluated on four instruction-following tasks: distress listing, visual question answering (VQA), PCI estimation with justification, and spatial grounding. Each task highlights a different aspect of pavement reasoning, including se-mantic identification, diagnostic decision making, numeric assessment, and spatial localization. These examples illustrate how domain-aligned instruc-tion tuning affects output structure, technical accuracy, and interpretability. We first examine distress listing results, where models are asked to iden-tify all visible distresses and assess their severity. As shown in Figure 19, PaveGPT and MiniCPM-V-2.6 generate detailed and well-structured out-puts, correctly identifying multiple distress types such as alligator cracking, raveling, and patching. PaveGPT further distinguishes between structural and surface-level conditions, using terminology consistent with ASTM D6433. InternVL also detects major distresses, but introduces a non-standard term, surface discoloration, which reflects partial confusion between visual appear-ance and engineering-defined distress categories. LLaVA-1.6 produces accu-rate but less complete listings, while LLaMA-3.2 fails to identify any dis-tress. These differences indicate that instruction tuning improves multi-class recognition and technical vocabulary usage, although sensitivity to subtle conditions remains model-dependent. 52 List visible distresses and severities. 
+
+Based on the observable evidence in the image, the following distresses are present: 
+
+Longitudinal Cracking: Medium severity 2. Transverse Cracking: Low severity 
+
+3. Surface Raveling: Low severity. 4.Patching: Medium severity 
+
+LLaVA -1.6 -7B 
+
+Based on the observable evidence in the pavement image, the following distresses 
+
+are identified: 1. Longitudinal Crack. The severity appears to be low to moderate, 
+
+with the crack being visible but not excessively wide or deep. 2.  Surface Raveling .
+
+The severity is low to moderate , as the raveling is localized and does not appear to 
+
+be extensive. 3.  Minor Surface Staining : The severity is low, as these stains do not 
+
+affect the structural integrity of the pavement. 
+
+LLaMA -3.2 -11B 
+
+No visible distresses observed. The pavement surface appears intact with no 
+
+observable cracking, spalling, rutting, or other deterioration features as defined by 
+
+ASTM D6433. 
+
+MiniCPM -V-2.6 
+
+Visible distresses include: Longitudinal Cracking: Low severity (tight cracks, minimal 
+
+spalling).  Surface Raveling : Low severity  (minor aggregate loss, no structural 
+
+compromise). Patch Deterioration: Low severity (edge spalling, no delamination) 
+
+InternVL -3.5 -8B 
+
+Based on the observable evidence in the pavement image, the following distresses 
+
+are identified: 1.  Alligator Cracking : The severity appears to be medium, as the 
+
+cracks are clearly visible but have not yet reached a critical stage where significant 
+
+structural damage is evident. 2.  Raveling : The severity is low , as the raveling is 
+
+limited to small areas and does not significantly affect the overall integrity of the 
+
+pavement. 3. Patching: The severity is low, as there are no signs of deterioration or 
+
+failure around the patch edges. 4.  Surface Discoloration . However, this is not 
+
+classified as a distress per standard pavement engineering terminology, as it does not 
+
+significantly impact the structural performance of the pavement.  PaveGPT 
+
+Based on visual observation of the pavement surface, the following distresses are 
+
+identifiable: 1. Alligator Cracking  - Low Severity: Characterized by interconnected 
+
+cracking forming a pattern resembling alligator skin. The cracks appear tight with minimal 
+
+surface disruption, indicating early -stage fatigue cracking without significant structural 
+
+compromise. 2. Raveling  - Low Severity: Observed as slight disintegration of the asphalt 
+
+surface with fine aggregate particles becoming loose and detached. This is evident as a 
+
+subtle loss of surface texture and cohesion, primarily affecting the upper portion of the 
+
+pavement layer. 3. Weathering  - Low Severity: Manifested as superficial oxidation of the 
+
+asphalt binder, resulting in a slightly roughened and faded appearance. The surface 
+
+exhibits mild discoloration and reduced gloss, indicative of natural aging processes. No 
+
+other distress types are clearly discernible within the visible pavement area. 
+
+Ground 
+
+truth 
+
+User Figure 19: Qualitative comparison of VLM responses for distress listing task. Red high-lights indicate correct matches with ground truth. 
+
+We next analyze maintenance recommendation through a multiple-choice VQA task. The ground truth action is corrective repair, based on the pres-ence of potholes. Figure 20 shows that PaveGPT, MiniCPM, and InternVL correctly select this option and justify their choice by referencing safety con-cerns and ASTM D6433 guidance. Their explanations clearly link the ob-served distress type to the required intervention. In contrast, LLaVA-1.6 se-53 lects preventive treatment, suggesting difficulty in mapping potholes to the appropriate maintenance category. LLaMA-3.2 again underperforms, choos-ing routine maintenance with minimal reasoning. These examples show that instruction tuning improves not only answer accuracy, but also the logical connection between visual evidence and engineering decisions. Primary maintenance recommendation for this section: 
+
+(a) Routine maintenance 
+
+(b) Preventive treatment 
+
+(c) Corrective repair 
+
+(d) Reconstruction required 
+
+Based on the observed pothole at coordinates [300, 200, 350, 240], the primary 
+
+maintenance recommendation is  (c) Corrective repair.  The pothole indicates a need 
+
+for immediate action to prevent further deterioration and potential safety hazards. 
+
+Routine maintenance or preventive treatment would not address the existing 
+
+damage, and reconstruction is not necessary at this stage. 
+
+LLaVA -1.6 -7B 
+
+(b) Preventive treatment. 
+
+Reason: The observed potholes indicate localized areas of distress that require 
+
+immediate attention. However, the overall pavement condition does not appear 
+
+severely deteriorated. Preventive treatments such as patching the potholes would 
+
+help prevent further deterioration and maintain the pavement's condition. Routine 
+
+maintenance may not be sufficient given the presence of potholes, while corrective 
+
+repair or reconstruction might be excessive for the current level of distress observed. 
+
+LLaMA -3.2 -11B 
+
+a)  Routine maintenance. 
+
+Reasoning: Given that the image primarily shows a repaired section of the 
+
+pavement, it suggests that routine maintenance has already been performed. There 
+
+are no visible signs of distress or degradation in the rest of the pavement area. 
+
+Therefore, continuing with routine maintenance is the most appropriate 
+
+recommendation based on the observable evidence. 
+
+MiniCPM -V-2.6 
+
+(c) Corrective repair. 
+
+Given the presence of  two potholes , corrective repair is necessary to address the 
+
+immediate safety concerns and prevent further deterioration. The potholes indicate 
+
+localized damage that requires patching or full -depth repair to restore the pavement's 
+
+integrity. 
+
+InternVL -3.5 -8B 
+
+(c) Corrective repair. 
+
+Reasoning: The image shows  two potholes , which are significant distresses that 
+
+require immediate attention. According to ASTM D6433 standards,  potholes of any 
+
+size necessitate corrective repair  to prevent further deterioration and ensure safety. 
+
+Therefore, the primary maintenance recommendation is corrective repair. 
+
+PaveGPT 
+
+(c) Corrective repair. 
+
+Explanation: The image shows two potholes, which are surface -level failures that require 
+
+immediate corrective measures to prevent further deterioration. According to ASTM 
+
+D6433, potholes of any severity necessitate full -depth patching, making corrective repair 
+
+the most appropriate action. The affected areas demand urgent attention to restore 
+
+pavement functionality and ensure safety. 
+
+Ground 
+
+truth 
+
+User 
+
+Figure 20: Results on multiple-choice VQA for maintenance recommendation. Red high-lights indicate correct matches with ground truth. 
+
+54 PCI estimation provides a deeper view into structured numeric reason-ing combined with visual assessment. As illustrated in Figure 21, PaveGPT outputs a PCI value of 41 and provides a step-by-step justification that ref-erences distress types, severity levels, extent, and deduct values consistent with ASTM D6433. The explanation clearly separates major structural dis-tresses from minor surface defects and explains their relative impact on the final score. LLaVA-1.6 also produces a compliant explanation and estimates a PCI of 49, which falls within the correct condition class range. Although the numeric values differ slightly, both outputs align with the ground truth condition rating of Poor. Other models either fail to generate a numeric PCI or do not provide a structured justification, indicating that PCI estimation remains challenging without explicit supervision on reasoning format and standards. 55 Conduct a comprehensive visual pavement condition evaluation by  systematically 
+
+identifying all observable distresses, assessing their  severity /extent, evaluating 
+
+structural/functional performance, and  providing  a PCI estimate with 
+
+ASTM  D6433 -compliant justification. 
+
+LLaVA -1.6 -7B 
+
+PCI = 49; Condition Class: Poor. Justification: Per ASTM D6433, the assessment focuses on observable 
+
+distresses and their impact. Key findings:  1. Distress Identification:  Transverse/ longitudinal cracking 
+
+dominates (widths ~¼ –½ inch), with localized spalling at crack intersections. Minor surface raveling 
+
+(<10% of area) is present but secondary to structural issues.  2. Severity & Extent:  Cracks are medium 
+
+severity (moderate width, edge deterioration) and exhibit moderate extent (≈ 18% coverage ). Spalling 
+
+contributes additional deduct points due to its role in moisture infiltration and subgrade weakening. 
+
+3. Functional/Structural Impact:  The combination of extensive cracking and spalling reduces load -
+
+bearing capacity and increases water intrusion risk —critical factors for performance decline. The 
+
+cumulative effect places the pavement in the  "Poor" category (PCI 40 –54),  consistent with the observed 
+
+distress profile. 
+
+PaveGPT 
+
+Ground 
+
+truth 
+
+Professional PCI Estimate: 41; Condition Class: Poor. Technical Justification: 1.  Distress Identification 
+
+& Severity Assessment : - Alligator Cracking : High severity (ASTM D6433 Code 11. Covers ~18% of 
+
+the pavement area, indicating advanced fatigue failure.  - Longitudinal Cracking : Medium -high severity 
+
+(Code 22), with width > ¼ inch, spalling, and edge raveling extending 1 –2 inches into the pavement. 
+
+Spans the full length of the visible segment.  - Surface Raveling : Low -medium severity (Code 31), 
+
+localized loss of fine aggregate in <5% of the area. 2.  Extent Quantification : - Alligator cracking is 
+
+patchy but widespread, affecting multiple zones.  - Longitudinal cracking is continuous, dominating the 
+
+central pavement strip. 3.  Structural/Functional Evaluation : - Alligator cracking signals reduced load -
+
+bearing capacity and increased susceptibility to potholing.  \n Longitudinal cracking with spalling 
+
+compromises edge support and accelerates moisture infiltration.  - Ride quality is degraded due to uneven 
+
+surfaces and crack -induced roughness. 4.  PCI Calculation Rationale : Per ASTM D6433, distress deduct 
+
+values are applied based on severity and extent. Alligator cracking (high severity, 18% extent) and 
+
+longitudinal cracking (medium -high severity, 100% length) contribute the majority of deducts. Minor 
+
+raveling adds minimal impact. The combined effect yields a PCI of 41, consistent with the  Poor  condition 
+
+class (40 –54), indicating advanced deterioration requiring immediate remediation. 
+
+Distress Identification :  1. Alligator Cracking:  A network of interconnected cracks forming a polygonal 
+
+pattern, indicative of fatigue failure. Severity:  High  (crack widths > 1/4 inch , spalling at intersections). 
+
+Extent: ~20% of the visible area.  2. Longitudinal Cracking:  Linear cracks parallel to traffic flow, likely 
+
+due to shrinkage or thermal stress. Severity:  Medium  (widths 1/8 –1/4 inch, minimal edge spalling). 
+
+Extent: ~15% of the visible area. 3. Transverse Cracking: Perpendicular cracks across lanes, possibly from 
+
+temperature changes. Severity: Low -Medium (widths < 1/8 inch, no significant spalling). Extent: ~10% of 
+
+the visible area.  Structural Evaluation:  - The alligator cracking suggests loss of load -bearing capacity in 
+
+localized areas, increasing susceptibility to further deterioration under heavy traffic.  - Longitudinal 
+
+cracking compromises ride quality and may lead to water infiltration if left untreated.  - Transverse 
+
+cracking is less critical but indicates potential for future issues if not addressed.  PCI Calculation:  Using 
+
+ASTM D6433 methodology, the total deduct value is calculated as follows: Alligator Cracking (High 
+
+Severity): ~35 points (per ASTM Table 1 for high -severity alligator cracking).  - Longitudinal Cracking 
+
+(Medium Severity): ~12 points (per ASTM Table 2 for medium -severity longitudinal cracking).  -
+
+Transverse Cracking (Low -Medium Severity): ~5 points (per ASTM Table 3 for low -medium severity 
+
+transverse cracking). Total deducts = 35 + 12 + 5 = 52 points. Starting from a perfect score of 100, the 
+
+final PCI is 48.0, classifying the pavement as  Poor (40 –54 range). 
+
+User Figure 21: Qualitative comparison on PCI estimation with ASTM D6433-compliant rea-soning. Red highlights indicate correct matches. 
+
+Finally, we evaluate spatial grounding, where models are required to local-ize visible distresses using bounding boxes. Figure 22 shows that PaveGPT correctly identifies and localizes both a pothole and a longitudinal crack, producing bounding boxes in the expected [x1, y1, x2, y2] format with clear class labels. InternVL and MiniCPM also detect both objects, but PaveGPT’s boxes exhibit more precise alignment and clearer labeling. Im-56 portantly, PaveGPT explicitly associates each bounding box with a distress type, which supports downstream use in mapping, inspection reporting, and asset management systems. These examples demonstrate that instruction tuning improves both visual localization accuracy and structured output for-matting. Return the bbox of all the distress in [x1, y1, x2, y2] and the type of distress 
+
+User 
+
+The distress in the image is a pothole. The bounding box coordinates for the pothole are [100, 300, 
+
+300, 500]. The type of distress is a pothole, which is a localized pavement failure characterized by the 
+
+loss of pavement material, exposing the underlying layers. The pothole is located in the lower left 
+
+quadrant of the image, and it is the only distress present in the image. The pothole is a significant 
+
+distress that can lead to further pavement deterioration if not repaired promptly. 
+
+InternVL -3.5 -8B 
+
+The bounding box coordinates for the distress are [325, 486, 510, 722] with a high confidence level. 
+
+The distress type is a pothole, which is evident from its irregular shape and exposed aggregate within 
+
+the pavement surface. This pothole indicates severe localized damage likely caused by water 
+
+infiltration and repeated vehicle loading. 
+
+- Pothole:  [159, 278, 463, 430] 
+
+- Longitudina l Crack : [315, 0, 448, 278] 
+
+PaveGPT 
+
+MiniCPM -V-2.6 
+
+Figure 22: Model predictions for spatial grounding task. Red boxes indicate localized distresses. 
+
+57 These qualitative results show that supervised fine-tuning on PaveInstruct leads to more accurate, structured, and interpretable outputs across diverse pavement assessment tasks. The models demonstrate improved alignment with domain terminology, reasoning protocols, and output formats, which are essential for practical deployment in real-world pavement evaluation work-flows. 
+
+4.3. Model Efficiency and Complexity 
+
+To assess the computational requirements of each model, we conduct in-ference benchmarks on an NVIDIA A6000 GPU with 48 GB of memory. We measure four key metrics that characterize model efficiency during deploy-ment, including Time to First Token, token generation throughput, peak memory usage, and overall efficiency in tokens per second per gigabyte (TP-S/GB). These metrics reflect real-world usability, particularly in scenarios where speed, memory usage, and computational cost are important. 
+
+Time to First Token (TTFT) measures the latency between submit-ting an input and receiving the first generated token. It captures the ini-tial processing overhead, including image encoding, instruction parsing, and model warm-up. Lower TTFT values indicate faster responsiveness, which is critical for interactive applications or real-time deployments. 
+
+Throughput refers to the average number of tokens generated per second after the first token is produced. This reflects how efficiently the model handles long or multi-turn outputs. Higher throughput implies faster text generation, making the model more suitable for inference at scale. 
+
+Memory Usage reports the peak GPU memory consumption during in-ference. This includes memory allocated for the model weights, attention buffers, and intermediate activations. Lower memory usage enables deploy-ment on edge devices or smaller accelerators and allows concurrent processing of multiple inputs. 
+
+Efficiency (TPS/GB) is defined as the number of tokens generated per second per gigabyte of memory used. It combines speed and memory usage into a single metric, allowing direct comparison of how well each model bal-ances performance and resource consumption. Higher values indicate more efficient use of hardware resources. 
+
+Total Time is the overall wall-clock time taken to generate a complete response for a single example. This includes both the TTFT and the time spent generating all tokens. While influenced by throughput, it provides an intuitive sense of end-to-end latency from the user’s perspective. 58 Table 5 presents the inference benchmarks for all evaluated models. Among the compared models, PaliGemma-3B achieves the lowest TTFT of 60 ms and the highest throughput of 64.3 tokens per second while consuming only 6.02 GB of memory. This results in an efficiency of 10.7 TPS/GB, which is the highest among all models. However, this computational advantage comes at the cost of reduced task performance, as shown in our evaluation results. LLaVA-1.5 demonstrates the second-best latency at 93 ms and achieves a throughput of 44.2 tokens per second with an efficiency of 3.0 TPS/GB, making it a strong choice when balancing speed and capability. 
+
+Table 5: Inference efficiency benchmarks measured on an NVIDIA A6000 GPU (48 GB). TTFT: Time to First Token. Efficiency is computed as Throughput / Memory (TPS/GB). Best results are shown in bold , second best are underlined.                                         
+
+> Model TTFT (ms) ↓Throughput (tok/s) ↑Memory (GB) ↓Efficiency (TPS/GB) ↑Total Time (s) ↓
+> PaliGemma-3B 60 64.3 6.02 10.7 1.554
+> LLaVA-1.5-7B 93 44.2 14.51 3.0 2.263 LLaVA-1.6-7B 347 39.0 15.71 2.5 2.566 InternVL-3.5-8B 307 28.7 17.58 1.6 3.481 LLaMA-3.2-11B 253 30.8 22.31 1.4 3.247 PaveGPT-7B 236 39.7 16.81 2.4 2.518
+
+PaveGPT achieves a TTFT of 236 ms and a throughput of 39.7 tokens per second while using 16.81 GB of memory. This results in an efficiency of 2.4 TPS/GB, which is comparable to LLaVA-1.6 (2.5 TPS/GB) despite PaveGPT’s superior task performance. The slightly higher memory con-sumption of PaveGPT relative to LLaVA 1.5 can be attributed to the more complex vision encoder and language model architecture of Qwen2.5-VL. LLaMA 3.2 Vision exhibits the highest memory usage at 22.31 GB and the lowest efficiency at 1.4 TPS/GB, which is expected given its larger 11B parameter count. InternVL3-8B shows similar memory characteristics to PaveGPT but achieves lower throughput at 28.7 tokens per second. These results indicate that PaveGPT provides a reasonable trade-off between infer-ence efficiency and task performance, making it suitable for practical pave-ment inspection applications where both accuracy and computational feasi-bility are important considerations. 
+
+5. Practical Applications and Limitations 
+
+The instruction-tuned models enable construction agencies to replace multiple specialized inspection systems with a single unified tool that handles 59 diverse assessment tasks through natural language interaction. Field inspec-tors conducting building envelope assessments, concrete structure monitor-ing, or pavement surveys can conversationally query conditions and receive engineering standards-compliant responses immediately. The computational efficiency demonstrated makes deployment on edge devices practical with-out requiring cloud connectivity, enabling on-site inspection at construction projects and infrastructure assets. Operational deployment requires fine-tuning on local inspection images to capture region-specific defect patterns and construction practices, then inte-grating with existing management software through standard APIs. Training programs can use the models as interactive tools that guide new inspectors through defect identification and condition rating procedures for various con-struction materials and building systems. However, agencies must establish data governance policies for managing inspection images that may capture identifying information. Several technical limitations affect practical deployment. The dataset re-flects conditions from specific geographic regions and construction practices, making local fine-tuning essential for areas with different defect patterns or environmental conditions. Instruction generation relies on automated synthe-sis validated through expert review, meaning responses approximate rather than replicate experienced inspector communication. Evaluation measures technical performance but not operational factors like inspector trust or work-flow integration complexity. Condition estimation errors range from 13 to 31 points depending on architecture, suggesting use as screening tools rather than for final ratings driving capital investment decisions or regulatory com-pliance. The focus on static images limits temporal degradation tracking because the dataset lacks annotations linking repeated observations over time. This prevents forecasting capabilities needed for proactive maintenance planning and construction quality monitoring across project phases. These limitations indicate that agencies should validate performance in their construction con-texts, treat outputs as decision support augmenting inspector judgment, and focus initial deployments on preliminary screening where current capabilities align with operational needs. 60 6. Conclusion 
+
+This work addresses the challenge of applying vision-language models to specialized technical domains through instruction-driven pavement condition assessment. While general-purpose VLMs perform well on everyday tasks, they struggle with domain-specific requirements such as technical terminol-ogy, structured reasoning, and adherence to engineering standards. We intro-duce PaveInstruct , a comprehensive dataset of 278,889 instruction-response pairs spanning 32 task types, from spatial grounding to PCI estimation and maintenance recommendations. The dataset integrates annotations from nine heterogeneous sources through a systematic unification pipeline that preserves semantic richness while ensuring engineering validity. We also present PaveGPT , a domain-specialized foundation model trained on this dataset that achieves strong performance across perception, understanding, and reasoning tasks. Our experiments show that domain-specific instruction tuning fundamen-tally transforms model capabilities. Models that failed in zero-shot settings achieved improvements of over 20% in spatial grounding, reasoning, and gen-eration tasks after fine-tuning. More importantly, fine-tuned models pro-duced technically accurate outputs aligned with ASTM standards, gener-ated well-structured responses suitable for pavement management systems, and demonstrated professional reasoning chains. These improvements were consistent across different architectures, indicating that targeted supervision rather than model scale drives performance gains. The practical value extends beyond pavement assessment. Our approach enables conversational interfaces where professionals can query conditions, request maintenance priorities, and obtain justified assessments through nat-ural language. This unified framework replaces multiple specialized models with a single instruction-following system that handles diverse workflows. However, our dataset reflects specific geographic and climatic conditions that may not generalize to all regions, and PCI estimation errors may exceed tol-erances for certain regulatory applications. Future work should expand Pave-Instruct to additional regions and pavement types, develop real-time process-ing pipelines integrated with sensor data, and test deployment in operational management systems. Extending this approach to other infrastructure do-mains such as bridge inspection would validate its broader applicability. 61 7. Acknowledgements 
+
+The authors gratefully acknowledge the use of the iTiger HPC cluster, operated by the University of Memphis Research Computing group, which provided access to NVIDIA H100 GPUs. 
+
+References 
+
+[1] J. Bai, S. Bai, S. Yang, S. Wang, S. Tan, P. Wang, J. Lin, C. Zhou, J. Zhou, Qwen-vl: A versatile vision-language model for understanding, localization, text reading, and beyond, arXiv preprint arXiv:2308.12966 (2023). [2] P. Wang, S. Bai, S. Tan, S. Wang, Z. Fan, J. Bai, K. Chen, X. Liu, J. Wang, W. Ge, Y. Fan, K. Dang, M. Du, X. Ren, R. Men, D. Liu, C. Zhou, J. Zhou, J. Lin, Qwen2-vl: Enhancing vision-language model’s perception of the world at any resolution, arXiv preprint arXiv:2409.12191 (2024). [3] S. Bai, K. Chen, X. Liu, J. Wang, W. Ge, S. Song, K. Dang, P. Wang, S. Wang, J. Tang, H. Zhong, Y. Zhu, M. Yang, Z. Li, J. Wan, P. Wang, W. Ding, Z. Fu, Y. Xu, J. Ye, X. Zhang, T. Xie, Z. Cheng, H. Zhang, Z. Yang, H. Xu, J. Lin, Qwen2.5-vl technical report, arXiv preprint arXiv:2502.13923 (2025). [4] H. Liu, C. Li, Q. Wu, Y. J. Lee, Visual instruction tuning (2023). [5] H. Liu, C. Li, Y. Li, Y. J. Lee, Improved baselines with visual instruction tuning (2023). [6] X. He, Y. Zhang, L. Mou, E. Xing, P. Xie, Pathvqa: 30 000+ questions for medical visual question answering, arXiv preprint arXiv:2003.10286 (2020). URL https://arxiv.org/abs/2003.10286 
+
+[7] J. Lau, Jason S. Gayen, A. Ben Abacha, D. Demner-Fushman, A dataset of clinically generated visual questions and answers about radiology im-ages, Scientific Data 5 (1) (2018) 180251. doi:10.1038/sdata.2018. 251 .URL https://www.nature.com/articles/sdata2018251 
+
+62 [8] T. Qian, J. Chen, L. Zhuo, Y. Jiao, Y.-G. Jiang, Nuscenes-qa: A multi-modal visual question answering benchmark for autonomous driving sce-nario, arXiv preprint arXiv:2305.14836 (2023). URL https://arxiv.org/abs/2305.14836 
+
+[9] C. Sima, K. Renz, K. Chitta, L. Chen, H. Zhang, C. Xie, J. Beißwenger, P. Luo, A. Geiger, H. Li, Drivelm: Driving with graph visual question answering, in: European Conference on Computer Vision (ECCV) 2024, 2024. URL https://www.ecva.net/papers/eccv_2024/papers_ECCV/ papers/06870.pdf 
+
+[10] J. Kim, A. Rohrbach, T. Darrell, J. Canny, Z. Akata, Textual explana-tions for self-driving vehicles, Proceedings of the European Conference on Computer Vision (ECCV) (2018). [11] C. Li, C. Wong, S. Zhang, N. Usuyama, H. Liu, J. Yang, T. Naumann, H. Poon, J. Gao, Llava-med: Training a large language-and-vision as-sistant for biomedicine in one day (2023). arXiv:2306.00890 .URL https://arxiv.org/abs/2306.00890 
+
+[12] K. Singhal, Y. Lu, C. Kahn, . . . , Large language models encode clinical knowledge, arXiv preprint arXiv:2212.13138 (2022). URL https://arxiv.org/abs/2212.13138 
+
+[13] C. Schuhmann, R. Beaumont, R. Vencu, C. Gordon, R. Wight-man, M. Cherti, T. Coombes, A. Katta, C. Mullis, M. Wortsman, P. Schramowski, S. Kundurthy, K. Crowson, L. Schmidt, R. Kaczmar-czyk, J. Jitsev, Laion-5b: An open large-scale dataset for training next generation image-text models, arXiv preprint arXiv:2210.08402 (2022). URL https://arxiv.org/abs/2210.08402 
+
+[14] P. Sharma, N. Ding, S. Goodman, R. Soricut, Conceptual captions: A cleaned, hypernymed, image alt-text dataset for automatic image cap-tioning, in: Proc. 56th Annual Meeting of the Association for Compu-tational Linguistics (ACL 2018), 2018. URL https://aclanthology.org/P18-1238/ 
+
+[15] X. l. Chen, H. Fang, T.-Y. Lin, R. Vedantam, S. Gupta, P. Dollar, C. L. Zitnick, Microsoft coco captions: Data collection and evaluation server, 63 arXiv preprint arXiv:1504.00325 (2015). URL https://arxiv.org/abs/1504.00325 
+
+[16] R. Krishna, Y. Zhu, O. Groth, J. Johnson, K. Hata, J. Kravitz, S. Chen, Y. Kalantidis, J.-L. Li, D. A. Shamma, M. Bernstein, L. Fei-Fei, Visual genome: Connecting language and vision using crowdsourced dense image annotations, International Journal of Computer Vision 123 (1) (2017) 32–73. URL https://link.springer.com/article/10.1007/ s11263-016-0981-7 
+
+[17] H. Liu, C. Li, Y. J. Lee, Llava-instruct 150 k: Visual instruction tuning for large-scale multimodal models, in: arXiv preprint arXiv:2310.03744, 2023. URL https://arxiv.org/abs/2310.03744 
+
+[18] S. Kulkarni, S. Singh, D. Balakrishnan, S. Sharma, S. Devunuri, S. C. R. Korlapati, Crackseg9k: A collection and benchmark for crack segmen-tation datasets and frameworks, in: ECCV 2022 Workshops, Springer, 2022, pp. 179–195. doi:10.1007/978-3-031-25082-8_12 .URL https://arxiv.org/abs/2208.13054 
+
+[19] Y. Liu, J. Yao, X. Lu, R. Xie, L. Li, Deepcrack: A deep hierarchical feature learning architecture for crack segmentation, Neurocomputing 338 (2019) 139–153. doi:10.1016/j.neucom.2019.01.036 .[20] L. Zhang, F. Yang, Y. D. Zhang, Y. J. Zhu, Road crack detection using deep convolutional neural network, in: Image Processing (ICIP), 2016 IEEE International Conference on, IEEE, 2016, pp. 3708–3712. [21] Z. Tong, T. Ma, J. Huyan, W. Zhang, Pavementscapes: A large-scale hierarchical image dataset for asphalt pavement damage segmentation, arXiv preprint arXiv:2208.00775 (2022). URL https://arxiv.org/abs/2208.00775 
+
+[22] M. Ren, X. Zhang, X. Zhi, Y. Wei, Z. Feng, An annotated street view image dataset for automated road damage detection, Scientific Data 11 (1) (Apr. 2024). doi:10.1038/s41597-024-03263-7 .URL http://dx.doi.org/10.1038/s41597-024-03263-7 
+
+64 [23] Z. Liu, W. Wu, X. Gu, B. Cui, Pavedistress: A comprehensive dataset of pavement distresses detection, Data in Brief 57 (2024) 111111. 
+
+doi:https://doi.org/10.1016/j.dib.2024.111111 .URL https://www.sciencedirect.com/science/article/pii/ S2352340924010734 
+
+[24] H. Majidifard, P. Jin, Y. Adu-Gyamfi, W. G. Buttlar, Pavement image datasets: A new benchmark dataset to classify and densify pavement distresses, Transportation Research Record 2674 (2) (2020) 328–339. 
+
+arXiv:https://doi.org/10.1177/0361198120907283 , doi:10.1177/ 0361198120907283 .URL https://doi.org/10.1177/0361198120907283 
+
+[25] B. A. Kyem, E. Denteh, J. K. Asamoah, A. Aboah, Pavecap: The first multimodal framework for comprehensive pavement condition assess-ment with dense captioning and pci estimation, ArXiv abs/2408.04110 (2024). URL https://api.semanticscholar.org/CorpusID:271768959 
+
+[26] Y. Zhang, C. Liu, Vision-enhanced multi-modal learning frame-work for non-destructive pavement damage detection, Au-tomation in Construction 177 (2025) 106389. doi:https: //doi.org/10.1016/j.autcon.2025.106389 .URL https://www.sciencedirect.com/science/article/pii/ S0926580525004297 
+
+[27] X. Xiao, Y. Zhang, J. Wang, L. Zhao, Y. Wei, H. Li, Y. Li, X. Wang, S. K. Roy, H. Xu, T. Wang, Roadbench: A vision-language foundation model and benchmark for road damage understanding (2025). arXiv: 2507.17353 .URL https://arxiv.org/abs/2507.17353 
+
+[28] u. F. Özgenel, Concrete crack images for classification (2019). doi: 10.17632/5Y9WDSG2ZT.2 .URL https://data.mendeley.com/datasets/5y9wdsg2zt/2 
+
+[29] S. Dorafshan, R. Thomas, M. Maguire, Sdnet2018: An annotated image dataset for non-contact concrete crack detection using deep convolu-tional neural networks, Data in Brief 21 (11 2018). doi:10.1016/j. dib.2018.11.015 .65 [30] M. Eisenbach, R. Stricker, D. Seichter, K. Amende, K. Debes, M. Sessel-mann, D. Ebersbach, U. Stoeckert, H.-M. Gross, How to get pavement distress detection ready for deep learning? a systematic approach, in: 2017 International Joint Conference on Neural Networks (IJCNN), 2017, pp. 2039–2047. doi:10.1109/IJCNN.2017.7966101 .[31] R. Stricker, M. Eisenbach, M. Sesselmann, K. Debes, H.-M. Gross, Im-proving visual road condition assessment by extensive experiments on the extended gaps dataset, in: 2019 International Joint Conference on Neural Networks (IJCNN), 2019, pp. 1–8. doi:10.1109/IJCNN.2019. 8852257 .[32] H. Maeda, Y. Sekimoto, T. Seto, T. Kashiyama, H. Omata, Road dam-age detection and classification using deep neural networks with smart-phone images: Road damage detection and classification, Computer-Aided Civil and Infrastructure Engineering 33 (06 2018). doi:10.1111/ mice.12387 .[33] D. Arya, H. Maeda, S. K. Ghosh, D. Toshniwal, Y. Sekimoto, Rdd2022: A multi-national image dataset for automatic road damage detection (2022). arXiv:2209.08538 .URL https://arxiv.org/abs/2209.08538 
+
+[34] H. Yang, J. Cao, J. Wan, Q. Gao, C. Liu, M. Fischer, Y. Du, Y. Li, P. Jain, D. Wu, A large-scale image repository for automated pavement distress analysis and degradation trend prediction, Scientific Data 12 (1) (Aug. 2025). doi:10.1038/s41597-025-05748-5 .URL http://dx.doi.org/10.1038/s41597-025-05748-5 
+
+[35] Q. Zou, Y. Cao, Q. Li, Q. Mao, S. Wang, Cracktree: Automatic crack detection from pavement images, Pattern Recognition Letters 33 (3) (2012) 227–238. [36] Y. Shi, L. Cui, Z. Qi, F. Meng, Z. Chen, Automatic road crack detec-tion using random structured forests, IEEE Transactions on Intelligent Transportation Systems 17 (12) (2016) 3434–3445. [37] Q. Zou, Z. Zhang, Q. Li, X. Qi, Q. Wang, S. Wang, Deepcrack: Learning hierarchical convolutional features for crack detection, IEEE Transac-tions on Image Processing 28 (3) (2019) 1498–1512. 66 [38] S. Kulkarni, S. Singh, D. Balakrishnan, S. Sharma, S. Devunuri, S. C. R. Korlapati, Crackseg9k: a collection and benchmark for crack segmenta-tion datasets and frameworks, in: European Conference on Computer Vision, Springer, 2022, pp. 179–195. [39] S. Han, I.-H. Chung, Y. Jiang, B. Uwakweh, Pcier: Pavement condition evaluation using aerial imagery and deep learning, Geographies 3 (1) (2023) 132–142. doi:10.3390/geographies3010008 .URL https://www.mdpi.com/2673-7086/3/1/8 
+
+[40] Y. Adu-Gyamfi, B. Buttlar, E. Dave, D. Mensching, H. Majidifard, DSPS — dsps-1e998.web.app, https://dsps-1e998.web.app/data ,[Accessed 09-02-2025]. [41] H. Liu, C. Li, Q. Wu, Y. J. Lee, Visual instruction tuning (2023). arXiv: 2304.08485 .URL https://arxiv.org/abs/2304.08485 
+
+[42] L. Chen, J. Li, X. Dong, P. Zhang, C. He, J. Wang, F. Zhao, D. Lin, Sharegpt4v: Improving large multi-modal models with better captions (2023). arXiv:2311.12793 .URL https://arxiv.org/abs/2311.12793 
+
+[43] L. Li, Y. Yin, S. Li, L. Chen, P. Wang, S. Ren, M. Li, Y. Yang, J. Xu, X. Sun, L. Kong, Q. Liu, M 3it: A large-scale dataset towards multi-modal multilingual instruction tuning, arXiv preprint arXiv:2306.04387 (2023). [44] M. Moor, Q. Huang, S. Wu, M. Yasunaga, Y. Dalmia, J. Leskovec, C. Zakka, E. P. Reis, P. Rajpurkar, Med-flamingo: a multimodal med-ical few-shot learner, in: S. Hegselmann, A. Parziale, D. Shanmugam, S. Tang, M. N. Asiedu, S. Chang, T. Hartvigsen, H. Singh (Eds.), Pro-ceedings of the 3rd Machine Learning for Health Symposium, Vol. 225 of Proceedings of Machine Learning Research, PMLR, 2023, pp. 353–367. URL https://proceedings.mlr.press/v225/moor23a.html 
+
+[45] T. Deruyttere, S. Vandenhende, D. Grujicic, L. Van Gool, M. F. Moens, Talk2car: Taking control of your self-driving car, in: Proceedings of the 2019 Conference on Empirical Methods in Natural Language Process-ing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), 2019, pp. 2088–2098. 67 [46] X. Tian, J. Gu, B. Li, Y. Liu, Y. Wang, Z. Zhao, K. Zhan, P. Jia, X. Lang, H. Zhao, Drivevlm: The convergence of autonomous driving and large vision-language models (2024). arXiv:2402.12289 .URL https://arxiv.org/abs/2402.12289 
+
+[47] S. Lobry, D. Marcos, J. Murray, D. Tuia, Rsvqa: Visual question an-swering for remote sensing data, IEEE Transactions on Geoscience and Remote Sensing 58 (12) (2020) 8555–8566. doi:10.1109/TGRS.2020. 2988782 .[48] P. Lu, S. Mishra, T. Xia, L. Qiu, K.-W. Chang, S.-C. Zhu, O. Tafjord, P. Clark, A. Kalyan, Learn to explain: Multimodal reasoning via thought chains for science question answering, in: The 36th Conference on Neural Information Processing Systems (NeurIPS), 2022. [49] A. Kembhavi, M. Salvato, E. Kolve, M. Seo, H. Hajishirzi, A. Farhadi, A diagram is worth a dozen images (2016). arXiv:1603.07396 .[50] M. Mathew, D. Karatzas, C. V. Jawahar, Docvqa: A dataset for vqa on document images (2021). arXiv:2007.00398 .URL https://arxiv.org/abs/2007.00398 
+
+[51] M. Mathew, V. Bagal, R. P. Tito, D. Karatzas, E. Valveny, C. V. Jawa-har, Infographicvqa (2021). arXiv:2104.12756 .URL https://arxiv.org/abs/2104.12756 
+
+[52] H. Majidifard, P. Jin, Y. Adu-Gyamfi, W. G. Buttlar, Pavement image datasets: A new benchmark dataset to classify and densify pavement distresses, Transportation Research Record 2674 (2) (2020) 328–339. 
+
+arXiv:https://doi.org/10.1177/0361198120907283 , doi:10.1177/ 0361198120907283 .URL https://doi.org/10.1177/0361198120907283 
+
+[53] J. Zhu, J. Zhong, T. Ma, X. Huang, W. Zhang, Y. Zhou, Pavement distress detection using convolutional neural networks with images captured via uav, Automation in Construction 133 (2022) 103991. 
+
+doi:https://doi.org/10.1016/j.autcon.2021.103991 .URL https://www.sciencedirect.com/science/article/pii/ S0926580521004428 
+
+68 [54] H. Yan, J. Zhang, Uav-pdd2023: A benchmark dataset for pavement distress detection based on uav images, Data in Brief 51 (2023) 109692. 
+
+doi:https://doi.org/10.1016/j.dib.2023.109692 .URL https://www.sciencedirect.com/science/article/pii/ S2352340923007710 
+
+[55] M. Sharif, G. Han, W. Liu, X. Huang, Cultivating multidisciplinary research and education on gpu infrastructure for mid-south institutions at the university of memphis: Practice and challenge (2025). arXiv: 2504.14786 .URL https://arxiv.org/abs/2504.14786 
+
+[56] M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, A. Zisser-man, The PASCAL visual object classes (VOC) challenge, International Journal of Computer Vision 88 (2) (2010) 303–338. [57] D. M. W. Powers, Evaluation: From precision, recall and F-measure to ROC, informedness, markedness & correlation, Journal of Machine Learning Technologies 2 (1) (2011) 37–63. [58] V. I. Levenshtein, Binary codes capable of correcting deletions, inser-tions and reversals, Soviet Physics Doklady 10 (8) (1966) 707–710. [59] L. Zheng, W.-L. Chiang, Y. Sheng, S. Zhuang, Z. Wu, Y. Zhuang, Z. Lin, Z. Li, D. Li, E. P. Xing, H. Zhang, J. E. Gonzalez, I. Sto-ica, Judging LLM-as-a-judge with MT-bench and chatbot arenaNeurIPS 2023 Datasets and Benchmarks Track (2023). arXiv:2306.05685 ,
+
+doi:10.48550/arXiv.2306.05685 .URL https://arxiv.org/abs/2306.05685 
+
+[60] K. Papineni, S. Roukos, T. Ward, W.-J. Zhu, BLEU: a method for au-tomatic evaluation of machine translation, in: Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics, Asso-ciation for Computational Linguistics, Philadelphia, Pennsylvania, USA, 2002, pp. 311–318. doi:10.3115/1073083.1073135 .URL https://aclanthology.org/P02-1040/ 
+
+[61] C.-Y. Lin, ROUGE: A package for automatic evaluation of summaries, in: Text Summarization Branches Out, Association for Computational 69 Linguistics, Barcelona, Spain, 2004, pp. 74–81. URL https://aclanthology.org/W04-1013/ 
+
+[62] R. Vedantam, C. L. Zitnick, D. Parikh, CIDEr: Consensus-based image description evaluation, in: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2015, pp. 4566–4575. URL https://openaccess.thecvf.com/content_cvpr_2015/html/ Vedantam_CIDEr_Consensus-Based_Image_2015_CVPR_paper.html 
+
+70

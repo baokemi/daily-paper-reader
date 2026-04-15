@@ -1,0 +1,587 @@
+Title: Flexible Electric Vehicle Charging with Karma
+
+URL Source: https://arxiv.org/pdf/2604.07246v1
+
+Published Time: Thu, 09 Apr 2026 01:15:22 GMT
+
+Number of Pages: 7
+
+Markdown Content:
+# Flexible Electric Vehicle Charging with Karma 
+
+Ezzat Elokda, Ruiting Wang, Karl H. Johansson, Angela Fontan 
+
+Abstract — Motivated by the need to develop fair and efficient schemes to facilitate the electrification of transport, this paper proposes a non-monetary karma economy for flexible Electric Vehicle (EV) charging, managing the intertemporal allocation of limited power capacity. We consider a charging facility with limited capacity that must schedule arriving EVs to charge in real-time. For this purpose, the facility adopts online karma auctions, in which each EV user is endowed with non-tradable karma tokens, places a karma bid in each time interval it is present in the facility, and capacity is allocated to the highest bidders, who must pay their bids. These payments are subsequently redistributed to the users to form a closed, indefinitely sustainable economy. The main contribution is to extend previous karma Dynamic Population Game (DPG) formulations to this setting which features novel State of Charge (SOC) dynamics and private trip deadlines in addition to urgency. A Stationary Nash Equilibrium (SNE) of the EV charging karma economy is guaranteed to exist, and it is demonstrated to provide pronounced benefits with respect to benchmark scheduling schemes as it balances between meeting deadlines and prioritizing high urgency. 
+
+I. I NTRODUCTION 
+
+The clean energy transition is upon us. The European Union is legally bound to reduce carbon emissions by 55% compared to 1990 by 2030, and achieve net-zero emissions by 2050 [1]. The electrification of transport is expected to be a major enabler of the transition owing to the pres-ence of relatively mature, energy-efficient Electric Vehicle (EV) technology [2]. However, a rapid penetration of EVs risks overloading present infrastructures if not appropriately managed. Sources of energy scarcity facing prospective EV users include limited charging spaces [3], physical power limits of the distribution grid [4], and the availability of clean energy [5]. To address this challenge, it is crucial to leverage the flexibility of EV charging loads [6]: depending on the present State of Charge (SOC) and private attributes such as upcoming trip deadline and urgency, EV users may not always need to charge immediately when they arrive at a charging facility, making it possible to shift EV power consumption to times of less scarcity. The prototypical way to manage resource scarcity is mon-etary control , and many monetary pricing [7]–[9] and auc-tion [10]–[12] mechanisms have been proposed to maximize the benefit of potential flexibility in EV charging behaviors for smart power management at charging facilities. The 
+
+> The authors are with the Department of Decision and Control Systems, School of Electrical Engineering and Computer Science, KTH Royal In-stitute of Technology, Stockholm, Sweden ( {elokda; ruiting; kallej; ang-fon }@kth.se). They are also affiliated with the research center Digital Fu-tures, Stockholm, Sweden. This work was supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation.
+
+Fig. 1: Illustration of EV Charging Karma Economy. working principle of these mechanisms is to expose EV users to dynamic, real-time price signals that are high during times of scarcity, thereby incentivizing off-peak charging and other desired behaviors from the operation perspective. However, there are several issues with these monetary control schemes. First, they may be outright rejected in communal settings, e.g., to allocate office charging slots to company employees. Second, empirical evidence indicates varying responsiveness to dynamic prices, with many EV users not responding when price variations are too low to justify the burden of planning and real-time monitoring [13], [14]. Third and arguably most important, monetary control is discriminatory , allocating flexibility based on willingness to pay while overlooking ability to pay [15]. This fairness issue is likely to exacerbate as prices vary more severely with increased EV penetration and intermittent renewable generation. This paper instead proposes a non-monetary approach to flexible EV charging. We adopt a fixed, fair charging price, and rely on a non-monetary matching mechanism to address temporal scarcity over a time period or day. Among existing matching mechanisms [16], the recently developed karma economy [17]–[21] is particularly suited for this purpose due to its unique ability to be sustained indefinitely over infinite time [19]. Karma is a non-tradable token used to bid for resources repeatedly, flowing from resource consumers to yielders in a closed and indefinitely sustainable cycle. This design encourages truthful bidding according to private needs, as users effectively “play against their future selves”. Compared to tradable token schemes [22], karma ensures equity through entirely non-monetary participation [18]. Previous works have developed a game-theoretic frame-work for general karma economies [17], and applied it to specific problems in transportation, e.g., highway priority lanes allocation [18] and coupled allocation of priority roads and parking spaces [23]. Moreover, it was shown that karma equilibria maximize Long-run Nash Welfare (LNW) under certain conditions [19]. LNW is the infinite-time extension of Nash welfare, an alternative social welfare function to This work has been submitted to the IEEE for possible publication. Copyright may be transferred without notice, after which this version may no longer be accessible. 
+
+> arXiv:2604.07246v1 [eess.SY] 8 Apr 2026
+
+the commonly employed utilitarianism that is considered to encode both fairness and efficiency jointly [24], [25]. In this paper, we conceptualize a karma-based scheme for flexible EV charging, as portrayed in Fig. 1. Each day, EV users arrive stochastically at a charging facility with private, stochastic demands to charge. The private demands consist of a deadline to charge by, a desired charge level, and an urgency of the upcoming trip. The charging facility employs online karma auctions, e.g., hourly, to allocate the available capacity. In each auction, the highest karma bidders get to charge for the next hour, pay their bids, and the payments get uniformly redistributed in the population to form a closed economy. This process repeats indefinitely, with the SOC at the beginning of each day being correlated to the SOC accumulated at the end of the previous day for each EV. In comparison to previous karma formulations [17], [18], [23], this setting bears significant complexity, owing to the presence of intra-day charging dynamics (in addition to the previously considered inter-day karma dynamics), and the novel scheduling aspect related to meeting private deadlines (in addition to previously considered private ur-gency). Accordingly, we incorporate a micro time repre-senting the time of day, modeled as a global state, and a macro time representing different days. We adopt state-dependent discounting to discount future payoffs at the end of each day, a technique first used in [23]. Our main contributions are as follows. First, we adopt and extend pre-vious karma Dynamic Population Game (DPG) formulations to this complex EV charging problem and show that the Stationary Nash Equilibrium (SNE) existence guarantee is maintained. Second, a numerical investigation of the SNE reveals that the karma scheme balances effectively between meeting deadlines and prioritizing high urgency trips, ac-cording to private deadlines and urgency, and outperforms benchmark scheduling schemes, including First-Come-First-Serve (FCFS) and Earliest-Deadline-First (EDF), in terms of the average payoffs experienced by the users. The remainder of the paper is organized as follows. Section II describes the proposed karma scheme and its DPG formulation, in which a SNE is guaranteed to exist (Theorem 1). Section III performs a numerical analysis of the SNE in a charging station setting, demonstrating the benefits of the karma scheme in comparison to the benchmarks. Section IV concludes and outlines future research directions. 
+
+Notation: Let f : D × C → R be a function whose domain is defined on D ⊆ N and C ⊆ Rn. To distinguish discrete and continuous arguments, we use notation f [d]( c),with d ∈ D and c = ( c1, . . . , c n) ∈ C . We use boldface to denote vectors, matrices, and higher dimensional tensors. Accordingly, f (c) = (f [d]( c)) d∈D is the vector formed by stacking f [d]( c) for d ∈ D . We adopt the shorthand notation P 
+
+> d
+
+f [d] instead of P 
+
+> d∈D
+
+f [d]. For a ∈ A ⊆ N,
+
+P[a | d]( c) denotes the conditional probability of a given 
+
+d ∈ D and c ∈ C, and P[d+ | d]( c) denotes one-step transition probabilities for d. For m ∈ R≥0, we denote by σ ∈ m ∆( D) := 
+
+n
+
+σ ∈ R|D| ≥0
+
+P 
+
+> d∈D
+
+σ[d] = m
+
+o
+
+adistribution over the elements of D (with total mass m), and 
+
+σ[d] ∈ [0 , m ] denotes the mass of element d. For c ∈ R≥0,
+
+⌊c⌋ ∈ N denotes its rounded down integer, and we define 
+
+⌈c⌉ := ⌊c⌋ + 1 . When considering multiple user types, we denote by xτ a quantity associated to type τ .II. K ARMA -BASED EV C HARGING 
+
+In this section, we first provide a high-level description of our proposed scheme in Section II-A, before detailing its game-theoretic model in Section II-B. Section II-C contains the main theoretical result on the well-posedness of the model: the guaranteed existence of a SNE (Theorem 1). 
+
+A. Description of Karma-based EV Charging 
+
+As illustrated in Fig. 1, we consider a population of EV users N = {1, . . . , n } who arrive at a charging facility at discrete time intervals t ∈ T = {tstart , t start + ∆ t, . . . , t end }
+
+[hr], where T is a scarcity period of interest. The charging facility has a (potentially time-varying) capacity C[t] [kWh], that is, the total energy available to charge EVs over the interval t. This could represent the available chargers in a single charging station, or more generally, the total charging capacity in a community or neighborhood of interest. Charg-ers have a common nominal charging rate enom [kWh], and we assume that C[t] is an integer multiple of enom .The charging facility adopts an online karma auction to allocate the available charging slots C[t]/e nom . Each EV user i ∈ N is endowed with karma tokens ki[t] ∈ K =
+
+{0, 1, . . . , k max }, and the auction proceeds over two stages: 
+
+bidding and redistribution . EV users that are present at the charging facility at the start of interval t, and whose SOC is less than 80% of the battery capacity 1, are eligible to participate in the bidding stage. They place a karma bid 
+
+bi[t] ∈ B [ki[t]] = {0, 1, . . . , k i[t]}, limited by their karma, and the highest C[t]/e nom bidders are admitted to charge. Ties on the C[t]/e nom -highest bid are settled randomly. In the redistribution stage, those who are admitted to charge must pay what they bid. The total payment is redistributed uniformly to all users regardless of their presence in the charging facility [23], while respecting the maximum karma constraint kmax (as elaborated in Section II-B.2.e). Thus, the system’s average karma ¯k = P 
+
+> i∈N
+> ki[t]
+> N
+
+is preserved over time. This process repeats indefinitely, with the karma balance at the end of each day carrying over to the next day. Since karma constrains bids over time, bids are expected to correlate well with private user demand states, e.g., the deadline, desired SOC, and urgency of the upcoming trip. Users do not only compete with others but must also balance their needs against their future selves. In what follows, we formulate a game-theoretic model that aims to predict rational equilibrium bidding behavior as a function of private demands and the resulting performance of the karma scheme.   
+
+> 1We limit charging to 80% of battery capacity to avoid nonlinear losses typically present in the upper range of battery charging dynamics.
+
+B. Dynamic Population Game Model 
+
+Our model adopts and extends previous formulations of karma economies [17], [18] to the present setting, and is based on the class of DPGs [26]. A DPG can be viewed as a collection of discounted, infinite-horizon Markov Decision Processes (MDPs) faced by individual players in a continu-ous population, in our case, EV users participating in online karma auctions. The MDPs of different players are coupled through a social state encoding the macroscopic distribution of states and actions in the population. The main modeling exercise in a DPG is to specify the immediate payoff function 
+
+and the state transition function of these MDPs, which are functions of the social state. If these functions satisfy a continuity assumption, a SNE, the central solution concept of DPGs (defined in Section II-C), is guaranteed to exist. Following this framework, we assume that the population 
+
+N forms a continuum of nonatomic EV users, and express the available charging capacity in average terms, denoted by 
+
+c[t] [kWh / user]. Users are assumed to be symmetric, i.e., they have identical static traits, but can be in different states at any given time 2. The user state is defined as 
+
+x = [ t, ˜x] ∈ X = T × ˜X , (1a) 
+
+˜x = [ ℓ, t d, s d, u, s, k ] ∈ ˜X = L × T d × S × U × S × K .
+
+(1b) It consists of a global component t ∈ T (the current time-of-day, cf. Section II-A), and an individual component ˜x, which is composed as follows:  
+
+> •
+
+ℓ ∈ L = {0, 1, 2} is a presence state , respectively indicating that the user has not yet arrived at ( ℓ = 0 ), is present in ( ℓ = 1 ), or has departed from ( ℓ = 1 ) the charging facility;  
+
+> •
+
+td ∈ T d = {0, ∆t, . . . , t d,max } [hr] is the user’s private deadline for its upcoming trip;  
+
+> •
+
+sd ∈ S d ⊆ S [kWh] is the user’s private desired SOC for its upcoming trip;  
+
+> •
+
+u ∈ U = {u1, . . . , u nu } is the user’s private urgency of the upcoming trip;  
+
+> •
+
+s ∈ S = {enom , 2 enom , . . . , s max } [kWh] is the SOC of the user’s EV battery, discretized by enom . 
+
+> •
+
+k ∈ K is the user’s karma, cf. Section II-A. The action of each user at each time-step is a karma bid 
+
+b ∈ B [ℓ, s, k ], where B[ℓ, s, k ] = ∅ if ℓ̸ = 1 or s = smax ,denoting that the user cannot participate in the bidding in these states, and B[ℓ, s, k ] = {0, 1, . . . , k } otherwise. The social state is defined as 
+
+(d, π) ∈ D × Π, (2a) 
+
+d : T → ∆( ˜X ), π : X → ∆( B[ℓ, s, k ]) . (2b) The first component is the state distribution d, defined as the conditional distribution of individual states for a given time interval, i.e., d[˜ x | t] is the fraction of the population in ˜x at interval t. The second component is the symmetric policy π followed by all users, defined as a probabilistic 
+
+> 2The formulation can be readily extended to multiple user types, cf. [26].
+
+map from state to action, i.e., π[b | x] is the probability of bidding b when in state x. The remainder of this section is thus dedicated to deriving the immediate payoffs r(d, π) and the state transition probabilities p(d, π) of the users’ MDP, as functions of the social state. 
+
+1) Immediate payoff function r[x, b ]( d, π): EV users are assumed to incur a cost equal to their urgency for each time interval in which their upcoming trip deadline has passed (td = 0 ), but they are still present in the charging facility (ℓ = 1 ). Accordingly, immediate payoffs are given by 
+
+r[x, b ]( d, π) = r[t, ℓ, t d, s d, s, u ] = 
+
+
+
+−u, t < t end , ℓ = 1 , t d = 0 ,
+
+−u
+
+ sd−senom − td
+
+> ∆t
+
+
+
+, t = tend , ℓ = 1 , td 
+
+> ∆t
+
+< sd−senom ,
+
+0, otherwise .
+
+(3) The second case in (3) corresponds to the situation where an EV user has not yet completed charging at the end of the scarcity period tend . The user will continue charging at rate enom until it reaches its desired SOC sd, and incur a cost of u for each additional time-step beyond its deadline. Note that r[x, b ]( d, π) does not actually depend on the social state (d, π) nor the bid b, however, the resulting MDP is still dependent on these quantities through the state transitions. 
+
+2) State transition function p[x+ | x, b ]( d, π): Due to the complex definition of user states, deriving the state transition function is a significant modeling exercise that will occupy the remainder of this section. We tackle the complexity by leveraging the conditional independence of state components to define transitions component-wise, as follows. 
+
+a) Time-of-day transitions: Time increments by ∆t and rolls over to the next day at the end of the current day, i.e., 
+
+P[t+ | t] = 
+
+
+
+1, t+ = t + ∆ t, t < t end ,
+
+1, t+ = tstart , t = tend ,
+
+0, otherwise .
+
+(4) 
+
+b) Presence state transitions: Given an arrival time distribution Pa satisfying P 
+
+> t
+
+Pa[t] ≤ 1, where strict inequal-ity models a non-zero probability to not visit the charging facility, the presence state ℓ evolves as 
+
+P[ℓ+ = 1 | t, ℓ, t d, s d, s +] = 
+
+
+
+Pa[tstart ], t = tend ,   
+
+> Pa[t+∆ t]1−P
+> t′≤tPa
+> τ[t′]
+
+, t < t end , ℓ = 0 ,
+
+1, t < t end , ℓ = 1 , t d > ∆t, 
+
+1, t < t end , ℓ = 1 , t d ≤ ∆t, s+ < s d,
+
+0, otherwise ;
+
+(5a) 
+
+P[ℓ+ = 2 | t, ℓ, t d, s d, s +] = 
+
+
+
+1, t < t end , ℓ = 1 , t d ≤ ∆t, s + ≥ sd,
+
+1, t < t end , ℓ = 2 ,
+
+0, otherwise ;
+
+(5b) and P[ℓ+ = 0 | · ] = 1 − P[ℓ+ = 1 | · ] − P[ℓ+ = 2 | · ].The first two cases in (5a) capture arrivals at the charging facility, where we use Bayes rule to derive the probability of a user arriving in the next interval given that it has not arrived yet ( ℓ = 0 ). Once in the charging facility (ℓ = 1) ,the user remains there until its trip deadline. If the deadline is about to pass (or has passed already), and its next SOC 
+
+s+ falls short of the desired sd, it remains in the charging facility ( ℓ+ = 1 ); otherwise it departs on its trip ( ℓ+ = 2 ). 
+
+c) Demand state transitions: The trip deadline, desired SOC, and urgency jointly form the private demand state .They are drawn for each user at the start of each day from a distribution ϕ ∈ ∆( T d × S d × U ), and evolve according to 
+
+P[td+, s d+, u + | t, ℓ, t d, s d, u ] = 
+
+
+
+ϕ[td+, s d+, u +], t = tend ,
+
+1, t < t end , ℓ = 0 , t d+ = td,sd+ = sd, u + = u, 
+
+1, t < t end , ℓ > 0,td+ = max {td − ∆t, 0},sd+ = sd, u + = u, 
+
+0, otherwise ,
+
+(6) i.e., sd and u remain constant for the day, while td decrements by ∆t once the user arrives at the charging facility. 
+
+d) SOC transitions: The evolution of the SOC depends on the karma auction outcomes. Following [18], let ν[b |
+
+t]( d, π) = P 
+
+> ˜x
+
+d[˜ x | t] π[b | t, ˜x] denote the distribution of bids in interval t, from which the threshold bid to be among the c[t]-highest bidders is derived as 
+
+b∗[t]( d, π) = 
+
+(
+
+0, P 
+
+> b≥0
+
+ν[b | t] enom < c [t],
+
+max {b ≥ 0 | P 
+
+> b′≥b
+
+ν[b′ | t] enom ≥ c[t]}, otherwise ,
+
+(7) where we omit the dependency on (d, π) from the right-hand side of the equation (here and hereafter). Accordingly, the energy e ∈ { 0, e nom } allocated to an EV user bidding b
+
+in interval t is distributed as 
+
+P[e = enom | t, b ]( d, π) =
+
+
+
+1, b > b ∗[t],f e[t], b = b∗[t],
+
+0, otherwise ,
+
+(8) where f e[t]( d, π) = min 
+
+n c[t]−P    
+
+> b>b ∗[t]ν[b|t]enom
+> ν[b∗[t]|t]enom
+
+, 1
+
+o
+
+is the uniform random probability for users tying at b∗[t] to charge, and P[e = 0 | · ] = 1 −P[e = enom | · ]. Note, however, that (8) possesses a discontinuity at social states for which ν[b∗[t] |
+
+t]( d, π) = 0 for some t. As in [18], we approximate (8) with a continuous function given by 
+
+Pϵ[e = enom | t, b ]( d, π) = 
+
+
+
+0, P 
+
+> b′>b
+
+ν[b | t] enom > c [t],
+
+1,
+
+P 
+
+> b′≥b
+
+ν[b | t] + ϵ
+
+
+
+enom ≤ c[t],f e,ϵ [t], otherwise ,
+
+(9) where ϵ is a small approximation parameter that slightly under-allocates c[t] when there are ties at b∗[t], and 
+
+f e,ϵ [t]( d, π) = min 
+
+n c[t]−P    
+
+> b>b ∗[t]ν[b|t]enom
+> (ν[b∗[t]|t]+ ϵ)enom
+
+, 1
+
+o
+
+. It is shown in [18] that Equation (9) is continuous in (d, π) for ϵ > 0,and lim ϵ→0 Pϵ[e | · ] = P[e | · ].Given the karma auction outcome probability (9), the SOC transitions conditional on energy allocation e are given by 
+
+P[s+ | t, ℓ, s d, s, e ] = X
+
+> sp
+
+P[sp | ℓ, s, e ] P[s+ | t, s d, s p],
+
+(10a) 
+
+P[sp | ℓ, s, e ] = 
+
+
+
+1, ℓ = 1 , s p = min {s + e, s max },
+
+1, ℓ̸ = 1 , s p = s, 
+
+0, otherwise ,
+
+(10b) 
+
+P[s+ | t, s d, s p] = 
+
+
+
+1, t < t end , s + = sp,
+
+Pend [s+ | sd, s p], t = tend ,
+
+0, otherwise ,
+
+(10c) where sp is an intermediate variable denoting the SOC prior to completing the upcoming trip, distributed per (10b). The SOC transitions conditional on sp are given by (10c), in which Pend [sstart | sd, s end ] models an exogenous distribution relating the current day’s sd and ending SOC send to the next day’s starting SOC sstart , cf. Section III-A for an example. 
+
+e) Karma transitions: It remains to specify the karma transitions which follow the same redistributive scheme of [18]. Consider as intermediate variable the next karma prior to redistribution kp, governed by 
+
+P[kp | k, b, e ] = 
+
+
+
+1, e = 0 , k p = k
+
+1, e = enom , k p = k − b
+
+0, otherwise .
+
+(11) The distribution of kp in interval t is P[kp | t]( d, π) = P 
+
+> τ, ˜x
+
+d[˜ x] P 
+
+> b
+
+π[b | t, ˜x] P 
+
+> e
+
+Pϵ[e | t, b ] P[kp | k, b, e ]. The uniform redistribution share to each user is thus computed as ¯ξ[t]( d, π) = ¯k − P 
+
+> kp
+
+P[kp | t] kp. The following karma-dependent redistribution attains ¯ξ[t] on average, meanwhile respecting the maximum karma limit kmax :
+
+ξ[t, k p]( d, π) = 
+
+
+
+kmax − kp, kp +  ¯ξ[t] ≥ kmax       
+
+> ¯ξ[t]−P
+> kp′ ≥kmax −⌊¯ξ[t]⌋P[kp′
+> |t]
+> 
+> kmax −kp′P
+> kp′<k max −⌊¯ξ[t]⌋P[kp′|t]
+
+, otherwise .
+
+(12) Letting f k[t, k p]( d, π) = ξ[t, k p] − ⌊ ξ[t, k p]⌋, the karma transitions conditional on kp are 
+
+P[k+ | t, k p]( d, π) = 
+
+
+
+1 − f k[t, k p], k+ = kp + ⌊ξ[t, k p]⌋ ,f k[t, k p], k+ = kp + ⌈ξ[t, k p]⌉ ,
+
+0, otherwise ,
+
+(13) and the overall karma transitions are obtained by combin-ing (11)–(13) as 
+
+P[k+ | t, k, b, e ]( d, π) = X
+
+> kp
+
+P[kp | k, b, e ] P[k+ | t, k p].
+
+(14) 
+
+f) Overall state transitions: Finally, combining the above gives the overall state transition function 
+
+p[x+ | x, b ]( d, π) = P[t+ | t]
+
+P[td+, s d+, u + | t, ℓ, t d, s d, u ]
+
+P[ℓ+, s +, k + | t, ℓ, t d, s d, s, k, b ], (15) where the [ℓ, s, k ]-state transitions are grouped using 
+
+P[ℓ+, s +, k + | t, ℓ, t d, s d, s, k, b ] = 
+
+X
+
+> e
+
+Pϵ[e | t, b ] P[s+ | t, ℓ, s d, s, e ]
+
+P[ℓ+ = 1 | t, ℓ, t d, s d, s +] P[k+ | t, k, b, e ]. (16) 
+
+C. Existence of Stationary Nash Equilibrium (SNE) 
+
+With the immediate payoffs (3) and state transitions (15) specified, we proceed to define the solution concept of SNE and guarantee its existence in accordance to the DPG framework. The state transition matrix P (d, π), infinite hori-zon value function V (d, π), and state-action value function 
+
+Q(d, π) are respectively defined as 
+
+P [x+ | x] = X
+
+> b
+
+π[b | x] p[x+ | x, b ],V [x] = r[t, ℓ, t d, s d, s, u ] + δ[t] X
+
+> x+
+
+P [x+ | x] V [x+],Q[x, b ] = r[t, ℓ, t d, s d, s, u ] + δ[t] X
+
+> x+
+
+p[x+ | x, b ] V [x+].
+
+Here, δ[t] is a state-dependent discount factor satisfying 
+
+δ[t < t end ] = 1 and δ[t = tend ] ∈ [0 , 1) , i.e., discounting occurs only on transitions to future days, but not within the same day. Note that Q 
+
+> t
+
+δ[t] < 1, and therefore the Bellman recursion specifying V (d, π) is eventually contracting and has a unique, continuous solution in (d, π) [27]. 
+
+Definition 1. A social state (d∗, π∗) is a Stationary Nash Equilibrium (SNE) if, for all x = [ t, ˜x] ∈ X ,
+
+d∗[˜ x | t] = X
+
+> ˜x−
+
+d∗[˜ x− | t−] P [t, ˜x | t−, ˜x−], (18a) 
+
+π∗[· | x] ∈ argmax 
+
+> σ∈∆( B[ℓ,s,k ])
+
+X
+
+> b
+
+σ[b] Q[x, b ], (18b) where t− = t − ∆t for t > t start and t− = tend for t = tstart .The existence of a SNE is guaranteed for general DPGs if the immediate payoff and state transition functions are con-tinuous in the social state (d, π) [26]. Due to the continuous construction of these functions using (9), and that continuity is not lost with the state-dependent discounting scheme, the following theorem is a consequence of [26, Proposition 1]. 
+
+Theorem 1. A SNE is guaranteed to exist in the EV charging karma economy with immediate payoff function (3) and state transition function (15) .
+
+III. N UMERICAL ANALYSIS 
+
+We now perform a numerical analysis of the SNE of the EV charging karma economy, computed using the evo-lutionary dynamics-inspired algorithm introduced in [17], [26]. Due to the size of the state space in this complex setting, the SNE computation was rather expensive, and we terminated the algorithm after 1000 iterations, which required approximately 48hrs to complete with a quad-core Intel i7-8550U CPU and 16GB RAM machine. 
+
+A. Settings and Parameters 
+
+We consider two representative settings in our numerical analysis: moderate scarcity and high scarcity . Both settings consider a single charging station, e.g., workplace charging, with nominal charging rate enom = 8 kWh (corresponding to level-2 AC charging). The average capacity is 8/3kWh / user in moderate scarcity, and 2kWh / user in high scarcity, i.e., the charging station can admit at most 1/3 or 1/4 of the total population to charge at a time, respectively. In both settings, we consider a 12-hour time period with tstart = 7 :00, tend =19 :00, ∆t = 1 ; maximum SOC smax = 64 kWh (correspond-ing to 80% of 80kWh battery); system average karma ¯k = 9 
+
+and maximum karma kmax = 18 ; continuous approximation parameter ϵ = 10 −4; and end-of-day discount factor δ[tend ] = 0.99 . The arrival time distribution follows typical workplace patterns with Pa[t] = 0 .25 for t ∈ { 7:00 , 8:00 , 9:00 } and 
+
+Pa[t] = 0 .125 for t ∈ { 10:00 , 11:00 }. The demand state distribution is ϕ[td, s d, u ] = P[td] P[sd] P[u], with each day’s trip deadline, desired SOC and urgency drawn independently from the following distributions: P[td = 8 hr ] = 0 .75 (default deadline), P[td = 4 hr ] = 0 .25 (occasional short deadline); 
+
+P[sd = 32 kWh ] = 0 .75 (default 40% charge requirement), 
+
+P[sd = 48 kWh ] = 0 .2 (occasional 60% charge requirement), 
+
+P[sd = 64 kWh ] = 0 .05 (rare 80% charge requirement); and P[u = 1] = 0 .75 (default urgency), P[u = 9] = 0 .25 
+
+(occasional high urgency). Finally, we suppose that EV users do not have access to external charging and thus the end-of-day SOC transitions are deterministic with sstart =max send − sd + enom , e nom 3.
+
+B. Performance Measures and Benchmarks 
+
+We consider two performance measures: the per-day av-erage wait time beyond deadline ¯w(d∗, π∗) (or average        
+
+> 3This corresponds to maintaining a minimum SOC of enom (10% of battery capacity) and thus the actual trip consumption is sd−enom .Moderate Scarcity High Scarcity
+> 0
+> 20
+> 40
+> 60
+> 80 Avg. Wait Time [min]  FCFS EDF Karma
+
+(a) Average wait time ¯wModerate Scarcity High Scarcity  
+
+> −4
+> −2
+> 0Avg. Payoff
+> FCFS EDF Karma
+
+(b) Average payoff ¯r
+
+Fig. 2: Performance of karma versus FCFS and EDF. wait time for short) and average payoff ¯r(d∗, π∗), given respectively at SNE (d∗, π∗) as 
+
+¯w(d∗, π∗) = X
+
+> t,s d,u,s,k
+
+d∗[ℓ = 1 , t d = 0 , s d, u, s, k | t], (19) 
+
+¯r(d∗, π∗) = X
+
+> t, ˜x
+
+d∗[˜ x | t] r[t, ˜x]. (20) The average wait time as per (19) is defined as the long-run fraction of times spent in “waiting” states [ℓ = 1 , t d = 0] at which the deadline has passed but the EV must still remain in the charging station. The average payoff as per (20) is the long-run average of the immediate payoff function (3) with respect to the stationary distribution d∗, and additionally takes into account the urgency in waiting states. Moreover, we consider two popular benchmarks in the scheduling literature: FCFS and EDF. Under FCFS, EV users are prioritized based on order of arrival and remain charging until they either reach smax or depart from the charging station. This baseline scheme is agnostic to the private demand states [td, s d, u ]. Under EDF, EV users report their deadlines td and desired SOC sd, and those with earliest 
+
+td gain priority (unless they have already reached sd). EDF is considered the workhorse scheduler in deadline-sensitive contexts since it guarantees meeting all deadlines whenever feasible [28], [29]. However, in addition to assuming truthful reporting of td and sd, it does not take the urgency u into account. Each of these two benchmarks induces a Markov chain on the states whose derivation is similar to Section II-B.2 4. The performance measures of each benchmark are computed analogously to Equations (19)–(20) at the station-ary distribution of the respective Markov chain. 
+
+C. Results 
+
+We first show the performance measures of the karma scheme versus the benchmarks for both settings of moderate and high scarcity in Fig. 2. The average wait time is highest for FCFS, lowest for EDF, and the karma scheme lies in between these two benchmarks, cf. Fig. 2a. Higher average wait time indicates that the karma scheme is susceptible to miss more deadlines than EDF under the assumption of truthful reporting in EDF. Nonetheless, the karma scheme attains the maximum average payoff, cf. Fig. 2b, owing to its ability to tailor to the private urgency in addition to the  
+
+> 4The main difference to Section II-B.2 is that priority to charge, i.e., Equation (9), is based on arrival times or deadlines instead of bids. Low Urgency High Urgency
+> 0
+> 5
+> 10
+> 15 Avg. Wait Time [min]  FCFS EDF Karma
+
+(a) Moderate Scarcity Low Urgency High Urgency  
+
+> 0
+> 20
+> 40
+> 60
+> 80 Avg. Wait Time [min]
+
+(b) High Scarcity 
+
+Fig. 3: Average wait time conditional on urgency ¯w[u].0 1 2 3 4 5 6 7 8 9 10 11 12 Time Interval 025 50 75 100 % Users in Station 
+
+> c/enom
+> c/enom
+
+(a) P[ℓ = 1 | t]0 1 2 3 4 5 6 7 8 9 10 11 12 Time Interval 0246Threshold Bid  
+
+> Moderate Scarcity High Scarcity
+
+(b) b∗[t]
+
+Fig. 4: Charging station occupancy and threshold bids. private deadline. As illustrated in Fig. 3, once we condition the average wait time on the urgency state 5, karma drastically reduces the wait times of high urgency users compared to EDF. Karma thus effectively balances between meeting deadlines and prioritizing high urgency trips. Finally, we focus on the competitive landscape under the karma scheme. Fig. 4a shows the fraction of users present in the charging station over time, defined as P[ℓ =1 | t]( d∗, π∗) = P 
+
+> td,s d,u,s,k
+
+d∗[ℓ = 1 , t d, s d, u, s, k | t],as well as the fraction that can be admitted to charge in each time interval c/e nom . Fig. 4b shows the corresponding threshold bid b∗[t] to be among the c/e nom highest bidders. As expected, in the high scarcity setting, there is prolonged congestion of the charging station, which in turn results in higher threshold bids than in the moderate scarcity setting. The threshold bids decay to zero towards the end of the day as the congestion gets alleviated. IV. CONCLUSION 
+
+This paper introduces a karma-based scheme for flex-ible EV charging, framing the system as a DPG with a guaranteed SNE. Numerical analysis demonstrates that the karma scheme outperforms benchmark scheduling schemes (FCFS and EDF) in terms of average payoffs experienced by the users. This superiority stems from the mechanism’s unique capacity to align allocation with both heterogeneous deadlines and private urgency. While this study assumes that users can participate in relatively frequent bidding, we envision automating the bidding based on the SNE policy in the future. It is also important to consider user hetero-geneity, e.g., heterogeneous battery capacities, charging rates, access to home charging, commuting patterns, etc.. With      
+
+> 5For urgency u,¯w[u]( d∗,π∗) =
+> P
+> t,s d,s,k d∗[ℓ=1 ,t d=0 ,s d,u,s,k |t]
+> P[u].
+
+heterogeneous users, previous work has shown that karma economies maximize LNW under some assumptions that do not hold in the present setting (e.g., that utility for resources is additively separable) [19], and it will be interesting to extend this result. Another exciting research direction is to investigate the added benefit of coupling EV charging with other resource allocations, e.g., traffic and household energy. REFERENCES [1] European Parliament and Council of the European Union, “Regulation (EU) 2021/1119 of the European Parliament and of the Council of 30 June 2021 establishing the framework for achieving climate neutrality and amending Regulations (EC) No 401/2009 and (EU) 2018/1999 (European Climate law),” Official Journal of the European Union , vol. L 243, pp. 1–17, 2021, document 32021R1119. [2] European Commission and Directorate-General for Climate Action, 
+
+Going Climate-Neutral by 2050 – A strategic long-term vision for a prosperous, modern, competitive and climate-neutral EU economy .Publications Office, 2019. [3] Y. Zhang, P. You, and L. Cai, “Optimal charging scheduling by pricing for ev charging station with dual charging modes,” IEEE Transactions on Intelligent Transportation Systems , vol. 20, no. 9, pp. 3386–3396, 2018. [4] Y. Li and A. Jenn, “Impact of electric vehicle charging demand on power distribution grid congestion,” Proceedings of the National Academy of Sciences , vol. 121, no. 18, p. e2317599121, 2024. [5] M. E. Kabir et al. , “Optimal scheduling of EV charging at a solar power-based charging station,” IEEE Systems Journal , vol. 14, no. 3, pp. 4221–4231, 2020. [6] N. Sadeghianpourhamami et al. , “Quantitive analysis of electric ve-hicle flexibility: A data-driven approach,” International Journal of Electrical Power & Energy Systems , vol. 95, pp. 451–462, 2018. [7] S. Limmer, “Dynamic pricing for electric vehicle charging—A litera-ture review,” Energies , vol. 12, no. 18, p. 3574, 2019. [8] Z. J. Lee, J. Z. Pang, and S. H. Low, “Pricing ev charging service with demand charge,” Electric Power Systems Research , vol. 189, p. 106694, 2020. [9] C. Lu et al. , “Deadline differentiated dynamic EV charging price menu design,” IEEE Transactions on Smart Grid , vol. 14, no. 1, pp. 502– 516, 2022. [10] E. H. Gerding et al. , “Online mechanism design for electric vehicle charging,” in The 10th International Conference on Autonomous Agents and Multiagent Systems-Volume 2 , 2011, pp. 811–818. [11] L. Hou et al. , “A simultaneous multi-round auction design for schedul-ing multiple charges of battery electric vehicles on highways,” IEEE Transactions on Intelligent Transportation Systems , vol. 23, no. 7, pp. 8024–8036, 2021. [12] P.-Y. Su et al. , “Two-stage mechanism design for electric vehicle charging with day-ahead reservations,” in 2025 IEEE 64th Conference on Decision and Control (CDC) , 2025, pp. 3995–4002. [13] M. Grˇ zani´ c et al. , “Prosumers as active market participants: A sys-tematic review of evolution of opportunities, models and challenges,” 
+
+Renewable and Sustainable Energy Reviews , vol. 154, p. 111859, 2022. [14] M. Chatzouli et al. , “Which electric vehicle users are flexible and price responsive? Uncovering user types in Denmark,” Energy Research & Social Science , vol. 127, p. 104240, 2025. [15] M. Palm and A. Thomas, “Americans meet congestion pricing: Re-framing the equity debate around cbd tolling for auto-dependent countries,” Urban Studies , 2026. [16] A. E. Roth, Who gets What–and Qhy: The New Economics of Match-making and Market Design . Houghton Mifflin Harcourt, 2015. [17] E. Elokda et al. , “A self-contained karma economy for the dynamic allocation of common resources,” Dynamic Games and Applications ,vol. 14, no. 3, pp. 578–610, 2024. [18] E. Elokda et al. , “CARMA: Fair and efficient bottleneck congestion management via nontradable karma credits,” Transportation Science ,vol. 59, no. 2, pp. 340–359, 2025. [19] E. Elokda et al. , “A vision for trustworthy, fair, and efficient socio-technical control using karma economies,” Annual Reviews in Control ,vol. 60, p. 101026, 2025. [20] M. Salazar et al. , “Urgency-aware optimal routing in repeated games through artificial currencies,” European Journal of Control , vol. 62, pp. 22–32, 2021. [21] L. Pedroso et al. , “Fair artificial currency incentives in repeated weighted congestion games: Equity vs. equality,” in 2024 IEEE 63rd Conference on Decision and Control (CDC) , 2024, pp. 954–959. [22] L. Balzer et al. , “Dynamic tradable credit scheme for multimodal urban networks,” Transportation Research Part C: Emerging Tech-nologies , vol. 149, p. 104061, 2023. [23] E. Elokda et al. , “To travel quickly or to park conveniently: Coupled resource allocations with multi-karma economies,” IFAC-PapersOnLine , vol. 58, no. 30, pp. 25–30, 2024. [24] I. Caragiannis et al. , “The unreasonable fairness of maximum Nash welfare,” ACM Transactions on Economics and Computation (TEAC) ,vol. 7, no. 3, pp. 1–32, 2019. [25] I. Shilov et al. , “Welfare and cost aggregation for multi-agent control: When to choose which social cost function, and why?” IEEE Open Journal of Control Systems , 2026. [26] E. Elokda et al. , “Dynamic population games: A tractable intersection of mean-field games and population games,” IEEE Control Systems Letters , vol. 8, pp. 1072–1077, 2024. [27] J. Stachurski and J. Zhang, “Dynamic programming with state-dependent discounting,” Journal of Economic Theory , vol. 192, p. 105190, 2021. [28] H. Chetto and M. Chetto, “Some results of the earliest deadline scheduling algorithm,” IEEE Transactions on software engineering ,vol. 15, no. 10, p. 1261, 1989. [29] A. Ahmad et al. , “Earliest-deadline-based scheduling to reduce urban traffic congestion,” IEEE Transactions on Intelligent Transportation Systems , vol. 15, no. 4, pp. 1510–1526, 2014.

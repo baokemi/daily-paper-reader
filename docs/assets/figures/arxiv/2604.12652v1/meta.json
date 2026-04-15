@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12652v1/fig-001.webp",
+      "caption": "Figure 2: Qualitative comparison of 6 representative winning cases. Each row shows the full Prompt, Baseline (QwenImage-2512), and Ours (PromptEcho-trained). Ours demonstrates more faithful adherence to fine-grained details including color, count, texture, and spatial relations.",
+      "page": 15,
+      "index": 1,
+      "width": 735,
+      "height": 1094
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12652v1/fig-002.webp",
+      "caption": "Figure 1: Overview of the PromptEcho training pipeline. (Left, dashed green) Data Preparation: a frozen VLM captions images from a source dataset to build the caption corpus {c1, . . . , cN}. (Main loop) At each iteration, a caption ci is sampled and fed to the T2I model Gθ, which generates K images. Each image xj enters the PromptEcho Reward Computation (blue box): the image, a fixed query q, and the original caption c are concatenated as input tokens to the same frozen VLM; a single teacher-forcing forward pass produces logits over all positions; the cross-entropy loss is computed only on caption token positions, yielding the reward Rj = −CE(c | xj , q). Group advantage Âj = Rj − mean(R1:K) is then used by AWM/GRPO to update Gθ via policy gradient. The same frozen VLM (e.g. Qwen3-VL-32B) is shared across data preparation and reward computation, requiring no fine-tuning or human annotation.",
+      "page": 4,
+      "index": 2,
+      "width": 826,
+      "height": 571
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12652v1/fig-003.webp",
+      "caption": "Figure 3: Text rendering quality comparison before and after PromptEcho training (Section 4.4). Each row shows the Input Image, Prompt, Before PromptEcho, and After PromptEcho. After training, the model produces more accurate Chinese characters with improved stroke completeness and layout consistency in e-commerce poster generation.",
+      "page": 16,
+      "index": 3,
+      "width": 746,
+      "height": 1133
+    }
+  ]
+}

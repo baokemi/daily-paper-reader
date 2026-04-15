@@ -1,0 +1,1281 @@
+Title: Beyond Semantic Search: Towards Referential Anchoring in Composed Image Retrieval
+
+URL Source: https://arxiv.org/pdf/2604.05393v1
+
+Published Time: Wed, 08 Apr 2026 00:33:46 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Beyond Semantic Search: Towards Referential Anchoring in Composed Image Retrieval 
+
+Yuxin Yang 1,2 Yinan Zhou 3,4 Yuxin Chen 4 Ziqi Zhang 1 Zongyang Ma 1
+
+Chunfeng Yuan 1,2,* Bing Li 1,2,5 Jun Gao 6 Weiming Hu 1,2,7
+
+1Institute of Automation, Chinese Academy of Sciences 2University of Chinese Academy of Sciences 
+
+3Xi’an Jiaotong University 4Tencent Inc. 5PeopleAI Inc. 6HelloGroup Inc. 7ShanghaiTech University 
+
+{yangyuxin2023, mazongyang2020}@ia.ac.cn, {ziqi.zhang, cfyuan, bli, wmhu}@nlpr.ia.ac.cn, zyn13572297710@stu.xjtu.edu.cn, uasonchen@tencent.com, gaojun55@gmail.com a) Various Multimodal Image Retrieval Tasks 
+
+Worn on a woman 
+
+standing by the pond, 
+
+wearing a hat and 
+
+close to a handbag. 
+
+Laid out on a surface 
+
+with a brown background 
+
+and white patterns, in an 
+
+indoor environment. 
+
+Add a wide -brimmed hat, 
+
+a plaid bag, and change 
+
+the background to an 
+
+outdoor setting with trees. 
+
+Remove the hat and bag ,
+
+change the shoes to 
+
+black heels, make the hair 
+
+purple, and replace the 
+
+background with curtains. 
+
+The headphones and 
+
+wooden desk are 
+
+replaced by glasses and 
+
+a computer monitor on 
+
+a white surface. 
+
+The glasses, monitor, 
+
+and white desk are 
+
+swapped for headphones 
+
+on a wooden surface. 
+
+The metal monkey and 
+
+textured gray surface 
+
+are replaced by a white 
+
+rabbit figurine and a 
+
+smooth white desk. 
+
+The white rabbit and 
+
+smooth white desk 
+
+are replaced by a 
+
+metal monkey on a 
+
+textured gray surface. 
+
+The scene 
+
+shifts from 
+
+driving on 
+
+a winding 
+
+road through 
+
+green hills to 
+
+being parked 
+
+in a sunny lot. 
+
+The view 
+
+zooms in, 
+
+showing lush 
+
+greenery 
+
+framing 
+
+the base 
+
+beneath 
+
+a vibrant sky. 
+
+Now leaves 
+
+the parking 
+
+lot and 
+
+cruising along 
+
+a winding 
+
+highway 
+
+through lush 
+
+green hills. 
+
+The view 
+
+changes to 
+
+the 
+
+waterfront, 
+
+showing a 
+
+boat on 
+
+the water 
+
+under an 
+
+overcast sky. 
+
+Moves from 
+
+an outdoor, 
+
+modern 
+
+backdrop to 
+
+an indoor 
+
+showroom, 
+
+with the 
+
+camera angle 
+
+raised higher. 
+
+Now sits 
+
+outside a 
+
+modern 
+
+building, 
+
+captured 
+
+from a 
+
+lower and 
+
+more direct 
+
+side angle. 
+
+The wide, 
+
+angled 
+
+waterfront 
+
+view of the 
+
+city skyline 
+
+shifts to 
+
+a tight, 
+
+ground -level 
+
+perspective 
+
+> The ground -
+> level view of
+> the buildings
+> gives way to
+> a wide, angled
+> perspective
+> from the water,
+> capturing the
+> broader city
+> skyline.
+
+c) Some Examples from the OACIRR Dataset 
+
+Fashion C a r 
+
+Product Landmark 
+
+OA C IRR 
+
+b) Task Definition : Composed Image Retrieval vs. Object -Anchored CIR 
+
+The toy bear is 
+
+inside a toy box 
+
+instead of on 
+
+a bookshelf. 
+
+Inside a toy box 
+
+instead of on 
+
+a bookshelf. Instance Matching 
+
+Semantic Matching 
+
+Instance Matching 
+
+Semantic Matching 
+
+Instance Matching 
+
+Semantic Matching 
+
+Semantic 
+
+Matching 
+
+1
+
+Anchored Object 
+
+1
+
+2
+
+2
+
+Query Target 
+
+Based on 
+
+Visual 
+
+Similarity This Suit 
+
+Change the color to 
+
+silver and park it on 
+
+a suburban street. 
+
+Query 
+
+Target A car 
+
+Based on 
+
+Semantic 
+
+Matching      
+
+> Now on the grass holding an
+> orange frisbee, instead of
+> running in front of the house.
+
+Query 
+
+Target 
+
+This dog 
+
+> The view changes to an angled
+> perspective, capturing a snowy
+> winter landscape with bare trees
+> set against a vibrant sunset sky.
+
+Query 
+
+Target 
+
+This house 
+
+Figure 1. Overview of the Object-Anchored Composed Image Retrieval ( OACIR ) task and our OACIRR dataset. 
+
+Abstract 
+
+Composed Image Retrieval (CIR) has demonstrated sig-nificant potential by enabling flexible multimodal queries that combine a reference image and modification text. How-ever, CIR inherently prioritizes semantic matching, strug-gling to reliably retrieve a user-specified instance across contexts. In practice, emphasizing concrete instance fi-delity over broad semantics is often more consequential. In this work, we propose Object-Anchored Composed Image 
+
+Retrieval ( OACIR ), a novel fine-grained retrieval task that 
+
+*Corresponding author. 
+
+Project page: https://hahajun1101.github.io/OACIR/ 
+
+mandates strict instance-level consistency. To advance re-search on this task, we construct OACIRR (OACIR on Real-world images), the first large-scale, multi-domain bench-mark comprising over 160K quadruples and four chal-lenging candidate galleries enriched with hard-negative in-stance distractors. Each quadruple augments the composi-tional query with a bounding box that visually anchors the object in the reference image, providing a precise and flex-ible way to ensure instance preservation. To address the OACIR task, we propose AdaFocal , a framework featuring a Context-Aware Attention Modulator that adaptively inten-sifies attention within the specified instance region, dynam-
+
+1
+
+> arXiv:2604.05393v1 [cs.CV] 7 Apr 2026
+
+ically balancing focus between the anchored instance and the broader compositional context. Extensive experiments demonstrate that AdaFocal substantially outperforms ex-isting compositional retrieval models, particularly in main-taining instance-level fidelity, thereby establishing a robust baseline for this challenging task while opening new direc-tions for more flexible, instance-aware retrieval systems. 
+
+1. Introduction 
+
+The paradigm of image retrieval has progressively evolved toward more flexible and user-oriented forms of interaction. While traditional single-modal methods [10, 14, 37, 41, 51] often struggle to express complex user intentions, Com-posed Image Retrieval (CIR) [7, 12, 40] has emerged as a powerful paradigm to address this limitation. By combining a reference image with modification text, CIR leverages the synergy between visual and textual modalities to retrieve se-mantically aligned target images. This capability has signif-icantly broadened its applicability across diverse domains, including e-commerce and interactive search systems. Despite its flexibility, the fundamental design of CIR pri-oritizes semantic matching over instance-level fidelity. As illustrated in Figure 1(a), the reference image in a conven-tional CIR query often serves as a coarse-grained visual an-chor, defining the global visual scene or object category. Consequently, the CIR model is tasked primarily with broad semantic integration, rendering the retrieval of a specific in-stance unreliable, particularly in the presence of visually similar distractors. In many practical applications [25–27], including digital memory retrieval and long-term identity tracing, emphasizing concrete instance fidelity is often more critical than achieving broad semantic alignment. In this work, we propose Object-Anchored Composed 
+
+Image Retrieval ( OACIR ), a novel fine-grained image re-trieval task that mandates strict instance-level consistency. As illustrated in Figure 1(b), OACIR extends the conven-tional compositional query by incorporating an anchored instance. The objective is to retrieve a target image that semantically satisfies the textual modification while strictly preserving the identical anchored instance. Achieving this objective substantially advances compositional retrieval systems, enabling more flexible and expressive user inter-actions while improving reliability in real-world scenarios. While offering these advantages, this powerful formulation also introduces two core challenges: (1) Compositional Reasoning : Requires the synthesis of three distinct infor-mation sources — the anchored instance, the global visual scene, and the textual modification — into a single coherent representation. (2) Fine-grained Discrimination : Requires distinguishing the exact anchored instance from a gallery enriched with visually and semantically similar distractors. To advance research on this emergent task, we construct 
+
+OACIRR (OACIR on Real-world images), the first large-scale, multi-domain benchmark for OACIR. As showcased in Figure 1(c), OACIRR comprises a unified training set of 127K quadruples covering 2,647 instances, along with an extensive evaluation benchmark containing 33.4K queries across 1,238 instances from four diverse domains: Fashion, Car, Product, and Landmark. The benchmark is enriched with over 26.6K curated distractor instances to form chal-lenging galleries. Collectively, OACIRR provides both a high-quality foundational dataset and a rigorous, compre-hensive benchmark for the OACIR task. To address the unique challenges of OACIR, we propose 
+
+AdaFocal , a simple yet effective framework that integrates a lightweight Context-Aware Attention Modulator (CAAM) .This module analyzes the multimodal query context to pre-dict a modulation scalar, which is then used to adaptively intensifies visual attention on the anchored instance during feature fusion. This mechanism achieves a dynamic balance between instance preservation and compositional reason-ing. Our extensive experiments validate that AdaFocal sub-stantially outperforms existing retrieval paradigms adapted for the OACIR task, demonstrating a pronounced advantage in maintaining instance-level fidelity. These results not only establish AdaFocal as a robust baseline but also underscore the significance of our benchmark in revealing the limita-tions of current semantic-level retrieval models. In summary, the main contributions are as follows: • We propose the novel Object-Anchored Composed 
+
+Image Retrieval ( OACIR ) task, which advances compo-sitional retrieval beyond semantic matching by mandating strict instance-level consistency. • We construct OACIRR , a large-scale, multi-domain benchmark comprising over 160K real-world quadruples from 3.9K unique instances, and a challenging evaluation protocol tailored for rigorous instance-level assessment. • We propose AdaFocal , an efficient framework that dy-namically intensifies attention on the anchored instance region, providing a robust baseline for the OACIR task. 
+
+2. Related Work 
+
+Composed Image Retrieval. Prevailing supervised Com-posed Image Retrieval (CIR) methods typically leverage Vision-Language Pre-training (VLP) models for founda-tional encoding, subsequently employing various adapta-tion strategies tailored to the retrieval task [4, 12, 18, 21, 32, 46]. To alleviate reliance on annotated triplets, Zero-Shot CIR (ZS-CIR) approaches explore either converting the ref-erence image into a pseudo-text representation [5, 6, 11, 38] or using LLM-generated target descriptions [19, 48] to re-cast the problem as text-to-image retrieval. Another re-search line addresses data scarcity by automatically syn-thesizing large-scale training triplets [8, 15, 21, 39, 50]. Despite their differences, these approaches operate at the semantic level and therefore struggle to reliably retrieve 2Image Pairs Collection 1    
+
+> DeepFashion2 Stanford Cars
+> Products -10K
+> Google
+> Landmarks v2
+> Source Datasets
+> Fine -grained
+> Image
+> Classification
+> Visual
+> Consistency
+> Filtering
+> Same style but in different colors
+> Different areas of the same landmark
+> Subset
+> with
+> Sufficient
+> Images
+> Subset
+> with
+> Insufficient
+> Images
+
+Image Pairs Filtering 2     
+
+> Image
+> Similarity
+> Calculation
+> Statistics
+> based
+> Filtering
+> Class -centric
+> Images
+> (Lack of
+> background
+> information )
+> Over Highly
+> Similar
+> Image Pairs
+> (Lack of
+> modification )
+
+Quadruples Annotation 3          
+
+> MLLM
+> Annotator
+> Image Pair
+> +Prompt
+> Modification Text
+> (w/o Instance
+> Category
+> Information )
+> Instance
+> Class Label
+> Grounding Model
+> +Human Annotator
+> Instance
+> Bounding Box
+
+Candidate Gallery Construction 4                 
+
+> Instance
+> Class Label
+> Statistics
+> Category based
+> Filtering
+> Expanded
+> Image Gallery
+> Total Quadruples
+> 127.2 K
+> Total Images
+> 39.5 K
+> Total ID Number
+> 2.65 K
+> Total Queries
+> 33.4 K
+> Candidate Images
+> 26.6 K
+> Total ID Number
+> 1.24 K
+> OA CIRR
+
+Figure 2. The multi-stage construction pipeline for the OACIRR dataset. 
+
+a user-specified instance across contexts. In contrast, our OACIR task imposes strict constraints on instance fidelity, enabling more precise and reliable retrieval. 
+
+Instance Consistency in Image Retrieval. Instance-level consistency has long been a central goal in image retrieval, explored extensively within person-centric tasks such as Image-based Person Retrieval (IPR) [34, 42, 47, 55], its clothes-changing variants (CC-IPR) [17], and more re-cently, Composed Person Retrieval (CPR) [29]. While these methods have advanced person identification under various conditions, their specialized focus inherently limits their ap-plicability to broader object categories in general-purpose retrieval. A distinct paradigm achieves instance awareness by fine-tuning a model to associate a visual concept with a learnable textual token [1, 11, 49]. However, this re-liance on per-instance optimization hinders both scalabil-ity and practical utility. In contrast, our OACIR frame-work achieves robust instance fidelity through an explicit visual prompt at inference time, offering a more flexible and general-purpose approach that bypasses the need for either domain-specific architectures or per-instance fine-tuning. 
+
+3. The OACIRR Benchmark 
+
+Advancing OACIR requires a benchmark that moves be-yond semantic-level matching to enforce strict instance-level consistency. To this end, we propose a compre-hensive pipeline for constructing OACIR data from real-world images, as detailed in Section 3.1. Leveraging this pipeline, we construct OACIRR (Object-Anchored 
+
+Composed Image Retrieval on Real-world images), a pio-neering large-scale, multi-domain benchmark for this emer-gent task. A comprehensive analysis of its quality, diversity, and the challenges it poses is presented in Section 3.2. 
+
+3.1. Dataset Construction 
+
+As illustrated in Figure 2, our OACIRR dataset construc-tion pipeline comprises four sequential key stages: ( i) Im-age Pairs Collection, ( ii ) Image Pairs Filtering, ( iii ) Quadru-ples Annotation, and ( iv ) Candidate Gallery Construction. We detail each stage below: 
+
+Stage 1: Image Pair Collection. The foundation of OACIR lies in sourcing image pairs that feature an identical instance across different contexts. We leverage four large-scale, fine-grained visual classification datasets as our primary sources: DeepFashion2 [13], Stanford Cars [20], Products-10K [3], and Google Landmarks v2 [44]. Given a source dataset D = {(Ii, y i)}Ni=1 , where Ii represents an image and 
+
+yi denotes its instance-level ID, we first organize the images with the same ID into high-fidelity sets Sj = {Ii|yi = yj }
+
+by applying fine-grained classification and visual consis-tency filtering. Subsequently, a set Sj is considered valid for construction if it contains at least τvalid images. All construction-valid image sets proceed to the subsequent quadruple construction stages, while the remainder are re-served for populating the candidate gallery. 
+
+Stage 2: Image Pair Filtering. To ensure quadruple qual-ity and task difficulty, we perform a rigorous two-step fil-tering process on the image pairs sampled from each set 
+
+Sj . First, to ensure the modification text is meaningful and to prevent models from relying on trivial image similarity shortcuts, we discard overly similar pairs by thresholding their feature cosine similarity. Second, to foster richer back-ground diversity, we filter out class-centric images. Specifi-cally, an image is discarded if it is visually similar to at least 
+
+τcount other images within the same set. 
+
+Stage 3: Quadruple Annotation. From each filtered pair of the reference and target image (Ir , I t), we conduct a semi-automatic annotation process to construct the final quadruple (Ir , B r , T m, I t), where Br denotes the bounding box of the anchored instance on Ir , and Tm is the modi-fication text. We first leverage a powerful MLLM [2] to generate both the modification text Tm and the instance’s class label lins . For bounding box annotation, we employ a grounding model [54] to generate initial proposals. Pro-3Dataset Publication # Samples Splits Data Type Avg Length of Instance Instance Visual Contextual Multi-Modification Text Consistency Distractors Grounding Modification Text Domain                                                                                           
+
+> CIRR [31] ICCV 2021 36.6K train, eval real-world 11.3 %%%%!
+> FashionIQ [45] CVPR 2021 30.1K train, eval real-world 5.3 %!%%%
+> CIRCO [6] ICCV 2023 1.0K eval real-world 8.2 %%%%!
+> InstructPix2Pix [8] CVPR 2023 454K train, eval synthetic 9.4 %%%%!
+> LaSCo [21] AAAI 2024 389K train synthetic 5.9 %–%%!
+> CIRHS [22] ACM MM 2025 535K train synthetic 10.2 %–%!!
+> SynCPR [29] NIPS 2025 1.1M train synthetic 13.3 !–%!%
+> ITCPR [29] NIPS 2025 2.2K eval real-world 9.5 !!%%%
+> OACIRR (Ours) CVPR 2026 161K train, eval real-world 20.1 !!!!!
+
+Table 1. Comparative analysis of existing Multimodal Image Retrieval datasets. a) The distribution of instances  
+
+> across different data splits.
+> b) The distribution of instances
+> across fine -grained categories.
+
+Figure 3. Instance distribution of the OACIRR benchmark. 
+
+posals with confidence scores below a predefined threshold are then manually annotated to ensure ground-truth preci-sion. Finally, the entire corpus of annotated quadruples is partitioned into training and evaluation sets at an 8:2 ratio. 
+
+Stage 4: Candidate Gallery Construction. To rigorously evaluate a model’s instance discrimination capabilities, we construct a dedicated candidate gallery Gs for each of the four subsets s in the evaluation benchmark. Each gallery comprises the complete set of ground-truth target images 
+
+{It} from the test quadruples of subset s, supplemented by a curated collection of distractors. To maximize instance-level ambiguity, distractors are sourced via a targeted hard-negative mining strategy: We first identify the set of all unique category labels Ls present within the test queries of the subset s. We then populate the gallery with hard negatives by sampling images from the reserved pool (from Stage 1) with category labels lcat ∈ L s. This strategy en-sures that each gallery is densely enriched with distractors that are categorically relevant but instance-inconsistent. 
+
+3.2. Dataset Analysis 
+
+We provide a comprehensive analysis of the OACIRR 
+
+benchmark from three perspectives: ( i) Quality and Contri-butions, ( ii ) Diversity and Statistics, ( iii ) Core Challenges. 
+
+Quality and Contributions. As summarized in Table 1, 
+
+OACIRR establishes a new standard for identity-preserving compositional retrieval through several pivotal features. (1) 
+
+Real-World Authenticity : Sourced entirely from real-world images, it sets a new benchmark for authentic scenes that directly reflect practical application scenarios. (2) Instance-level Fidelity : The benchmark is built upon the principle of 
+
+Instance Consistency , ensuring every quadruple maintains the anchored instance’s precise identity. This principle is reinforced by a candidate gallery enriched with targeted In-stance Distractors , creating a challenging testbed for fine-grained discrimination. (3) Enhanced Usability : OACIRR 
+
+pioneers the integration of Visual Grounding via bounding boxes, providing an explicit, non-verbal cue that enhances both query precision and user convenience. (4) Modal-ity Synergy : The dense modification texts, which describe contextual changes, foster a strong synergistic interplay be-tween the visual and textual modalities, compelling models to perform genuine compositional reasoning. 
+
+Diversity and Statistics. OACIRR provides a complete ecosystem for model development, featuring a large-scale training set of over 127K quadruples from 2,647 unique instances, and a multi-domain evaluation benchmark with 33.4K quadruples across 1,238 unique instances. As illus-trated in Figure 3, the instances are distributed across four distinct domains, a curated design intended to evaluate both retrieval depth and breadth. The Fashion, Car, and Land-mark subsets evaluate retrieval depth , featuring densely cu-rated galleries of approximately 5K candidates each, drawn from over 1,000 distractor IDs to challenge a model’s abil-ity to discriminate between highly similar instances. In con-trast, the Product subset tests retrieval breadth , with a vast gallery of nearly 12K candidates from 800 unique IDs that assesses a model’s efficiency and accuracy at scale. 
+
+Core Challenges. Successfully addressing the OACIRR 
+
+benchmark demands a sophisticated set of capabilities from the retrieval models. Specifically, models must demon-strate: (1) Advanced Compositional Reasoning : The abil-ity to perceive subtle visual details and comprehend com-plex modification texts, and to fuse them into a unified representation. (2) Fine-grained Instance Discrimination :The ability to distinguish a specific visual instance from a gallery saturated with semantically and visually similar dis-tractors. (3) Adaptive Visual Attention : The ability to inter-pret the bounding box as a visual prompt and dynamically intensify focus within the region while preserving the com-positional context. Collectively, these challenges establish 
+
+OACIRR as a rigorous benchmark for advancing the fron-tier of identity-preserving compositional retrieval. 4Multimodal        
+
+> Fusion Queries
+> …
+> Inside a toy box
+> instead of on
+> a bookshelf.
+> Reference Image 𝑰 𝒓 Modification Text 𝑻 𝒎
+> Image
+> Encoder 𝓔 𝑰
+> Text
+> Tokenizer
+> Contextual
+> Probe Tokens
+> …
+> …
+> Contextual
+> [CLS] Token
+> Contextual Reasoning Module
+
+Context –Aware Attention Modulator 
+
+（CAAM ）
+
+𝜷 
+
+> Linear 𝑪
+> Modulation Scalar
+
+Multimodal Encoder 𝓔 𝑴 
+
+Attention Activation Mechanism        
+
+> Reference Image 𝑰 𝒓
+> 𝑩 𝒓
+> Cropped
+> Instance Region
+> …
+> Image Patches
+> Attention Activation
+> Inside a toy box
+> instead of on
+> a bookshelf.
+> Modification Text 𝑻 𝒎
+> Text
+> Tokenizer
+> Target Image 𝑰 𝒕
+> Image
+> Encoder 𝓔 𝑰
+> Linear 𝑴 Linear 𝑰
+> …
+> [CLS]
+> Token
+> Max
+
+Alignment Loss  
+
+> Parameter Training
+> Parameter Freezing
+> Contrastive
+> Alignment
+> Head
+> Image Encoder 𝓔 𝑰
+
+/
+
+Branch 
+
+> …
+
+Figure 4. Overall architecture of our proposed AdaFocal framework. 
+
+4. Method 
+
+To address the core challenges of the OACIR task, we pro-pose AdaFocal , an effective framework that dynamically modulates visual attention for precise, instance-level re-trieval. Our approach augments a multimodal fusion back-bone with a dedicated module that learns to adaptively focus on user-specified instance regions, enabling a nuanced bal-ance between instance fidelity and compositional reasoning. 
+
+4.1. Overall Architecture 
+
+As illustrated in Figure 4, AdaFocal is built around a central Multimodal Encoder EM, which serves as the backbone for both query and target feature extraction. The framework’s design reflects a two-stage reasoning process: (1) Contextual Perception : It first perceives and 
+
+reasons over the query’s compositional context via the 
+
+Context-Aware Attention Modulator (CAAM) . (2) Adaptive Focus : It then dynamically focuses on the anchored instance to generate the final composed representation for retrieval. The framework operates through two parallel branches: • The Query Branch processes the input query (Ir ,B r ,T m).It is uniquely augmented by the CAAM , which analyzes the multimodal context to predict a modulation signal. This signal drives the Attention Activation Mechanism ,which amplifies the focus on the specified instance region during feature fusion within the multimodal encoder EM.• The Target Branch processes the target image It through the same frozen Image Encoder EI and multimodal en-coder EM to produce its representation. Finally, the output representations from both branches are projected into a shared embedding space by a Con-trastive Alignment Head for similarity computation. 
+
+4.2. Context-Aware Attention Modulator 
+
+The core challenge in OACIR is to determine the appropri-ate degree of focus on the instance specified by Br , which should vary based on the semantic context of Ir and Tm.The CAAM is designed to address this by making the atten-tion modulation process context-aware and learnable. As illustrated in the left part of Figure 4, the CAAM first processes the reference image and modification text via the frozen Image Encoder and a Text Tokenizer. These features are then fed into the shared multimodal encoder alongside a set of K learnable Contextual Probe Tokens (denoted as 
+
+{pk}Kk=1 ), which learn contextual cues by interacting with the multimodal inputs. The resulting output features, along with a learnable Contextual [CLS] Token , are then pro-cessed by the Contextual Reasoning Module (CRM) . The 
+
+CRM aggregates and reasons over these tokens to produce a final contextual representation, which is then projected by a mapping layer, Linear C (·), to form the final query-specific 
+
+Modulation Scalar β for adaptive attention modulation: 
+
+β = Linear C (CRM (EM(EI (Ir ), T m, {pk}))) . (1) 
+
+4.3. Attention Activation Mechanism 
+
+The modulation scalar generated by the CAAM drives the 
+
+Attention Activation Mechanism within the query branch. The multimodal encoder fuses visual information via cross-attention between its M frozen Multimodal Fusion Queries, denoted as {qm}Mm=1 , and the N visual patch em-beddings {en}Nn=1 from the reference image. Inspired by attention manipulation techniques developed for generative models [53], we adapt this principle to the retrieval task by injecting the learned modulation scalar as 5Domain Method Pretraining Data Fashion Car Product Landmark Avg.            
+
+> RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5
+
+UMR                                                                                                   
+
+> UniIR-CLIP SF [43] M-BEIR [43] 17.33 12.26 24.76 32.67 16.95 41.89 33.71 18.22 40.10 29.47 15.51 43.24 27.18 UniIR-BLIP FF [43] 28.53 22.41 39.63 37.21 19.97 46.51 37.76 20.98 43.19 31.71 17.14 52.12 33.10 LamRA-Ret [30] M-BEIR + NLI [36] 27.45 21.63 37.10 61.03 35.44 74.51 69.45 39.53 70.25 58.64 32.58 68.74 49.70 MM-Embed [28] M-BEIR + MTEB [35] 41.38 34.55 52.50 53.21 30.06 62.80 71.03 41.47 71.15 78.85 38.88 79.32 54.60 GME ( 2B ) [52] UMRB [52] 38.13 32.14 51.50 58.84 31.60 66.03 76.89 44.11 74.20 73.86 38.99 75.61 55.16 GME ( 7B ) [52] 44.98 39.24 60.18 63.11 38.34 75.38 83.44 54.60 84.15 77.11 47.09 82.69 62.53 U-MARVEL [24] M-BEIR + NLI 46.05 40.38 60.59 62.92 39.96 74.90 83.26 54.69 84.13 69.81 37.67 73.08 60.62
+
+ZS-CIR Pic2Word [38] CC3M [9] 14.98 11.15 21.55 12.07 4.07 11.32 45.95 13.66 34.19 55.98 20.99 52.12 24.84 LinCIR [16] 15.78 12.04 21.82 5.55 2.23 7.28 47.55 14.63 34.91 42.76 19.57 47.15 22.61 
+
+CIR                                                                     
+
+> SPRC (ViT-L) [4] CIRR [31] 28.54 25.49 44.26 22.47 15.23 36.78 52.55 33.35 61.47 37.31 24.20 49.99 35.97
+> OACIRR (Ours) 61.09 54.80 75.85 68.99 46.48 86.95 80.29 67.14 90.41 72.62 54.27 86.11 70.42 SPRC (ViT-G) [4] CIRR [31] 28.62 25.79 44.48 25.13 15.92 37.06 54.39 34.85 62.31 40.41 26.29 52.39 37.30
+> OACIRR (Ours) 65.25 58.51 80.89 72.87 49.82 89.57 86.05 70.61 93.68 76.32 56.04 89.00 74.05
+> AdaFocal (ViT-L) 72.60 61.95 85.30 75.68 51.87 90.04 87.76 69.94 93.32 80.50 57.55 90.25 76.40
+
+OACIR AdaFocal (ViT-G) OACIRR (Ours) 77.15 65.31 86.88 78.42 53.63 92.22 91.86 74.11 95.39 82.92 58.47 91.63 79.00 
+
+Table 2. Quantitative comparison on the OACIRR benchmark. “Avg.” represents the average results across all evaluation metrics. 
+
+a dynamic bias into the cross-attention computation. A bi-nary mask MBr , spatially aligned with the patch embed-dings corresponding to the bounding box Br , is used to ap-ply this bias. The output of the modulated cross-attention, which produces the updated queries {ˆqm}, is formulated as: 
+
+{ˆqm} = A′V = Softmax 
+
+ QK T + β · MBr
+
+√dk
+
+
+
+V,  (2) where A′ denotes the modulated attention weights, Q =
+
+fq ({qm}), K = fk({en}), and V = fv ({en}) represent the transformed query, key, and value matrices obtained via projections f(·), and dk denotes the dimension of matrix K.This adaptive mechanism, driven by the context-aware modulation scalar β, intensifies the model’s focus on the user-specified instance by re-weighting the value matrix V .
+
+4.4. Objective Function 
+
+During training, the final query representation fq is ob-tained by projecting the [CLS] token from the query branch through the multimodal mapping layer Linear M(·):
+
+fq = Linear M(E′M(EI (Ir ), B r , T m, {qm})) , (3) where E′M denotes the multimodal encoder operating with the Attention Activation Mechanism .Similarly, the target representation ft is obtained by pro-jecting the image tokens from the target branch through the image mapping layer Linear I (·):
+
+ft = Linear I (EM(EI (It), {qm})) . (4) The entire framework is trained end-to-end using a batch-based contrastive learning objective. We employ the Contrastive Alignment Loss, formulated as: 
+
+LAlign = − 1
+
+|B| 
+
+> |B|
+
+X
+
+> i=1
+
+log S(f (i) 
+
+> q
+
+, f (i) 
+
+> t
+
+)
+
+P|B|  
+
+> j=1
+
+S(f (i) 
+
+> q
+
+, f (j) 
+
+> t
+
+) , (5) where S(a, b ) := exp( Sim (( a, b )/τ ) , Sim (·) represents the cosine similarity between features, τ is a temperature hyper-parameter. B denotes the training batch, fq (i) and 
+
+ft(i) denote the i-th query and target representations in B.During inference, the CAAM dynamically predicts the modulation scalar β for each unique query, and the resulting query representation fq is used to rank all candidates in the gallery based on cosine similarity. 
+
+5. Experiments 
+
+5.1. Experimental Setup 
+
+Benchmark Details. The experiments are conducted primarily on the newly proposed OACIRR benchmark. The evaluation benchmark comprises four distinct subsets (Fashion, Car, Product, and Landmark), each with dedi-cated queries and a candidate gallery, totaling 33.4K queries and 26.6K unique images. The training set is a unified col-lection of 127.2K quadruples, aggregated from all four sub-sets, used for fine-tuning models. 
+
+Implementation Details. All experiments are conducted on four Tesla V100 GPUs with 32GB of memory. During 
+
+OACIRR construction, modification texts were generated using Qwen-VL-Max [2], while bounding boxes were an-notated using MM-Grounding-DINO-Large [54]. For fine-tuning AdaFocal on OACIRR , we set the number of epochs to 20 and the batch size to 128. We employ the AdamW op-timizer [33] with betas set to (0.9, 0.98) and a weight decay 6CAAM OACIRR Benchmark CRM Probe Tokens RID @1 R@1 R@5 Avg.                                 
+
+> Baseline (w/o CAAM) 77.74 58.39 88.61 74.91
+> Average Pooling Frozen 79.70 59.84 89.62 76.39
+> Learnable 79.83 59.57 89.54 76.31
+> MLP Frozen 80.51 60.55 90.15 77.07
+> Learnable 81.10 61.10 90.40 77.53
+> Frozen 81.59 61.85 91.13 78.19
+> Transformer Learnable 82.59 62.88 91.53 79.00
+
+Table 3. Ablation study on the architecture of the CAAM .
+
+of 0.05. The Multimodal Encoder is based on the BLIP-2 Q-Former [23]. To ensure stable training and balanced pa-rameter updates, a differential learning rate strategy is em-ployed. The learning rate for the lightweight CAAM is set to 1e-4, while the parameters of the Multimodal Encoder are fine-tuned with a smaller learning rate of 1e-5. The temper-ature hyper-parameter τ is set to 0.07. 
+
+Evaluation Metrics. The evaluation of OACIR centers on two key aspects: (1) the semantic correctness of the final retrieved image and (2) the consistency of the anchored in-stance. To this end, we introduce the top-K Instance Recall 
+
+(R ID @K) in addition to the standard top-K Recall (R@K). A retrieval is deemed correct under R ID only if the retrieved image contains the exact same instance specified within the reference image’s bounding box. We report Recall@1 and Recall@5 to assess overall retrieval performance, alongside RID @1 to specifically measure the model’s instance fidelity. 
+
+5.2. Quantitative Evaluation 
+
+We present a comprehensive quantitative evaluation on the 
+
+OACIRR benchmark to analyze the capabilities of exist-ing retrieval paradigms and demonstrate the effectiveness of our proposed AdaFocal framework. As detailed in Table 2, we assess three distinct groups: Universal Multimodal Re-trieval (UMR) models, Composed Image Retrieval (CIR) methods, and our proposed approach. 
+
+Evaluation Settings. To ensure a fair comparison, the eval-uation protocol is adapted for each model class: (1) For 
+
+UMR models , capable of visual grounding, the reference image is rendered with the bounding box, accompanied by a textual prompt explicitly instructing the model to preserve the anchored instance. (2) For Zero-shot and Supervised CIR methods , which lack native support for bounding box inputs, the OACIR task is converted into a standard CIR format by embedding the instance’s unique ID tag into the modification text. (3) Our AdaFocal framework is inher-ently designed to process the native OACIR task input. 
+
+Analysis of Existing Paradigms. The results under zero-shot evaluation reveal the profound challenge OACIR poses to existing models. Even with explicit visual and textual cues, powerful UMR models exhibit limited instance-level a) Results on the Fashion subset b) Results on the Car subset            
+
+> c) Results on the Product subset d) Results on the Landmark subset
+
+Figure 5. Ablation study on the Modulation Scalar β.
+
+fidelity. Their pre-training prioritizes broad semantic cor-respondence across diverse multimodal data and therefore does not equip them with the robust instance-level discrim-ination required for this task, a deficiency particularly ev-ident in multi-object scenarios such as the Fashion subset. ZS-CIR methods, relying solely on semantic-level textual cues, perform even worse, as they lack the fine-grained vi-sual input necessary to resolve the instance-level ambiguity presented by our benchmark’s hard-negative distractors. 
+
+The Critical Role of Instance-Aware Training. To iso-late the contribution of our dataset, we fine-tune a strong supervised CIR baseline, SPRC [4]. When trained on the CIRR dataset, SPRC achieves a modest 37.30% average re-call, confirming that semantic-level compositional training is insufficient for OACIR. However, when the same model is fine-tuned on our OACIRR dataset, its performance soars to 74.05% in average recall. This substantial improvement validates the critical role of our dataset’s instance-consistent construction in successfully addressing the OACIR task. 
+
+The Efficacy of AdaFocal . Building upon the strong foun-dation of our training data, AdaFocal demonstrates a fur-ther significant performance leap across all subsets. With an identical ViT-G backbone, it outperforms the OACIRR-trained SPRC by a large margin, achieving average im-provements of +4.14 in R@1 and +7.47 in R ID @1. This gain confirms that our direct and adaptive visual ground-ing mechanism is more effective than relying on ambigu-ous textual prompts for instance preservation. Critically, the narrow gap between R@1 and R ID @1 across all baselines indicates their primary failure mode is instance misidentifi-cation. In contrast, AdaFocal widens this gap by achieving much higher Instance Recall, demonstrating a superior ca-pability to precisely identify the target instance. 
+
+5.3. Ablation Study 
+
+We now dissect the core mechanisms of our AdaFocal 
+
+framework, analyzing the architectural design of the CAAM 
+
+and the impact of the Attention Activation Mechanism .
+
+Component Analysis of CAAM. To validate the architec-tural design of the CAAM , we evaluate several variants, with the results presented in Table 3. The analysis reveals two 7Replace the         
+
+> background with a
+> curtain and switch
+> her footwear
+> to black sandals.
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+> R@1 R@5 Retrieval Results
+> Multimodal Query
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+> R@1 R@5 Retrieval Results
+> Multimodal Query
+> Change the motion -
+> blurred shot to
+> static view of it
+> parked by a house.
+> Transition to a closer,
+> upward view of under
+> overcast skies, with lush
+> greenery partially
+> obscuring the structure.
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+> R@1 R@5 Retrieval Results
+> Multimodal Query
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+> R@1 R@5 Retrieval Results
+> Set the scene
+> in a café, and
+> change her lower
+> garment to black.
+> Multimodal Query
+
+Figure 6. Qualitative comparison of our AdaFocal and the Baseline on the OACIRR benchmark. Green boxes indicate the ground-truth target, yellow boxes indicate instance-correct but semantically incorrect results, and all other retrieved images are marked with red boxes .
+
+key insights. First, the method of contextual aggregation 
+
+is crucial. The superiority of the Transformer-based CRM over simpler aggregation methods underscores the necessity of its reasoning capabilities for interpreting complex com-positional contexts and predicting a meaningful modulation scalar. Second, employing learnable Contextual Probe To-kens is vital. Across all configurations, learnable probe to-kens consistently outperform their frozen counterparts, with the performance gain being most pronounced when paired with the Transformer CRM. This highlights a synergistic ef-fect in which advanced reasoning is required to fully exploit the nuanced cues captured by task-adapted probe tokens. 
+
+Efficacy of Adaptive Attention. To demonstrate the effi-cacy of our adaptive focus strategy, we compare AdaFocal 
+
+against a baseline without attention modulation ( β = 0 ) and against variants using a range of fixed, manually set β val-ues. As illustrated in Figure 5, the results yield three critical findings. First, applying any positive attention bias ( β > 0)consistently outperforms the baseline, confirming that ex-plicitly focusing on the anchored instance is critical for the OACIR task. Second, a clear trade-off between instance fi-delity and compositional reasoning emerges as β increases. RID @1 rises sharply and then saturates, demonstrating that intensified focus greatly enhances instance identification. However, R@1 exhibits a sharper decline after its peak, as an excessively large β causes the model to neglect crucial context from both the image background and modification text, leading to semantic mismatches. Lastly, the optimal fixed β varies across subsets, confirming that the ideal bal-ance is highly context-dependent. Our AdaFocal frame-work, which leverages the CAAM to predict a query-specific 
+
+β, consistently outperforms any fixed attention activation strategy and operates near the performance ceiling across all conditions. This provides direct evidence for the neces-sity of our context-aware, adaptive modulation approach. 
+
+5.4. Qualitative Results 
+
+Qualitative results in Figure 6 visually substantiate AdaFo-cal ’s superior ability to balance instance fidelity and com-positional reasoning. The baseline model, lacking an adap-tive visual attention modulation mechanism, fails by incor-rectly prioritizing semantic cues from the modification text and thus retrieves instance-inconsistent results. In contrast, guided by the CAAM , AdaFocal retrieves the ground-truth target by adaptively intensifying its focus on the anchored instance, fulfilling the personalization constraint while pre-cisely interpreting the contextual changes. Notably, the high ranks of other instance-consistent results further underscore our robust instance-level discrimination capabilities. 
+
+6. Conclusion 
+
+In this work, we propose Object-Anchored Composed 
+
+Image Retrieval ( OACIR ), a novel task that pushes compo-sitional retrieval beyond semantic matching to achieve rig-orous instance fidelity. To advance research in this emergent area, we construct OACIRR , the first large-scale, multi-domain benchmark that provides a foundational dataset of over 160K real-world quadruples and candidate galleries enriched with curated instance distractors. Furthermore, we propose AdaFocal , a novel framework that dynamically in-tensifies attention on the anchored instance specified by the bounding box, thereby balancing instance preservation with compositional reasoning. Extensive experiments validate the task’s challenges for existing models while establishing 
+
+AdaFocal as an effective baseline. We hope that our work inspires a new generation of compositional retrieval systems with greater flexibility and instance-aware reliability. 8Acknowledgements 
+
+This research was supported by multiple funding sources, including the Beijing Natural Science Foundation (Grants L243015, L223003, and JQ24022), the National Natural Science Foundation of China (Grants 62192782, 62532015, and 62302501), and the Beijing Major Science and Tech-nology Project under Contract (No. Z251100008425008). 
+
+References 
+
+[1] Yuval Alaluf, Elad Richardson, Sergey Tulyakov, Kfir Aber-man, and Daniel Cohen-Or. Myvlm: Personalizing vlms for user-specific queries. In European Conference on Computer Vision , pages 73–91. Springer, 2024. 3 [2] Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang, Shijie Wang, Jun Tang, et al. Qwen2.5-vl technical report. arXiv preprint arXiv:2502.13923 , 2025. 3, 6, 1 [3] Yalong Bai, Yuxiang Chen, Wei Yu, Linfang Wang, and Wei Zhang. Products-10k: A large-scale product recognition dataset. arXiv preprint arXiv:2008.10545 , 2020. 3, 1 [4] Yang Bai, Xinxing Xu, Yong Liu, Salman Khan, Fahad Khan, Wangmeng Zuo, Rick Siow Mong Goh, and Chun-Mei Feng. Sentence-level prompts benefit composed image retrieval. In The Twelfth International Conference on Learn-ing Representations , 2024. 2, 6, 7 [5] Alberto Baldrati, Marco Bertini, Tiberio Uricchio, and Al-berto Del Bimbo. Effective conditioned and composed im-age retrieval combining clip-based features. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pat-tern Recognition , pages 21466–21474, 2022. 2 [6] Alberto Baldrati, Lorenzo Agnolucci, Marco Bertini, and Al-berto Del Bimbo. Zero-shot composed image retrieval with textual inversion. In Proceedings of the IEEE/CVF Interna-tional Conference on Computer Vision , pages 15338–15347, 2023. 2, 4, 7 [7] Alberto Baldrati, Marco Bertini, Tiberio Uricchio, and Al-berto Del Bimbo. Composed image retrieval using con-trastive learning and task-oriented clip-based features. ACM Transactions on Multimedia Computing, Communications and Applications , 20(3):1–24, 2023. 2 [8] Tim Brooks, Aleksander Holynski, and Alexei A Efros. In-structpix2pix: Learning to follow image editing instructions. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 18392–18402, 2023. 2, 4 [9] Soravit Changpinyo, Piyush Sharma, Nan Ding, and Radu Soricut. Conceptual 12m: Pushing web-scale image-text pre-training to recognize long-tail visual concepts. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3558–3568, 2021. 6 [10] Yanbei Chen, Shaogang Gong, and Loris Bazzani. Image search with text feedback by visiolinguistic attention learn-ing. In Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition , pages 3001–3011, 2020. 2 [11] Niv Cohen, Rinon Gal, Eli A Meirom, Gal Chechik, and Yuval Atzmon. "this is my unicorn, fluffy": Personalizing frozen vision-language representations. In European Con-ference on Computer Vision , pages 558–577. Springer, 2022. 2, 3 [12] Ginger Delmas, Rafael S Rezende, Gabriela Csurka, and Di-ane Larlus. Artemis: Attention-based retrieval with text-explicit matching and implicit similarity. In The Tenth In-ternational Conference on Learning Representations , 2022. 2[13] Yuying Ge, Ruimao Zhang, Xiaogang Wang, Xiaoou Tang, and Ping Luo. Deepfashion2: A versatile benchmark for de-tection, pose estimation, segmentation and re-identification of clothing images. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 5337–5345, 2019. 3, 1 [14] Albert Gordo, Jon Almazán, Jerome Revaud, and Diane Lar-lus. Deep image retrieval: Learning global representations for image search. In European Conference on Computer Vi-sion , pages 241–257. Springer, 2016. 2 [15] Geonmo Gu, Sanghyuk Chun, Wonjae Kim, HeeJae Jun, Yoohoon Kang, and Sangdoo Yun. Compodiff: Versatile composed image retrieval with latent diffusion. Transactions on Machine Learning Research , 2024. Expert Certification. 2, 7 [16] Geonmo Gu, Sanghyuk Chun, Wonjae Kim, Yoohoon Kang, and Sangdoo Yun. Language-only training of zero-shot com-posed image retrieval. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 13225–13234, 2024. 6 [17] Yan Huang, Qiang Wu, Jingsong Xu, and Yi Zhong. Celebrities-reid: A benchmark for clothes variation in long-term person re-identification. In 2019 International Joint Conference on Neural Networks (IJCNN) , pages 1–8. IEEE, 2019. 3 [18] Xintong Jiang, Yaxiong Wang, Mengjian Li, Yujiao Wu, Bingwen Hu, and Xueming Qian. Cala: Complementary association learning for augmenting comoposed image re-trieval. In Proceedings of the 47th International ACM SI-GIR Conference on Research and Development in Informa-tion Retrieval , pages 2177–2187, 2024. 2 [19] Shyamgopal Karthik, Karsten Roth, Massimiliano Mancini, and Zeynep Akata. Vision-by-language for training-free compositional image retrieval. In The Twelfth International Conference on Learning Representations , 2024. 2 [20] Jonathan Krause, Michael Stark, Jia Deng, and Li Fei-Fei. 3d object representations for fine-grained categorization. In 
+
+2013 IEEE International Conference on Computer Vision Workshops , pages 554–561, 2013. 3, 1 [21] Matan Levy, Rami Ben-Ari, Nir Darshan, and Dani Lischin-ski. Data roaming and quality assessment for composed im-age retrieval. In Proceedings of the AAAI Conference on Ar-tificial Intelligence , pages 2991–2999, 2024. 2, 4, 7 [22] Haiwen Li, Delong Liu, Zhaohui Hou, Zhicheng Zhao, and Fei Su. Automatic synthesis of high-quality triplet data for composed image retrieval. arXiv preprint arXiv:2507.05970 ,2025. 4, 7 
+
+9[23] Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. In In-ternational Conference on Machine Learning , pages 19730– 19742. PMLR, 2023. 7 [24] Xiaojie Li, Chu Li, Shi-Zhe Chen, and Xi Chen. U-marvel: Unveiling key factors for universal multimodal re-trieval via embedding learning with mllms. arXiv preprint arXiv:2507.14902 , 2025. 6 [25] Zongzhao Li, Jiacheng Cen, Bing Su, Tingyang Xu, Yu Rong, Deli Zhao, and Wenbing Huang. Large language-geometry model: When llm meets equivariance. In Pro-ceedings of the 42nd International Conference on Machine Learning , 2025. 2 [26] Zongzhao Li, Xiangzhe Kong, Jiahui Su, Zongyang Ma, Mingze Li, Songyou Li, Yuelin Zhang, Yu Rong, Tingyang Xu, Deli Zhao, et al. From macro to micro: Benchmark-ing microscopic spatial intelligence on molecules via vision-language models. arXiv preprint arXiv:2512.10867 , 2025. [27] Zongzhao Li, Zongyang Ma, Mingze Li, Songyou Li, Yu Rong, Tingyang Xu, Ziqi Zhang, Deli Zhao, and Wenbing Huang. Star-r1: Spatial transformation reasoning by rein-forcing multimodal llms. arXiv preprint arXiv:2505.15804 ,2025. 2 [28] Sheng-Chieh Lin, Chankyu Lee, Mohammad Shoeybi, Jimmy Lin, Bryan Catanzaro, and Wei Ping. Mm-embed: Universal multimodal retrieval with multimodal llms. In The Thirteenth International Conference on Learning Represen-tations , 2025. 6 [29] Delong Liu, Haiwen Li, Zhaohui Hou, Zhicheng Zhao, Fei Su, and Yuan Dong. Automatic synthetic data and fine-grained adaptive feature alignment for composed person re-trieval. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2025. 3, 4 [30] Yikun Liu, Yajie Zhang, Jiayin Cai, Xiaolong Jiang, Yao Hu, Jiangchao Yao, Yanfeng Wang, and Weidi Xie. Lamra: Large multimodal model as your advanced retrieval assistant. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 4015–4025, 2025. 6 [31] Zheyuan Liu, Cristian Rodriguez-Opazo, Damien Teney, and Stephen Gould. Image retrieval on real-life images with pre-trained vision-and-language models. In Proceedings of the IEEE/CVF International Conference on Computer Vision ,pages 2125–2134, 2021. 4, 6, 7 [32] Zheyuan Liu, Weixuan Sun, Damien Teney, and Stephen Gould. Candidate set re-ranking for composed image re-trieval with dual multi-modal encoder. Transactions on Ma-chine Learning Research , 2024. 2 [33] I Loshchilov. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101 , 2017. 6 [34] Hao Luo, Youzhi Gu, Xingyu Liao, Shenqi Lai, and Wei Jiang. Bag of tricks and a strong baseline for deep per-son re-identification. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition Work-shops , 2019. 3 [35] Niklas Muennighoff, Nouamane Tazi, Loïc Magne, and Nils Reimers. Mteb: Massive text embedding benchmark. In 
+
+Proceedings of the 17th Conference of the European Chap-ter of the Association for Computational Linguistics , pages 2014–2037, 2023. 6 [36] Yixin Nie, Adina Williams, Emily Dinan, Mohit Bansal, Ja-son Weston, and Douwe Kiela. Adversarial nli: A new benchmark for natural language understanding. In Proceed-ings of the 58th Annual Meeting of the Association for Com-putational Linguistics , pages 4885–4901, 2020. 6 [37] Hyeonwoo Noh, Andre Araujo, Jack Sim, Tobias Weyand, and Bohyung Han. Large-scale image retrieval with attentive deep local features. In Proceedings of the IEEE International Conference on Computer Vision , pages 3456–3465, 2017. 2 [38] Kuniaki Saito, Kihyuk Sohn, Xiang Zhang, Chun-Liang Li, Chen-Yu Lee, Kate Saenko, and Tomas Pfister. Pic2word: Mapping pictures to words for zero-shot composed image retrieval. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19305– 19314, 2023. 2, 6 [39] Lucas Ventura, Antoine Yang, Cordelia Schmid, and Gül Varol. Covr: Learning composed video retrieval from web video captions. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 5270–5279, 2024. 2, 7 [40] Nam Vo, Lu Jiang, Chen Sun, Kevin Murphy, Li-Jia Li, Li Fei-Fei, and James Hays. Composing text and image for image retrieval-an empirical odyssey. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6439–6448, 2019. 2 [41] Zihao Wang, Xihui Liu, Hongsheng Li, Lu Sheng, Jun-jie Yan, Xiaogang Wang, and Jing Shao. Camp: Cross-modal adaptive message passing for text-image retrieval. In 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 5764–5773, 2019. 2 [42] Zhixiang Wang, Zheng Wang, Yinqiang Zheng, Yung-Yu Chuang, and Shin’ichi Satoh. Learning to reduce dual-level discrepancy for infrared-visible person re-identification. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 618–626, 2019. 3 [43] Cong Wei, Yang Chen, Haonan Chen, Hexiang Hu, Ge Zhang, Jie Fu, Alan Ritter, and Wenhu Chen. Uniir: Train-ing and benchmarking universal multimodal information re-trievers. In European Conference on Computer Vision , pages 387–404. Springer, 2024. 6 [44] Tobias Weyand, Andre Araujo, Bingyi Cao, and Jack Sim. Google landmarks dataset v2: A large-scale benchmark for instance-level recognition and retrieval. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 2575–2584, 2020. 3, 1 [45] Hui Wu, Yupeng Gao, Xiaoxiao Guo, Ziad Al-Halah, Steven Rennie, Kristen Grauman, and Rogerio Feris. Fashion iq: A new dataset towards retrieving images by natural language feedback. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11307– 11317, 2021. 4, 7 [46] Yuxin Yang, Yinan Zhou, Yuxin Chen, Ziqi Zhang, Zongyang Ma, Chunfeng Yuan, Bing Li, Lin Song, Jun Gao, Peng Li, and Weiming Hu. Detailfusion: A dual-branch framework with detail enhancement for composed image re-trieval. arXiv preprint arXiv:2505.17796 , 2025. 2 
+
+10 [47] Zhengwei Yang, Meng Lin, Xian Zhong, Yu Wu, and Zheng Wang. Good is bad: Causality inspired cloth-debiasing for cloth-changing person re-identification. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1472–1481, 2023. 3 [48] Zhenyu Yang, Dizhan Xue, Shengsheng Qian, Weiming Dong, and Changsheng Xu. Ldre: Llm-based divergent reasoning and ensemble for zero-shot composed image re-trieval. In Proceedings of the 47th International ACM SI-GIR Conference on Research and Development in Informa-tion Retrieval , pages 80–90, 2024. 2 [49] Chun-Hsiao Yeh, Bryan Russell, Josef Sivic, Fabian Caba Heilbron, and Simon Jenni. Meta-personalizing vision-language models to find named instances in video. In Pro-ceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19123–19132, 2023. 3 [50] Kai Zhang, Yi Luan, Hexiang Hu, Kenton Lee, Siyuan Qiao, Wenhu Chen, Yu Su, and Ming-Wei Chang. Magi-cLens: Self-supervised image retrieval with open-ended in-structions. In Proceedings of the 41st International Con-ference on Machine Learning , pages 59403–59420. PMLR, 2024. 2 [51] Qi Zhang, Zhen Lei, Zhaoxiang Zhang, and Stan Z Li. Context-aware attention network for image-text retrieval. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 3536–3545, 2020. 2 [52] Xin Zhang, Yanzhao Zhang, Wen Xie, Mingxin Li, Ziqi Dai, Dingkun Long, Pengjun Xie, Meishan Zhang, Wenjie Li, and Min Zhang. Gme: Improving universal multimodal retrieval by multimodal llms. arXiv preprint arXiv:2412.16855 , 2024. 6[53] Yuechen Zhang, Shengju Qian, Bohao Peng, Shu Liu, and Jiaya Jia. Prompt highlighter: Interactive control for multi-modal llms. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13215– 13224, 2024. 5 [54] Xiangyu Zhao, Yicheng Chen, Shilin Xu, Xiangtai Li, Xin-jiang Wang, Yining Li, and Haian Huang. An open and com-prehensive pipeline for unified object grounding and detec-tion. arXiv preprint arXiv:2401.02361 , 2024. 3, 6, 1 [55] Kecheng Zheng, Wu Liu, Lingxiao He, Tao Mei, Jiebo Luo, and Zheng-Jun Zha. Group-aware label transfer for do-main adaptive person re-identification. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5310–5319, 2021. 3 
+
+11 Beyond Semantic Search: Towards Referential Anchoring in Composed Image Retrieval 
+
+# Supplementary Material 
+
+7. More Details on the OACIRR Benchmark 
+
+In this section, we provide a comprehensive overview of the construction pipeline and detailed statistics of the OACIRR 
+
+benchmark. We describe the subset-specific protocols in Section 7.1, the prompts used for MLLM-based annotation in Section 7.2, the detailed dataset statistics in Section 7.3, and the instance diversity visualization in Section 7.4. 
+
+7.1. Subset-Specific Construction Pipeline 
+
+We construct the four OACIRR subsets — Fashion, Car, Product, and Landmark — using four large-scale, fine-grained visual classification datasets: DeepFashion2 [13], Stanford Cars [20], Products-10K [3], and Google Land-marks v2 [44]. Given that these sources differ substantially in structure and granularity, we design tailored protocols and apply subset-specific filtering thresholds throughout the construction pipeline. We detail each stage below: 
+
+Stage 1: Image Pair Collection. The objective of this stage is to establish high-fidelity, instance-level image sets, with procedures tailored to each data source: • For Products-10K , the images are already organized at the stock-keeping-unit (SKU) level, which naturally aligns with our instance-level fidelity requirement. • For DeepFashion2 and Stanford Cars , the initial group-ings (based on item styles or car models) often contain multiple color variants. To obtain color-consistent in-stance sets, we further subdivide each group using a pre-trained fine-grained classifier (CLIP-ConvNeXt-Base). • For Google Landmarks v2 , image sets vary between vi-sually coherent views of a landmark and knowledge-based collections that mix disparate appearances. To enforce strict visual consistency, we prompt an MLLM [2] to identify and retain only visually coherent subsets. 
+
+Stage 2: Image Pair Filtering. As summarized in Table 4, we apply subset-specific thresholds to ensure high-quality image pairs and appropriate task difficulty. A set Sj is re-tained only if its size exceeds the construction-valid thresh-old τvalid . Image pairs with feature cosine similarity above 
+
+τhigh are removed to ensure meaningful modifications. To promote background diversity, an image is filtered out if its feature similarity exceeds τcentric with at least τcount other images in the same set. • To balance the query volume across domains, we adopt smaller τvalid values for subsets with fewer initial IDs (Fashion, Car) and larger values for subsets with abun-dant initial IDs (Product, Landmark).                       
+
+> Subset Filtering Threshold
+> τvalid τhigh τcentric τcount
+> Fashion 80.92 0.88 3
+> Car 10 0.88 0.85 2
+> Product 20 0.88 0.85 2
+> Landmark 15 0.90 0.88 3
+> Table 4. Filtering Thresholds for each OACIRR subset.
+
+• To calibrate task difficulty across domains, we adopt more relaxed thresholds ( τhigh , τcentric , τcount ) for subsets involving complex multi-object scenes (Fashion, Land-mark), and more rigorous thresholds for subsets centered around a single salient object (Car, Product). 
+
+Stage 3: Quadruple Annotation. This stage involves a semi-automatic process. We assign class labels lins to each high-fidelity instance set using a tailored prompt. To rein-force the synergy between the visual and textual modalities, we instruct the MLLM to generate modification texts de-scribing only contextual changes, explicitly excluding any mention of the preserved instance. For bounding boxes, we directly use the ground-truth annotations in DeepFash-ion2. For the remaining three subsets, bounding box pro-posals with confidence scores below 0.3 from our grounding model [54] are manually re-annotated to ensure precision. 
+
+Stage 4: Candidate Gallery Construction. To construct challenging yet efficient candidate galleries, we compute the instance class distribution for each test subset. Each gallery is populated by sampling hard negatives from the reserved image pool (from Stage 1) to match the class dis-tribution of the query set. This strategy maximizes instance-level ambiguity while maintaining a compact and computa-tionally efficient gallery for the benchmark. 
+
+7.2. MLLM Annotation Prompts 
+
+We employed Qwen-VL-Max [2] for all MLLM-based an-notation tasks, which comprise two key sub-tasks: (1) gen-erating class labels for each high-fidelity instance set, and (2) producing contextual modification text conditioned on an image pair and its associated instance class label. 
+
+Instance Class Label Generation. This step was applied selectively depending on the characteristics of each sub-set. For the Fashion subset, we directly adopted the coarse-grained apparel categories defined in DeepFashion2. For the Car subset, all instances were uniformly assigned the label “ car ”. Consequently, MLLM-based labeling was re-1quired only for the Product and Landmark subsets, which exhibit greater category diversity. For the Product subset, which involves only class label annotation, the following prompt template was used: 
+
+Class Label Generation for Product subset 
+
+Analyze the provided images to identify the single, identical commercial product present in all of them. Your task is to output a concise, generic tag for this common object. 
+
+Important Context: 
+
+1. There is exactly one object that is the same product across all images. 2. This object may appear in different states, environ-ments, or from different viewing angles in each image. 
+
+Requirements: 
+
+1. Output only the tag for the common object and noth-ing else. 2. The tag must be a short, descriptive noun phrase in English. It should be specific enough to be unambigu-ous but not overly detailed. 3. DO NOT include any brand names. 4. DO NOT describe the object’s state, its background, the viewing angle, or any similarities or differences be-tween the images. 5. DO NOT include any introductory phrases like “The common object is:”. For the Landmark subset, we designed a prompt that con-currently performs visual consistency filtering and class la-bel annotation. The prompt template is as follows: 
+
+Visual Consistency Filter & Class Label Generation for Landmark subset 
+
+Your task is to analyze a set of images from a sin-gle landmark ID and determine if they represent a “Visual-type” or a “Knowledge-type” landmark, based ONLY on the visual evidence provided. When in doubt, classify as “Knowledge-type”. Your goal is to approve “Visual-type” only when the images unambiguously represent a single, consistent landmark, with verification purely from visual cues. 
+
+Landmark Types Explained: 
+
+1. Visual-type : The images depict a single, visually consistent, and dominant landmark. The landmark is the same physical entity across all images, even when viewed from different angles or under varying condi-tions (e.g., day/night, summer/winter). 2. Knowledge-type : The images are related by a shared theme or geographic context but do not contain one visually consistent landmark. Their connection is conceptual or requires external knowledge to identify. (e.g., different buildings within a university campus; interior and exterior views of a large museum.) 
+
+Response Format: 
+
+Your response MUST be a JSON object and nothing else. Follow this exact format: {“type”: “visual” or “knowledge”, “label”: “ Specific Name of the Landmark” or null, “reasoning”: “A brief explanation for your decision.” }
+
+Important Rules: 
+
+1. If you classify as “knowledge”, set “label” to null. 2. If you classify as “visual”, provide the class label of the landmark for the “label”. 3. Do not include any introductory text before or after the JSON object. 
+
+Contextual Modification Text Generation. To ensure that the generated modification text is accurate, diverse, and ef-fectively complements the visual information, we designed domain-specific prompt templates for all four subsets. Ashared instruction across these prompts was to restrict the MLLM to describe only contextual changes, thereby maxi-mizing its synergy with the visual anchor. The correspond-ing prompt templates are provided below. 
+
+Modification Text Generation for Fashion subset 
+
+Based on the two provided images, generate a modifi-cation text to transform the first image into the second. 
+
+Requirements: 
+
+1. The modification text must be written in fluent and natural English, NOT exceeding 30 words. 2. Focus exclusively on the most significant and def-inite changes. DO NOT describe any identical parts between the two images. 3. A specific “ Object to Ignore” is provided below. DO NOT mention this object or any of its attributes in the modification text. 4. Avoid any explicit references to the images them-selves. For example, DO NOT use phrases like “ in the first image” or “ in the second picture”. 5. Employ diverse expressions. Avoid using repetitive sentence structures or fixed grammatical patterns. 2Examples: 
+
+1. The woman is now wearing a large pink bow and holding a light-up wand. 2. The person is wearing a denim skirt, and the back-ground changes to a store with shelves and products. 3. The girl changed from wearing patterned pants to white cut-off shorts, and moved from an indoor yoga room to an outdoor pathway. 
+
+Object to Ignore: [Object] 
+
+Modification Text Generation for Car subset 
+
+Based on the two provided images, generate a modi-fication text that describes the changes from the first image to the second. 
+
+Important Context: 
+
+The car (model and color) is the same in both images. 
+
+Requirements: 
+
+1. The modification text must be written in fluent and natural English, NOT exceeding 25 words. 2. Focus exclusively on the most significant and definite changes (e.g., Background / Environment, Viewing Angle, Car’s State). DO NOT describe the car’s model or color, as they are unchanged. 3. Avoid any explicit references to the images them-selves. For example, DO NOT use phrases like “ in the first image” or “ in the second picture”. 4. Employ diverse expressions. Avoid using repetitive sentence structures or fixed grammatical patterns. 
+
+Examples: 
+
+1. Now shown from a low-angle perspective. 2. The scene changes to a desert at sunset. 3. The car is now viewed from a front angle on a snowy mountain road with its headlights turned on. 4. Instead of being parked in a garage, the vehicle is now on a bridge with its driver-side door open. 
+
+Modification Text Generation for Product subset 
+
+Based on the two provided images, generate a modi-fication text that describes the changes from the first image to the second. 
+
+Important Context: 
+
+The product object: [Object] is the same in both images. You are strictly forbidden from mentioning 
+
+this product in your response. Your task is to describe how its presentation has changed. 
+
+Requirements: 
+
+1. The modification text must be written in fluent and natural English, NOT exceeding 30 words. 2. Focus exclusively on the most significant and definite changes (e.g., Background / Environment, Viewing Angle, State, Packaging, Interaction). 3. A specific “ Object to Ignore” is provided below. DO NOT mention this product object or any of its attributes (e.g., color, brand, type) in your response. 4. Avoid any explicit references to the images them-selves. For example, DO NOT use phrases like “ in the first image” or “ in the second picture”. 5. Employ diverse expressions. Avoid using repetitive sentence structures or fixed grammatical patterns. 
+
+Examples: 
+
+1. Now shown from a top-down perspective. 2. Now shown out of its original packaging. 3. The laptop is open and displayed on a wooden desk. 4. The sneakers are now being worn by a person on a basketball court. 
+
+Object to Ignore: [Object] 
+
+ModificationText Generation for Landmark subset 
+
+Based on the two provided images, generate a modifi-cation text to transform the first image into the second. 
+
+Important Context: 
+
+Both images are about the landmark: [Object] .You are strictly forbidden from mentioning this landmark in your response. Your task is to describe how its context, framing, and atmosphere has changed. 
+
+Requirements: 
+
+1. The modification text must be written in fluent and natural English, NOT exceeding 30 words. 2. Focus exclusively on the most significant and def-inite changes (e.g., Viewing Angle, Change in Scope or Focus, Atmospheric Conditions, Surrounding Envi-ronment). 3. A specific “ Object to Ignore” is provided below. DO NOT mention this landmark, its name, its archi-tectural style, or its location in your response. 4. Avoid any explicit references to the images them-selves. For example, DO NOT use phrases like “ in the first image” or “ in the second picture”. 
+
+35. Employ diverse expressions. Avoid using repetitive sentence structures or fixed grammatical patterns. 
+
+Examples: 
+
+1. Now seen from an aerial perspective on a clear day. 2. The scene shifts to a clear night, with the structure illuminated. 3. Now viewed from across the river on a foggy morning, with autumn foliage visible. 
+
+Object to Ignore: [Object] 
+
+Statistic Number Percentage                                
+
+> Total Annotated Quadruples 127,166
+> - Fashion 12,874 10.1% - Car 12,728 10.0% - Product 75,616 59.5% - Landmark 25,948 20.4%
+> Total Unique Images 39,495
+> - Fashion 1,034 2.6% - Car 3,111 7.9% - Product 27,531 69.7% - Landmark 7,819 19.8%
+> Total Unique Instances 2,647
+> - Fashion 80 3.0% - Car 199 7.5% - Product 1,419 53.6% - Landmark 949 35.9% Maximum Modification Text Length 30.0 -Average Modification Text Length 20.2 -
+
+Table 5. Statistics of OACIRR Training Dataset. 
+
+Statistic Number Percentage                                        
+
+> Total Annotated Quadruples 33,449
+> - Fashion 3,606 10.8% - Car 3,586 10.7% - Product 21,046 62.9% - Landmark 5,211 15.6%
+> Total Unique Images 26,595
+> Quadruple Images 15,467 58.1% Distractor Images 11,134 41.9% - Fashion 5,077 19.1% - Car 4,717 17.7% - Product 11,801 44.4% - Landmark 5,000 18.8%
+> Total Unique Instances 4,945
+> Quadruple Instances 1,238 25.0% Distractor Instances 3,707 75.0% - Fashion 1,683 34.0% - Car 1,089 22.0% - Product 799 16.2% - Landmark 1,374 27.8% Maximum Modification Text Length 30.0 -Average Modification Text Length 19.4 -
+
+Table 6. Statistics of OACIRR Evaluation Benchmark. 
+
+7.3. Detailed Dataset Statistics 
+
+As shown in Tables 5 and 6, we provide a detailed statis-tical breakdown of the OACIRR benchmark, highlighting the scale and diversity of both the training data and the eval-uation benchmark. The partitioning and design of OACIRR 
+
+were guided by two principles to ensure rigor and utility: • Strict data partitioning for fair evaluation. We en-force a strict separation between the training and evalua-tion splits by ensuring that no images or instances overlap between them. We further reduce fine-grained category overlap to prevent data leakage and ensure that evaluation faithfully reflects generalization to unseen instances. • Asymmetric design for comprehensive evaluation. The asymmetric composition of the four subsets is a deliberate design choice that leverages domain-specific characteris-tics to assess complementary retrieval capabilities. The Fashion, Car, and Landmark subsets emphasize retrieval depth , requiring discrimination among visually similar in-stances within a coherent domain. In contrast, the Prod-uct subset targets retrieval breadth , evaluating robust-ness under substantially larger and more diverse candi-date spaces. Collectively, these complementary settings provide a holistic assessment of both fine-grained dis-crimination and large-scale retrieval performance. 
+
+7.4. Instance Diversity Visualization 
+
+Figure 7 presents a curated collage of representative, cropped instances from the four primary domains, offer-ing a compact visual summary of the benchmark’s scope. 
+
+OACIRR covers a broad spectrum of categories, ranging from everyday apparel and common vehicles to diverse con-sumer goods and iconic global sites, exposing models to a wide variety of visual concepts and real-world contexts. Complementing this breadth, OACIRR also exhibits substantial fine-grained depth. Individual sub-categories are densely populated with numerous distinct instances, en-compassing a wide range of appearance variations. Such granularity enables evaluation to extend beyond coarse cat-egory recognition toward precise, instance-level discrim-ination. Collectively, this diversity and depth establish 
+
+OACIRR as a comprehensive and challenging benchmark for instance-aware compositional retrieval. 
+
+8. Additional Evaluation Protocols and Results 
+
+To supplement the quantitative results in the main text, this section provides the detailed evaluation protocols used to adapt existing retrieval paradigms to the OACIR task and presents additional results under alternative configurations. Section 8.1 details the two adaptation settings that convert the anchored-instance constraint into formats compatible with different model architectures, and Section 8.2 reports supplementary quantitative results under these settings. 48.1. Details on Evaluation Protocols 
+
+Setting 1: Instance-as-Textual Adaptation. The anchored object is specified through a textual cue. A short tem-plate containing the instance’s class label is appended to the original modification text, converting the OACIR task into an instance-aware CIR formulation while preserving richer contextual information. This setting assesses the model’s capacity to ground fine-grained textual constraints within a visually complex query. Prompt templates are given below: 
+
+Prompt Templates for Setting 1 
+
+1. Same [Object] 
+
+2. With the same [Object] 
+
+3. Fixed [Object] 
+
+4. Identical [Object] 
+
+5. Invariant [Object] 
+
+6. Keep the [Object] 
+
+7. Preserving the [Object] 
+
+8. [Object] unchanged 
+
+Setting 2: Instance-as-Visual Adaptation. The anchored object is provided as an explicit visual cue by rendering its bounding box onto the reference image and pairing it with a brief instruction. This setting assesses the model’s capac-ity to interpret direct visual grounding signals for instance preservation. The instruction is given below: 
+
+Instruction for Setting 2 
+
+[Prompt Template for Setting 1] 
+
+in the [Color] bounding box. 
+
+Model-Specific Application. Universal Multimodal Re-trieval (UMR) models rely heavily on visual grounding and instructional prompts. Therefore, we adopt Setting 2 as the default protocol for these models, using domain–specific in-structions tailored to each OACIRR subset. The complete domain-specific instruction templates are provided below. 
+
+UMR Instruction Templates for Fashion subset 
+
+1. Find a fashion image that aligns with the reference image and style note. 
+
+2. Retrieve a fashion scene image that reflects the described transformation from the provided image. 
+
+3. Can you find an outfit image that meets the adjustments described in the text? 
+
+4. I’m looking for a similar fashion image with the described changes to the model and scene. 
+
+UMR Instruction Templates for Car subset 
+
+1. Retrieve a car image that aligns with the reference image and the scene modifications. 
+
+2. Find a vehicle image like this one, but with the adjustments from the text. 
+
+3. Can you pull up a car image that incorporates the requested changes? 
+
+4. I’m looking for a similar car image with the described changes to the setting and angle. 
+
+UMR Instruction Templates for Product subset 
+
+1. Find a product image that aligns with the provided image and the modification instructions. 
+
+2. Given the reference image and display notes, find the matching product image. 
+
+3. Can you find a product image that meets the requested changes to the background and view? 
+
+4. I’m looking for a similar product image matches the new display style from the text. 
+
+UMR Instruction Templates for Landmark subset 
+
+1. Retrieve a landmark image that aligns with the reference image and the described conditions. 
+
+2. Pull up a photo of a landmark that matches the reference image and the requested transformation. 
+
+3. Given the reference image and description, identify the corresponding landmark view. 
+
+4. I’m looking for a similar landmark image with the specified changes in atmosphere and perspective. In contrast, Zero-shot and Supervised CIR methods do not support bounding-box inputs. Therefore, we adopt Set-ting 1 as their default protocol, translating the instance con-straint into a textual form compatible with their workflow. 
+
+8.2. Ablation on Evaluation Protocols 
+
+To validate these choices, we additionally evaluate UMR models under Setting 1 and CIR models under Setting 2 .As shown in Table 7, each model class performs best under its default protocol, indicating that UMR models rely on explicit visual grounding while CIR models favor seman-tically integrated textual cues. In contrast, our AdaFocal 
+
+provides a robust encoding mechanism that adapts reliably to the OACIR task and its anchored-instance constraint. 5Domain Method Pretraining Data Fashion Car Product Landmark Avg.            
+
+> RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5
+
+Setting 1: Instance-as-Textual Adaptation                                                                                                                              
+
+> UMR LamRA-Ret [30] M-BEIR + NLI 25.93 20.54 36.26 58.13 33.87 72.10 67.27 36.64 67.51 57.05 32.06 67.99 47.95 MM-Embed [28] M-BEIR + MTEB 38.05 32.70 50.69 51.37 29.62 61.74 66.68 36.73 65.49 75.95 37.75 78.53 52.11 GME ( 2B ) [52] UMRB 37.10 31.45 51.33 55.91 30.37 63.94 75.91 40.90 72.39 72.65 38.76 74.46 53.76 GME ( 7B ) [52] 44.54 38.33 59.51 58.73 35.05 70.91 81.87 53.42 82.97 76.20 46.82 82.27 60.89 U-MARVEL [24] M-BEIR + NLI 44.32 39.14 59.64 59.63 38.17 72.16 80.78 51.40 81.01 68.00 37.08 72.23 58.63
+> ZS-CIR Pic2Word [38] CC3M 14.98 11.15 21.55 12.07 4.07 11.32 45.95 13.66 34.19 55.98 20.99 52.12 24.84 LinCIR [16] 15.78 12.04 21.82 5.55 2.23 7.28 47.55 14.63 34.91 42.76 19.57 47.15 22.61
+> CIR SPRC (ViT-G) [4] CIRR 28.62 25.79 44.48 25.13 15.92 37.06 54.39 34.85 62.31 40.41 26.29 52.39 37.30
+> OACIRR (Ours) 65.25 58.51 80.89 72.87 49.82 89.57 86.05 70.61 93.68 76.32 56.04 89.00 74.05
+
+Setting 2: Instance-as-Visual Adaptation                                                                                                                              
+
+> UMR
+> LamRA-Ret [30] M-BEIR + NLI 27.45 21.63 37.10 61.03 35.44 74.51 69.45 39.53 70.25 58.64 32.58 68.74 49.70 MM-Embed [28] M-BEIR + MTEB 41.38 34.55 52.50 53.21 30.06 62.80 71.03 41.47 71.15 78.85 38.88 79.32 54.60 GME ( 2B ) [52] UMRB 38.13 32.14 51.50 58.84 31.60 66.03 76.89 44.11 74.20 73.86 38.99 75.61 55.16 GME ( 7B ) [52] 44.98 39.24 60.18 63.11 38.34 75.38 83.44 54.60 84.15 77.11 47.09 82.69 62.53 U-MARVEL [24] M-BEIR + NLI 46.05 40.38 60.59 62.92 39.96 74.90 83.26 54.69 84.13 69.81 37.67 73.08 60.62 ZS-CIR Pic2Word [38] CC3M 14.96 11.00 21.16 12.04 3.95 11.07 39.39 11.50 27.13 46.60 18.39 46.49 21.97 LinCIR [16] 15.76 11.99 21.48 5.54 2.17 7.25 46.57 13.85 33.96 42.16 19.09 47.11 22.24 CIR SPRC (ViT-G) [4] CIRR 28.59 25.68 43.68 24.23 15.48 36.25 46.62 29.33 49.44 33.64 23.03 46.73 33.56
+> OACIRR (Ours) 64.14 57.71 79.65 72.70 48.29 89.18 84.27 66.86 91.13 75.24 54.65 88.93 72.73
+
+OACIR Task-Specific Architecture                                                       
+
+> Baseline (ViT-G) 69.07 58.76 81.44 74.59 49.78 89.46 87.48 69.53 93.66 79.80 55.49 89.87 74.91
+> Baseline †(ViT-G) 72.66 63.31 83.97 76.85 50.24 89.87 88.68 72.13 94.09 80.05 55.69 90.14 76.47
+> SPRC †(ViT-G) 69.94 60.98 82.72 74.08 51.62 89.79 86.42 70.90 93.74 77.41 55.90 89.02 75.21
+> OACIR
+> AdaFocal (ViT-G) OACIRR (Ours) 77.15 65.31 86.88 78.42 53.63 92.22 91.86 74.11 95.39 82.92 58.47 91.63 79.00
+
+Table 7. Quantitative comparison on the OACIRR benchmark under different evaluation settings and OACIR-specific baselines. 
+
+“Avg.” represents the average results across all evaluation metrics. The best result is highlighted in bold , and the second best is underlined. 
+
+Baseline denotes the standard CIR baseline, Baseline † denotes the ROI-cropped baseline, and SPRC † denotes plug-and-play CIR baseline. 
+
+9. Additional Ablation Studies 
+
+This section provides additional ablation studies to further validate the effectiveness of our method and the value of the OACIRR benchmark. Section 9.1 compares AdaFo-cal against stronger region-aware baselines, including ex-plicit ROI cropping and a plug-and-play integration into SPRC [4], further verifying the effectiveness of our adaptive attention design. Section 9.2 and Section 9.3 evaluate the generalization ability of models trained on OACIRR across tasks and domains, respectively. Section 9.4 analyzes the robustness of AdaFocal to imperfect bounding box inputs. Finally, Section 9.5 examines key design choices within the 
+
+Context-Aware Attention Modulator (CAAM) , including the modulation output form, the number of self-attention layers, and the configuration of contextual probe tokens. 
+
+9.1. Region-Aware Baselines 
+
+To rigorously evaluate the necessity and effectiveness of our adaptive attention mechanism, we compare AdaFocal 
+
+against three region-aware baseline models, each reflecting a distinct way of handling the anchored instance constraint: • Standard CIR Baseline. This model removes the CAAM 
+
+module ( β = 0 ) and encodes the full reference image and modification text using the Multimodal Encoder. While it preserves global visual context, it lacks any mechanism to preferentially attend to the anchored instance region. • ROI-Cropped Baseline (Baseline †). To introduce ex-plicit region awareness without additional learning, we crop the reference image using the bounding box Br and feed only the cropped region into the encoder. This forces attention onto the instance but eliminates surrounding context essential for interpreting the modification text. • Plug-and-Play CIR Baseline (SPRC †). To enable a fairer independent evaluation, we integrate the CAAM 
+
+into the strong CIR model SPRC [4] by applying its dy-namic attention activation during the first image-text fu-sion stage of the query encoder. This isolates CAAM 
+
+as a plug-and-play module for instance-focused attention modulation within an existing CIR architecture. As shown in Table 7, using the cropped instance (Baseline †) improves Instance Recall over the Standard Baseline, indicating that explicit isolation strengthens iden-6Method Pretraining Data Pretraining Scale FashionIQ CIRR CIRCO Avg@10 Avg@50 R@1 R@5 Rs@1 Avg. mAP@5 mAP@10 mAP@25                                                                 
+
+> CASE [21] LaSCo + CoCo 389 K ––35.40 65.78 64.29 65.04 –––CoVR-BLIP [39] WebVid-CoVR 1,644 K 27.70 44.63 38.48 66.70 69.28 67.99 21.43 22.33 24.47 CompoDiff [15] ST18M + LAION-2B 18,000 K 39.02 51.71 26.71 55.14 64.54 59.84 15.33 17.71 19.45 CoAlign (ViT-G) [22] CIRHS 535 K 39.22 60.08 41.08 71.11 70.80 70.96 21.60 23.38 25.98
+> Baseline (ViT-L) 37.82 59.57 41.59 72.36 72.06 72.21 21.51 23.14 25.47
+> Baseline (ViT-G) OACIRR (Ours) 127 K 39.80 61.81 42.96 73.62 72.95 73.28 23.96 24.69 26.58
+
+Table 8. Zero-shot cross-task generalization on standard CIR benchmarks. 
+
+Setting Method Fashion Car Product Landmark Avg.                                                                  
+
+> RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5
+> SPRC [4] 48.73 40.51 62.84 66.86 41.49 78.98 62.79 42.68 71.72 59.49 38.55 71.23 57.16
+> Cross-Domain AdaFocal 61.15 50.25 71.54 74.26 45.65 85.81 67.84 45.53 74.68 61.58 40.66 71.94 62.57
+> SPRC [4] 65.25 58.51 80.89 72.87 49.82 89.57 86.05 70.61 93.68 76.32 56.04 89.00 74.05
+> Full Finetuning AdaFocal 77.15 65.31 86.88 78.42 53.63 92.22 91.86 74.11 95.39 82.92 58.47 91.63 79.00
+
+Table 9. Cross-domain generalization on the OACIRR benchmark. 
+
+tity preservation. However, its gains in standard Recall re-main limited, suggesting that removing background context hinders the interpretation of contextual modifications. In-tegrating CAAM into SPRC (SPRC †) still improves over vanilla SPRC, verifying that our module is effective as a plug-and-play instance-aware attention mechanism. How-ever, its gains remain limited, indicating that complex post-interaction layers prior to query encoding in existing CIR methods can dilute this direct instance-focused attention. In contrast, AdaFocal achieves the strongest overall balance between instance fidelity and compositional reasoning. 
+
+9.2. Cross-Task Generalization of OACIRR 
+
+We evaluate whether the instance-consistent supervision provided by OACIRR transfers effectively to standard CIR settings. To this end, we train a Standard CIR Baseline ex-clusively on the OACIRR training set and directly evaluate the resulting model in a zero-shot manner on three estab-lished CIR benchmarks: FashionIQ [45], CIRR [31], and CIRCO [6]. We compare its performance with representa-tive CIR models trained on large-scale or synthetic triplet datasets, including CASE [21], CoVR-BLIP [39], Com-poDiff [15], and CoAlign [22]. As shown in Table 8, the model pretrained on OACIRR 
+
+achieves strong zero-shot transfer performance across all three benchmarks, consistently outperforming methods trained on substantially larger datasets. These findings sup-port two key conclusions: (1) Importance of Instance-Consistent Supervision : Enforcing precise instance-level alignment provides a more reliable training signal than synthetic or loosely paired semantic triplets, fostering ro-bust compositional reasoning. (2) Data Efficiency through High Quality : The real-world fidelity and careful cura-tion of OACIRR lead to highly competitive transfer perfor-mance while requiring substantially fewer training samples than existing large-scale datasets. Overall, these cross-task results demonstrate that OACIRR serves not only as a rig-orous benchmark for instance-aware retrieval, but also as an effective pretraining resource for the standard CIR task. 
+
+9.3. Cross-Domain Generalization on OACIRR 
+
+To evaluate whether models trained on OACIRR can gen-eralize beyond domain-specific semantics, we conduct a leave-one-domain-out evaluation across the four subsets. For each target subset, the model is trained on the remaining three subsets and tested on the held-out one. We compare this Cross-Domain setting with the standard Full Finetun-ing setting, where all four subsets are used for training. As shown in Table 9, AdaFocal consistently outperforms SPRC on all unseen domains under the Cross-Domain set-ting, demonstrating stronger instance-centric reasoning be-yond domain-specific semantics. At the same time, the clear performance gap between Cross-Domain and Full Finetun-ing confirms that the four subsets are strongly complemen-tary rather than redundant, highlighting both the diversity and the intrinsic challenge of the OACIRR benchmark. 
+
+9.4. Robustness to Bounding Box Quality 
+
+To evaluate the robustness of AdaFocal to imperfect user in-puts, we simulate noisy bounding boxes through Scale and Shift perturbations. Specifically, Scale enlarges or shrinks the bounding box while preserving its center, and Shift ad-ditionally offsets the center to mimic localization errors. As shown in Table 10, AdaFocal is robust to Scale per-7Bounding Box Fashion Car Product Landmark Avg.                                                                        
+
+> IoU Perturbation RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 1.00 Original 77.15 65.31 86.88 78.42 53.63 92.22 91.86 74.11 95.39 82.92 58.47 91.63 79.00 0.80 Scale 77.05 65.24 86.82 78.26 53.54 92.16 91.86 74.11 95.35 82.83 58.41 91.60 78.93
+> 0.50 Scale +Shift 75.16 63.24 85.55 77.07 52.61 91.54 91.20 73.44 94.83 81.66 57.66 90.96 77.91
+> NaN w/o Bounding Box 69.07 58.76 81.44 74.59 49.78 89.46 87.48 69.53 93.66 79.80 55.49 89.87 74.91
+
+Table 10. Robustness of AdaFocal to Scale and Shift perturbations of bounding boxes on the OACIRR benchmark.  
+
+> Modulation Output
+
+Fashion Car Product Landmark Avg.                                          
+
+> RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 RID @1 R@1 R@5 Scalar ( β)77.15 65.31 86.88 78.42 53.63 92.22 91.86 74.11 95.39 82.92 58.47 91.63 79.00 Vector ( ⃗β)74.60 65.25 85.94 77.32 53.33 92.19 91.56 73.13 94.92 82.80 58.96 91.77 78.48
+
+Table 11. Ablation study on the modulation output design of the CAAM .                     
+
+> CAAM OACIRR Benchmark # Self-Attention Layers RID @1 R@1 R@5 Avg. 181.38 62.39 90.54 78.10
+> 282.59 62.88 91.53 79.00 382.31 62.75 91.42 78.83
+> 482.02 62.51 91.24 78.59
+
+Table 12. Ablation study on the number of self-attention layers .
+
+turbation, with only negligible performance drops across all subsets. In contrast, the combined perturbation of Scale + Shift causes a clearer degradation, and removing the bound-ing box leads to the largest drop. These results indicate that 
+
+AdaFocal tolerates moderate input noise while still relying on visual anchors for reliable instance-aware retrieval. 
+
+9.5. CAAM Design Analysis 
+
+We further analyze three key design choices of the Context-Aware Attention Modulator (CAAM) , including the mod-ulation output form, the depth of the Contextual Reason-ing Module (CRM) , and the number of learnable Contex-tual Probe Tokens . We prioritize configurations that achieve strong performance with minimal complexity. • Scalar vs. Vector Modulation. As shown in Table 11, replacing the default scalar modulation with a query-wise vector output ( ⃗β ∈ RM ) offers no additional gain. This suggests that a single scalar is sufficient to control atten-tion intensity while better preserving the relative semantic coherence among pre-trained fusion queries. Therefore, we adopt the scalar design as the default output form. • Depth of the Contextual Reasoning Module. As shown in Table 12, increasing the CRM depth from 1 to 2 layers leads to clear improvements in both instance-level fidelity and overall recall, indicating that a single layer lacks suf-ficient cross-modal reasoning capacity. Scaling beyond                          
+
+> CAAM OACIRR Benchmark # Probe Tokens RID @1 R@1 R@5 Avg. 281.92 63.15 91.49 78.85
+> 482.38 62.41 91.15 78.65
+> 882.59 62.88 91.53 79.00 16 82.46 62.94 91.45 78.95
+> 32 82.21 62.90 91.37 78.83
+
+Table 13. Ablation study on the number of probe tokens .
+
+2 layers offers no significant gains and may add unnec-essary complexity to the compact design of the module. Based on these observations, we employ a 2-layer CRM .• Number of the Contextual Probe Tokens. As shown in Table 13, using too few probe tokens limits the module’s capacity to capture diverse contextual cues, while increas-ing the token count further yields only marginal benefit. Since the performance saturates at 8 probe tokens , we adopt this configuration as the default setting. 
+
+10. Additional Qualitative Analysis 
+
+Figure 8 presents qualitative comparisons across diverse re-trieval scenarios, revealing two failure modes of baseline CIR models and showing how AdaFocal addresses them. 
+
+Semantic Drift. Baseline models tend to conflate strong textual modifications with intrinsic object attributes, yield-ing retrievals that follow text-implied properties rather than preserving the visual anchor. AdaFocal maintains instance identity while faithfully reflecting contextual changes. 
+
+Fine-grained Confusion. Baseline models often return se-mantically similar yet instance-incorrect distractors, reflect-ing a reliance on global semantics over instance-specific cues. AdaFocal retrieves the correct instance more reliably under high visual similarity, offering clear gains in chal-lenging cases by emphasizing distinctive local cues. 8Fashion Car Product Landmark Figure 7. A curated collage of representative instances from the OACIRR benchmark. AdaFocal 
+
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+
+R@1 R@5 Retrieval Results 
+
+Change the blue 
+
+denim to white, 
+
+sitting pose ,
+
+holding a drink. 
+
+Multimodal Query 
+
+Now unboxed 
+
+and displayed 
+
+on a desk next 
+
+to a keyboard. 
+
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+
+R@1 R@5 Retrieval Results 
+
+Multimodal Query 
+
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+
+R@1 R@5 Retrieval Results Multimodal Query 
+
+Change background 
+
+to plain white ,
+
+and now shown 
+
+from the front .
+
+A distant view 
+
+from across the 
+
+water , featuring 
+
+a passing boat .
+
+> AdaFocal
+> ( Ours )
+> Baseline
+> ( w/o CAAM  )
+
+R@1 R@5 Retrieval Results 
+
+Multimodal Query 
+
+Figure 8. Qualitative comparison of our AdaFocal and the Baseline on the OACIRR benchmark. Green boxes indicate the ground-truth target, yellow boxes indicate instance-correct but semantically incorrect results, and all other retrieved images are marked with red boxes .
+
+9

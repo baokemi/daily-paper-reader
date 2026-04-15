@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11994v1/fig-001.webp",
+      "caption": "Table 1 Common notation.",
+      "page": 30,
+      "index": 1,
+      "width": 1040,
+      "height": 1256
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11994v1/fig-002.webp",
+      "caption": "Figure 2 Comparison of UCRL, COMPLETE, O-O UCRL-VTR (Optimal), and O-O UCRL-VTR (Pessimistic) under different environment shifts Δ, coverage 𝜏, 𝐾, and 𝑀off .",
+      "page": 22,
+      "index": 2,
+      "width": 979,
+      "height": 668
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11994v1/fig-003.webp",
+      "caption": "Figure 4 Supplementary results to Figure 2, including DP-LSVI and UCBVI. The setting in Figure 4a matches that of Figure 2a, and the setting in Figure 4b matches that of Figure 2b.",
+      "page": 72,
+      "index": 3,
+      "width": 945,
+      "height": 375
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11994v1/fig-004.webp",
+      "caption": "Figure 1 Graphical illustration of the sufficient conditions over the informativeness of offline data for 𝐾 = 103, 𝑀off = 1.5× 1011, 𝜖 = 10−3, 𝐻 = 3, 𝑑 = 5, and 𝐵 = 10. The admissible region is computed directly from Eq. (13). When 𝜏 ≲ 10−7, no value of Δ yields informative offline data. Once 𝜏 exceeds this threshold, larger 𝜏 admits a larger environment shift Δ, with an approximately linear dependence. The deviation from linearity near 𝜏 ≈ 10−7 is mainly caused by the logarithmic confidence term in Eq. (13).",
+      "page": 13,
+      "index": 4,
+      "width": 681,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11994v1/fig-005.webp",
+      "caption": "Figure 3 Cumulative regret versus 𝜏 for different Δ(𝜏), with 𝐾 = 4× 103 and 𝑀off = 105.",
+      "page": 24,
+      "index": 5,
+      "width": 663,
+      "height": 277
+    }
+  ]
+}

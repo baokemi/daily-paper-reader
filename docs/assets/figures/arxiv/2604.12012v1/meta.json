@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-001.webp",
+      "caption": "Figure 1. TIPSv2’s improvement to the masked image modeling pretraining strategy. As part of our complete TIPSv2 method, we introduce iBOT++ (bottom), a simple modification to the well-known iBOT [68] self-supervised objective (top-left), where visible tokens also contribute directly to the loss. This enhancement dramatically improves patch-text alignment, as demonstrated by zero-shot image segmentation results (top-right).",
+      "page": 1,
+      "index": 1,
+      "width": 496,
+      "height": 369
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-002.webp",
+      "caption": "Figure 8. PCA maps at ViT-g or ViT-7B size. Comparing the first 3 PCA components from teacher models of DINOv2 (with registers, ViT-g), DINOv3 (ViT-7B), and TIPSv2 (ViT-g). Images are forwarded at 1372 resolution for patch size 14 models (DINOv2 and TIPSv2) and at 1568 resolution for patch size 16 models (DINOv3). As for the ViT-L PCA maps, DINOv3 features appear smoother, but TIPSv2 features capture more semantically focused details, e.g., notice the ceiling details in row 2 or the different colors contrasting people and backpacks in row 3.",
+      "page": 11,
+      "index": 2,
+      "width": 494,
+      "height": 528
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-003.webp",
+      "caption": "Figure 9. Zero-shot segmentation visualization. Comparing results with the iBOT loss (used in TIPS) vs the iBOT++ loss (used in TIPSv2), where classes are predicted directly by finding the closest text embedding to each image patch token, without any post-processing. Compared to baseline iBOT, iBOT++ achieves significantly improved patch-text alignment, as part of the TIPSv2 recipe.",
+      "page": 11,
+      "index": 3,
+      "width": 494,
+      "height": 779
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-004.webp",
+      "caption": "Figure 7. PCA maps at ViT-L size. Comparing the first 3 PCA components from the ViT-L models of DINOv2 (with registers), DINOv3, and TIPSv2. Images are forwarded at 1372 resolution for patch size 14 models (DINOv2 and TIPSv2) and at 1568 resolution for patch size 16 models (DINOv3). DINOv3 features appear smoother, but TIPSv2 features show more semantically focused features, e.g., TIPSv2 maps show all windows clustered together in row 1, and the eyes and leash are distinct on the dog in row 4.",
+      "page": 10,
+      "index": 4,
+      "width": 494,
+      "height": 528
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-005.webp",
+      "caption": "Figure 6. Zero-shot segmentation visualization. Comparing results for TIPSv2, TIPS and SigLIP 2, where classes are predicted directly by finding the closest text embedding to each image patch token, without any post-processing. TIPSv2 enhances patchtext alignment significantly compared to other models, showcasing strong off-the-shelf capabilities.",
+      "page": 8,
+      "index": 5,
+      "width": 496,
+      "height": 330
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-006.webp",
+      "caption": "Table 6. Global image-text evaluations, where TIPSv2 achieves best or second-best in 5 out of 7 cases. We highlight the best and second-best number of each column.",
+      "page": 8,
+      "index": 6,
+      "width": 894,
+      "height": 189
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-007.webp",
+      "caption": "Table 2. Initialization and masking ablations for distillation. Comparing TIPS ViT-L models re-trained with different strategies. We highlight best and second-best overall. Initialization is either from scratch (“Random”) or initialized from the teacher model (“Pretrained”). Update is either training ( ) or frozen ( ). The results show that removing masking and randomly initializing the student image encoder are critical for achieving strong patch-text alignment.",
+      "page": 4,
+      "index": 7,
+      "width": 749,
+      "height": 181
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-008.webp",
+      "caption": "Figure 10. Comparison of TIPSv2 against recent vision encoders. The chart illustrates the percentage of shared evaluation benchmarks where TIPSv2 secures the best result (green) compared head-to-head to other individual leading models (orange). TIPSv2 demonstrates a winning record on the majority of shared tasks. The integer displayed on the chart represents the count of metrics on which each respective model achieves the best result (i.e., the number of wins). For each comparison between individual vision encoders, we use the largest comparable model size (ViT-g against ViT-g, or ViT-g against ViT-G, or ViT-L against ViT-L).",
+      "page": 12,
+      "index": 8,
+      "width": 486,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12012v1/fig-009.webp",
+      "caption": "Figure 3. TIPSv2 pretraining overview. TIPSv2 introduces 3 improvements (highlighted in green borders) to the combined contrastive and self-supervised approach to pretrain vision encoders. iBOT++ is an enhanced masked image modeling loss. Head-only EMA enables memory-efficient self-supervised losses. Multi-granularity captions provide a range of possible textual descriptions for images, increasing the robustness of the model.",
+      "page": 5,
+      "index": 9,
+      "width": 490,
+      "height": 419
+    }
+  ]
+}
