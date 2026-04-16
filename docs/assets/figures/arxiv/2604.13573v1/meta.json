@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-001.webp",
+      "caption": "Table 2: Performance comparison. The best and second-best results are bold and underlined, respectively. “Imp.” indicates the improvement of our approach over the strongest baseline, with “*” denoting significance at the 0.05 level (paired 𝑡-test).",
+      "page": 6,
+      "index": 1,
+      "width": 1048,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-002.webp",
+      "caption": "Figure 12: Effect of the temperature parameter 𝜏 during federated pretraining, evaluated by NDCG@10.",
+      "page": 15,
+      "index": 2,
+      "width": 500,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-003.webp",
+      "caption": "Figure 11: Visualization of item embeddings before and after incorporating the ID modality.",
+      "page": 15,
+      "index": 3,
+      "width": 1056,
+      "height": 264
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-004.webp",
+      "caption": "Figure 10: Distributions of inter-user representation similarities before and after behavior encoder fine-tuning.",
+      "page": 15,
+      "index": 4,
+      "width": 1056,
+      "height": 184
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-005.webp",
+      "caption": "Figure 1: Paradigm comparison. One-to-one transfer suffers from performance degradation on the source market and negative transfer to the target market. Many-to-many collaboration is promising but not well explored by existing methods, motivating our federated collaboration framework.",
+      "page": 2,
+      "index": 5,
+      "width": 504,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-006.webp",
+      "caption": "Figure 3: Inter-market heterogeneity under CE and S2CE.",
+      "page": 7,
+      "index": 6,
+      "width": 506,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-007.webp",
+      "caption": "Table 4: Notation Table.",
+      "page": 10,
+      "index": 7,
+      "width": 498,
+      "height": 425
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-008.webp",
+      "caption": "Figure 9: Distributions of inter-user representation similarities under behavior encoders trained with CE and S2CE.",
+      "page": 14,
+      "index": 8,
+      "width": 506,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-009.webp",
+      "caption": "Figure 8: Inter-market heterogeneity under CE and S2CE.",
+      "page": 13,
+      "index": 9,
+      "width": 506,
+      "height": 306
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-010.webp",
+      "caption": "Figure 6: Effect of the temperature parameter 𝜏 during federated pretraining, evaluated by HR@10.",
+      "page": 8,
+      "index": 10,
+      "width": 494,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13573v1/fig-011.webp",
+      "caption": "Figure 2: Overview of FeCoSR for CMR. I. (Orange) Federated pretraining with textual modality for cross-market behavior-level pattern learning; II. (Green) Local fine-tuning with ID modality for market-specific item-level preference modeling.",
+      "page": 4,
+      "index": 11,
+      "width": 970,
+      "height": 373
+    }
+  ]
+}

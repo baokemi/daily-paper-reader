@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06430v1/fig-001.webp",
+      "caption": "Fig. 1: Simulation layout and sample snapshot of camera (black vertices) and target (black crosses) configuration. 16 cameras are placed on a 4× 4 grid over a 100× 100 workspace. Each camera has a sector FOV with half-angle 30◦ and sensing range of 20 units (light gray wedges show the selected heading of each camera). Colored edges denote the one-hop communication links between grid neighbors, with warmer colors representing higher delays.",
+      "page": 6,
+      "index": 1,
+      "width": 437,
+      "height": 377
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06430v1/fig-002.webp",
+      "caption": "Fig. 2: Coverage over time (mean ±95% CI, n = 20 runs, running average over 50 time steps) for DOG-IU and DOG under increasing maximum one-hop delay d̄ on a 100× 100 workspace with 16 grid-placed cameras, 8 headings, and 80 clustered targets (8 clusters). The gap widens as delay increases, illustrating the benefit of intermediate updates under more severe communication delays.",
+      "page": 7,
+      "index": 2,
+      "width": 1052,
+      "height": 444
+    }
+  ]
+}

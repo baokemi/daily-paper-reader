@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-001.webp",
+      "caption": "Figure 5 Training Reward during RL.",
+      "page": 15,
+      "index": 1,
+      "width": 986,
+      "height": 1116
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-002.webp",
+      "caption": "Figure 1 Examples of search trajectories. A high-quality trajectory (left) constitutes a lossless encoding of the question’s intent, preserving all necessary information required to reconstruct the original question. In contrast, trajectories that involve insufficient (middle) or irrelevant (right) search steps fail to preserve this information, resulting in incomplete or distorted representations of the question.",
+      "page": 2,
+      "index": 2,
+      "width": 986,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-003.webp",
+      "caption": "Table 1 Main results. The best and second-best performances are shown in bold and underline, respectively. †/⋆ denotes in-domain/out-of-domain datasets.",
+      "page": 7,
+      "index": 3,
+      "width": 972,
+      "height": 1157
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-004.webp",
+      "caption": "Figure 4 Performance comparison on the ResearchRubrics (Sharma et al., 2025) benchmark for open-ended Deep Research tasks. Scores are evaluated using the fine-grained rubric-based framework of Sharma et al. (2025), with Gemini 2.5 Pro as the judge, and are reported as domain-wise scores and the overall average across ten domains.",
+      "page": 10,
+      "index": 4,
+      "width": 971,
+      "height": 616
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-005.webp",
+      "caption": "Figure 2 Overview of the Cycle-Consistent Search (CCS) framework. The agent πθ generates search trajectories τ to address a question q. To ensure the search process is driven by information gain rather than lexical copying, τ is passed through a strategic information bottleneck (ψ) that removes the aT and masks entities within actions (highlighted in grey). A frozen reconstructor Pϕ then attempts to recover the original question from τ̃ . The agent is optimized using GRPO based on the semantic similarity between q and q̂, encouraging trajectories that capture sufficient evidence.",
+      "page": 4,
+      "index": 5,
+      "width": 984,
+      "height": 313
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-006.webp",
+      "caption": "Figure 7 Training reward for TTRL.",
+      "page": 19,
+      "index": 6,
+      "width": 986,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-007.webp",
+      "caption": "Figure 3 Qualitative analysis of search trajectories. CCS assigns low rewards to trajectories exhibiting (a) Information Void, where the retrieved observations fail to satisfy key entity constraints, and (b) Shallow Depth, where the agent fails to complete the full multi-hop search scaffold. By contrast, high rewards are assigned only to trajectories that preserve both the search structure and the supporting observations needed to faithfully reconstruct the original question. Masked spans are highlighted in gray.",
+      "page": 9,
+      "index": 7,
+      "width": 979,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12967v1/fig-008.webp",
+      "caption": "Figure 6 Average number of search during RL.",
+      "page": 16,
+      "index": 8,
+      "width": 986,
+      "height": 1014
+    }
+  ]
+}

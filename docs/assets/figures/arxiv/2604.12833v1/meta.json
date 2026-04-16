@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-001.webp",
+      "caption": "Table 3: Performance Degradation (↓) of VLMs on VQA Task Under Multimodal Semantic Lighting Attacks Examples Generated from the COCO Dataset. We compare the correctness (%) evaluated by GPT-4 of previous methods with our proposed approach. The performance is considered better with lower values. Number in bold indicates the best performance.",
+      "page": 6,
+      "index": 1,
+      "width": 1056,
+      "height": 183
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-002.webp",
+      "caption": "Figure 4: Visualization of some digital MSLA samples causing LVLMs to give incorrect answers. In each LVLM response, we highlight the correct and error parts using different colors.",
+      "page": 6,
+      "index": 2,
+      "width": 1056,
+      "height": 261
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-003.webp",
+      "caption": "Table 2: Performance Degradation (↓) of VLMs on Image Captioning Under Multimodal Semantic Lighting Attacks Examples Generated from the COCO Dataset. We compare the consistency (%) evaluated by GPT-4 of previous methods with our proposed approach. Lower values indicate better attack performance. The best result is shown in bold.",
+      "page": 6,
+      "index": 3,
+      "width": 1056,
+      "height": 183
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-004.webp",
+      "caption": "Figure 6: Visualization of physical MSLA samples causing LVLMs to give incorrect answers. In each LVLM response, we highlight the correct and error parts using different colors.",
+      "page": 7,
+      "index": 4,
+      "width": 1056,
+      "height": 444
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-005.webp",
+      "caption": "Figure 1: Overall framework of MSLA. Given a clean image, we parameterize the triangular light by its relative position, radius, color, and three polar angles, and optimize these variables with a genetic algorithm. The optimized triangular light can be deployed using simple optical devices such as a flashlight, colored transparent sheets, and shape templates.",
+      "page": 3,
+      "index": 5,
+      "width": 1056,
+      "height": 844
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-006.webp",
+      "caption": "Figure 9: Attack performance under different transparency parameter 𝛼 with varying radius scaling factors 𝛾 on four CLIP variants.",
+      "page": 8,
+      "index": 6,
+      "width": 1056,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12833v1/fig-007.webp",
+      "caption": "Figure 2: Experimental devices.",
+      "page": 4,
+      "index": 7,
+      "width": 506,
+      "height": 293
+    }
+  ]
+}

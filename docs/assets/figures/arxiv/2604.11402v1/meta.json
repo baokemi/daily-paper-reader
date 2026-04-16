@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-001.webp",
+      "caption": "Figure 2. MixVPR [2] recall (R@1/5/10/20) vs. time gap on NYU-VPR [41]. Performance degrades with time and drops sharply across the summer-to-winter transition.",
+      "page": 2,
+      "index": 1,
+      "width": 1036,
+      "height": 301
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-002.webp",
+      "caption": "Figure 4. Overview of our semi-automatic annotation pipeline. GPT-4o generates descriptions of changed vegetation and objects from image pairs, which Grounded SAM uses to segment changes. SAM2 Tracking identifies geometrically inconsistent segments, and MAST3R estimates common view between image pairs. Object Matching and Common View Matching filter noises and classify viewpointinduced changes, producing initial masks. Manual inspection refines these masks into ground truth.",
+      "page": 7,
+      "index": 2,
+      "width": 992,
+      "height": 337
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-003.webp",
+      "caption": "Figure 5. 4 image pairs annotated by our pipeline. We annotate three types of change on T1 w.r.t. T0: new objects, appearance changes, and objects not in common view.",
+      "page": 7,
+      "index": 3,
+      "width": 496,
+      "height": 260
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-004.webp",
+      "caption": "Table 5. Comparison on the filtered VL-CMU-CD dataset used in the main paper and the original VL-CMU-CD dataset containing noisy annotations. Green cells indicate improvements after adding LangSCD.",
+      "page": 14,
+      "index": 4,
+      "width": 627,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-005.webp",
+      "caption": "Figure 6. Examples of noisy ground-truth annotations in the VL-CMU-CD dataset. Each row shows two image pairs with the reference image (t0), the query image (t1), and the provided ground-truth (GT) change mask. We mark annotation errors directly on the images: red circles indicate false negatives, where true scene changes are missing from the GT mask, while green boxes indicate false positives, where the GT mask incorrectly included unchanged region. These examples demonstrate the presence of substantial annotation noise in VL-CMU-CD, which motivates our manual quality check and filtering procedure described in the main paper.",
+      "page": 14,
+      "index": 5,
+      "width": 1036,
+      "height": 722
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-006.webp",
+      "caption": "Table 3. Comparison of RSCD and RSCD with our modules on multi-class change detection. RSCD is modified to output four semantic change classes and trained with multi-class supervision on NYC-CD.",
+      "page": 8,
+      "index": 6,
+      "width": 1029,
+      "height": 260
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-007.webp",
+      "caption": "Table 2. F1-score and IoU comparison of GeSCF, RSCD, and C-3PO models with and without LangSCD across four datasets. Bold numbers indicate highest per dataset. Green background shows improvement.",
+      "page": 8,
+      "index": 7,
+      "width": 1032,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-008.webp",
+      "caption": "Table 1. Comparison of major scene change detection datasets with our NYC-CD dataset.",
+      "page": 4,
+      "index": 8,
+      "width": 1004,
+      "height": 394
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-009.webp",
+      "caption": "Figure 11. Improvement of the language module on F1-score and IoU across multiple domains. Results are from a unified model trained jointly on seven datasets—four street-view (NYC-CD, VL-CMU-CD, PSCD, ChangeSim) and three remote sensing (S2Looking, SYSUCD, CDD).",
+      "page": 19,
+      "index": 9,
+      "width": 1036,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-010.webp",
+      "caption": "Figure 3. Overview of the proposed LangSCD Our framework takes two images captured at different times (T0 and T1) as inputs, then predict multi-class masks. The Cross-Modal Feature Enhancer injects language-derived priors about new objects in T1 into visual features. The geometric semantic matching module is designed to refine the initial predictions by enforcing spatial completeness and semantic consistency.",
+      "page": 5,
+      "index": 10,
+      "width": 932,
+      "height": 699
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11402v1/fig-011.webp",
+      "caption": "Figure 7. Diagram of the language–image fusion module. DINOv2 [31] features [B, 384, 36, 36] are projected to [B, 256, 36, 36], flattened into [B, 1296, 256] image tokens, and fused with BERT [6] text tokens [B, T, 256] via 6 layers of deformable self-attention and bidirectional cross-attention. The fused tokens are reshaped back to a 36 × 36 feature map and mapped to the original DINOv2 channel space.",
+      "page": 16,
+      "index": 11,
+      "width": 498,
+      "height": 747
+    }
+  ]
+}

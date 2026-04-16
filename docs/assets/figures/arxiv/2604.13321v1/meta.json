@@ -1,0 +1,622 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-001.webp",
+      "caption": "Figure 4. Statistical Analysis using visual plots for LLaVAOneVision - results for images with dog. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian.",
+      "page": 6,
+      "index": 1,
+      "width": 416,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-002.webp",
+      "caption": "Figure 5. Statistical Analysis using visual plots for Qwen2.5-VL7B-Instruct - results for images with dog. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian.",
+      "page": 6,
+      "index": 2,
+      "width": 416,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-003.webp",
+      "caption": "Table 3. Low Kolmogorov–Smirnov (K-S) statistic coupled with p-value > alpha (0.05) means there’s no reason to reject the null hypothesis that the error distribution for LLaVA-OneVision, Qwen2.5-VL-7B-Instruct, LLaVA 1.5 and 1.6 are purely random (Gaussian).",
+      "page": 6,
+      "index": 3,
+      "width": 752,
+      "height": 291
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-004.webp",
+      "caption": "Table 2. LLaVA-OneVision, Qwen2.5-VL-7B-Instruct, LLaVA 1.5 and LLaVA 1.6 vision encoders estimate 2D orientation to a high degree of accuracy across diverse image sets.",
+      "page": 6,
+      "index": 4,
+      "width": 910,
+      "height": 289
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-005.webp",
+      "caption": "Figure 12. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with train for 36 randomly selected images",
+      "page": 11,
+      "index": 5,
+      "width": 448,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-006.webp",
+      "caption": "Figure 11. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with fish for 36 randomly selected images",
+      "page": 11,
+      "index": 6,
+      "width": 448,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-007.webp",
+      "caption": "Figure 9. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with dog for 36 randomly selected images",
+      "page": 11,
+      "index": 7,
+      "width": 446,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-008.webp",
+      "caption": "Figure 10. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with lizard for 36 randomly selected images",
+      "page": 11,
+      "index": 8,
+      "width": 448,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-009.webp",
+      "caption": "Table 5. LLaVA-LLaMA results for the 72 test samples with the beach scene in the background. LLaMA frequently responds that the 2D orientation is 90◦ or “not possible to determine”. The number of correct answers (among valid responses) is very low, even with high thresholds",
+      "page": 25,
+      "index": 9,
+      "width": 496,
+      "height": 354
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-010.webp",
+      "caption": "Figure 59. Incremental feature substitution for LLaVA-OneVision on images with the lizard scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 540,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 106.) This implies the orientation information is highly diffuse.",
+      "page": 26,
+      "index": 10,
+      "width": 1015,
+      "height": 180
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-011.webp",
+      "caption": "Figure 27. Statistical Analysis using visual plots for Qwen2.5VL-7B-Instruct - results for images with lizard. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 15,
+      "index": 11,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-012.webp",
+      "caption": "Figure 26. Statistical Analysis using visual plots for LLaVAOneVision - results for images with lizard. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 15,
+      "index": 12,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-013.webp",
+      "caption": "Figure 49. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with lizard foregrounds (Scale 3). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 21,
+      "index": 13,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-014.webp",
+      "caption": "Figure 47. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with lizard foregrounds (Scale 1). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 21,
+      "index": 14,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-015.webp",
+      "caption": "Figure 48. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with lizard foregrounds (Scale 2). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 21,
+      "index": 15,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-016.webp",
+      "caption": "Figure 46. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with dog foregrounds (Scale 3). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 21,
+      "index": 16,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-017.webp",
+      "caption": "Figure 74. Incremental feature substitution for Qwen2.5-VL-7B-Instruct on images with the vase-toaster-indoor scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 128,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 105.) This implies the orientation information is highly diffuse.",
+      "page": 29,
+      "index": 17,
+      "width": 1015,
+      "height": 180
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-018.webp",
+      "caption": "Figure 52. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with lizard foregrounds (Scale 3). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 22,
+      "index": 18,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-019.webp",
+      "caption": "Figure 50. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with lizard foregrounds (Scale 1). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 22,
+      "index": 19,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-020.webp",
+      "caption": "Figure 51. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with lizard foregrounds (Scale 2). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 22,
+      "index": 20,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-021.webp",
+      "caption": "Figure 53. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with train foregrounds (Scale 1). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 22,
+      "index": 21,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-022.webp",
+      "caption": "Figure 83. Results of foreground orientation estimation by LLaVA 1.6 for dog images (scale 1) when (a) only BG (b) BG and FG are rotated in the test images and training set consists of images with only FG rotated.",
+      "page": 34,
+      "index": 22,
+      "width": 477,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-023.webp",
+      "caption": "Figure 84. Results of foreground orientation estimation by LLaVA 1.5 for lizard images (scale 1) when (a) only BG (b) BG and FG are rotated in the test images and training set consists of images with only FG rotated.",
+      "page": 34,
+      "index": 23,
+      "width": 477,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-024.webp",
+      "caption": "Figure 81. Results of foreground orientation estimation by LLaVA 1.5 for dog images (scale 1) when (a) only BG (b) BG and FG are rotated in the test images and training set consists of images with only FG rotated.",
+      "page": 34,
+      "index": 24,
+      "width": 477,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-025.webp",
+      "caption": "Figure 24. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with train foregrounds (scale 2) for 72 randomly selected images",
+      "page": 14,
+      "index": 25,
+      "width": 446,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-026.webp",
+      "caption": "Figure 25. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with train foregrounds (scale 3) for 72 randomly selected images",
+      "page": 14,
+      "index": 26,
+      "width": 446,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-027.webp",
+      "caption": "Figure 23. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with train foregrounds (scale 1) for 72 randomly selected images",
+      "page": 14,
+      "index": 27,
+      "width": 446,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-028.webp",
+      "caption": "Table 1. Image sets and corresponding prompts to LLaVA/Qwen2.5-VL-7B-Instruct.",
+      "page": 3,
+      "index": 28,
+      "width": 523,
+      "height": 368
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-029.webp",
+      "caption": "Figure 79. Incremental feature substitution for LLaVA 1.5 on images with the indoor background scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 20,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 105.) This implies the orientation information is highly diffuse.",
+      "page": 33,
+      "index": 29,
+      "width": 1015,
+      "height": 529
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-030.webp",
+      "caption": "Figure 80. Incremental feature substitution for LLaVA 1.6 on images with the indoor background scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 16,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 106.) This implies the orientation information is highly diffuse.",
+      "page": 33,
+      "index": 30,
+      "width": 1015,
+      "height": 530
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-031.webp",
+      "caption": "Figure 86. Results of foreground orientation estimation by LLaVA 1.5 for train images (scale 1) when (a) only BG (b) BG and FG are rotated in the test images and training set consists of images with only FG rotated.",
+      "page": 35,
+      "index": 31,
+      "width": 477,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-032.webp",
+      "caption": "Table 6. Impact of background (BG) image rotation on foreground (FG) rotation (rot.) estimation for dog foreground images (Scale 1) using LLaVA 1.5 and LLaVA 1.6 - Mean Absolute Error (MAE) for synthetic background image sets under different rotation conditions. When background is rotated, performance: (1) degrades sharply when trained on only FG rot. images, (2) and (3) improves significantly when trained on BG+FG rot., (4) improves moderately when trained on only BG rot.",
+      "page": 35,
+      "index": 32,
+      "width": 506,
+      "height": 593
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-033.webp",
+      "caption": "Figure 85. Results of foreground orientation estimation by LLaVA 1.6 for lizard images (scale 1) when (a) only BG (b) BG and FG are rotated in the test images and training set consists of images with only FG rotated.",
+      "page": 35,
+      "index": 33,
+      "width": 477,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-034.webp",
+      "caption": "Figure 36. Statistical Analysis using visual plots for LLaVAOneVision - results for images with koala-beach. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 18,
+      "index": 34,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-035.webp",
+      "caption": "Figure 35. Statistical Analysis using visual plots for Qwen2.5VL-7B-Instruct - results for images with fish. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 18,
+      "index": 35,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-036.webp",
+      "caption": "Figure 37. Statistical Analysis using visual plots for Qwen2.5-VL7B-Instruct - results for images with koala-beach. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 18,
+      "index": 36,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-037.webp",
+      "caption": "Figure 34. Statistical Analysis using visual plots for LLaVAOneVision - results for images with fish. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 18,
+      "index": 37,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-038.webp",
+      "caption": "Figure 55. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with train foregrounds (Scale 3). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 23,
+      "index": 38,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-039.webp",
+      "caption": "Figure 57. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with train foregrounds (Scale 2). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 23,
+      "index": 39,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-040.webp",
+      "caption": "Figure 54. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with train foregrounds (Scale 2). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 23,
+      "index": 40,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-041.webp",
+      "caption": "Figure 56. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with train foregrounds (Scale 1). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 23,
+      "index": 41,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-042.webp",
+      "caption": "Figure 71. Incremental feature substitution for LLaVA-OneVision on images with the vase-indoor scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 540,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 106.) This implies the orientation information is highly diffuse.",
+      "page": 28,
+      "index": 42,
+      "width": 1015,
+      "height": 180
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-043.webp",
+      "caption": "Figure 22. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with lizard foregrounds (scale 3) for 72 randomly selected images",
+      "page": 13,
+      "index": 43,
+      "width": 448,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-044.webp",
+      "caption": "Figure 19. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with dog foregrounds (scale 3) for 72 randomly selected images",
+      "page": 13,
+      "index": 44,
+      "width": 446,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-045.webp",
+      "caption": "Figure 18. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with dog foregrounds (scale 2) for 72 randomly selected images",
+      "page": 13,
+      "index": 45,
+      "width": 446,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-046.webp",
+      "caption": "Figure 20. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with lizard foregrounds (scale 1) for 72 randomly selected images",
+      "page": 13,
+      "index": 46,
+      "width": 448,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-047.webp",
+      "caption": "Figure 17. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with dog foregrounds (scale 1) for 72 randomly selected images",
+      "page": 13,
+      "index": 47,
+      "width": 446,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-048.webp",
+      "caption": "Figure 21. 2D orientation estimation performance comparison between LLaVA 1.5 and 1.6 on the images with lizard foregrounds (scale 2) for 72 randomly selected images",
+      "page": 13,
+      "index": 48,
+      "width": 448,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-049.webp",
+      "caption": "Figure 1. Set of images - Sets A and B are used for experiments with LLaVA-OV and Qwen2.5-VL-7B-Instruct, and set C is used for LLaVA1.5 and LLaVA1.6. Since LLaVA-OV and Qwen2.5-VL-7B-Instruct can be prompted with 2 images, real images were used. But since LLaVA1.5 and 1.6 can be prompted with only 1 image, synthetic images with reduced artifacts were used to improve the prediction accuracy. [A: Whole Images]: (a) dog (b) train (c) lizard (d) beach (e) indoor (f) fish. [B: In-Place Rotated Objects]: (a) koala on beach (b) vase on indoor (c) vase and toaster on indoor. [C: Blended Images with foreground on background]: (a) dog on beach (b) lizard on fish (c) train on indoor environment, with foreground scales 1, 2 and 3 from left to right.",
+      "page": 4,
+      "index": 49,
+      "width": 948,
+      "height": 507
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-050.webp",
+      "caption": "Table 7. Impact of background (BG) image rotation on foreground (FG) rotation (rot.) estimation for lizard foreground images (Scale 1) using LLaVA 1.5 and LLaVA 1.6 - Mean Absolute Error (MAE) for synthetic background image sets under different rotation conditions. When background is rotated, performance: (1) degrades sharply when trained on only FG rot. images, (2) and (3) improves significantly when trained on BG+FG rot., (4) improves moderately when trained on only BG rot.",
+      "page": 36,
+      "index": 50,
+      "width": 509,
+      "height": 594
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-051.webp",
+      "caption": "Table 8. Impact of background (BG) image rotation on foreground (FG) rotation (rot.) estimation for train foreground images (Scale 1) using LLaVA 1.5 and LLaVA 1.6 - Mean Absolute Error (MAE) for synthetic background image sets under different rotation conditions. When background is rotated, performance: (1) degrades sharply when trained on only FG rot. images, (2) and (3) improves significantly when trained on BG+FG rot., (4) improves moderately when trained on only BG rot.",
+      "page": 36,
+      "index": 51,
+      "width": 508,
+      "height": 593
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-052.webp",
+      "caption": "Figure 87. Results of foreground orientation estimation by LLaVA 1.6 for train images (scale 1) when (a) only BG (b) BG and FG are rotated in the test images and training set consists of images with only FG rotated.",
+      "page": 36,
+      "index": 52,
+      "width": 477,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-053.webp",
+      "caption": "Figure 41. Statistical Analysis using visual plots for Qwen2.5-VL7B-Instruct - results for images with vase-toaster-indoor. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 19,
+      "index": 53,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-054.webp",
+      "caption": "Figure 39. Statistical Analysis using visual plots for Qwen2.5VL-7B-Instruct - results for images with vase-indoor. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 19,
+      "index": 54,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-055.webp",
+      "caption": "Figure 38. Statistical Analysis using visual plots for LLaVAOneVision - results for images with vase-indoor. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 19,
+      "index": 55,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-056.webp",
+      "caption": "Figure 40. Statistical Analysis using visual plots for LLaVAOneVision - results for images with vase-toaster-indoor. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 19,
+      "index": 56,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-057.webp",
+      "caption": "Figure 31. Statistical Analysis using visual plots for Qwen2.5VL-7B-Instruct - results for images with beach. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 17,
+      "index": 57,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-058.webp",
+      "caption": "Figure 30. Statistical Analysis using visual plots for LLaVAOneVision - results for images with beach. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 17,
+      "index": 58,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-059.webp",
+      "caption": "Figure 33. Statistical Analysis using visual plots for Qwen2.5VL-7B-Instruct - results for images with indoor. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 17,
+      "index": 59,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-060.webp",
+      "caption": "Figure 32. Statistical Analysis using visual plots for LLaVAOneVision - results for images with indoor. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 17,
+      "index": 60,
+      "width": 416,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-061.webp",
+      "caption": "Figure 77. Incremental feature substitution for LLaVA 1.5 on images with the fish background scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 20,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 105.) This implies the orientation information is highly diffuse.",
+      "page": 32,
+      "index": 61,
+      "width": 1015,
+      "height": 529
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-062.webp",
+      "caption": "Figure 78. Incremental feature substitution for LLaVA 1.6 on images with the fish background scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 16,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 106.) This implies the orientation information is highly diffuse.",
+      "page": 32,
+      "index": 62,
+      "width": 1015,
+      "height": 530
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-063.webp",
+      "caption": "Figure 15. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with vase for 36 randomly selected images",
+      "page": 12,
+      "index": 63,
+      "width": 446,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-064.webp",
+      "caption": "Figure 14. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with koala for 36 randomly selected images",
+      "page": 12,
+      "index": 64,
+      "width": 446,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-065.webp",
+      "caption": "Figure 13. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with indoor for 36 randomly selected images",
+      "page": 12,
+      "index": 65,
+      "width": 446,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-066.webp",
+      "caption": "Figure 16. 2D orientation estimation performance comparison between LLaVA OneVision and Qwen2.5-VL-7B-Instruct on the images with vase and toaster for 36 randomly selected images",
+      "page": 12,
+      "index": 66,
+      "width": 448,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-067.webp",
+      "caption": "Figure 67. Incremental feature substitution for LLaVA-OneVision on images with the fish scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 540,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 106.) This implies the orientation information is highly diffuse.",
+      "page": 27,
+      "index": 67,
+      "width": 1015,
+      "height": 180
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-068.webp",
+      "caption": "Figure 58. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with train foregrounds (Scale 3). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 24,
+      "index": 68,
+      "width": 506,
+      "height": 418
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-069.webp",
+      "caption": "Figure 75. Incremental feature substitution for LLaVA 1.5 on images with the beach background scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 20,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 105.) This implies the orientation information is highly diffuse.",
+      "page": 31,
+      "index": 69,
+      "width": 923,
+      "height": 484
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-070.webp",
+      "caption": "Figure 76. Incremental feature substitution for LLaVA 1.6 on images with the beach background scene. No matter how the features are selected (according to the magnitude of the weights in the regressor or the absolute difference between anchor and target feature values, or randomly). 16,000 features or more must be replaced to fool the predictor. (Note that the x-axis is the number of feature substitutions times 106.) This implies the orientation information is highly diffuse.",
+      "page": 31,
+      "index": 70,
+      "width": 1031,
+      "height": 515
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-071.webp",
+      "caption": "Figure 44. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with dog foregrounds (Scale 1). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 20,
+      "index": 71,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-072.webp",
+      "caption": "Figure 45. Statistical Analysis using visual plots for LLaVA 1.6 - results for images with dog foregrounds (Scale 2). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 20,
+      "index": 72,
+      "width": 506,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-073.webp",
+      "caption": "Figure 43. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with dog foregrounds (Scale 3). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 20,
+      "index": 73,
+      "width": 506,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-074.webp",
+      "caption": "Figure 42. Statistical Analysis using visual plots for LLaVA 1.5 - results for images with dog foregrounds (Scale 2). Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 20,
+      "index": 74,
+      "width": 506,
+      "height": 416
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-075.webp",
+      "caption": "Figure 3. 2D orientation estimation performance comparison of LLaVA-OneVision and Qwen2.5-Vl-7B-Instruct on the images with the dog for 36 randomly selected images.",
+      "page": 5,
+      "index": 75,
+      "width": 446,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-076.webp",
+      "caption": "Figure 29. Statistical Analysis using visual plots for Qwen2.5VL-7B-Instruct - results for images with train. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 16,
+      "index": 76,
+      "width": 416,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13321v1/fig-077.webp",
+      "caption": "Figure 28. Statistical Analysis using visual plots for LLaVAOneVision - results for images with train. Together with the numerical results in Table 3 and the visual plots in this Figure, we can conclude that the residual error distribution (Table 2) is random/Gaussian",
+      "page": 16,
+      "index": 77,
+      "width": 416,
+      "height": 327
+    }
+  ]
+}

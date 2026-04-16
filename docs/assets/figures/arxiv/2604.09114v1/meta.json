@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-001.webp",
+      "caption": "Figure 1. Given a CIR query, our model analyzes the presence of the requested changes in a list of candidate images, to re-rank them depending on their relevance with respect to the modification text. The target image is framed in green.",
+      "page": 1,
+      "index": 1,
+      "width": 496,
+      "height": 462
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-002.webp",
+      "caption": "Table 1. Statistics on the question generation process, on the Fashion IQ validation dataset. The manual evaluation is performed over 136 questions randomly sampled from the three clothing types.",
+      "page": 6,
+      "index": 2,
+      "width": 487,
+      "height": 286
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-003.webp",
+      "caption": "Figure 3. Accuracy of the fine-tuned VQA model depending on the percentage of our automatically-annotated dataset used. For each model version, we measure the accuracy over all the target images in our three different validation sets.",
+      "page": 6,
+      "index": 3,
+      "width": 496,
+      "height": 357
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-004.webp",
+      "caption": "Table 4. CIR performance improvement when combining a CIR method with our FIRE-CIR model. For each initial CIR model, the best results are highlighted in bold.",
+      "page": 7,
+      "index": 4,
+      "width": 822,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-005.webp",
+      "caption": "Table 3. Results on the Fashion IQ validation split for state-of-the-art CIR methods. Best results are highlighted in bold.",
+      "page": 7,
+      "index": 5,
+      "width": 922,
+      "height": 378
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-006.webp",
+      "caption": "Figure 2. Overview of the FIRE-CIR model. Left: VQA score computation. The modification text is decomposed into a set of visual questions about the candidate image, which are answered using a VQA model. The predicted answers are then used to compute the VQA score, measuring the relevance of the candidate image with respect to the text. The set of questions and their answers give an interpretable insight in the relevance evaluation of each image. Right: CIR inference. Given the CIR query and a set of candidate images, FIRE-CIR computes the VQA score of each candidate image, and combines it with the score returned by another CIR method to refine the ranking of the retrieved images.",
+      "page": 3,
+      "index": 6,
+      "width": 932,
+      "height": 527
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-007.webp",
+      "caption": "Figure 8. Similarly, visual similarity and the green design contribute to having candidate images similar to the reference one in the topretrieved results. However, FIRE-CIR accurately promotes the ground-truth image, as its color is more coherent with what is written in the modification text.",
+      "page": 13,
+      "index": 7,
+      "width": 986,
+      "height": 554
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-008.webp",
+      "caption": "Figure 9. Contrary to FashionBLIP-2 which focuses specifically on the “workout muscle” characteristic, FIRE-CIR gives more importance to all the features, including the orange color.",
+      "page": 13,
+      "index": 8,
+      "width": 986,
+      "height": 556
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-009.webp",
+      "caption": "Figure 4. Average recall and inference speed of FIRE-CIR depending on the number n of re-ranked images, evaluated on the Fashion IQ validation set.",
+      "page": 8,
+      "index": 9,
+      "width": 502,
+      "height": 377
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-010.webp",
+      "caption": "Figure 6. In this example, FIRE-CIR is able to accurately identify the pattern in the dresses and re-ranks the retrieved results according to their resemblance with what is described in the modification text.",
+      "page": 12,
+      "index": 10,
+      "width": 986,
+      "height": 554
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09114v1/fig-011.webp",
+      "caption": "Figure 7. While FashionBLIP-2 ranks highly the reference image as some of its visual aspects remain compatible with the CIR query, FIRE-CIR correctly identifies that this dress does not have a solid black color, and thus re-ranks it outside of the top-50 results. The ground-truth target image is at the 8th rank, but the 7 other top-ranked images are also compatible with the given query.",
+      "page": 12,
+      "index": 11,
+      "width": 986,
+      "height": 556
+    }
+  ]
+}

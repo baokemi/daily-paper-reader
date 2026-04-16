@@ -1,0 +1,300 @@
+Title: Challenging Vision-Language Models with Physically Deployable Multimodal Semantic Lighting Attacks
+
+URL Source: https://arxiv.org/pdf/2604.12833v1
+
+Published Time: Wed, 15 Apr 2026 01:34:56 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Challenging Vision-Language Models with Physically Deployable Multimodal Semantic Lighting Attacks 
+
+# Yingying Zhao, Chengyin Hu, Qike Zhang, Xin Li, Xin Wang, Yiwei Wei, Jiujiang Guo, Jiahuan Long, Tingsong Jiang, Wen Yao 
+
+## Abstract 
+
+Vision-Language Models (VLMs) have shown remarkable perfor-mance, yet their security remains insufficiently understood. Ex-isting adversarial studies focus almost exclusively on the digital setting, leaving physical-world threats largely unexplored. As VLMs are increasingly deployed in real environments, this gap becomes critical, since adversarial perturbations must be physically real-izable. Despite this practical relevance, physical attacks against VLMs have not been systematically studied. Such attacks may in-duce recognition failures and further disrupt multimodal reasoning, leading to severe semantic misinterpretation in downstream tasks. Therefore, investigating physical attacks on VLMs is essential for assessing their real-world security risks. To address this gap, we propose Multimodal Semantic Lighting Attacks (MSLA), the first physically deployable adversarial attack framework against VLMs. MSLA uses controllable adversarial lighting to disrupt multimodal semantic understanding in real scenes, attacking semantic align-ment rather than only task-specific outputs. Consequently, it de-grades zero-shot classification performance of mainstream CLIP variants while inducing severe semantic hallucinations in advanced VLMs such as LLaVA and BLIP across image captioning and visual question answering (VQA). Extensive experiments in both digital and physical domains demonstrate that MSLA is effective, trans-ferable, and practically realizable. Our findings provide the first evidence that VLMs are highly vulnerable to physically deployable semantic attacks, exposing a previously overlooked robustness gap and underscoring the urgent need for physical-world robustness evaluation of VLMs. 
+
+## Keywords 
+
+Vision-Language Models; Physical Adversarial Attack; Multimodal Semantic Lighting Attacks 
+
+## 1 Introduction 
+
+In recent years, classical Vision-Language Models (VLMs) [ 7, 28 ]have achieved cross-modal embedding alignment through large-scale image-text contrastive learning [ 31 ]. Meanwhile, further ad-vances in vision-language pretraining have enabled these models to extend to generative and comprehension tasks [ 48 ], such as image captioning [ 3 , 16 ] and visual question answering (VQA) [ 6 , 22 ]. Current VLMs [ 6, 21 , 22 ] have achieved remarkable progress in bridging computer vision and natural language processing. Ow-ing to their powerful cross-modal understanding, VLMs are being rapidly deployed in safety-critical real-world applications, including autonomous driving [35, 38] and security surveillance [1, 27]. However, despite their strong performance across diverse tasks, VLMs remain vulnerable to adversarial examples [ 23 , 40 , 43 ]. In real-world scenarios, they inevitably encounter complex environ-mental perturbations [ 2, 9 , 30 ]. Among these, illumination variation is one of the most common and unavoidable factors. Notably, most existing adversarial attacks against VLMs are limited to the digital domain. In practical deployment, however, physical adversarial at-tacks pose a more realistic and severe threat than digital attacks, which typically rely on imperceptible pixel-level noise [ 8 ]. Although several studies have investigated illumination-based physical at-tacks [ 11 , 34 , 37 ], most of them focus on conventional deep neural networks rather than VLMs, leaving the vulnerability of VLMs to physical light perturbations largely unexplored. To bridge this research gap, we propose the first physical at-tack against VLMs, termed Multimodal Semantic Lighting Attacks (MSLA), to systematically investigate the vulnerability of VLMs to light perturbations. We model the triangular light using a 9-dimensional parameter space, including center coordinates, radius, color, and polar angles, resulting in a complex non-convex opti-mization problem. In this setting, traditional optimization methods are easily trapped in local optima, while genetic algorithms [ 12 ]can better explore the search space through crossover and muta-tion. Experimental results show that MSLA significantly degrades VLM performance under optimized light parameters and remains effective in real-world physical deployments, revealing the vulner-ability of VLMs to realistic light-based perturbations. The main contributions of this work are summarized as follows: 
+
+• To the best of our knowledge, we propose the first physical adversarial attack framework against VLMs, termed MSLA, and systematically investigate the feasibility and potential threat of exploiting localized triangular illumination to attack VLMs. 
+
+• We conduct extensive experiments in both digital and phys-ical settings. The results demonstrate that MSLA achieves strong attack effectiveness across both domains, exposing the vulnerability of VLMs to real-world physical light per-turbations. 
+
+• Through in-depth analyses on zero-shot classification, image captioning, and VQA, we reveal how localized light pertur-bations interfere with visual attention and feature encoding, leading to semantic shifts and cross-modal reasoning failures in VLMs. 
+
+## 2 Related Work 2.1 Robustness of Vision-Language Models 
+
+Driven by large-scale multimodal pre-training, foundation mod-els [ 7 , 18 , 24 , 28 ] seamlessly integrate visual and linguistic features. According to the manner of multimodal interaction, existing VLMs can generally be categorized into fused models and aligned mod-els [ 42 ]. Fused models such as BLIP [ 17 ] employ a joint encoder to perform unified modeling of image and text information, thereby learning shared multimodal representations. In contrast, aligned  
+
+> arXiv:2604.12833v1 [cs.CV] 14 Apr 2026 MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil Trovato et al.
+
+models (e.g., CLIP [ 28 ]) use separate image and text encoders to extract features, and then achieve cross-modal alignment via con-trastive learning or matching mechanisms. Based on these pre-training paradigms, recent VLMs [ 6, 21 , 22 ] have demonstrated strong capabilities in visual understanding and natural language generation. However, as these models are increasingly deployed in real-world applications, research on the robustness of VLMs has also attracted increasing attention. Existing studies [ 29 , 36 ] have shown that VLMs still exhibit limitations in modeling fine-grained visual attributes, such as spatial relations and numerical informa-tion. Furthermore, since most VLMs remain highly dependent on the features extracted by visual encoders at the architectural level, their outputs are relatively sensitive to perturbations in input im-ages, especially when sufficient textual context is unavailable as a constraint [8, 41, 45]. Adversarial attacks against VLMs have attracted increasing at-tention [ 19 , 26 ]. Although prior studies have shown that VLMs are vulnerable to 𝐿 𝑝 -norm perturbations [ 8 , 25 ], their robustness to light interference in real-world scenarios remains unexplored. To fill this gap, MSLA systematically evaluates the impact of light perturbations on VLMs in both digital and physical settings. 
+
+## 2.2 Physical Adversarial Light Attacks 
+
+To overcome the limitations of digital-domain attacks in real-world scenarios, researchers have increasingly explored physical adver-sarial attacks. Among them, light-based attacks are particularly stealthy and practical, as lighting is ubiquitous, difficult to control, and often appears as natural visual effects [ 10 ]. Specifically, sev-eral studies focus on active light attacks, where OPAD [ 11 ] and SPAA [ 14 ] use projectors to cast adversarial light onto target ob-jects or scenes, and AdvLB [ 9 ] employs laser beams to generate localized high-intensity perturbations. Other works exploit am-bient lighting conditions, such as manipulating shadows [ 47 ] or reflected light [ 37 ], to create adversarial patterns. Moreover, prior research [ 13 ] suggests that even common natural light spots can threaten model performance. However, most of these attacks focus on specific applications such as traffic sign recognition, and their targets are primarily CNN-based visual models rather than modern VLMs. Notably, cur-rent studies on the illumination robustness of VLMs [ 23 , 40 ] are generally limited to the digital domain and have not further evalu-ated these models in real-world physical deployment settings. In contrast, the proposed MSLA framework adopts a lightweight pa-rameterized modeling strategy and leverages localized light, jointly constrained by geometric features and color attributes, to assess the illumination robustness of VLMs in the real physical world. 
+
+## 3 Methodology 
+
+In this section, we introduce the proposed MSLA framework, as shown in Figure 1. The MSLA framework uses a parametric trian-gular light pattern to simulate local lighting changes and generate adversarial samples. 
+
+## 3.1 Problem Definition 
+
+Given an input image 𝐼 and a candidate text label set T , where 
+
+T = {𝑡 1, 𝑡 2, . . . , 𝑡 𝑘 } and the ground-truth label is ¯𝑡 ∈ T , a vision-language model 𝐹 consists of an image encoder 𝐸 𝐼 and a text encoder 
+
+𝐸 𝑇 . The model predicts the semantic alignment between image and text by computing cross-modal similarities: 
+
+𝑧 𝑘 = 𝑠 (𝐸 𝐼 (𝐼 ), 𝐸 𝑇 (𝑡 𝑘 )) , 𝑘 = 1, 2, . . . , 𝐾, (1) where 𝑠 (· , ·) denotes the similarity function in the joint embedding space. The prediction probability over all candidate labels is then obtained through a softmax operation: 
+
+𝑝 (𝑡 𝑘 | 𝐼 ) = exp (𝑧 𝑘 )
+
+Í𝐾 𝑗 =1 exp (𝑧 𝑗 ) . (2) Under normal conditions, a model is expected to correctly align the input image with its ground-truth text label: 
+
+arg max   
+
+> 𝑡 𝑘 ∈ T
+
+𝑝 (𝑡 𝑘 | 𝐼 ) = ¯𝑡 . (3) Our goal is to fool the vision-language model by applying a physically realizable localized triangular light perturbation to the image, thereby suppressing the confidence of the ground-truth label and disrupting the cross-modal alignment. Unlike conventional pixel-wise adversarial perturbations that modify the entire image, our attack is constrained to a localized light region that can be physically projected in the real world. Therefore, the adversarial example is formulated as: 
+
+𝐼 𝑎𝑑𝑣 = A ( 𝐼, Θ, 𝛼, M) , (4) where A (·) denotes the light application function, Θ is the param-eter set of the triangular light, 𝛼 controls its transparency, and the binary mask M indicates whether a position is allowed to be modified, where one denotes allowed and zero denotes not allowed. The objective of MSLA is to search for an optimal parameter set 
+
+Θ∗, where the resulting adversarial image minimizes the confidence assigned to the ground-truth label: 
+
+Θ∗ = arg min  
+
+> Θ
+
+𝑝 (¯𝑡 | A ( 𝐼, Θ, 𝛼, M)) . (5) 
+
+## 3.2 Triangular Light Modeling 
+
+In principle, the light pattern could be extended to more general polygonal shapes. However, we choose triangles because they are the simplest polygonal structure that still preserves sufficient shape diversity for adversarial modeling, while remaining natural in ap-pearance and easy to realize in practice. Instead of directly opti-mizing three free vertices, which requires complicated geometric constraints to guarantee a valid triangle, we adopt a circle-based geometric modeling framework. Specifically, we first define a circle by its center and radius, and then generate three vertices on the circumference through angular parameters. 
+
+Radius. For an input image of fixed size 𝐻 × 𝑊 , We select a radius 
+
+𝑟 from [10 , 𝛾 min (𝐻,𝑊 )] , where 𝑟 is measured in pixels. A small radius may cause the three vertices to collapse onto the same pixel after coordinate rounding, degenerating the triangle into a single point. Therefore, the minimum radius is set to 10 px. We further introduce a scaling factor 𝛾 to constrain the maximum radius. As Challenging Vision-Language Models with Physically Deployable Multimodal Semantic Lighting Attacks MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil 
+
+Figure 1: Overall framework of MSLA. Given a clean image, we parameterize the triangular light by its relative position, radius, color, and three polar angles, and optimize these variables with a genetic algorithm. The optimized triangular light can be deployed using simple optical devices such as a flashlight, colored transparent sheets, and shape templates. 
+
+discussed in Section 4.4, we set 𝛾 = 0.2 to balance attack effective-ness and visual stealthiness, thereby preventing the light pattern from occupying an excessively large image region. 
+
+Center. To ensure that the generated triangle lies entirely within the valid image region, the circle center 𝑜 (𝑥, 𝑦 ) is constrained within the feasible range determined by the current radius 𝑟 . Specifically, the center coordinates are computed as: 
+
+𝑥 = 𝑥 min + 𝑥 rel · ( 𝑥 max − 𝑥 min ),𝑦 = 𝑦 min + 𝑦 rel · ( 𝑦 max − 𝑦 min ), (6) Here, 𝑥 rel and 𝑦 rel are relative coordinate parameters with values in [0, 1], which describe the offset of the circle center within the feasible region determined by 𝑥 min = 𝑟 , 𝑥 max = 𝑊 − 𝑟 , 𝑦 min = 𝑟 , and 
+
+𝑦 max = 𝐻 − 𝑟 .
+
+Shape. Unlike RFLA [ 37 ], which can only generate a specific type of right triangle, this work aims to optimize a more general form of triangular light. To generate triangles of arbitrary shapes, we randomly choose three independent angles 𝜙 1, 𝜙 2, 𝜙 3 ∈ [ 0, 360 ◦].The three distinct vertices 𝑐 𝑖 (𝑥 𝑖 , 𝑦 𝑖 ) on the circumference are then determined by the following equations: 
+
+
+
+𝑥 𝑖 = 𝑥 + 𝑟 × sin 
+
+
+
+𝜙 𝑖 × 𝜋 
+
+180 
+
+
+
+,𝑦 𝑖 = 𝑦 + 𝑟 × cos 
+
+
+
+𝜙 𝑖 × 𝜋 
+
+180 
+
+
+
+,𝑖 = 1, 2, 3. (7) 
+
+Color. Besides geometry, the fill color of the triangular light is also incorporated into the attack modeling. In the digital setting, we randomly select a color tuple (𝑅, 𝐺, 𝐵 ) from the region of [0, 255 ].MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil Trovato et al. 
+
+## 3.3 Adversarial Optimization 
+
+Based on the above modeling, we develop an optimization strategy based on genetic algorithm to search for the optimal triangular light configuration. 
+
+Optimization objective. The objective of MSLA is to find an adversarial light configuration that suppresses the confidence of the ground-truth label while increasing the uncertainty of model prediction. To this end, we define the fitness function as: 
+
+L( Θ) = log  𝑝 (¯𝑡 | 𝐼 𝑎𝑑𝑣 ) + 𝜖  − H ( 𝑝 (· | 𝐼 𝑎𝑑𝑣 )) , (8) where 𝑝 (¯𝑡 | 𝐼 𝑎𝑑𝑣 ) denotes the probability assigned to the original ground-truth label, 𝜖 is a small constant (set to 𝑒 −10 in this paper) introduced to avoid numerical instability in the logarithm when 
+
+𝑝 (¯𝑡 | 𝐼 𝑎𝑑𝑣 ) approaches zero, and H (·) is the Shannon entropy of the output distribution: 
+
+H ( 𝑝 ) = −
+
+> 𝐾
+
+∑︁ 
+
+> 𝑘 =1
+
+𝑝 (𝑡 𝑘 | 𝐼 𝑎𝑑𝑣 ) log 𝑝 (𝑡 𝑘 | 𝐼 𝑎𝑑𝑣 ). (9) The first term suppresses the confidence of the correct label through logarithmic scaling. Compared with directly minimizing 
+
+𝑝 (¯𝑡 | 𝐼 𝑎𝑑𝑣 ), log  𝑝 (¯𝑡 | 𝐼 𝑎𝑑𝑣 ) + 𝜖  remains sensitive even when the ground-truth confidence is small. The second term increases the entropy of the prediction distribution, encouraging decision con-fusion and dispersing probability mass toward incorrect classes. Therefore, the optimal adversarial parameter set is obtained by: 
+
+Θ∗ = arg min  
+
+> Θ
+
+L( Θ). (10) 
+
+Genetic algorithm. Since the parameter vector Θ contains hetero-geneous variables, including bounded continuous coordinates, color attributes, and angular parameters, the optimization landscape is highly non-convex and unsuitable for conventional gradient-based methods. To address this issue, we employ a genetic algorithm [ 12 ]to perform global search in the parameter space. Specifically, each individual in the population is encoded as a chromosome: 
+
+Θ = (𝑥 rel , 𝑦 rel , 𝑟, 𝑅, 𝐺, 𝐵, 𝜙 1, 𝜙 2, 𝜙 3). (11) We first randomly initialize a population of candidate light configu-rations. In each generation, the fitness value of each individual is evaluated on the target model. Individuals with better attack per-formance, indicated by lower fitness values, are selected as parents through tournament selection. Then, crossover is applied to ex-change partial parameter segments between parent chromosomes, enabling the search to explore new combinations of geometry and color. Mutation is further introduced on continuous variables such as center coordinates, radius, angles, and color channels, which in-creases population diversity and reduces the risk of getting trapped in local optima. Through iterative selection, crossover, and muta-tion, the population gradually evolves toward more effective ad-versarial light configurations. The optimization terminates when either the model no longer predicts the ground-truth label as Top-1 or the maximum generation budget is reached. 
+
+## 3.4 Physical Deployable Attack 
+
+In digital setting, we can generate colors by combining different RGB channel values. However, when conducting physical adver-sarial attacks, limited by equipment and physical materials, this search space is impractical. In the physical experiment, we collected the actual color of the selected transparent plastic sheet under the target camera. The sampled real physical color is taken as the initial search parameter of the genetic algorithm, rather than a randomly generated RGB sequence. At the same time, according to the op-timized polar angles, we can locate the three angles through a protractor, quickly obtain the vertices of the triangle on the circle, and accurately cut out the shape template. The physical device is shown in Figure 2. 
+
+Figure 2: Experimental devices. 
+
+## 4 Experiment 
+
+To validate the effectiveness of the proposed MSLA, we conducted systematic digital and physical experiments. Moreover, to ensure the comparability and fairness of the digital evaluation, we strictly followed the experimental protocol established in ITA [23]. 
+
+## 4.1 Experimental Setup 
+
+Datasets. We conduct our evaluation on the COCO dataset [ 5 ]. COCO provides diverse real-world scenes and object categories and has been widely adopted for evaluating the robustness of VLMs. We use the identical set of 300 images as ITA [ 23 ], with each of the 30 categories represented by 10 images. We further adopt the 80 COCO categories as the semantic label list. 
+
+Target models. We use the same experimental settings as ITA [ 23 ]. For the image classification task, we select four representative CLIP variants as attack targets, including OpenCLIP ViT-B/16 [15, 28 ], Meta-CLIP ViT-L/14 [ 39 ], EVA-CLIP ViT-G/14 [ 33 ], and Ope-nAI CLIP ViT-L/14 [ 46 ]. These models differ in parameter scale, pre-training data, and visual feature extraction capability, thereby enabling a comprehensive evaluation of the robustness of our method. For image captioning and visual question answering (VQA), we consider models with diverse architectures, including LLaVA-1.5 [ 22 ], LLaVA-1.6 [ 20 ], OpenFlamingo [ 4], BLIP-2 ViT-L [ 16 ], BLIP-2 FlanT5-XL [ 16 ], and InstructBLIP [ 22 ]. We compare the proposed method against the following baselines: Shadow Attack [ 47 ], Nat-ural Light Attack [ 13 ], and ITA [ 23 ]. As the current state-of-the-art illumination-based attack against vision-language models, ITA serves as the primary baseline in our study. 
+
+Evaluation Metrics. For the image classification task, we report the attack success rate and top-1 accuracy, and further evaluate Challenging Vision-Language Models with Physically Deployable Multimodal Semantic Lighting Attacks MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil 
+
+Table 1: Performance Degradation ( ↓) of VLMs on Zero-shot Classification Under Multimodal Semantic Lighting Attacks Examples Generated from the COCO Dataset. We compare the accuracy (%) of existing illumination-based attack methods with our proposed method across four CLIP variants. Lower accuracy indicates stronger attack performance. The best result is shown in bold. Method OpenCLIP ViT-B/16 Meta-CLIP ViT-L/14 EVA-CLIP ViT-G/14 OpenAI CLIP ViT-L/14 
+
+Clean 97 98 98 93 Natural Light Attack [13] 94 ( ↓ 3) 97 ( ↓ 1) 97 ( ↓ 1) 93(-) Shadow Attack [47] 84 ( ↓ 13 ) 82 ( ↓ 16 ) 95 ( ↓ 3) 79 ( ↓ 14 )ITA [23] 46 ( ↓ 51 ) 64 ( ↓ 34 ) 84 ( ↓ 14 ) 51 ( ↓ 42 )
+
+MSLA (ours) 29 ( ↓ 68 ) 23 ( ↓ 75 ) 36 ( ↓ 62 ) 11 ( ↓ 82 )
+
+the relative performance drop compared to clean samples. For im-age captioning and VQA, we adopt the LLM-as-a-judge evaluation framework in accordance with recent studies [22, 44, 46]. 
+
+Implementation details. We employ a genetic algorithm as the core optimization strategy to heuristically search the predefined parameter space over the coordinates, color, and the polar angles. In the optimization setup, the population size is set to 50 and the maximum number of generations is set to 200, while the crossover rate and mutation rate are fixed at 0.8 and 0.1, respectively. In particular, based on the quantitative findings of the ablation study in Section 4.4, we fix the transparency of the triangular light spot to 
+
+𝛼 = 0.5 and set the radius scaling factor to 0.2 in order to maintain a balance between attack effectiveness and visual stealthiness. All attack experiments are conducted on an NVIDIA RTX 3090 (24GB) GPU. 
+
+## 4.2 Digital Domain Performance 
+
+Evaluation on Zero-Shot Classification. Table 1 compares our method with previous illumination-based attack methods on zero-shot classification tasks. Although the proposed attack is restricted to a local triangular region, it still induces substantial performance degradation across all target models. Our method consistently out-performs competing approaches, including ITA, on all CLIP variants. In particular, the top-1 accuracy on perturbed samples drops by nearly 60% relative to clean samples for OpenCLIP ViT-B/16, EVA-CLIP ViT-G/14, and Meta-CLIP ViT-L/14, while the attack success rate on OpenAI CLIP ViT-L/14 reaches as high as 82% . The adversar-ial examples generated by our method are illustrated in Figure 3. It can be observed that VLMs can correctly recognize and classify the clean samples under normal conditions. However, after introducing the triangular light perturbation, the models’ predictions exhibit clear deviations and result in misclassification. 
+
+Evaluation on Image Captioning Tasks. Beyond zero-shot clas-sification, we further evaluate the effectiveness of the proposed MSLA on image captioning and VQA tasks. To ensure a fair and comprehensive comparison, we perform transfer attacks on large-scale Vision-Language Models (LVLMs) using samples generated by image encoders from different VLMs for zero-shot classifica-tion tasks. As shown in Table 2, the proposed MSLA consistently achieves the strongest attack effect on image captioning, yielding the lowest caption consistency scores across all evaluated models. Notably, smaller models suffer more severe degradation under the 
+
+Figure 3: Visualization Results of Zero-shot Classification. The first row shows clean samples with their corresponding Top-1 labels, while the second row presents the MSLA sam-ples with misclassified labels. 
+
+proposed attack. Smaller models such as OpenFlamingo and BLIP-2 exhibit substantial performance drops of approximately 28% and 
+
+21% , respectively. In contrast, the larger LLaVA-1.6 model shows a relatively smaller degradation of about 15% , suggesting that mod-els with larger parameter scales may possess stronger robustness against light perturbations. As illustrated in Figure 4 (a), while the models generate semantically accurate captions for clean images, they exhibit clear object hallucinations and semantic drift under attack, for example, misinterpreting a tire as a pink umbrella or a swan as a kite. These observations suggest that MSLA effectively disrupts visual grounding during caption generation. 
+
+Evaluation on VQA Tasks. As reported in Table 3, MSLA is even more destructive on the VQA task, where it consistently outper-forms all baselines by a large margin. Nearly all target models suffer substantial performance drops on VQA under attack, with correct-ness scores reduced by around 40% overall regardless of model size. This indicates that reasoning-intensive tasks are especially vulnerable to localized light perturbations, as VQA depends more heavily on precise visual grounding and fine-grained integration of visual and textual information. The visual examples in Figure 4 (b) further illustrate that the attack causes failures in counting, spa-tial understanding, and visual reasoning. For instance, the model changes the correct counting answer from “3” to “There are about 100 bears,” flips the binary response to the question “Is the pizza sitting on wood?” from “No” to “Yes,” or misreads the clock time from “12:43” to “3:00.” These findings indicate that the perturba-tion propagates from corrupted visual perception to downstream cross-modal reasoning, leading to severe answer distortion. MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil Trovato et al. 
+
+Table 2: Performance Degradation ( ↓) of VLMs on Image Captioning Under Multimodal Semantic Lighting Attacks Examples Generated from the COCO Dataset. We compare the consistency (%) evaluated by GPT-4 of previous methods with our proposed approach. Lower values indicate better attack performance. The best result is shown in bold. Image Encoder Models #Params Clean Natural Light Attack [13] Shadow Attack [47] ITA [23] MSLA (ours)                                                               
+
+> OpenAI CLIP ViT-L/14 LLaVA-1.5 7B 78.60 77.00( ↓1.63 )74.60( ↓4.00 )63.73( ↓14 .87 )56.23( ↓22 .37 )
+> LLaVA-1.6 7B 72.10 71.70( ↓0.39 )71.17( ↓0.93 )61.60( ↓10 .51 )56.33( ↓15 .77 )
+> OpenFlamingo 3B 70.20 69.53( ↓0.67 )67.80( ↓2.40 )53.93( ↓16 .27 )41.73( ↓28 .47 )
+> Blip-2 (FlanT5 XL ViT-L) 3.4B 75.10 70.77( ↓4.33 )68.57( ↓6.53 )60.93( ↓14 .17 )53.88( ↓21 .22 )
+> EVA-CLIP ViT-G/14 Blip-2 (FlanT5 XL )4.1B 74.96 71.27( ↓3.69 )68.80( ↓6.17 )62.01( ↓11 .88 )49.89( ↓25 .07 )
+> InstructBLIP (FlanT5 XL )4.1B 76.50 72.07( ↓4.43 )69.77( ↓6.73 )63.20( ↓13 .30 )59.43( ↓17 .07 )
+
+Table 3: Performance Degradation ( ↓) of VLMs on VQA Task Under Multimodal Semantic Lighting Attacks Examples Generated from the COCO Dataset. We compare the correctness (%) evaluated by GPT-4 of previous methods with our proposed approach. The performance is considered better with lower values. Number in bold indicates the best performance. Image Encoder Models #Params Clean Natural Light Attack [13] Shadow Attack [47] ITA [23] MSLA (ours)                                                            
+
+> OpenAI CLIP ViT-L/14 LLaVA-1.5 7B 68.00 68.00(-) 67.00( ↓1.00 )48.00( ↓20 .00 )24.00( ↓44 .00 )
+> LLaVA-1.6 7B 64.00 63.00( ↓1.00 )64.00(-) 43.00( ↓21 .00 )26.00( ↓38 .00 )
+> OpenFlamingo 3B 45.00 39.00( ↓6.00 )44.00( ↓1.00 )19.00( ↓26 .00 )3.00( ↓42 .00 )
+> Blip-2 (FlanT5 XL ViT-L) 3.4B 63.00 58.00( ↓5.00 )50.00( ↓13 .00 )38.00( ↓25 .00 )6.00( ↓57 .00 )
+> EVA-CLIP ViT-G/14 Blip-2 (FlanT5 XL )4.1B 54.00 53.00( ↓1.00 )54.00(-) 33.00( ↓21 .00 )10.00( ↓44 .00 )
+> InstructBLIP (FlanT5 XL )4.1B 68.00 64.00( ↓4.00 )62.00( ↓6.00 )44.00( ↓24 .00 )15.00( ↓53 .00 )
+
+Figure 4: Visualization of some digital MSLA samples causing LVLMs to give incorrect answers. In each LVLM response, we highlight the correct and error parts using different colors. 
+
+Figure 5: Attention analysis of CLIP models before and after our proposed method in the digital setting. Attention Analysis. To further show the impact of the proposed MSLA on VLMs, we use Grad-CAM [ 32 ] to visualize the changes in attention heatmaps of four mainstream CLIP variants before and after the attack. For clean samples, the models’ attention is accurately concentrated on the core semantic regions of the target objects. As shown in Figure 5, OpenCLIP focuses on the banana, while MetaCLIP attends to the bed. However, after MSLA is applied, OpenCLIP shifts its attention from the banana to the wheel of a cart, leading to a misclassification as bicycle. Similarly, MetaCLIP redirects its attention from the bed to the wall background and incorrectly predicts kite. These results indicate that the triangular illuminated region successfully attracts and disrupts the models’ visual attention. Challenging Vision-Language Models with Physically Deployable Multimodal Semantic Lighting Attacks MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil 
+
+Figure 6: Visualization of physical MSLA samples causing LVLMs to give incorrect answers. In each LVLM response, we highlight the correct and error parts using different colors. 
+
+## 4.3 Physical Domain Performance 
+
+By placing a colored transparent plastic sheet and a paper cutout of a specific shape in front of a flashlight, we can physically project a triangular light pattern onto a specific region, thereby enabling a physically deployable attack. The experimental samples are objects belonging to the COCO-80 categories that can be collected in the real world. All evaluation experiments are completed through dy-namic video sequences of about 5 to 7 seconds recorded by mobile phones fixed on a tripod. 
+
+Zero-Shot Classification in the Physical World. We perform optimization on the extracted clean video frames to obtain the tri-angular perturbation parameters that induce classification failure. Based on the optimized parameters, we prepare the corresponding cutout and use a transparent plastic sheet of the matched color to project the triangular light pattern onto the specific region, while recording an adversarial video. As shown in Figure 7, we present successful attack frames extracted from the adversarial videos to-gether with the corresponding label changes. To quantitatively assess the stability of the attack in physical environments, we re-port the frame-level attack success rate, defined as the proportion of frames in the adversarial video that are misclassified by the model among all evaluated frames. Meanwhile, we also visualize the attention heatmaps of aligned frames from the clean and adversarial videos, as shown in Figure 8. The results indicate that, for models with higher frame-level attack success rates, such as EVA-CLIP and OpenCLIP, the adversarial perturbation effectively causes visual attention to shift dramatically away from the target object. In contrast, for models with lower attack success rates, such as OpenAI CLIP, the attention regions re-main largely consistent before and after the attack, without obvious dispersion or shift. 
+
+Image Captioning Tasks in the Physical World. Similarly, based on the optimized parameters, we prepare the triangular cutout 
+
+Figure 7: Physical MSLA samples for Zero-shot Classification with the corresponding frame-level ASR. 
+
+Figure 8: Attention analysis of CLIP models before and after our proposed method in the physical setting. 
+
+and use a flashlight together with a colored transparent sheet to project the light pattern while recording the adversarial video. For qualitative analysis, we extract key frames from the adversarial videos in which the LVLMs generate distorted captions. As shown in Figure 6 (a), the clean images can be described correctly by the target models, whereas under the physical triangular light perturbation, the generated captions deviate significantly from the actual scene. For example, in the clean sample, the scene is correctly described MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil Trovato et al. 
+
+Figure 9: Attack performance under different transparency parameter 𝛼 with varying radius scaling factors 𝛾 on four CLIP variants. 
+
+as “a bowl on a shelf.” However, under the physical triangular light perturbation, the same scene is miscaptioned as “a coffee table with a built-in sink.” The results indicate that our perturbations can disrupt the perception and generation processes of LVLMs in real physical environments. 
+
+VQA Tasks in the Physical World. We further evaluate the pro-posed attack on VQA tasks in the physical world. As shown in Figure 6 (b), several mainstream LVLMs, including LLaVA, BLIP, and OpenFlamingo, are able to correctly answer object recognition and spatial reasoning questions based on clean images, such as “What is the object in front of the cupboard?” or “What is on the wooden table?” However, when exposed to triangular light with specific colors and positions, all of them generate incorrect answers that deviate from the actual physical scene. For example, the per-turbed models may misidentify a backpack as a vase or a mouse as a remote control. These results further demonstrate that MSLA can effectively mislead VLMs in real physical environments through simple light-based perturbations. 
+
+## 4.4 Ablation Study 
+
+Attack Performance vs. Transparency and Radius Scaling Factor. The transparency parameter 𝛼 controls the cover intensity of the color, while the radius scaling factor 𝛾 determines its spa-tial extent. To isolate the influence of these two parameters, this ablation uses only the simplest confidence-based fitness function rather than the proposed multi-objective one. As shown in Figure 9, the ASR on CLIP models increases with both 𝛼 and 𝛾 . Specifically, ASR remains low when 𝛼 < 0.3, shows a substantial improvement at 𝛼 = 0.5, and gradually saturates as 𝛼 further increases to 0.7.Similarly, a small radius scaling factor ( 𝛾 = 0.1) yields limited inter-ference, whereas increasing 𝛾 to 0.2 significantly improves attack performance. Although a larger 𝛾 of 0.3 brings additional ASR gains, it also makes the perturbation resemble a broad global occlusion, reducing stealthiness. Therefore, considering both adversarial ef-fectiveness and visual plausibility, we set the attack configuration to 𝛼 = 0.5 and 𝛾 = 0.2 in the main experiments. 
+
+Attack Performance vs. Fitness Function. To validate the effec-tiveness of the proposed fitness function in the optimization process, 
+
+Table 4: Performance Degradation ( ↓) of CLIP variants on Zero-shot Classification under different fitness functions. Lower accuracy (%) indicates stronger attack performance. The best result in each row is shown in bold.  
+
+> CLIP variants
+
+Lprob (Θ) Llog (Θ) Lmulti (Θ) (ours)  
+
+> OpenCLIP ViT-B/16 44(
+
+↓ 53 ) 31( ↓ 66 ) 29( ↓ 68 ) 
+
+> Meta-CLIP ViT-L/14 40(
+
+↓ 58 ) 28( ↓ 70 ) 23( ↓ 75 ) 
+
+> EVA-CLIP ViT-G/14 53(
+
+↓ 45 ) 39( ↓ 59 ) 36( ↓ 62 ) 
+
+> OpenAI CLIP ViT-L/14 16(
+
+↓ 77 ) 13( ↓ 80 ) 11( ↓ 82 )
+
+we compare three different fitness function designs. As shown in Table 4, across all four CLIP variants our proposed multi-objective fitness function consistently achieves the strongest attack perfor-mance, inducing the largest performance drop on every model. In comparison, the attack based on the pure logit suppression objec-tive performs slightly worse, while the variant using only the basic probability term 𝑝 (¯𝑡 | 𝐼 𝑎𝑑𝑣 ) as the fitness function yields the lowest results. These findings demonstrate that our fitness function can more effectively steer the genetic algorithm toward optimal light perturbation parameters, thereby maximizing the adversarial effect on VLMs. 
+
+## 5 Conclusion 
+
+In this work, we propose the MSLA framework to reveal and eval-uate the security vulnerabilities of VLMs. We parameterize the geometric shape, position, color, and transparency of the triangu-lar light, and optimize them with a genetic algorithm. Extensive experiments demonstrate that MSLA significantly degrade the per-formance of a wide range of mainstream VLMs across zero-shot image classification, image captioning, and VQA tasks. It can also be physically deployed with simple devices such as a flashlight and col-ored transparent plastic sheets. This study presents a new physical-world adversarial attack paradigm for VLMs while exposing their vulnerability to realistic illumination variations, emphasizing the need for stronger robustness against lighting disturbances. Challenging Vision-Language Models with Physically Deployable Multimodal Semantic Lighting Attacks MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil 
+
+## References 
+
+[1] Sani Abba, Ali Mohammed Bizi, Jeong-A Lee, Souley Bakouri, and Maria Liz Crespo. 2024. Real-time object detection, tracking, and monitoring framework for security surveillance systems. Heliyon 10, 15 (2024). [2] Haider Al-Tahan, Quentin Garrido, Randall Balestriero, Diane Bouchacourt, Caner Hazirbas, and Mark Ibrahim. 2024. Unibench: Visual reasoning requires rethink-ing vision-language beyond scaling. Advances in Neural Information Processing Systems 37 (2024), 82411–82437. [3] Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katherine Millican, Malcolm Reynolds, et al .2022. Flamingo: a visual language model for few-shot learning. Advances in neural information processing systems 35 (2022), 23716–23736. [4] Anas Awadalla, Irena Gao, Josh Gardner, Jack Hessel, Yusuf Hanafy, Wanrong Zhu, Kalyani Marathe, Yonatan Bitton, Samir Gadre, Shiori Sagawa, et al . 2023. Openflamingo: An open-source framework for training large autoregressive vision-language models. arXiv preprint arXiv:2308.01390 (2023). [5] Xinlei Chen, Hao Fang, Tsung-Yi Lin, Ramakrishna Vedantam, Saurabh Gupta, Pi-otr Dollár, and C Lawrence Zitnick. 2015. Microsoft coco captions: Data collection and evaluation server. arXiv preprint arXiv:1504.00325 (2015). [6] Zhe Chen, Jiannan Wu, Wenhai Wang, Weijie Su, Guo Chen, Sen Xing, Muyan Zhong, Qinglong Zhang, Xizhou Zhu, Lewei Lu, et al . 2024. Internvl: Scaling up vision foundation models and aligning for generic visual-linguistic tasks. In 
+
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition .24185–24198. [7] Mehdi Cherti, Romain Beaumont, Ross Wightman, Mitchell Wortsman, Gabriel Ilharco, Cade Gordon, Christoph Schuhmann, Ludwig Schmidt, and Jenia Jitsev. 2023. Reproducible scaling laws for contrastive language-image learning. In 
+
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition .2818–2829. [8] Xuanming Cui, Alejandro Aparcedo, Young Kyun Jang, and Ser-Nam Lim. 2024. On the robustness of large multimodal models against image adversarial at-tacks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 24625–24634. [9] Ranjie Duan, Xiaofeng Mao, A. K. Qin, Yuefeng Chen, Shaokai Ye, Yuan He, and Yun Yang. 2021. Adversarial Laser Beam: Effective Physical-World Attack to DNNs in a Blink. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) . 16062–16071. [10] Junbin Fang, You Jiang, Canjian Jiang, Zoe L Jiang, Chuanyi Liu, and Siu-Ming Yiu. 2024. State-of-the-art optical-based physical adversarial attacks for deep learning computer vision systems. Expert Systems with Applications 250 (2024), 123761. [11] Abhiram Gnanasambandam, Alex M Sherman, and Stanley H Chan. 2021. Optical adversarial attack. In Proceedings of the IEEE/CVF international conference on computer vision . 92–101. [12] John H Holland. 1992. Genetic algorithms. Scientific american 267, 1 (1992), 66–73. [13] Teng-Fang Hsiao, Bo-Lun Huang, Zi-Xiang Ni, Yan-Ting Lin, Hong-Han Shuai, Yung-Hui Li, and Wen-Huang Cheng. 2024. Natural light can also be danger-ous: Traffic sign misinterpretation under adversarial natural light attacks. In 
+
+Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision .3915–3924. [14] Bingyao Huang and Haibin Ling. 2022. Spaa: Stealthy projector-based adversarial attacks on deep image classifiers. In 2022 IEEE Conference on Virtual Reality and 3D User Interfaces (VR) . IEEE, 534–542. [15] Gabriel Ilharco, Mitchell Wortsman, Nicholas Carlini, Rohan Anil, Matthias Minderer, Xiaohua Zhai, Alexey Dosovitskiy, Lucas Beyer, Kunal Talwar, Andreas Steiner, et al . 2021. OpenCLIP: An open source implementation of CLIP. GitHub repository (2021). [16] Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. 2023. Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. In International conference on machine learning . PMLR, 19730–19742. [17] Junnan Li, Dongxu Li, Caiming Xiong, and Steven Hoi. 2022. Blip: Bootstrapping language-image pre-training for unified vision-language understanding and generation. In International conference on machine learning . PMLR, 12888–12900. [18] Liunian Harold Li, Mark Yatskar, Da Yin, Cho-Jui Hsieh, and Kai-Wei Chang. 2019. Visualbert: A simple and performant baseline for vision and language. 
+
+arXiv preprint arXiv:1908.03557 (2019). [19] Daizong Liu, Mingyu Yang, Xiaoye Qu, Pan Zhou, Yu Cheng, and Wei Hu. 2025. A survey of attacks on large vision–language models: Resources, advances, and future trends. IEEE Transactions on Neural Networks and Learning Systems (2025). [20] Haotian Liu, Chunyuan Li, Yuheng Li, and Yong Jae Lee. 2024. Improved baselines with visual instruction tuning. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 26296–26306. [21] Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan Zhang, Sheng Shen, and Yong Jae Lee. 2024. Llavanext: Improved reasoning, ocr, and world knowledge. [22] Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2023. Visual in-struction tuning. Advances in neural information processing systems 36 (2023), 34892–34916. [23] Hanqing Liu, Shouwei Ruan, Yao Huang, Shiji Zhao, and Xingxing Wei. 2025. When Lighting Deceives: Exposing Vision-Language Models’ Illumination Vul-nerability Through Illumination Transformation Attack. In Proceedings of the IEEE/CVF International Conference on Computer Vision . 10485–10495. [24] Jiasen Lu, Dhruv Batra, Devi Parikh, and Stefan Lee. 2019. Vilbert: Pretrain-ing task-agnostic visiolinguistic representations for vision-and-language tasks. 
+
+Advances in neural information processing systems 32 (2019). [25] Chengzhi Mao, Scott Geng, Junfeng Yang, Xin Wang, and Carl Vondrick. 2022. Understanding zero-shot adversarial robustness for large-scale models. arXiv preprint arXiv:2212.07016 (2022). [26] Tianrui Qin, Xuan Wang, Juanjuan Zhao, Kejiang Ye, Cheng-zhong Xu, and Xitong Gao. 2025. On the Adversarial Robustness of Visual-Language Chat Models. In Proceedings of the 2025 International Conference on Multimedia Retrieval .1118–1127. [27] Jingxiang Qu, Ryan Wen Liu, Yuan Gao, Yu Guo, Fenghua Zhu, and Fei-Yue Wang. 2024. Double domain guided real-time low-light image enhancement for ultra-high-definition transportation surveillance. IEEE Transactions on Intelligent Transportation Systems 25, 8 (2024), 9550–9562. [28] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al . 2021. Learning transferable visual models from natural language supervision. In International conference on machine learning . PmLR, 8748–8763. [29] Shouwei Ruan, Yinpeng Dong, Hanqing Liu, Yao Huang, Hang Su, and Xingxing Wei. 2024. Omniview-tuning: Boosting viewpoint invariance of vision-language pre-training models. In European Conference on Computer Vision . Springer, 309– 327. [30] Shouwei Ruan, Yinpeng Dong, Hang Su, Jianteng Peng, Ning Chen, and Xingx-ing Wei. 2023. Towards viewpoint-invariant visual recognition via adversarial training. In Proceedings of the IEEE/CVF International Conference on Computer Vision . 4709–4719. [31] Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, et al . 2022. Laion-5b: An open large-scale dataset for training next generation image-text models. Advances in neural information processing systems 
+
+35 (2022), 25278–25294. [32] Ramprasaath R Selvaraju, Michael Cogswell, Abhishek Das, Ramakrishna Vedan-tam, Devi Parikh, and Dhruv Batra. 2017. Grad-cam: Visual explanations from deep networks via gradient-based localization. In Proceedings of the IEEE interna-tional conference on computer vision . 618–626. [33] Quan Sun, Yuxin Fang, Ledell Wu, Xinlong Wang, and Yue Cao. 2023. Eva-clip: Improved training techniques for clip at scale. arXiv preprint arXiv:2303.15389 
+
+(2023). [34] Yitong Sun, Yao Huang, and Xingxing Wei. 2024. Embodied laser attack: Leverag-ing scene priors to achieve agent-based robust non-contact attacks. In Proceedings of the 32nd ACM International Conference on Multimedia . 5902–5910. [35] Xiaoyu Tian, Junru Gu, Bailin Li, Yicheng Liu, Yang Wang, Zhiyong Zhao, Kun Zhan, Peng Jia, Xianpeng Lang, and Hang Zhao. 2024. Drivevlm: The conver-gence of autonomous driving and large vision-language models. arXiv preprint arXiv:2402.12289 (2024). [36] Shengbang Tong, Zhuang Liu, Yuexiang Zhai, Yi Ma, Yann LeCun, and Saining Xie. 2024. Eyes Wide Shut? Exploring the Visual Shortcomings of Multimodal LLMs. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) . 9568–9578. [37] Donghua Wang, Wen Yao, Tingsong Jiang, Chao Li, and Xiaoqian Chen. 2023. Rfla: A stealthy reflected light adversarial attack in the physical world. In Proceedings of the IEEE/CVF international conference on computer vision . 4455–4465. [38] Weijie Wei, Zhipeng Luo, Ling Feng, and Venice Erin Liong. 2025. Spatial-aware Vision Language Model for Autonomous Driving. arXiv preprint arXiv:2512.24331 
+
+(2025). [39] Hu Xu, Saining Xie, Xiaoqing Ellen Tan, Po-Yao Huang, Russell Howes, Vasu Sharma, Shang-Wen Li, Gargi Ghosh, Luke Zettlemoyer, and Christoph Feichten-hofer. 2023. Demystifying clip data. arXiv preprint arXiv:2309.16671 (2023). [40] Ying Yang, Jie Zhang, Xiao Lv, Di Lin, Tao Xiang, and Qing Guo. 2025. Light as Deception: GPT-driven Natural Relighting Against Vision-Language Pre-training Models. arXiv preprint arXiv:2505.24227 (2025). [41] Ziyi Yin, Muchao Ye, Tianrong Zhang, Tianyu Du, Jinguo Zhu, Han Liu, Jinghui Chen, Ting Wang, and Fenglong Ma. 2023. Vlattack: Multimodal adversarial attacks on vision-language tasks via pre-trained models. Advances in Neural Information Processing Systems 36 (2023), 52936–52956. [42] Jiaming Zhang, Qi Yi, and Jitao Sang. 2022. Towards adversarial attack on vision-language pre-training models. In Proceedings of the 30th ACM International Conference on Multimedia . 5005–5013. [43] Tianyuan Zhang, Lu Wang, Xinwei Zhang, Yitong Zhang, Boyi Jia, Siyuan Liang, Shengshan Hu, Qiang Fu, Aishan Liu, and Xianglong Liu. 2024. Visual adver-sarial attack on vision-language models for autonomous driving. arXiv preprint arXiv:2411.18275 (2024). MM ’26, November 10–14, 2026, Rio de Janeiro, Brazil Trovato et al. 
+
+[44] Yichi Zhang, Yao Huang, Yitong Sun, Chang Liu, Zhe Zhao, Zhengwei Fang, Yifan Wang, Huanran Chen, Xiao Yang, Xingxing Wei, Hang Su, Yinpeng Dong, and Jun Zhu. 2024. MultiTrust: A Comprehensive Benchmark Towards Trustworthy Multimodal Large Language Models. In Advances in Neural Information Processing Systems , A. Globerson, L. Mackey, D. Belgrave, A. Fan, U. Paquet, J. Tomczak, and C. Zhang (Eds.), Vol. 37. Curran Associates, Inc., 49279–49383. doi:10.52202/ 079017-1561 [45] Yunqing Zhao, Tianyu Pang, Chao Du, Xiao Yang, Chongxuan Li, Ngai-Man Man Cheung, and Min Lin. 2023. On evaluating adversarial robustness of large vision-language models. Advances in Neural Information Processing Systems 36 (2023), 54111–54138. [46] Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al . 2023. Judging llm-as-a-judge with mt-bench and chatbot arena. Advances in neural information processing systems 36 (2023), 46595–46623. [47] Yiqi Zhong, Xianming Liu, Deming Zhai, Junjun Jiang, and Xiangyang Ji. 2022. Shadows can be dangerous: Stealthy and effective physical-world adversarial attack by natural phenomenon. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 15345–15354. [48] Luowei Zhou, Hamid Palangi, Lei Zhang, Houdong Hu, Jason Corso, and Jianfeng Gao. 2020. Unified vision-language pre-training for image captioning and vqa. In 
+
+Proceedings of the AAAI conference on artificial intelligence , Vol. 34. 13041–13049.

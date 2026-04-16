@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-001.webp",
+      "caption": "Table 21: Conformal coverage under corruption shift (PadChest). Calibrated on clean data, tested on corrupted. Coverage gap = target − empirical (positive = under-coverage).",
+      "page": 21,
+      "index": 1,
+      "width": 479,
+      "height": 307
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-002.webp",
+      "caption": "Table 6: Entropy decomposition and error detection on PadChest (Targeted LoRA). MC Dropout MI is negligible; the ensemble produces meaningful MI elevated for errors. Yet total entropy from a single model achieves the best errordetection AUROC.",
+      "page": 7,
+      "index": 2,
+      "width": 421,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-003.webp",
+      "caption": "Figure 8: Recommended deployment protocol (two tiers). Tier 1 uses a single forward pass; Tier 2 uses MC Dropout (K=10) for stricter risk control. The entropy threshold τ should be calibrated per-site on local validation data.",
+      "page": 22,
+      "index": 3,
+      "width": 466,
+      "height": 311
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-004.webp",
+      "caption": "Table 11: Image corruption types and severity-level parameterizations. We apply all corruptions to the original chest radiograph before input to the vision encoder.",
+      "page": 13,
+      "index": 4,
+      "width": 919,
+      "height": 505
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-005.webp",
+      "caption": "Figure 3: Per-member ensemble diagnostics on PadChest. Seed 42 is substantially more accurate and better calibrated than the other four members. The ensemble (probability averaging) inherits the majority’s poor performance rather than the best member’s quality, explaining the OOD failure reported in Section 5.1.",
+      "page": 19,
+      "index": 5,
+      "width": 459,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-006.webp",
+      "caption": "Figure 2: Reliability diagrams on clean test data. Targeted LoRA methods (center) track the diagonal on both datasets. The deep ensemble (right) succeeds on in-distribution MIMIC but fails on OOD PadChest.",
+      "page": 17,
+      "index": 6,
+      "width": 994,
+      "height": 1115
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-007.webp",
+      "caption": "Table 26: Cross-architecture UQ comparison on PadChest (OOD). Both MedGemma-4B-IT and LLaVA-RAD-7B show the UQ–paraphrase bridge: entropy predicts paraphrase flips (AUROC) significantly above chance.",
+      "page": 24,
+      "index": 7,
+      "width": 494,
+      "height": 610
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-008.webp",
+      "caption": "Figure 4: Pairwise disagreement heatmap on PadChest. Seed 42 disagrees strongly with all other seeds (34–58%), while seeds 456/789/2024 form a low-disagreement cluster (<13%). This asymmetry means majority voting amplifies the poorly-calibrated cluster rather than using diversity effectively.",
+      "page": 20,
+      "index": 8,
+      "width": 474,
+      "height": 355
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08941v1/fig-009.webp",
+      "caption": "Figure 5: Mutual information vs. number of forward passes K across dropout rates. MI increases with pdrop but remains negligible (<0.0003 nats) in all conditions, three orders of magnitude below the entropy scale (∼0.54 nats). LoRAonly dropout produces insufficient weight perturbation for meaningful epistemic uncertainty estimation.",
+      "page": 20,
+      "index": 9,
+      "width": 480,
+      "height": 295
+    }
+  ]
+}

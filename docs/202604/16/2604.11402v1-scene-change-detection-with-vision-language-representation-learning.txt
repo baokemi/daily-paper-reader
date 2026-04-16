@@ -1,0 +1,368 @@
+Title: Scene Change Detection with Vision-Language Representation Learning
+
+URL Source: https://arxiv.org/pdf/2604.11402v1
+
+Published Time: Tue, 14 Apr 2026 02:44:33 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# Scene Change Detection with Vision-Language Representation Learning 
+
+# Diwei Sheng 1 Vijayraj Gohil 1 Satyam Gaba 1 Zihan Liu 1
+
+# Giles Hamilton-Fletcher 1 John-Ross Rizzo 1 Yongqing Liang 1 Chen Feng 1✉
+
+> 1
+
+# New York University 
+
+https://github.com/ai4ce/LangSCD *
+
+Figure 1. LangSCD detects three types of semantic changes between two images captured at different times, object changes, vegetation appearance changes, and viewpoint changes. It also predicts complete masks of the changed objects with accurate boundaries. Unlike the state-of-the-art RSCD model that predicts binary change masks and produces fragmented detections that miss meaningful scene changes. 
+
+# Abstract 
+
+Scene change detection (SCD) is crucial for urban monitor-ing and navigation but remains challenging in real-world environments due to lighting variations, seasonal shifts, viewpoint differences, and complex urban layouts. Existing methods rely primarily on low-level visual features, limit-ing their ability to accurately identify changed objects amid the visual complexity of urban scenes. In this paper, we propose LangSCD, a vision–language framework for scene change detection that overcomes this single-modal limi-tation by incorporating semantic reasoning through lan-guage. Our approach introduces a modular language com-ponent that leverages vision-language models (VLMs) to generate textual descriptions of scene changes, which are fused with visual features through a cross-modal feature en-hancer. We further introduce a geometric–semantic match-ing module that refines the predicted masks by enforcing se-mantic consistency and spatial completeness. Existing real-world scene change detection benchmarks provide only bi-nary change annotations, which are insufficient for down-stream applications requiring fine-grained understanding of scene dynamics. To address this limitation, we introduce NYC-CD, a large-scale dataset of 8,122 real-world image pairs collected in New York City with multiclass change an-notations generated through a semi-automatic pipeline. Ex-tensive experiments across multiple street-view benchmarks demonstrate that our language and matching modules con-sistently improve existing change-detection architectures, achieving state-of-the-art performance and highlighting the value of integrating linguistic reasoning with visual repre-sentations for robust scene change detection. 
+
+1
+
+> arXiv:2604.11402v1 [cs.CV] 13 Apr 2026 (a) VPR performance vs. time gap (months) on NYU-VPR.
+> (b) Example place observed over 0–8 months in NYU-VPR. The construction gradually al-tered the scene.
+> Figure 2. MixVPR [2] recall (R@1/5/10/20) vs. time gap on NYU-VPR [41]. Performance degrades with time and drops sharply across the summer-to-winter transition.
+
+# 1. Introduction 
+
+Scene Change Detection (SCD) is a fundamental research challenge with significant industrial applications. It ad-dresses a core question: given two images of the same lo-cation at different times, how can we determine what has changed while distinguishing structural modifications from transient illumination variations (see Fig. 1). High-quality SCD provides the actionable signals necessary for database maintenance, map updating, and Visual Place Recognition (VPR). By identifying these changes, new objects can be in-corporated, removed structures can be pruned, and appear-ance changes can be reflected. Crucially, this change sig-nal should be object–aware (beyond coarse pixel differenc-ing) so that updates target semantically meaningful entities rather than transient noise. Two primary downstream applications depend on high-accuracy SCD: (1) Visual Place Recognition (VPR) : VPR seeks to identify a previously visited location from visual input. However, performance often degrades as the tem-poral gap between query and database images widens, as shown in Fig. 2(a). Seasonal shifts, urban construction, and vegetation growth gradually make static databases ob-solete, causing retrieval recall to collapse. Fig. 2(b) il-lustrates a real-world scene observed over several months, where construction has significantly altered the environ-ment. (2) Long-term Dataset Maintenance : A na¨ ıve maintenance strategy simply appends newly captured im-ages to a database, leading to unbounded growth and slower retrieval. In contrast, SCD enables selective updates by identifying persistent structural modifications rather than transient visual distractors. This results in a more com-pact database, faster retrieval, and improved long-term ro-bustness. Beyond these, SCD enables applications such as anomaly detection [10], mobile robotics [30] and au-tonomous vehicles [14]. Despite significant progress, existing SCD solutions re-main constrained by a single-modal bottleneck: they rely on low-level visual consistency while lacking high-level semantic priors to distinguish task-relevant changes from environmental noise. Simulation-based methods [32] of-ten fail to generalize to real environments, while fixed-viewpoint approaches [46] cannot handle the unconstrained camera motion from mobile platforms. Recent pipelines leveraging vision foundation models [18] produce frag-mented predictions (see Fig. 1), as they struggle to reason about what has changed in a semantically meaningful way. This limitation is particularly acute in urban environ-ments, which we highlight to distinguish from more struc-tured indoor or satellite settings. Urban SCD presents a unique confluence of three challenges: (1) Diverse Change Space: structural alterations—such as construction progress, storefront updates, and billboard changes—co-occur with dynamic traffic and foliage cycles. (2) Un-constrained Acquisition: drastic viewpoint variations in-troduce depth-dependent parallax and occlusions, severely complicating spatial correspondence. (3) High Appearance Volatility: extreme illumination shifts, shadows, and mir-ror reflections create visual “pseudo-changes” that mimic structural updates. These challenges reveal a fundamental gap: existing SCD methods lack explicit, object-level semantic priors that help distinguish meaningful structural changes from nui-sance visual variations. Purely visual pipelines struggle to reason about what changed in complex urban scenes, while directly applying off-the-shelf Vision-Language Models (VLMs) is insufficient. Although VLMs possess strong semantic reasoning capabilities, they often fail to respect the geometric constraints of street-view imagery; under large viewpoint shifts they frequently produce hallucinated regions or coarse localization rather than precise change masks. To address these limitations, we propose LangSCD ,a vision-language framework that tightly couples language-derived semantics with robust visual features. Our key insight is that language can provide structured semantic 2priors describing what changed, while geometric reason-ing ensures spatial consistency across views. Specifically, we introduce a Cross-modal Feature Enhancer that in-jects language-derived semantic cues into visual representa-tions to suppress appearance-driven pseudo-changes, and a 
+
+Geometric–Semantic Matching Module that refines pre-dictions by enforcing spatial completeness and cross-view consistency. Together, these components enable reliable object-level change detection in unconstrained urban envi-ronments. The contributions of this paper are as follows. • We present NYC-CD, a new real-world street-view SCD benchmark. This is the first multi-class SCD benchmark featuring object, appearance, and viewpoint changes in diverse urban environments. To build this bench-mark, we provide a scalable, semi-automatic data annota-tion pipeline that yields high-quality, object-level change masks. • We propose LangSCD, a modular framework for SCD that injects language priors about changes and fuses them with visual features to produce precise object-aware change masks robust to appearance and viewpoint shifts. LangSCD enables robust urban SCD under viewpoint variation, detecting object, appearance, and viewpoint-induced changes jointly. • Strong experimental evidence demonstrates that our plug-and-play modules consistently improve performance across multiple SCD backbones. The gains remain robust under different choices of VLMs including open-source and proprietary models. LangSCD outperforms existing uni-modal or naive VLM-based approaches on both bi-nary and multi-class SCD. 
+
+# 2. Related Works 
+
+2.1. Scene Change Detection Methods 
+
+The majority of existing scene change detection methods share a fundamental limitation: reliance on uni-modal vi-sual information. Supervised learning approaches, whether using convolutional neural networks (CNNs) [1, 11, 33, 43, 46] or vision transformers [12, 26, 38, 45], have achieved notable success in controlled settings. CNN-based meth-ods such as ChangeNet [43] and C-3PO [46] establish strong baselines, while transformer-based methods such as RSCD [26] leverage self-attention mechanisms for im-proved long-range dependency modeling. However, both architectures remain constrained by relying on low-level vi-sual features, which produce fragmented change masks that are disturbed by shadows and reflections while overlooking the semantic context of changed objects. Recent advances in 3D Gaussian splatting [4, 5, 15, 28, 49] and weakly/self-supervised learning [3, 9, 21, 24, 25, 34, 35, 39] address specific challenges but maintain the uni-modal bottleneck. Gaussian splatting methods like 3DGS-CD [28] excel at handling geometric variations through 3D scene representations, yet require dense multiview captures that may not always be available. Weakly supervised ap-proaches such as DiffMatch [24] and self-supervised meth-ods such as EMPLACE [3] reduce annotation requirements but still learn exclusively from visual patterns. Training-free zero-shot methods [17, 18] such as GeSCF offer im-pressive generalization using pre-trained models, but re-main limited by visual-only features. We overcomes this limitation by introducing a language module that integrates seamlessly with existing architectures. By incorporating VLM-generated textual descriptions, our LangSCD consis-tently improves performance across tested baselines, with particularly strong gains on complex urban scenes. Although language-integrated change detection is emerging, existing methods differ significantly from our approach. Remote sensing change detection meth-ods [7, 47] leverage language to detect structured changes with top-down perspective, such as building construction or deforestation, lacking the complexity of street-level vari-ations. Because these changes are structurally simple, they do not require refining its predictions to obtain complete object masks, whereas we explicitly leverage a geometric and semantic matching module to refine initial masks and incorporate object-level information. ViewDelta [44] relies on user-provided text prompts, making the process inefficient. Our method differs by automatically generating descriptions of changes using Vision-Language Models such as GPT [13], then integrating these descriptions with visual features through our cross-modal feature enhancer and verifying them geometrically. 
+
+2.2. Scene Change Detection Datasets 
+
+Table 1 compares existing scene change detection datasets along three capabilities: object change, appearance change, and viewpoint difference. Most prior datasets primarily fo-cus on object-level changes. For example, CD2014 [48] targets dynamic objects, while PCD TSUNAMI [16], PCD GSV [16], VL-CMU-CD [1], PSCD [39], and ChangeVPR [18] focus on structural changes captured from largely aligned viewpoints. Object-centric datasets such as CARLA-OBJCD [8], GSV-OBJCD [8], and UMAD [23] expand annotations for new or missing objects but still lack explicit modeling of appearance variations. Simulated datasets including CARLA-OBJCD [8], Changesim [32], and Standardsim [29] provide larger-scale training data but do not capture the complexity of real-world urban imagery. Consequently, appearance-driven changes and viewpoint-induced differences remain largely underrepresented. In contrast, our NYC-CD dataset contains 8,122 real-world outdoor image pairs annotated with pixel-level masks for three types of changes: object changes (new or missing ob-3Table 1. Comparison of major scene change detection datasets with our NYC-CD dataset.                                                                                  
+
+> Dataset Real/Sim Scene Image Pairs Object change Appearance change Viewpoint difference
+> CARLA-OBJCD* [8] Sim Outdoor 15000 ✓✗✓
+> Changesim [32] Sim Indoor ∼130,000 ✓✓(rotated) ✗
+> Standardsim [29] Sim Indoor 12718 ✓✗✗
+> CD2014 [48] Real Outdoor 7000 ✓(dynamic) ✗✗
+> PCD TSUNAMI [16] Real Outdoor 100 ✓✗✗
+> PCD GSV [16] Real Outdoor 100 ✓✗✗
+> VL-CMU-CD [1] Real Outdoor 1362 ✓✗✗
+> PSCD [39] Real Outdoor 770 ✓✗✗
+> GSV-OBJCD* [8] Real Outdoor 500 ✓✗✓
+> UMAD [23] Real Outdoor 26301 ✓✗✗
+> ChangeVPR [18] Real Outdoor 529 ✓✗✗
+> NYC-CD (Ours) Real Outdoor 8122 ✓✓(vegetation) ✓
+
+jects), appearance changes (e.g., vegetation growth), and viewpoint-induced changes caused by camera pose varia-tion, making it the only dataset that jointly supports all three aspects in real street-view environments. 
+
+# 3. LangSCD 
+
+3.1. Overall Architecture 
+
+LangSCD integrates language guidance into scene change detection, addressing the fundamental limitations of uni-modal approaches. As illustrated in Figure 3, a standard SCD backbone consists of a shared-weight image encoder, a feature merging module, and a segmentation head; ex-isting methods primarily differ in whether the encoder is CNN-based, DINOv2-based, or SAM-based [18, 26, 46]. We augment this pipeline with two plug-and-play mod-ules. Specifically, the cross-modal feature enhancer takes the encoded feature of Image T1 and enhances it with text features encoding descriptions of new objects in T1. The enhanced T1 feature is then compared with the Image T0
+
+feature using the original backbone’s merging module and segmentation head, producing an initial pixel-level change mask. Building upon this output, the geometric and seman-tic matching modules are applied to refine fragmented ini-tial mask into object-consistent masks by jointly leverag-ing SAM2’s class-agnostic tracking and Grounded SAM’s semantically informed segmentation. This design yields a new end-to-end architecture that integrates semantic rea-soning and geometric consistency in a simple yet effective manner, enabling existing SCD models to address the pre-viously under-explored challenge of street-view semantic change detection. 
+
+3.2. Language Module and Cross-modal Enhancer 
+
+The language module provides semantic guidance to the SCD pipeline through vision–language reasoning. Given an image pair, a Visual-Language Model (VLM) such as GPT-4o, generates a natural language description of objects that appear in T1 but not in T0, and objects with different appear-ances. This description serves as a high-level hypothesis of potential scene changes. The generated text is then encoded by a BERT [6] text backbone, from which we extract the full sequence of token embeddings from the final hidden layer to obtain text features. To integrate language features with visual representa-tions from F1, we employ a cross-modal feature enhancer 
+
+adapted from GroundingDINO [27]. As illustrated in Fig. 3 block 2, Each enhancement layer performs deformable self-attention over image tokens, enabling adaptive focus on relevant regions, while text tokens undergo self-attention to preserve linguistic structure. Cross-modal interaction is achieved through bidirectional per-token cross-attention :• Text-to-image attention allows each spatial image token to attend over all BERT tokens, grounding textual concepts in specific visual regions. • Image-to-text attention enables each text token to refine its embedding using the corresponding visual context, re-inforcing semantic alignment. This cross-modal interaction operates at the token level—each image token attends to all text tokens and vice versa—producing enhanced visual features F ′ 
+
+> 1
+
+that combine spatial localization with semantic cues from the language module. 
+
+3.3. Geometric and Semantic Matching Module 
+
+The geometric and semantic matching module refines the initial segmentation masks to elevate change detection from 4Figure 3. Overview of the proposed LangSCD Our framework takes two images captured at different times ( T0 and T1) as inputs, then predict multi-class masks. The Cross-Modal Feature Enhancer injects language-derived priors about new objects in T1 into visual features. The geometric semantic matching module is designed to refine the initial predictions by enforcing spatial completeness and semantic consistency. 
+
+pixel-level responses to object-level reasoning. It com-bines complementary matching strategies to address two key challenges: incomplete object segmentation and noise from irrelevant changes. The geometric matching component leverages SAM2’s tracking capabilities to ensure spatial completeness of de-tected changes [36]. By generating class-agnostic object proposals and tracking them across the image pair, SAM2 identifies object masks with inconsistency. We evaluate the overlap ratio α between each inconsistent mask and the ini-tial prediction, retaining masks where α > α t. Rather than selecting αt heuristically, we determine its value through a threshold sweep summarized in the supplementary mate-rial. This analysis reveals a precision–recall trade-off, and we adopt αt = 0 .20 as the final operating point. Geomet-ric matching completes fragmented object segments that are partially detected in the initial mask, ensuring full-object consistency across views. The semantic matching component employs the open vo-cabulary segmentation model Grounded SAM [37] to filter out noise and validate semantic relevance. Guided by VLM-generated descriptions, [37] produces segmentation masks aligned with the candidate changed objects. We compute overlap ratios between these semantic masks and the initial predictions and retain those satisfying α > α g . As with geometric matching, the value of αg is chosen through a threshold sweep, and we select αg = 0 .10 . Both αt and 
+
+αg are selected on the NYC-CD validation set using the RSCD+LangSCD configuration, and the same fixed thresh-olds are then applied uniformly across all backbones and all datasets , without any test-set tuning . This semantic filtering step effectively removes false positives caused by shadows, reflections, or other non-structural variations. Geometric and semantic matching operate in synergy: geometric matching ensures spatial completeness, while se-mantic matching enforces semantic relevance (refer to the supplementary material for qualitative examples). This dual-validation process transforms noisy, incomplete pixel-level predictions into coherent object-level change masks, improving precision and interpretability. The output pro-5vides semantically grounded, object-aware change detec-tion masks. 
+
+# 4. Annotation Method 
+
+Our annotation method aims to identify and categorize scene changes between image pairs to create high-quality training data. Given a pair of images T0 and T1 captured at different times from different viewpoints, our method anno-tates three distinct types of change on T1 with respect to T0:(1) new/missing objects, representing objects that appear on 
+
+T1 but not on T0; (2) vegetation appearance changes, cap-turing seasonal alterations in plants; and (3) objects not in view due to viewpoint change, distinguishing geometric oc-clusions from actual scene changes. This multiclass annota-tion approach enables more nuanced understanding of urban scene dynamics compared to binary change detection. Figure 4 presents the pipeline overview. We dive into each module below. 
+
+Change Captioning. The annotation process begins by using GPT-4o to generate descriptions of changes between pairs of images. We provide the model with T0 and T1
+
+along with text prompts for vegetation appearance and ob-ject changes (see supplementary material). In both cases, GPT-4o is explicitly instructed to exclude weather varia-tions, lighting differences, and pedestrians (which are al-ready anonymized in our dataset) to focus on semantically meaningful changes. The model is tasked with identifying objects that appear in T1 but not in T0 as well as vegetation changes. For vegetation appearance changes, we request descriptive attributes such as “green trees” or “bare bushes” to capture seasonal variations. This process yields two lists: changed objects with their descriptions and changed vege-tation with appearance-aware attributes. 
+
+Open Vocabulary Segmentation. The change descrip-tion from GPT-4o are processed through Grounded SAM 2 [37] to produce semantically changed masks. It segments all instances of changed objects in T1, regardless of whether they represent actual changes. For instance, if GPT identi-fies “chairs” as a change due to additional chairs appearing in T1, Grounded SAM 2 segments both preexisting and new chairs. Similarly, vegetation appearance changes are seg-mented using descriptive phrases like “bare trees” or “green foliage,” where the descriptive nature inherently indicates that these segments represent changes. 
+
+SAM2 Tracking. To identify inconsistent objects, we use SAM2 [36] tracking capabilities across the image pair. The process begins with automatic segment generation in 
+
+T1 to produce object segments. These segments are then used as prompts for T0, allowing us to identify segments present in T1 but absent in T0—potential indicators of new objects. However, this raw output often includes irrelevant changes such as shadows or reflections. These geometri-cally inconsistent masks require refinement through match-ing with the semantic masks. 
+
+Object Matching. We refine the change detection by computing the overlap between geometrically inconsistent SAM2 masks and semantically changed G-SAM masks. We retain SAM2 mask if it overlaps with any Grounded SAM2 mask. This matching process leverages the complemen-tary strengths of both approaches: SAM2 tracking iden-tifies changing regions but may include visual distractors, while Grounded SAM 2 identifies semantically relevant ob-jects that are potentially changing regions. The intersec-tion yields high-confidence masks that represent the actual changes in relevant objects. 
+
+Common View Estimation and Matching. To distin-guish between actual scene changes and viewpoint-induced variations, we employ MAST3R [22] for robust dense matching between image pairs. MAST3R excels in two-view regimes, predicting dense correspondences and esti-mating the common-view region that is the area visible in both images. We calculate the overlap between each filtered object mask and the common-view mask. Objects over-lapping with the common view are classified as genuine new/missing object changes, while those outside are cate-gorized as objects not in view. The same classification pro-cess applies to the appearance masks in Grounded SAM 2, distinguishing actual appearance changes from viewpoint-induced occlusions. This step produces our initial pseudo-masks with multi-class labels. 
+
+Manual Inspection. The final stage involves careful human verification of the initial pseudo-masks to ensure annotation quality. We review each image pairs, discard-ing those with false negatives (unlabeled changes in the initial masks) to maintain the completeness of the data set. False positive object masks are manually removed to ensure precision. This semi-automatic approach effi-ciently combines the scalability of automated methods with the accuracy of human judgment, producing high-quality multi-class change detection annotations for complex urban scenes. Figure 5 shows the multi-class change mask an-notated by our semi-automatic method for different image pairs. 
+
+# 5. NYC-CD Dataset 
+
+The NYC-CD dataset comprises 8,122 carefully curated im-age pairs extracted from the NYU-VPR dataset [41], pro-viding a comprehensive benchmark for urban scene change detection. The source NYU-VPR dataset contains street-level imagery recorded throughout Manhattan, New York from May 2016 to March 2017. All images include GPS tags for spatial reference, while pedestrians and vehicles are replaced with white pixels using MSeg [19] to preserve pri-vacy. This rich temporal and spatial coverage of one of the world’s most dynamic urban environments provides an ideal foundation for studying complex scene changes. 6Text Prompts 
+
+> 1. Vegetation
+> 2. Objects
+> Vision Language
+> Model
+> Changed Vegetation
+> Descriptions
+> Grounded SAM 2
+> SAM2
+> Tracking
+> MAST3R
+> Object Matching
+> Common View
+> Matching
+> Common View
+> Matching
+> Manually remove
+> false positive masks
+> Changed
+> Objects Descriptions
+> T1
+> New/Missing Objects
+> Vegetation Changes
+> Viewpoint Change
+> T0
+> Dense Corrrespondence
+> "Orange traffic
+> barrels"
+> "Green Trees"
+
+Figure 4. Overview of our semi-automatic annotation pipeline. GPT-4o generates descriptions of changed vegetation and objects from image pairs, which Grounded SAM uses to segment changes. SAM2 Tracking identifies geometrically inconsistent segments, and MAST3R estimates common view between image pairs. Object Matching and Common View Matching filter noises and classify viewpoint-induced changes, producing initial masks. Manual inspection refines these masks into ground truth. 
+
+Figure 5. 4 image pairs annotated by our pipeline. We annotate three types of change on T1 w.r.t. T0: new objects, appearance changes, and objects not in common view. 
+
+To construct meaningful image pairs for change detec-tion, we employ VPR instead of simple GPS matching. VPR retrieves the most visually similar images for a query from a database of images with known camera poses, ensur-ing sufficient visual overlap between the paired images. We specifically use images from different quarters as database and queries (Q1 paired with Q3, Q2 paired with Q4), guar-anteeing a minimum three-month temporal gap between image pairs to capture meaningful scene changes. Using MixVPR [2], a state-of-the-art VPR method, we pair each database image with its top-1 retrieval result to form poten-tial change pairs. This VPR-based approach is crucial be-cause GPS coordinates alone would often yield image pairs with minimal or no viewpoint overlap, making change de-tection infeasible. By prioritizing visual similarity while maintaining temporal separation, we ensure that each poten-tial pair contains sufficient common content for meaningful change analysis while capturing the natural viewpoint vari-ations that occur in real-world scenarios. The NYC-CD dataset introduces several unique charac-teristics that distinguish it from existing benchmarks. Most notably, it explicitly incorporates and annotates viewpoint-induced changes, addressing a critical gap in current datasets that either assume static cameras or attempt to min-imize viewpoint differences. In practical applications like autonomous navigation and augmented reality, viewpoint variations are inevitable and can create apparent changes that are purely geometric rather than semantic. By catego-rizing these as a distinct change type, our dataset enables algorithms to differentiate genuine scene changes from perspective-induced variations. Furthermore, the dataset captures the full complexity of dense urban environments with large temporal spans. The urban environment is rich with diverse changes, including seasonal foliage vari-ations, ongoing construction, evolving storefront appear-ances, and dynamic objects in motion. Unlike controlled simulated environments that cannot replicate real-world un-predictability, NYC-CD provides authentic urban scene dy-namics, making it an essential resource for developing ro-bust change detection systems capable of handling the com-plexities of real-world deployment. 
+
+# 6. Experiments 
+
+6.1. Setup 
+
+We plug our proposed modules into three representative baselines that differ primarily in their image encoder design for SCD. C-3PO [46] represents traditional CNN-based ap-proaches, using convolutional neural networks as the visual backbone for pixel-level change detection. RSCD [26] ex-emplifies transformer-based methods built on DINOv2 [31], leveraging its pretrained visual representations with full-image cross-attention. GeSCF [18] relies on SAM as the underlying visual encoder, enabling zero-shot change de-7Table 2. F1-score and IoU comparison of GeSCF, RSCD, and C-3PO models with and without LangSCD across four datasets. Bold numbers indicate highest per dataset. Green background shows improvement.                                                                    
+
+> Model ChangeVPR VL-CMU-CD PSCD NYC-CD (ours)
+> F1 IoU F1 IoU F1 IoU F1 IoU GeSCF 0.47 0.36 0.77 0.65 0.40 0.28 0.16 0.10 GeSCF+LangSCD 0.64 (+17%) 0.55 (+19%) 0.82 (+5%) 0.71 (+6%) 0.49 (+9%) 0.37 (+9%) 0.57 (+41%) 0.49 (+38%) RSCD 0.24 0.16 0.83 0.73 0.54 0.40 0.13 0.17 RSCD+LangSCD 0.63 (+39%) 0.54 (+38%) 0.85 (+2%) 0.75 (+2%) 0.59 (+5%) 0.46 (+6%) 0.70 (+57%) 0.58 (+51%) C-3PO 0.12 0.08 0.50 0.39 0.66 0.54 0.09 0.10 C-3PO+LangSCD 0.58 (+46%) 0.49 (+41%) 0.73 (+23%) 0.67 (+28%) 0.70 (+4%) 0.58 (+4%) 0.57 (+48%) 0.47 (+37%) Table 3. Comparison of RSCD and RSCD with our modules on multi-class change detection. RSCD is modified to output four semantic change classes and trained with multi-class supervision on NYC-CD.
+
+## Class / Summary F1-score IoU 
+
+## RSCD RSCD + LangSCD ( ∆) RSCD RSCD + LangSCD ( ∆)0. Non-change area 0.899 0.945 (+4.6%) 0.816 0.895 (+7.9%) 1. New/Missing Object 0.438 0.472 (+3.4%) 0.281 0.309 (+2.8%) 2. Appearance Change 0.655 0.703 (+4.8%) 0.487 0.542 (+5.5%) 3. Object not in view 0.459 0.563 (+10.4%) 0.298 0.391 (+9.3%) 
+
+## Mean (Macro F1 / mIoU) 0.613 0.671 (+5.8%) 0.471 0.534 (+6.3%) 
+
+tection without task-specific training. 
+
+Multi-class supervision. While existing baselines are originally designed for binary change detection, for exper-iments on NYC-CD we extend RSCD to support multi-class change prediction : we modify the RSCD segmenta-tion head to output multiple classes. The modified RSCD is trained using standard pixel-wise cross-entropy loss with the multi-class annotations provided by NYC-CD. 
+
+Evaluation protocol. Our evaluation encompasses four diverse datasets that challenge change detection methods across scenarios and viewpoints. For street-view evalua-tion, we use NYC-CD, VL-CMU-CD [1], PSCD [39], and ChangeVPR [18], which span urban development, seasonal variation, and natural disasters. NYC-CD contains 8,122 image pairs, randomly split into 5,195 training pairs, 1,299 validation pairs, and 1,630 test pairs. For binary evaluation on NYC-CD, all methods are evaluated using binary masks formed as the union of new/missing objects, appearance changes, and viewpoint-induced changes, ensuring fair comparison with binary baselines. For multi-class evaluation, RSCD and RSCD + LangSCD are evaluated, as they explicitly predict multi-class outputs. As noted in prior work [18, 46], the VL-CMU-CD dataset contains samples with clearly inaccurate ground-truth masks. We perform a manual quality check and re-move image pairs with evidently incorrect annotations (e.g., ground-truth masks that completely miss a changed object). Representative examples of noisy labels and the result on the original VL-CMU-CD dataset are shown in the Sup-plementary Material. The same filtered dataset is used to retrain and evaluate all baselines to ensure fair comparison. 
+
+6.2. Comparative studies 
+
+Quantitative comparison. Table 2 reports F1 and IoU results for GeSCF, RSCD, and C-3PO with and with-out LangSCD. Across ChangeVPR , VL-CMU-CD , and 
+
+PSCD , our approach consistently improves all baselines. On ChangeVPR, which contains strong appearance varia-tions typical in long-term VPR, the gains are particularly large: GeSCF improves from 0.47 to 0.64 F1 (+17%), RSCD from 0.24 to 0.63 (+39%), and C-3PO from 0.12 to 0.58 (+46%), with similar improvements in IoU. On VL-CMU-CD and PSCD, the improvements are more mod-erate but remain consistent across architectures. For ex-ample, RSCD+LangSCD achieves the best performance on VL-CMU-CD with 0.85 F1 and 0.75 IoU, while C-3PO+LangSCD achieves the best results on PSCD with 80.70 F1 and 0.58 IoU. These results indicate that language-guided reasoning provides semantic cues, while object-complete matching improves spatial consistency, jointly benefiting different SCD architectures across datasets. The largest improvements appear on NYC-CD , our pro-posed benchmark. This dataset is significantly more chal-lenging due to frequent appearance changes, complex ur-ban scenes, and strong viewpoint variations that often de-grade purely visual methods. Consequently, baseline per-formance is relatively low. By incorporating language-guided semantic reasoning and geometric matching, our LangSCD improves detection accuracy across all baselines. RSCD+LangSCD achieves the best results with 0.70 F1 and 0.58 IoU, corresponding to improvements of +57% and +41%, respectively. Similar gains are observed for GeSCF and C-3PO, highlighting the effectiveness of language guid-ance in challenging urban environments where distinguish-ing true structural changes from distracting visual variations requires semantic reasoning. Multi-class change detection analysis in Table 3 corrobo-rates our approach. The RSCD baseline shows varying per-formance across categories, with dynamic changes proving more challenging. Integrating our modules improves results across all classes, with particularly strong gains in the most difficult categories such as object not in view (refer to the supplementary material for qualitative comparison). Over-all, these enhancements yield higher mean performance and demonstrate more balanced and robust detection, especially in scenarios involving geometric transformations and ap-pearance variations. 
+
+Qualitative comparison. In Fig. 1, our method pro-duces accurate, object-complete change masks across di-verse urban scenes, clearly distinguishing three types of semantic changes: object changes, vegetation appearance changes, and viewpoint-induced changes. Compared with the SOTA RSCD model, which predicts only binary change masks and often yields fragmented detections or misses meaningful changes, our predictions align closely with ob-ject boundaries and maintain spatial completeness. The re-sults show that adding LangSCD helps localize structural changes such as new or missing objects, capture vegeta-tion appearance variations, and correctly identify regions affected by viewpoint shifts. This qualitative comparison highlights the advantage of language-guided reasoning and object-complete matching in producing semantically mean-ingful and geometrically consistent change masks. 
+
+Latency. Since captions are generated online at infer-ence, the runtime is dominated by the language compo-nent. The complete pipeline processes each image pair in an average of 4.89 seconds, with the majority of time at-tributed to caption generation, while the visual forward pass and geometric–semantic refinement contribute only a small fraction of the total cost (refer to the supplementary mate-rial). Our goal is not real-time perception but enabling a new capability for street-view scene change detection un-der large viewpoint differences, a challenging setting where existing visual-only methods often fail. In practice, such change detection is primarily used for offline tasks such as updating VPR databases or maintaining long-term maps, where images are processed asynchronously rather than in real time. In these scenarios, reliable change identification is more critical than per-frame speed. Improving inference efficiency, for example, through lightweight language mod-els, caching, or selective invocation of the language module, remains an important direction for future work. 
+
+6.3. Ablation studies 
+
+> Table 4. Ablation study on the NYC-CD dataset using RSCD as the base architecture.
+
+Method F1 Score IoU 
+
+RSCD 0.127 0.168 RSCD + Text (InternVL) 0.513 0.345 RSCD + Text (QwenVL) 0.537 0.401 RSCD + Text (GPT-4o) 0.563 0.424 RSCD + Text + SM 0.584 0.487 RSCD + Text + SM + GM 0.696 0.582 
+
+To better understand the contribution of each component, we conduct ablation studies on the NYC-CD dataset using RSCD as the visual backbone. RSCD is selected because it consistently demonstrates strong performance across our evaluations, providing a reliable foundation for isolating the impact of the proposed modules. 
+
+Effectiveness of the Proposed Modules. We evaluate the contribution of each component in our framework, in-cluding the language-guided cross-modal enhancer, the se-mantic matching (SM) module, and the geometric matching (GM) module, using RSCD as the base architecture (Ta-ble 4). Introducing language guidance alone already leads to substantial improvements over the RSCD baseline. Using different vision-language models, including InternVL and QwenVL, produces gains comparable to GPT-4o, demon-strating that our method does not rely on a specific propri-etary VLM. Importantly, these experiments replace GPT-4o with other models at inference time, showing that the improvements do not depend on using the same VLM for dataset annotation and inference. Adding the SM and GM modules further strengthens semantic alignment and geo-metric consistency, with the full system achieving the best overall performance. These results confirm that each pro-posed component contributes complementary benefits to scene change detection. 97. Conclusion 
+
+In this work, we present LangSCD , a framework that enables robust urban scene change detection in uncon-strained street-view environments. By injecting semantic priors through a cross-modal feature enhancer and enforcing object-complete consistency with geometric-semantic matching, our approach resolves distractors and viewpoint-induced ambiguities that challenge existing visual-only methods. We further introduce a real-world street-view benchmark NYC-CD with a scalable semi-automatic annotation pipeline to support object-level change detection. Extensive experiments across multiple backbones and datasets demonstrate consistent improve-ments over existing uni-modal and naive VLM-based approaches. Future work will focus on reducing anno-tation bias, improving robustness to extreme viewpoint changes, and extending the framework toward uni-fied foundation models for large-scale change detection. 
+
+# References 
+
+[1] Pablo F Alcantarilla, Simon Stent, German Ros, Roberto Ar-royo, and Riccardo Gherardi. Street-view change detection with deconvolutional networks. Autonomous Robots , 42(7): 1301–1322, 2018. 3, 4, 8, 5 [2] Amar Ali-Bey, Brahim Chaib-Draa, and Philippe Giguere. Mixvpr: Feature mixing for visual place recognition. In Pro-ceedings of the IEEE/CVF winter conference on applications of computer vision , pages 2998–3007, 2023. 2, 7 [3] Tim Alpherts, Sennay Ghebreab, and Nanne van Noord. Em-place: Self-supervised urban scene change detection. In Pro-ceedings of the AAAI Conference on Artificial Intelligence ,pages 1737–1745, 2025. 3 [4] Luqi Cheng, Zhangshuo Qi, Zijie Zhou, Chao Lu, and Guangming Xiong. Lt-gaussian: Long-term map update us-ing 3d gaussian splatting for autonomous driving. In 2025 IEEE Intelligent Vehicles Symposium (IV) , pages 1427–1433. IEEE, 2025. 3 [5] Kyusik Cho, Dong Yeop Kim, and Euntai Kim. Zero-shot scene change detection. In Proceedings of the AAAI Confer-ence on Artificial Intelligence , pages 2509–2517, 2025. 3 [6] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional trans-formers for language understanding. In Proceedings of the 2019 conference of the North American chapter of the asso-ciation for computational linguistics: human language tech-nologies, volume 1 (long and short papers) , pages 4171– 4186, 2019. 4 [7] Sijun Dong, Libo Wang, Bo Du, and Xiaoliang Meng. Changeclip: Remote sensing change detection with multi-modal vision-language representation learning. ISPRS Jour-nal of Photogrammetry and Remote Sensing , 208:53–69, 2024. 3, 2 [8] Ryuhei Hamaguchi, Shun Iwase, Rio Yokota, Yutaka Mat-suo, Ken Sakurada, et al. Epipolar-guided deep ob-ject matching for scene change detection. arXiv preprint arXiv:2007.15540 , 2020. 3, 4 [9] Lukas Hoyer, David Joseph Tan, Muhammad Ferjad Naeem, Luc Van Gool, and Federico Tombari. Semivl: semi-supervised semantic segmentation with vision-language guidance. In European Conference on Computer Vision ,pages 257–275. Springer, 2024. 3 [10] Chaoqin Huang, Haoyan Guan, Aofan Jiang, Ya Zhang, Michael Spratling, and Yan-Feng Wang. Registration based few-shot anomaly detection. In European conference on computer vision , pages 303–319. Springer, 2022. 2 [11] Rui Huang, Qingyi Zhao, Ruofei Wang, Caihua Liu, Sihua Gao, Yuxiang Zhang, and Wei Fan. Scalemix: intra-and inter-layer multiscale feature combination for change detec-tion. In ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pages 1–5. IEEE, 2023. 3 [12] Jiaxin Huo, Lihang Sun, and Jianyi Liu. Sctf-det: Siamese center-based detector with transformer and feature fusion for object-level change detection. In 2023 China Automation Congress (CAC) , pages 8788–8793. IEEE, 2023. 3 [13] Aaron Hurst, Adam Lerer, Adam P Goucher, Adam Perel-man, Aditya Ramesh, Aidan Clark, AJ Ostrow, Akila Weli-hinda, Alan Hayes, Alec Radford, et al. Gpt-4o system card. 
+
+arXiv preprint arXiv:2410.21276 , 2024. 3 [14] Joel Janai, Fatma G¨ uney, Aseem Behl, and Andreas Geiger. Computer vision for autonomous vehicles: Prob-lems, datasets and state of the art. Foundations and Trends in Computer Graphics and Vision , 12(1-3):1–308, 2020. 2 [15] Binbin Jiang, Rui Huang, Qingyi Zhao, and Yuxiang Zhang. Gaussian difference: Find any change instance in 3d scenes. In ICASSP 2025-2025 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pages 1–5. IEEE, 2025. 3 [16] CREST JST. Change detection from a street image pair us-ing cnn features and superpixel segmentation. In Proc. Brit. Mach. Vis. Conf , pages 61–1, 2015. 3, 4 [17] Shyam Sundar Kannan and Byung-Cheol Min. Zeroscd: Zero-shot street scene change detection. In 2025 IEEE In-ternational Conference on Robotics and Automation (ICRA) ,pages 4665–4671. IEEE, 2025. 3 [18] Jae-Woo Kim and Ue-Hwan Kim. Towards generalizable scene change detection. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 24463– 24473, 2025. 2, 3, 4, 7, 8, 1 [19] John Lambert, Zhuang Liu, Ozan Sener, James Hays, and Vladlen Koltun. MSeg: A composite dataset for multi-domain semantic segmentation. In CVPR , 2020. 6 [20] MA Lebedev, Yu V Vizilter, OV Vygolov, Vladimir A Knyaz, and A Yu Rubis. Change detection in remote sensing images using conditional adversarial networks. The Interna-tional Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences , 42:565–571, 2018. 5 [21] Seonhoon Lee and Jong-Hwan Kim. Semi-supervised scene change detection by distillation from feature-metric align-ment. In Proceedings of the IEEE/CVF Winter Confer-ence on Applications of Computer Vision , pages 1226–1235, 2024. 3 
+
+10 [22] Vincent Leroy, Yohann Cabon, and J´ erˆ ome Revaud. Ground-ing image matching in 3d with mast3r. In European Confer-ence on Computer Vision , pages 71–91. Springer, 2024. 6 [23] Dong Li, Lineng Chen, Cheng-Zhong Xu, and Hui Kong. Umad: University of macau anomaly detection benchmark dataset. In 2024 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 5836–5843. IEEE, 2024. 3, 4 [24] Kaiyu Li, Xiangyong Cao, Yupeng Deng, Jiayi Song, Jun-min Liu, Deyu Meng, and Zhi Wang. Semicd-vl: Visual-language model guidance makes better semi-supervised change detector. IEEE Transactions on Geoscience and Re-mote Sensing , 2024. 3 [25] Peixia Li, Pulak Purkait, Thalaiyasingam Ajanthan, Ma-jid Abdolshah, Ravi Garg, Hisham Husain, Chenchen Xu, Stephen Gould, Wanli Ouyang, and Anton Van Den Hengel. Semi-supervised semantic segmentation under label noise via diverse learning groups. In Proceedings of the IEEE/CVF international conference on computer vision , pages 1229– 1238, 2023. 3 [26] Chun-Jung Lin, Sourav Garg, Tat-Jun Chin, and Feras Day-oub. Robust scene change detection using visual foundation models and cross-attention mechanisms. In 2025 IEEE In-ternational Conference on Robotics and Automation (ICRA) ,pages 8337–8343. IEEE, 2025. 3, 4, 7 [27] Shilong Liu, Zhaoyang Zeng, Tianhe Ren, Feng Li, Hao Zhang, Jie Yang, Qing Jiang, Chunyuan Li, Jianwei Yang, Hang Su, et al. Grounding dino: Marrying dino with grounded pre-training for open-set object detection. In Euro-pean conference on computer vision , pages 38–55. Springer, 2024. 4 [28] Ziqi Lu, Jianbo Ye, and John Leonard. 3dgs-cd: 3d gaus-sian splatting-based change detection for physical object re-arrangement. IEEE Robotics and Automation Letters , 2025. 3[29] Cristina Mata, Nick Locascio, Mohammed Azeem Sheikh, Kenny Kihara, and Dan Fischetti. Standardsim: A synthetic dataset for retail environments. In International Conference on Image Analysis and Processing , pages 65–76. Springer, 2022. 3, 4 [30] Ulrich Nehmzow. Mobile robotics: a practical introduction .Springer Science & Business Media, 2012. 2 [31] Maxime Oquab, Timoth´ ee Darcet, Th´ eo Moutakanni, Huy Vo, Marc Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa, Alaaeldin El-Nouby, et al. Dinov2: Learning robust visual features without supervision. 
+
+arXiv preprint arXiv:2304.07193 , 2023. 7, 4 [32] Jin-Man Park, Jae-Hyuk Jang, Sahng-Min Yoo, Sun-Kyung Lee, Ue-Hwan Kim, and Jong-Hwan Kim. Changesim: To-wards end-to-end online scene change detection in indus-trial indoor environments. In 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 8578–8585. IEEE, 2021. 2, 3, 4, 5 [33] Jin-Man Park, Ue-Hwan Kim, Seon-Hoon Lee, and Jong-Hwan Kim. Dual task learning by leveraging both dense correspondence and mis-correspondence for robust change detection with imperfect matches. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13749–13759, 2022. 3 [34] Vijaya Raghavan T Ramkumar, Prashant Bhat, Elahe Arani, and Bahram Zonooz. Self-supervised pre-training for scene change detection. In Proceedings of the 35th Conference on Neural Information Processing Systems (NeurIPS 2021), Sydney, Australia , pages 6–14, 2021. 3 [35] Vijaya Raghavan T Ramkumar, Elahe Arani, and Bahram Zonooz. Differencing based self-supervised pretraining for scene change detection. In Conference on Lifelong Learning Agents , pages 952–965. PMLR, 2022. 3 [36] Nikhila Ravi, Valentin Gabeur, Yuan-Ting Hu, Ronghang Hu, Chaitanya Ryali, Tengyu Ma, Haitham Khedr, Roman R¨ adle, Chloe Rolland, Laura Gustafson, et al. Sam 2: Segment anything in images and videos. arXiv preprint arXiv:2408.00714 , 2024. 5, 6, 3 [37] Tianhe Ren, Shilong Liu, Ailing Zeng, Jing Lin, Kun-chang Li, He Cao, Jiayu Chen, Xinyu Huang, Yukang Chen, Feng Yan, Zhaoyang Zeng, Hao Zhang, Feng Li, Jie Yang, Hongyang Li, Qing Jiang, and Lei Zhang. Grounded sam: Assembling open-world models for diverse visual tasks, 2024. 5, 6, 3 [38] Ragav Sachdeva and Andrew Zisserman. The change you want to see (now in 3d). In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 2060– 2069, 2023. 3 [39] Ken Sakurada, Mikiya Shibuya, and Weimin Wang. Weakly supervised silhouette-based semantic scene change detec-tion. In 2020 IEEE International conference on robotics and automation (ICRA) , pages 6861–6867. IEEE, 2020. 3, 4, 8, 5[40] Li Shen, Yao Lu, Hao Chen, Hao Wei, Donghai Xie, Jiabao Yue, Rui Chen, Shouye Lv, and Bitao Jiang. S2looking: A satellite side-looking dataset for building change detection. 
+
+Remote Sensing , 13(24):5094, 2021. 5 [41] Diwei Sheng, Yuxiang Chai, Xinru Li, Chen Feng, Jianzhe Lin, Claudio Silva, and John-Ross Rizzo. Nyu-vpr: Long-term visual place recognition benchmark with view direc-tion and data anonymization influences. In 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 9773–9779. IEEE, 2021. 2, 6 [42] Qian Shi, Mengxi Liu, Shengchen Li, Xiaoping Liu, Fei Wang, and Liangpei Zhang. A deeply supervised attention metric-based network and an open aerial image dataset for remote sensing change detection. IEEE transactions on geo-science and remote sensing , 60:1–16, 2021. 5 [43] Ashley Varghese, Jayavardhana Gubbi, Akshaya Ra-maswamy, and P Balamuralidhar. Changenet: A deep learn-ing architecture for visual change detection. In Proceed-ings of the European conference on computer vision (ECCV) workshops , pages 0–0, 2018. 3 [44] Subin Varghese, Joshua Gao, and Vedhus Hoskere. Viewdelta: Text-prompted change detection in unaligned im-ages. arXiv preprint arXiv:2412.07612 , 2024. 3 [45] Dan Wang, Licheng Jiao, Jie Chen, Shuyuan Yang, and Fang Liu. Changes-aware transformer: Learning generalized changes representation. arXiv preprint arXiv:2309.13619 ,2023. 3 
+
+11 [46] Guo-Hua Wang, Bin-Bin Gao, and Chengjie Wang. How to reduce change detection to semantic segmentation. Pattern Recognition , 138:109384, 2023. 2, 3, 4, 7, 8, 1 [47] Jiahao Wang, Fang Liu, Licheng Jiao, Hao Wang, Shuo Li, Lingling Li, Puhua Chen, Xu Liu, and Wenping Ma. Change knowledge-guided vision-language remote sensing change detection. IEEE Transactions on Geoscience and Remote Sensing , 2025. 3 [48] Yi Wang, Pierre-Marc Jodoin, Fatih Porikli, Janusz Konrad, Yannick Benezeth, and Prakash Ishwar. Cdnet 2014: An expanded change detection benchmark dataset. In Proceed-ings of the IEEE conference on computer vision and pattern recognition workshops , pages 387–394, 2014. 3, 4 [49] Lin Zeng, Boming Zhao, Jiarui Hu, Xujie Shen, Ziqiang Dang, Hujun Bao, and Zhaopeng Cui. Gaussianupdate: Con-tinual 3d gaussian splatting update for changing environ-ments, 2025. 3 
+
+12 Scene Change Detection with Vision-Language Representation Learning 
+
+# Supplementary Material 
+
+# 1. NYC-CD Dataset Curation Statistics 
+
+The initial candidate pool contained 9,000 image pairs. During the final manual verification stage, 878 pairs were discarded due to incomplete pseudo-masks (e.g., missing change objects) or severe annotation ambiguity, resulting in a final dataset of 8,122 image pairs. We further ana-lyze the distribution of change categories across the dataset. Among the curated pairs, 5,040 pairs contain new or miss-ing object changes, 5,093 pairs contain vegetation appear-ance changes, and 7,201 pairs exhibit viewpoint-induced changes caused by camera repositioning and parallax ef-fects. Note that these categories are not mutually exclusive; a single image pair may contain multiple types of changes simultaneously. The high proportion of viewpoint changes reflects the unconstrained acquisition conditions of street-view imagery, where camera pose differences are common across temporal captures. 
+
+# 2. Noisy Label Examples from VL-CMU-CD Dataset 
+
+Impact of annotation noise in VL-CMU-CD. As noted in prior work [18, 46], the VL-CMU-CD dataset con-tains samples with clearly inaccurate ground-truth masks. We perform a manual quality check and remove image pairs with evidently incorrect annotations (e.g., ground-truth masks that completely miss a changed object). Ta-ble 5 compares performance on the filtered dataset used in the main paper and the original VL-CMU-CD dataset. The results show that incorrect annotations substantially degrade evaluation scores across methods. Representative examples of noisy labels are shown in Fig. 6. 
+
+# 3. Training Protocol 
+
+This section provides detailed information on the training configuration, including which components are trainable, dataset usage, and optimization settings. 
+
+Trainable and Frozen Components. LangSCD is de-signed as a lightweight extension to existing scene change detection (SCD) backbones. During training, the Cross-modal Feature Enhancer , Merge Module , and Convo-lution & Upsampling segmentation head are trainable. All other components are frozen, including the Multimodal LLM used for change captioning, the Text Feature Back-bone (BERT), the Image Encoder backbone (e.g., DI-NOv2 or CNN encoders depending on the baseline), and the Geometric–Semantic Matching module , which relies on pretrained SAM2 and Grounded SAM models. 
+
+Dataset-specific Training. For fair comparison, models are trained separately on each dataset used for evaluation rather than performing cross-dataset transfer. For example, when evaluating on VL-CMU-CD, PSCD, ChangeVPR, or NYC-CD, the corresponding training split of that dataset is used for training and the validation split is used for model selection. This protocol avoids cross-dataset leakage and ensures consistency with the training procedures adopted in prior work. 
+
+Optimization and Hyperparameters. Training follows the configuration of the underlying SCD backbone with minimal modification. For RSCD-based experiments, the DINOv2 encoder is kept frozen while the remaining train-able modules are optimized. Models are trained for 100 epochs using the Adam optimizer with an initial learning rate of 1 × 10 −4. A cosine learning-rate scheduler is used together with a warm-up stage at the beginning of training. The batch size is 4 and training uses mixed precision to improve efficiency. Random horizontal flipping with prob-ability 0.5 is used for data augmentation. Input resolution follows the dataset protocol (e.g., 504 × 504 for VL-CMU-CD ). For C-3PO experiments, we adopt the same optimization strategy while using a VGG16-based DeepLabV3 architec-ture with an input resolution of 640 × 640 .
+
+Loss Function. Binary scene change detection is opti-mized using pixel-wise cross-entropy loss . To address foreground–background imbalance, fixed class weights of 
+
+[0.025, 0.975] are applied during training to emphasize changed regions. 
+
+Threshold Selection. The thresholds used in the geomet-ric and semantic matching modules are selected using the 
+
+NYC-CD validation set . A threshold sweep is performed to determine the operating point, resulting in αt = 0 .20 
+
+for geometric matching and αg = 0 .10 for semantic match-ing. These thresholds are then fixed across all datasets and backbones without further tuning. 
+
+Training Hardware. All models are trained using four NVIDIA RTX 8000 GPUs .1Table 5. Comparison on the filtered VL-CMU-CD dataset used in the main paper and the original VL-CMU-CD dataset containing noisy annotations. Green cells indicate improvements after adding LangSCD. 
+
+Model Filtered VL-CMU-CD Original VL-CMU-CD 
+
+F1 IoU F1 IoU GeSCF 0.77 0.65 0.71 0.59 GeSCF+LangSCD 0.82 (+5%) 0.71 (+6%) 0.73 (+2%) 0.61 (+2%) RSCD 0.83 0.73 0.77 0.65 RSCD+LangSCD 0.85 (+2%) 0.75 (+2%) 0.78 (+1%) 0.67 (+2%) C-3PO 0.50 0.39 0.42 0.29 C-3PO+LangSCD 0.73 (+23%) 0.67 (+28%) 0.57 (+15%) 0.47 (+18%) 
+
+Figure 6. Examples of noisy ground-truth annotations in the VL-CMU-CD dataset. Each row shows two image pairs with the reference image ( t0), the query image ( t1), and the provided ground-truth (GT) change mask. We mark annotation errors directly on the images: red circles indicate false negatives , where true scene changes are missing from the GT mask, while green boxes indicate false positives ,where the GT mask incorrectly included unchanged region. These examples demonstrate the presence of substantial annotation noise in VL-CMU-CD, which motivates our manual quality check and filtering procedure described in the main paper. 
+
+# 4. Additional Language-Guided Baseline: ChangeCLIP 
+
+To further evaluate language-guided approaches for scene change detection, we evaluate ChangeCLIP [7], a recent vision–language remote sensing change detection method, on the NYC-CD dataset. ChangeCLIP requires a set of predicate classes as lan-2guage inputs to guide change prediction. Since NYC-CD focuses on open-world urban scene changes rather than a fixed predicate vocabulary, we adapt the input formulation by replacing the original predicate classes with change ob-ject descriptions generated by GPT . These generated de-scriptions are then used as language inputs for ChangeCLIP. We train and evaluate ChangeCLIP on the NYC-CD dataset using the same training protocol as other baselines. The resulting performance is: F1-score: 0.53 IoU: 0.40 
+
+This performance is lower than all LangSCD-based models evaluated in our experiments. The results suggest that directly applying existing vision–language change de-tection methods is insufficient for complex urban street-view scenarios with viewpoint variation. In contrast, LangSCD explicitly integrates language-derived semantic priors with geometric matching, enabling more accurate lo-calization of object-level scene changes. 
+
+# 5. Prompts and Generation Settings for GPT-4o 
+
+We used GPT-4o [13] for dataset annotations and inference. The exact prompts are shown below. In addition to the prompt, we also report the full set of generation parameters for reproducibility. • Model: gpt-4o 
+
+• Temperature: 0.2 (controls randomness; lower values yield more deterministic outputs) • Max tokens: 4096 
+
+• Top-p: default ( 1.0 )• Seed: not explicitly set (OpenAI API does not cur-rently expose a stable seed parameter; runs are near-deterministic under low temperature) • System role: “You are an expert to analyze images. You need to read images carefully.” • User content: prompt text combined with two base64-encoded input images • Rate limiting: a 1-second pause between calls • Batching: calls processed sequentially 
+
+Text prompt for object changes: I have 2 images of outdoor scenes: A and B. In this task, you must not talk about weather, lighting, vehicles, people, or animals. Re-frain from mentioning any elements that are not directly observable or are obscure. You must try your best to find all objects you see in A. For every object you see in A, you should try your best to find a corresponding object in B. Then, you must try your best to find all objects you see in B. For every object you see in B, you should try your best to find a corresponding object in A. In your response, just give me a numbered list of objects that you fail to find a match in B, and a numbered list of objects that you fail to find a match in A. Do not use prepositions. 
+
+Text prompt for vegetation changes: I have 2 images of outdoor scenes: A and B. In this task, you must try your best to find all vegetations you see in A. For every plant you see in A, you should try your best to find if it changed in B. Then, you must try your best to find all vegetations you see in B. For every plant you see in B, you should try your best to find if it changed in A. In your response, just give me a numbered list of changed plant names in A, and a numbered list of changed plant names in B. If the plant is removed, do not include it in the list. If there are no visible changed plants in the image A, write “1. None”. If there are no visible changed plants in the image B, write “1. None”. If a plant is changed, only include the plant name after change. Do not use prepositions such as to. For example: green trees, bare trees, green bushes, bare bushes, potted plants. 
+
+# 6. Evaluation of GPT-Generated Change Cap-tions 
+
+To assess the reliability of GPT in describing object-level scene changes, we conducted a human evaluation on a ran-domly selected subset of 800 image pairs from our dataset. For each pair, GPT produced a change caption listing new objects present in image I0 but absent in image I1. We eval-uated these captions along two criteria: 1. Completeness – whether all truly changed (new or miss-ing) objects were included. 2. Precision – whether the caption avoided listing objects that did not undergo change. Each caption was manually verified by annotators with access to the ground-truth change masks. Errors were recorded at the object level: • a false positive when GPT listed an object that was not actually new, and • a false negative when GPT failed to list a genuine new/missing object. Across the 800 evaluated image pairs, GPT produced a total of 75 false-positive objects and 37 false-negative ob-jects . Although GPT generally identifies the major scene differences, these results show that caption-only change de-tection may miss subtle changes and may hallucinate ob-jects in visually ambiguous regions. This analysis moti-vates the need for the structured language-guided modules described in the main paper, which leverage captions while enforcing consistency with visual evidence. 
+
+# 7. Threshold Sensitivity Analysis for SAM2–Grounded-SAM Agreement 
+
+We study how the overlap thresholds used for Grounded-SAM [37] alignment and SAM2 [36] temporal tracking 3Table 6. Sweep over the Grounded-SAM threshold αg with αt =0.5.
+
+αg GS Ratio Prec. Rec. F1 IoU 0.01 0.957 76.7 70.2 68.8 57.5 0.10 0.921 77.9 69.5 68.9 57.7 
+
+0.20 0.904 78.1 69.0 68.7 57.4 0.30 0.890 78.1 68.4 68.3 57.1     
+
+> Table 7. Sweep over the SAM2 threshold αtwith αg= 0 .1.
+
+αt SAM2 Ratio Prec. Rec. F1 IoU 0.40 0.552 77.0 70.6 69.1 57.8 0.30 0.582 75.9 72.0 69.4 58.0 0.20 0.616 74.5 73.5 69.6 58.2 
+
+0.10 0.667 72.0 75.6 69.6 58.1 0.01 0.749 65.9 79.8 68.4 56.4 affect the number of matched proposals and the down-stream change-detection performance. All experiments in this sweep are on the NYC-CD validation set using the RSCD [26] backbone together with our language and Ge-ometric–Semantic Matching modules as the baseline con-figuration. We vary the Grounded-SAM threshold αg and the SAM2 threshold αt independently. 
+
+7.1. Grounded-SAM threshold sweep 
+
+With the SAM2 threshold fixed at αt = 0 .5, we vary αg ∈{0.01 , 0.10 , 0.20 , 0.30 }. Table 6 reports the matched-mask ratio, precision, recall, F1, and IoU. We observe that detec-tion performance peaks at αg = 0 .10 , which balances re-jecting noisy language-driven proposals without suppress-ing valid ones. 
+
+7.2. SAM2 threshold sweep 
+
+Fixing αg = 0.1, we vary the SAM2 threshold αt ∈{0.40 , 0.30 , 0.20 , 0.10 , 0.01 }. As shown in Table 7, de-creasing αt increases the SAM2 matched-mask ratio but in-troduces more false positives, producing a clear precision– recall trade-off. The best F1 and IoU are achieved at αt =0.20 , which we select as our operating point. 
+
+# 8. Diagram of the language–image fusion mod-ule 
+
+Please refer to Fig. 7. 
+
+# 9. Evaluation Metric 
+
+We employ two standard metrics for the quantitative evalu-ation of binary change detection performance: Intersection over Union (IoU) and F-1 score. IoU measures the overlap                                                                    
+
+> GPT-4o Descriptions
+> BERT-base-uncased Output: [B, T, 768]
+> Linear proj. to 256-d Text tokens: [B, T, 256]
+> Image I1
+> e.g. [B, 3,504 ,504]
+> DINOv2 backbone Feature: [B, 384 ,36 ,36]
+> 1×1 conv + GN
+> [B, 256 ,36 ,36]
+> Flatten (36 ×36)
+> Image tokens: [B, 1296 ,256]
+> Feature Enhancer (6 layers)
+> Deformable self-attn (image)
+> Vanilla self-attn (text) Bi-directional cross-attn (per token) Image: [B, 1296 ,256] , Text: [B, T, 256]
+> Reshape tokens →[B, 256 ,36 ,36]
+> Inverse 1 ×1 conv →[B, 384 ,36 ,36]
+> Enhanced image features F′
+> 1
+> Figure 7. Diagram of the language–image fusion mod-ule. DINOv2 [31] features [B, 384 ,36 ,36] are projected to
+> [B, 256 ,36 ,36] , flattened into [B, 1296 ,256] image tokens, and fused with BERT [6] text tokens [B, T, 256] via 6 layers of deformable self-attention and bidirectional cross-attention. The fused tokens are reshaped back to a 36 ×36 feature map and mapped to the original DINOv2 channel space.
+
+between predicted and ground-truth masks by dividing the intersection (pixels correctly identified as changed) by the union (all pixels marked as changed in either prediction or ground-truth). The F-1 score, calculated as the harmonic mean of precision and recall, provides a balanced measure of detection precision. Higher F-1 score and IoU indicate better alignment with ground truth (Figure 8). 
+
+# 10. Inference-Time Caption Generation and Latency Analysis 
+
+This section reports the end-to-end inference latency of our full system and clarifies the computational cost of each module. All captions are generated online during infer-ence. We profile the runtime of the major components 4Figure 8. Higher IoU or F-1 score indicate better alignment with ground truth.   
+
+> Figure 9. Qualitative results of the matching module. Each column shows Image t0, Image t1, the initial pseudo-mask, and the final change mask.
+
+in our pipeline—caption generation, text encoding, visual forward pass, and geometric–semantic refinement—over a large-scale set of 8,000 image pairs. 
+
+10.1. Hardware Specification 
+
+All latency measurements were collected on the following workstation: • GPU: NVIDIA RTX 8000 (48 GB) • CPU: Single-threaded execution on one CPU core • Batch size: 1 image pair per forward pass • Dataset size for profiling: 8,000 image pairs 
+
+10.2. End-to-End Latency Breakdown 
+
+For each image pair, we measure four components: (i) cap-tion generation, (ii) text encoding, (iii) visual forward pass, and (iv) geometric–semantic refinement. Table 8 reports mean ± standard deviation over all 8,000 pairs. 
+
+10.3. Discussion 
+
+The majority of inference time arises from online cap-tion generation, which accounts for approximately 86% of the total latency. The visual forward pass and geometric– semantic refinement module are comparatively lightweight. For deployment scenarios requiring lower latency, this com-ponent can be accelerated by (1) adopting a smaller text model, (2) caching captions for stable viewpoints, or (3) pre-computing captions offline when operationally feasible. 
+
+# 11. Qualitative Results for Matching Module 
+
+Please refer to Fig. 9 
+
+# 12. Qualitative Results for Multi-Class Change Detection 
+
+Please refer to Fig. 10 
+
+# 13. Cross-Domain Generalization Results 
+
+We include three remote sensing datasets: S2Looking [40], SYSU-CD [42], and CDD [20] to assess cross-domain gen-eralization. The generalization capability of our language module is further validated through multi-domain experi-ments combining street view and remote sensing datasets (Figure 11). Training a unified model across all seven datasets: four street view datasets (NYC-CD, VL-CMU-CD [1], PSCD [39], ChangeSim [32]) and three remote sensing datasets (S2Looking, SYSU-CD, CDD) reveal con-sistent performance improvements regardless of imaging perspective or domain. The language module improves per-formance by approximately 10% on average in all datasets, with particularly strong gains in our NYC-CD dataset (over 10% improvement in both F1 and IoU) and VL-CMU-CD (approximately 12% improvement in F1). Even remote sensing datasets, which have fundamentally different view-ing angles and change characteristics compared to street-level imagery, benefit from our semantic enhancement, with improvements ranging from 5% to 15% in F1 scores. This cross-domain effectiveness demonstrates that the seman-tic understanding provided by language transcends specific imaging modalities, offering a domain-agnostic solution to improve change detection. The consistent improvements across such diverse datasets, from disaster assessment to urban monitoring, from ground-level to aerial perspectives, underscore the fundamental value of incorporating linguis-tic reasoning into visual change detection, suggesting that semantic context is universally beneficial regardless of the specific application domain or imaging conditions. 5Table 8. End-to-end latency breakdown (seconds per pair) on an RTX 8000 GPU. 
+
+Component Latency (s/pair) Description 
+
+Caption generation 4.22 ± 0.31 Online GPT-based captioning Text encoding + visual forward 0.59 ± 0.07 BERT + Swin-T + DINO Geometric–semantic refinement 0.084 ± 0.012 SAM2 tracking + Grounded-SAM 
+
+Total 4.89 ± 0.33 End-to-end system latency 
+
+> Figure 10. Additional results of our multi-class change detection method with ground truth and current SOTA baselines.
+
+6Figure 11. Improvement of the language module on F1-score and IoU across multiple domains. Results are from a unified model trained jointly on seven datasets—four street-view (NYC-CD, VL-CMU-CD, PSCD, ChangeSim) and three remote sensing (S2Looking, SYSU-CD, CDD). 
+
+7

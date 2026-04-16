@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-001.webp",
+      "caption": "Figure 4: Depth-dependent performance under image-token removal. We evaluate three output regimes on the same visual inputs: MCQ (bounded single-token generation), VQA (index+answer match, bounded multi-token generation), and caption generation.",
+      "page": 6,
+      "index": 1,
+      "width": 821,
+      "height": 209
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-002.webp",
+      "caption": "Figure 15: Layer substitution results for caption generation in LLaVA and InternVL. Image-token substitutions preserve semantic similarity (Appendix A.6) across layers, while textual substitutions lead to progressively larger degradation as layer gaps increase.",
+      "page": 15,
+      "index": 2,
+      "width": 812,
+      "height": 484
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-003.webp",
+      "caption": "Figure 16: Caption generation performance using BLUE and ROGUE scores on Flickr8K under visual processing depth truncation. Fine-tuned models significantly improve semantic similarity with the base model outputs compared to truncated models.",
+      "page": 15,
+      "index": 3,
+      "width": 821,
+      "height": 182
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-004.webp",
+      "caption": "Figure 5: Functional recovery on Flickr8K, ChartQA after distillation-based fine-tuning. Additional details of the result in Appendix-A.4",
+      "page": 7,
+      "index": 4,
+      "width": 827,
+      "height": 221
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-005.webp",
+      "caption": "Figure 9: Retention of reasoning-chain components under visual-token truncation. Semantic similarity is computed for summary, caption, and reasoning relative to the base model output (see Appendix-A.5 for additional results). Caption exhibits the strongest degradation, followed by reasoning, while summary remains comparatively stable.",
+      "page": 10,
+      "index": 5,
+      "width": 827,
+      "height": 183
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-006.webp",
+      "caption": "Figure 14: Cross-layer substitution experiments for VQA-style tasks for LLaVA, Qwen2.5-VL and InternVL. Replacing image tokens with earlier-layer representations causes minimal degradation in exact match (Appendix A.6) accuracy, whereas substituting textual tokens results in larger performance drops.",
+      "page": 14,
+      "index": 6,
+      "width": 812,
+      "height": 742
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-007.webp",
+      "caption": "Figure 13: Representation metrics for InternVL models showing consistent visual-token stabilization across architectures.",
+      "page": 14,
+      "index": 7,
+      "width": 818,
+      "height": 203
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-008.webp",
+      "caption": "Figure 2: Layer-wise evolution of matrix entropy, intrinsic dimensionality, and trajectory curvature for image and textual tokens. Image tokens exhibit early stabilization across all three metrics, whereas textual tokens remain dynamically evolving across depth.",
+      "page": 3,
+      "index": 8,
+      "width": 821,
+      "height": 238
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-009.webp",
+      "caption": "Figure 12: Layer-wise representation dynamics for the Qwen3-VL family with similar early stabilization of visual tokens and continued evolution of textual representations.",
+      "page": 13,
+      "index": 9,
+      "width": 821,
+      "height": 204
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-010.webp",
+      "caption": "Figure 11: Representation metrics across layer-wise depth for Qwen2.5-VL models showing the same stabilization behaviour observed in Fig. 10.",
+      "page": 13,
+      "index": 10,
+      "width": 821,
+      "height": 203
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-011.webp",
+      "caption": "Figure 10: Layer-wise evolution of representation metrics (section A.1), for the LLaVA family. Image tokens rapidly stabilize in early layers across all three metrics, while textual tokens continue to evolve across depth.",
+      "page": 13,
+      "index": 11,
+      "width": 818,
+      "height": 205
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-012.webp",
+      "caption": "Figure 6: Performance across truncation depths under multiple decoding strategies for base and fine-tuned models. Fine-tuned models exhibit reduced dispersion across decoding configurations.",
+      "page": 8,
+      "index": 12,
+      "width": 817,
+      "height": 378
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-013.webp",
+      "caption": "Figure 7: Coefficient of variation (CV) across decoding strategies. Fine-tuned models consistently show lower variability than truncated base models.",
+      "page": 8,
+      "index": 13,
+      "width": 817,
+      "height": 370
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-014.webp",
+      "caption": "Figure 3: Layer-substitution analysis for captioning with Qwen2.5-VL-7B-Instruct. For each row, we show the image-token similarity heatmap (left), text-token similarity heatmap (center), and the semantic similarity as a function of the layer gap (right). Additional results are reported in Appendix A.2",
+      "page": 4,
+      "index": 14,
+      "width": 732,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-015.webp",
+      "caption": "Figure 8: Compute–performance trade-off under visual-depth truncation. Blue: total GFLOPs per sample. Red: truncated base model performance. Green: fine-tuned model performance. Rightmost panel: prefill vs. decode compute decomposition. Fine-tuned models achieve high functional performance at substantially lower retained depth and compute budgets. Additional result on Appendix-A.4",
+      "page": 9,
+      "index": 15,
+      "width": 821,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-016.webp",
+      "caption": "Figure 18: BLEU and ROGUE similarity of reasoning-chain components under visual-token truncation. The caption shows the strongest degradation, followed by reasoning, while the summary remains comparatively stable.",
+      "page": 16,
+      "index": 16,
+      "width": 821,
+      "height": 364
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09425v1/fig-017.webp",
+      "caption": "Figure 17: ChartQA VQA performance vs compute flops using exact match (Appendix A.6) under image-token truncation. Exact match accuracy improves after fine-tuning with fewer flops. Also, prefill phase benefits more compare to decode phase.",
+      "page": 16,
+      "index": 17,
+      "width": 819,
+      "height": 190
+    }
+  ]
+}

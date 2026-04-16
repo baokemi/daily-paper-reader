@@ -1,0 +1,565 @@
+Title: HierFedCEA: Hierarchical Federated Edge Learning for Privacy-Preserving Climate Control Optimization Across Heterogeneous Controlled Environment Agriculture Facilities
+
+URL Source: https://arxiv.org/pdf/2604.13396v1
+
+Published Time: Thu, 16 Apr 2026 00:23:31 GMT
+
+Number of Pages: 7
+
+Markdown Content:
+> IEEE INTERNET OF THINGS JOURNAL 1
+
+# HierFedCEA: Hierarchical Federated Edge Learning for Privacy-Preserving Climate Control Optimization Across Heterogeneous Controlled Environment Agriculture Facilities 
+
+ANDRII VAKHNOVSKYI IOGRU LLC, New York, NY, USA 
+
+Abstract —Cross-facility knowledge transfer in Controlled En-vironment Agriculture (CEA) — greenhouses, vertical farms, and indoor cultivation facilities — can reduce HVAC energy con-sumption by 30–38% and accelerate new facility commissioning from months to days. However, facility operators refuse to share raw operational data because it encodes commercially sensitive grow recipes worth millions in R&D investment. We present HierFedCEA, a hierarchical federated learning framework that enables privacy-preserving climate control optimization across heterogeneous CEA facilities without exposing proprietary data. HierFedCEA decomposes the neural network PID auto-tuning model into three tiers aligned with the physical structure of the control problem: (1) a global physics tier capturing universal thermodynamic relationships, aggregated across all facilities; (2) a crop-cluster tier encoding cultivar-specific VPD-to-gain mappings, aggregated within crop-family groups; and (3) alocal personalization tier adapting to facility-specific equipment dynamics, never shared. This physics-informed decomposition enables convergence in 40–60 communication rounds, a 3.6 ×
+
+improvement over flat federated averaging. The framework applies tier-specific differential privacy budgets (ε = 8 for non-proprietary physics, ε = 4 for sensitive crop parameters) and leverages the extreme compactness of the 36-parameter PID model to achieve privacy essentially for free (excess risk 
+
+< 0.15 %). Simulation experiments calibrated from 7+ years of production deployment across 30+ commercial facilities in 8 U.S. climate zones demonstrate that HierFedCEA achieves 94% of centralized training performance while reducing total communication cost to under 1 MB and enabling cold-start convergence for new facilities within 14 days. To the best of our knowledge, this is the first federated learning framework designed for CEA climate control. 
+
+Index Terms —Federated learning, controlled environment agriculture, Internet of Things, edge computing, PID control, neural network, privacy-preserving, hierarchical aggregation, HVAC optimization. 
+
+I. I NTRODUCTION 
+
+# CONTROLLED Environment Agriculture (CEA) — en-compassing greenhouses, vertical farms, and plant fac-tories — is a rapidly growing sector projected to exceed $112 billion by 2030 [1]. CEA facilities depend on dense IoT sensor networks and industrial actuators to regulate air temper-ature, relative humidity, CO 2 concentration, photosynthetically active radiation (PAR), and nutrient solution chemistry simul-taneously and continuously. HVAC energy alone accounts for 
+
+Corresponding author: Andrii Vakhnovskyi (e-mail: andrii.vakhnovskyi@gmail.com). ORCID: 0009-0007-8306-5932. 
+
+30–80% of operating costs depending on climate zone [2], and Graamans et al. [3] showed that indoor agriculture already consumes more energy than all open-field cultivation globally while producing less than 1% of food output. AI-driven climate control offers substantial energy savings. Our prior work [2] demonstrated 30–38% HVAC energy re-duction across 30+ commercial facilities using neural network PID auto-tuning with Vapor Pressure Deficit (VPD) cascading control. A critical enabler was cross-facility knowledge trans-fer: PID parameters, VPD trajectories, and anomaly baselines learned at established facilities accelerate optimization at new deployments, reducing commissioning time from 6–9 months to 1–5 days. However, this knowledge transfer currently relies on central-ized cloud aggregation of facility telemetry — an approach with fundamental limitations. First, the platform operator gains full visibility into each facility’s environmental profiles, which encode commercially sensitive grow recipes represent-ing years of R&D investment [4]. Second, recent gradient inversion attacks [5] can reconstruct time-series sensor data from model updates, potentially exposing production patterns. Third, competitive multi-state operators managing facilities across different regulatory jurisdictions increasingly refuse to pool data on third-party servers. Federated learning (FL) [6] addresses these concerns by keeping raw data on-facility and sharing only model parameter updates. Yet applying FL to CEA introduces unique challenges absent from other IoT domains:  
+
+> •
+
+Extreme data heterogeneity : facilities grow fundamen-tally different crops (leafy greens, fruiting vegetables, cannabis, herbs) with distinct optimal control strategies, creating severe non-IID conditions that degrade standard FedAvg convergence by up to 55% [7].  
+
+> •
+
+Equipment heterogeneity : 50+ HVAC manufacturers with different actuator dynamics mean that PID gains optimal for one facility may be destabilizing for another.  
+
+> •
+
+Small federation size : with 5–30 participants (vs. mil-lions in mobile FL), each client has outsized influence on the global model, increasing vulnerability to Byzantine attacks [8].  
+
+> •
+
+Temporal non-stationarity : crop growth stages and sea-sonal HVAC behavior create concept drift that legitimate  
+
+> arXiv:2604.13396v1 [eess.SY] 15 Apr 2026 IEEE INTERNET OF THINGS JOURNAL 2
+
+FL must accommodate while adversarial drift must be rejected. No published work addresses federated learning for CEA climate control. While FL has been applied to building HVAC [9]–[11], precision agriculture image classification [12], and agricultural IoT sensing [13], the intersection of FL with CEA greenhouse climate control remains unexplored [14], [15]. This paper makes the following contributions: 1) We present HierFedCEA, a three-tier hierarchical feder-ated learning architecture that decomposes neural net-work PID parameters by physical meaning: universal thermodynamics (global), crop-specific VPD sensitiv-ity (cluster), and facility-specific equipment adaptation (local). This physics-informed decomposition is novel — existing approaches split by layer topology [26] or gradient similarity [30], not by domain physics. 2) We demonstrate that the extreme compactness of the PID auto-tuning model (36 parameters) makes differential privacy essentially free: formal analysis shows excess risk below 0.15% at ε = 4 , enabling strong privacy guarantees without meaningful utility loss. 3) We design tier-specific privacy budgets and communica-tion cadences matched to the sensitivity and timescale of each physical phenomenon, providing stronger pro-tection for proprietary crop parameters while relaxing constraints on non-sensitive physics. 4) We evaluate HierFedCEA through simulation experi-ments with parameters calibrated from 7+ years of production deployment across 30+ facilities in 8 U.S. climate zones, comparing against 8 baselines including the deployed centralized system. II. R ELATED WORK 
+
+A. Federated Learning for IoT 
+
+McMahan et al. [6] introduced FedAvg, which trains a shared model by averaging locally updated parameters from distributed clients. Subsequent work addressed key FL chal-lenges: FedProx [24] handles data heterogeneity via proximal regularization; SCAFFOLD [25] eliminates client drift through control variates; and personalized FL methods including Fed-Per [26] (personal layers), FedBN [27] (batch normalization), and Per-FedAvg [28] (meta-learning) balance global knowl-edge with local adaptation. Comprehensive surveys of FL for IoT [14], [16] and edge networks [17] have established the feasibility of FL on resource-constrained devices, including validation on Raspberry Pi hardware [17]. 
+
+B. FL for HVAC and Building Control 
+
+The closest related domain is federated HVAC control in commercial buildings. Su et al. [35] demonstrated dis-tributed HVAC control with edge computing in IoT buildings, while Xu et al. [11] proposed transfer learning for build-ing HVAC using a shared feature extractor across buildings. Xia et al. [9] applied federated deep reinforcement learning to multi-zone HVAC, demonstrating 15–23% energy savings. Hagstrom et al. [10] deployed FL for autonomous HVAC scheduling across commercial buildings. However, none of these works address the unique challenges of CEA: crop-specific control objectives (VPD rather than thermal comfort), biological damage timelines (hours, not days), or the extreme equipment heterogeneity across 50+ HVAC manufacturers serving the CEA industry. 
+
+C. AI for CEA Climate Control 
+
+AI-based greenhouse climate control has advanced rapidly but remains largely simulation-bound. Mulayim et al. [18] found that the combined duration of all peer-reviewed real-world AI-HVAC field experiments totals approximately 43 days globally. Ajagekar et al. [19] achieved 57% energy reduction via deep reinforcement learning — in simulation on a single greenhouse model. Our prior IOGRUCloud de-ployment [2] represents the largest documented real-world AI-driven CEA control system: 30+ facilities, 8 climate zones, 7+ years of continuous operation, with validated 30–38% energy savings. 
+
+D. FL for Agriculture 
+
+FL applications in agriculture focus predominantly on com-puter vision: crop disease detection [20], weed classifica-tion [21], and yield prediction from satellite imagery [12]. Dara et al. [13] surveyed FL for agricultural privacy, iden-tifying farmer data reluctance as a primary adoption barrier. To the best of our knowledge, no published work applies federated learning to CEA climate control — a gap this paper addresses. III. S YSTEM MODEL AND PROBLEM FORMULATION 
+
+A. CEA IoT Architecture 
+
+We consider a fleet of K CEA facilities, each operating a three-tier IoT architecture [2]: (1) a field layer of industrial sensors (Modbus RTU, BACnet/IP, 4–20 mA, SDI-12) and actuators (HVAC, dehumidifiers, LED lighting, irrigation); (2) an edge AI layer hosting real-time PID control, neural network auto-tuning, and anomaly detection on industrial ARM/x86 hardware; and (3) a cloud layer providing fleet coordination. Each facility k manages Zk independent climate zones (typically 10–60), with each zone deploying 20–40 sensors and 8–15 actuators. 
+
+B. Neural Network PID Auto-Tuning 
+
+Each zone operates a 7-3-3 multi-layer perceptron (MLP) that maps a sensor feature vector x ∈ R7 to PID gains 
+
+(Kp, K i, K d):
+
+h = σ(W1x + b1), [Kp, K i, K d]T = W2h + b2 (1) where W1 ∈ R3×7, b1 ∈ R3, W2 ∈ R3×3, b2 ∈ R3, σ is the sigmoid activation, and the total parameter count is |θ| =7 × 3 + 3 + 3 × 3 + 3 = 36 .The input feature vector comprises five environmen-tal measurements and two VPD error signals: x =[Tair , RH , T leaf , CO 2, PPFD , e VPD , R eVPD dt ], where eVPD =IEEE INTERNET OF THINGS JOURNAL 3
+
+VPD target − VPD actual . VPD serves as the primary cascading control variable because it captures the coupled temperature– humidity dynamics that govern plant transpiration [22], [23]. The local training objective at facility k minimizes: 
+
+Fk(θ) = 1
+
+nknkX
+
+> i=1
+
+ℓ(θ; x(k) 
+
+> i
+
+, y(k) 
+
+> i
+
+) (2) where ℓ is the mean squared error between the MLP-predicted PID gains and gains that achieve target VPD tracking perfor-mance, and nk is the number of training samples at facility k.
+
+C. Federated Learning Objective 
+
+The global FL objective seeks parameters θ∗ minimizing the weighted average of local objectives: 
+
+θ∗ = arg min 
+
+> θK
+
+X
+
+> k=1
+
+nk
+
+n Fk(θ), n =
+
+> K
+
+X
+
+> k=1
+
+nk (3) Standard FedAvg [6] solves (3) by performing E local SGD steps at each facility, then averaging the resulting parameters at the server. However, with heterogeneous CEA facilities growing different crops under different climates with differ-ent equipment, the local objectives Fk diverge significantly, causing weight divergence and slow convergence [7], [15]. IV. H IER FED CEA: H IERARCHICAL FEDERATED CEA 
+
+A. Physics-Informed Parameter Decomposition 
+
+The key insight of HierFedCEA is that the 36 parameters of the 7-3-3 PID MLP encode knowledge at three distinct physical scales, each with different sharing properties: 
+
+Tier 1 — Global Physics (18 parameters): The weights connecting the five environmental inputs ( Tair , RH, Tleaf , CO 2,PPFD) to the hidden layer encode thermodynamic relation-ships governed by the Clausius-Clapeyron equation, Fourier’s law, and conservation of energy. These relationships are uni-versal across all CEA facilities regardless of crop, climate, or equipment: the physics of heat transfer and psychrometric moisture transport do not change between a cannabis facility in Arizona and a lettuce greenhouse in Illinois. Formally, 
+
+θG = {W1[0 : 3 , 0 : 5] , b1} ∈ R18 .
+
+Tier 2 — Crop Cluster (17 parameters): The weights connecting VPD error inputs to the hidden layer, plus the entire output layer, encode crop-specific VPD sensitivity and gain-scheduling relationships. Cannabis requires tight VPD control (σVPD < 0.08 kPa) at specific growth stages, while lettuce tolerates broader VPD ranges. These parameters should be shared among facilities growing the same crop family but differ across crop families. Formally, θC = {W1[0 : 3 , 5 : 7] , W2, b2[0 : 2] } ∈ R17 .
+
+Tier 3 — Local Personalization (1 parameter): The derivative gain bias b2[2] encodes facility-specific actuator response characteristics — the dead time and lag that vary by HVAC manufacturer and installation. This parameter is never shared; it adapts online to local equipment dynamics. Formally, θL = {b2[2] } ∈ R1.                 
+
+> TABLE I HIER FED CEA P ARAMETER DECOMPOSITION
+> Tier Scope Params εComm.
+> 1: Global Physics All facilities 18 8.0 Weekly 2: Crop Cluster Same crop family 17 4.0 2–3 days 3: Local Single facility 1∞Never
+
+B. Crop-Family Clustering 
+
+Facilities are assigned to crop-family clusters C =
+
+{C1, . . . , C M } using a two-phase strategy: 
+
+Phase 1 — Domain-knowledge initialization : Facilities are grouped by crop family based on agronomic similarity: 
+
+C1 (cannabis), C2 (leafy greens: lettuce, herbs, microgreens), 
+
+C3 (fruiting crops: tomato, pepper, strawberry), C4 (propaga-tion/nursery). 
+
+Phase 2 — Gradient-based refinement : After an initial warm-up period ( Twarm = 20 rounds), cluster assignments are refined by gradient cosine similarity. For each facility k, the cosine similarity between its Tier-2 gradient and each cluster centroid gradient is computed: 
+
+sk,j = ∇θC Fk · ¯gj
+
+∥∇ θC Fk∥∥ ¯gj ∥ (4) where ¯gj = 1 
+
+> |Cj|
+
+P 
+
+> i∈Cj
+
+∇θC Fi is the cluster centroid gradient. Facility k is reassigned to arg max j sk,j if the similarity gain exceeds a threshold τ = 0 .15 and the target cluster has at least 3 members. Reassignment is evaluated every 10 rounds. 
+
+C. Aggregation Protocol 
+
+HierFedCEA performs aggregation at two levels per com-munication round: 
+
+Intra-cluster aggregation (Tier 2): Within each cluster Cj ,Tier-2 update deltas are aggregated using data-proportional weighted averaging. Each facility adds calibrated Gaussian noise to its update before transmission (local differential privacy): 
+
+θ(t+1)  
+
+> C
+
+= θ(t) 
+
+> C
+
++ X
+
+> k∈Cj
+
+nk
+
+P 
+
+> i∈Cj
+
+ni
+
+f∆θC,k (5) where f∆θC,k = ( θC,k − θ(t) 
+
+> C
+
+) + N (0 , z 2 
+
+> C
+
+C2I) is the noised update with clipping bound C = 1 .0 and noise multiplier zC =1.0, achieving (εC , δ )-differential privacy with εC ≈ 4.0 at 
+
+δ = 10 −5 over T = 100 rounds. 
+
+Global aggregation (Tier 1): Tier-1 update deltas are aggregated across all facilities using trust-weighted averaging inspired by FLTrust [29], with FedProx [24] proximal regular-ization ( μ = 0 .01 ) applied during local training: 
+
+θ(t+1)  
+
+> G
+
+= θ(t) 
+
+> G
+
++
+
+> K
+
+X
+
+> k=1
+
+TS k · nk
+
+PKi=1 TS i · ni
+
+f∆θG,k (6) where f∆θG,k is the noised Tier-1 update ( zG = 0 .8, εG ≈
+
+8.0) and TS k = max(0 , cos( f∆θG,k , g ref )) is the trust score computed against a physics-validated reference gradient gref 
+
+derived from thermodynamic first principles. We note that DP noise reduces trust score discriminability; with zG = 0 .8IEEE INTERNET OF THINGS JOURNAL 4
+
+on 18-dimensional updates, the signal-to-noise ratio remains sufficient for Byzantine detection (empirically validated in Section VII). 
+
+D. Privacy Analysis 
+
+The 36-parameter PID model makes differential privacy unusually favorable. The sensitivity of each model update is bounded by ∆ = C/n k where C is the per-example gradient clipping norm. For the Gaussian mechanism with noise mul-tiplier z, the R´ enyi divergence-based privacy accounting [31] yields: For Tier-2 parameters (17 dimensions) with z = 1.0,
+
+T = 100 rounds, subsampling rate q = 1 .0 (full participation): 
+
+ε ≈ 3.8 at δ = 10 −5. The privacy-utility tradeoff from Bassily et al. [32] gives excess empirical risk: 
+
+∆R ≤ O
+
+ d log(1 /δ )
+
+nε 2
+
+
+
+= O
+
+ 17 · 11 .510000 · 14 .4
+
+
+
+≈ 0.0014 (7) This represents less than 0.15% excess risk — privacy is essentially free for models this compact. This stands in stark contrast to FL for large vision or language models where DP noise significantly degrades performance. 
+
+E. Cold-Start Protocol 
+
+When a new facility knew joins the federation: 1) The server assigns knew to a crop cluster based on declared crop type. 2) Tier-1 (global physics) and Tier-2 (crop cluster) param-eters are downloaded from the current global and cluster models respectively. 3) Tier-3 (local) is initialized to zero bias and adapts online during the first growth cycle. 4) After Twarm local training steps, knew begins contributing to federation updates. This protocol transfers 35 of 36 parameters from fleet knowledge, providing the new facility with an initial model calibrated from the collective experience of the entire federa-tion. The remaining local parameter adapts to facility-specific equipment within the first 7–14 days of operation. V. A LGORITHM 
+
+The complete HierFedCEA training procedure is presented in Algorithm 1. 
+
+Communication cost : Each synchronized round transmits 
+
+18 + 17 = 35 float32 values per facility (140 bytes upload + 140 bytes download). While Table I specifies different ideal cadences per tier (weekly for Tier 1, 2–3 days for Tier 2), in practice both tiers are aggregated in the same communication round for simplicity. For K = 30 facilities and T = 100 
+
+rounds, total communication is 30 × 100 × 2 × 140 = 840 KB — orders of magnitude below the bandwidth capacity of even cellular IoT connections. 
+
+Convergence : Under standard assumptions (L-smoothness, bounded gradient variance), hierarchical aggregation with the physics-informed split reduces the effective gradient dissimi-larity σ2 
+
+> G
+
+compared to flat FedAvg because parameters within 
+
+Algorithm 1 HierFedCEA Training 
+
+Require: K facilities, clusters C = {C1, . . . , C M }, rounds T ,local epochs E, learning rate η, noise multipliers zG, z C ,proximal weight μ, trust reference gref  
+
+> 1:
+
+Initialize θ(0)  
+
+> G
+
+, θ (0)  
+
+> C
+
+, θ (0)  
+
+> L
+
+for all facilities  
+
+> 2:
+
+for t = 0 , 1, . . . , T − 1 do  
+
+> 3:
+
+for each facility k ∈ { 1, . . . , K } in parallel do  
+
+> 4:
+
+θk ← [θ(t) 
+
+> G
+
+; θ(t) 
+
+> C
+
+; θ(t)
+
+> L,k
+
+] {assemble full model } 
+
+> 5:
+
+for e = 1 , . . . , E do  
+
+> 6:
+
+Sample minibatch Bk from local data  
+
+> 7:
+
+gk ← ∇ θ ℓ(θk; Bk) + μ(θk − θ(t)) 
+
+> 8:
+
+Clip: gk ← gk · min(1 , C/ ∥gk∥) 
+
+> 9:
+
+θk ← θk − η g k 
+
+> 10:
+
+end for  
+
+> 11:
+
+∆θG,k ← θG,k − θ(t) 
+
+> G
+
++ N (0 , z 2
+
+> G
+
+C2I18 ) 
+
+> 12:
+
+∆θC,k ← θC,k − θ(t) 
+
+> C
+
++ N (0 , z 2 
+
+> C
+
+C2I17 ) 
+
+> 13:
+
+Send (∆ θG,k , ∆θC,k ) to server  
+
+> 14:
+
+end for  
+
+> 15:
+
+Server: Global aggregation (Tier 1)  
+
+> 16:
+
+for each k do  
+
+> 17:
+
+TS k ← max(0 , cos(∆ θG,k , g ref ))  
+
+> 18:
+
+end for  
+
+> 19:
+
+θ(t+1)  
+
+> G
+
+← θ(t) 
+
+> G
+
++ P   
+
+> k
+> TS knkP
+> iTS ini
+
+∆θG,k  
+
+> 20:
+
+Server: Cluster aggregation (Tier 2)  
+
+> 21:
+
+for each cluster Cj do  
+
+> 22:
+
+θ(t+1)  
+
+> Cj
+
+← θ(t) 
+
+> Cj
+
++ P  
+
+> k∈Cj
+> nkP
+> i∈Cjni
+
+∆θC,k  
+
+> 23:
+
+end for  
+
+> 24:
+
+if t > T warm and t mod 10 = 0 then  
+
+> 25:
+
+Refine cluster assignments via (4)  
+
+> 26:
+
+end if  
+
+> 27:
+
+Distribute θ(t+1)  
+
+> G
+
+, θ (t+1)  
+
+> Cj
+
+to facilities  
+
+> 28:
+
+end for 
+
+each tier share similar optimization landscapes across facil-ities. Empirically, HierFedCEA converges in 40–60 rounds compared to 150–200+ for flat FedAvg on heterogeneous CEA data (Section VII). VI. E XPERIMENTAL EVALUATION 
+
+A. Simulation Environment 
+
+We evaluate HierFedCEA using a physics-based CEA sim-ulator with parameters calibrated from 7+ years of production deployment across 30+ commercial facilities [2]. Each facility is modeled as a thermal system with coupled temperature– humidity dynamics: 
+
+Cth 
+
+dT dt = QHVAC + Qlight + Qsolar − U A (T − Tout ) (8) 
+
+Chum 
+
+dω dt = ˙ mtransp + ˙ mdehum + ˙ mvent (wout − ω) (9) where Cth , Chum are thermal and humidity capacitances, 
+
+Q terms are heat sources/sinks, and ˙m terms are moisture sources/sinks. HVAC actuators are modeled as first-order-plus-dead-time (FOPDT) systems [33] with manufacturer-specific time constants and dead times calibrated from field commissioning data. IEEE INTERNET OF THINGS JOURNAL 5
+
+We simulate 30 heterogeneous facilities spanning 6 crop types (cannabis flower, cannabis vegetative, lettuce, tomato, herbs, strawberry), 8 U.S. climate zones, and 5 HVAC equipment profiles. Weather data is generated from NOAA-calibrated parametric models for each climate zone. Each sim-ulation covers 180 days (approximately two cannabis growth cycles or four lettuce cycles). 
+
+B. Baselines 
+
+We compare HierFedCEA against 8 methods: 1) Local-Only : each facility trains independently with no knowledge sharing. 2) Centralized : all facility data pooled on a central server (upper bound, violates privacy). 3) Current-TL : the deployed centralized transfer learning approach [2]. 4) FedAvg [6]: standard federated averaging. 5) FedProx [24]: FedAvg with proximal regularization (μ = 0 .01 ). 6) SCAFFOLD [25]: variance reduction via control vari-ates. 7) Per-FedAvg [28]: personalized FL via meta-learning. 8) FedPer [26]: personal output layer, shared hidden layers. We exclude FedBN [27] because the 7-3-3 MLP contains no batch normalization layers, making FedBN inapplicable. All methods use identical model architectures and hyper-parameters: learning rate η = 0 .01 , local epochs E = 5 ,minibatch size B = 64 , gradient clipping norm C = 1 .0,DP noise multipliers zG = 0.8 (Tier 1) and zC = 1.0
+
+(Tier 2). Each facility generates approximately 8,640 training samples per 10-day window (10-second sensor polling across 10 zones), yielding n ≈ 10 ,000 samples per facility per aggregation cycle. Experiments are repeated 5 times with different random seeds; we report means and 95% confidence intervals. 
+
+C. Metrics 
+
+We evaluate along five dimensions:  
+
+> •
+
+Control quality : RMSE of VPD tracking (RMSE VPD 
+
+in kPa), VPD stability ( σVPD ), and setpoint overshoot percentage.  
+
+> •
+
+Energy efficiency : HVAC energy consumption (kWh/m 2/day), percentage reduction versus Local-Only baseline.  
+
+> •
+
+Convergence : communication rounds to reach target RMSE VPD < 0.10 kPa.  
+
+> •
+
+Privacy : achieved (ε, δ ) via R´ enyi DP accounting using the dp-accounting library [34].  
+
+> •
+
+Robustness : worst-case facility RMSE across all facili-ties. VII. R ESULTS AND DISCUSSION 
+
+A. Federation Benefit 
+
+Table II presents the main comparison across all 9 methods. HierFedCEA achieves RMSE VPD = 0.068 kPa, within 6%                                                          
+
+> TABLE II MAIN RESULTS : 30 F ACILITIES , 180-D AY SIMULATION
+> Method RMSE VPD Energy Rounds (kPa) Red. (%) to conv.
+> Local-Only 0.142 ±.008 ——Centralized 0.064 ±.003 36.2 —Current-TL 0.071 ±.004 33.8 —FedAvg 0.098 ±.006 24.1 187 FedProx 0.089 ±.005 27.3 142 SCAFFOLD 0.082 ±.005 29.6 98 Per-FedAvg 0.079 ±.004 30.4 112 FedPer 0.076 ±.004 31.2 95
+> HierFedCEA 0.068 ±.003 34.1 52
+> Heterogeneity Level
+> RMSE VPD  (kPa)
+> IID Low Med High Full
+> 0.06
+> 0.08
+> 0.10
+> 0.12
+> 0.14
+> FedAvg
+> SCAFFOLD
+> HierFedCEA
+> Fig. 1. VPD tracking RMSE versus data heterogeneity level. HierFedCEA degrades gracefully (12%) compared to FedAvg (47%) under increasing crop and climate diversity.
+
+of the Centralized upper bound (0.064 kPa) and substan-tially outperforming Local-Only (0.142 kPa) and flat FedAvg (0.098 kPa). The current deployed transfer learning system (Current-TL) achieves 0.071 kPa, placing HierFedCEA within statistical equivalence ( p = 0 .23 , Wilcoxon signed-rank) while providing formal privacy guarantees that Current-TL lacks. The physics-informed decomposition provides two advan-tages: (1) faster convergence (52 rounds vs. 95–187 for flat methods) because intra-tier parameter homogeneity reduces gradient dissimilarity; and (2) better final performance because local equipment adaptation (Tier 3) is not corrupted by aggre-gation with dissimilar facilities. 
+
+B. Heterogeneity Impact 
+
+We vary the degree of data heterogeneity from homoge-neous (all facilities grow the same crop in the same climate) to fully heterogeneous (6 crop types, 8 climates). Fig. 1 shows that flat FedAvg degrades sharply under increasing heterogeneity (RMSE increases 47%), while HierFedCEA degrades only 12% — demonstrating that the physics-informed decomposition effectively isolates crop-specific and facility-specific variation from the shared global model. IEEE INTERNET OF THINGS JOURNAL 6
+
+C. Privacy-Utility Tradeoff 
+
+We evaluate control quality degradation across privacy budgets ε ∈ { 1, 2, 4, 8, 16 , ∞} . At ε = 4 (Tier-2 default), RMSE VPD increases by only 0.003 kPa (4.4%) compared to no privacy ( ε = ∞). Even at ε = 2 (strong privacy), degradation is below 8%. This confirms the theoretical prediction from (7): the 17-dimensional Tier-2 model is compact enough that DP noise is negligible relative to the natural gradient variance. 
+
+D. Cold-Start Performance 
+
+A new facility joining the federation with HierFedCEA reaches 85% of fleet-average VPD tracking performance within 14 days, compared to 28 days for FedAvg and 56+ days for Local-Only training. The deployed centralized system achieves faster commissioning (1–5 days) because it transfers raw operational data without privacy constraints; the 14-day federated cold-start represents the cost of privacy preservation. The cold-start advantage over other FL methods comes from immediately receiving 35 of 36 parameters from fleet knowl-edge — only the local equipment adaptation parameter must be learned from scratch. 
+
+E. Limitations 
+
+This evaluation is simulation-based. While simulation pa-rameters are calibrated from 7+ years of production deploy-ment, real-world factors including network failures, sensor drift, and operator interventions may affect FL convergence. A pilot deployment on a subset of production facilities is planned as future work. Additionally, the current framework addresses PID auto-tuning only; extension to federated reinforcement learning for model predictive control is a natural next step. VIII. C ONCLUSION 
+
+We presented HierFedCEA, the first federated learning framework for climate control optimization in Controlled En-vironment Agriculture. By decomposing the PID auto-tuning neural network into three tiers aligned with the physics of the control problem — universal thermodynamics, crop-specific VPD sensitivity, and facility-specific equipment dynamics — HierFedCEA achieves 94% of centralized training perfor-mance while keeping proprietary operational data on-facility. The extreme compactness of the 36-parameter model makes differential privacy essentially free (excess risk < 0.15 % at 
+
+ε = 4 ), and total federation communication cost is under 1 MB. Simulation experiments calibrated from 30+ production facilities demonstrate 3.6 × faster convergence and graceful degradation under heterogeneity compared to standard FL baselines. Future work includes pilot deployment on produc-tion facilities and extension to federated anomaly detection across the fleet. REFERENCES [1] Research Nester, “Controlled environment agriculture market size, share & trends analysis report,” 2025. [2] A. Vakhnovskyi, “IOGRUCloud: A scalable AI-driven IoT platform for climate control in controlled environment agriculture,” arXiv preprint arXiv:2604.07586 , 2026. [3] L. Graamans et al. , “Plant factories versus greenhouses: Comparison of resource use efficiency,” Agricultural Systems , vol. 160, pp. 31–43, 2018. [4] L. Wiseman, J. Sanderson, A. Zhang, and E. Jakku, “Farmer and their data: An examination of farmers’ reluctance to share their data through the lens of the laws impacting smart farming,” NJAS-Wageningen J. Life Sciences , vol. 90–91, p. 100301, 2019. [5] L. Zhu, Z. Liu, and S. Han, “Deep leakage from gradients,” in Proc. NeurIPS , 2019. [6] B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efficient learning of deep networks from decentralized data,” in Proc. AISTATS , 2017. [7] Y. Zhao et al. , “Federated learning with non-IID data,” arXiv preprint arXiv:1806.00582 , 2018. [8] M. Fang, X. Cao, J. Jia, and N. Gong, “Local model poisoning attacks to Byzantine-robust federated learning,” in Proc. USENIX Security , 2020. [9] M. Xia et al. , “Federated deep reinforcement learning for multi-zone HVAC control,” IEEE Trans. Smart Grid , 2025. [10] M. Hagstrom et al. , “Federated learning for autonomous HVAC schedul-ing in commercial buildings,” Energy and Buildings , 2025. [11] Z. Xu et al. , “One for many: Transfer learning for building HVAC control,” in Proc. ACM BuildSys , 2020. DOI: 10.1145/3408308.3427617. [12] O. Friha et al. , “Internet of things for the future of smart agriculture: A comprehensive survey of emerging technologies,” IEEE/CAA J. Au-tomatica Sinica , vol. 8, no. 4, 2021. [13] R. Dara et al. , “Federated learning for agricultural privacy,” Computers and Electronics in Agriculture , 2025. [14] D. C. Nguyen et al. , “Federated learning for Internet of Things: A comprehensive survey,” IEEE Internet of Things Journal , vol. 8, no. 21, pp. 16243–16266, 2021. [15] W. Lu et al. , “Federated learning with non-IID data: A survey,” IEEE Internet of Things Journal , vol. 11, no. 12, 2024. [16] A. Imteaj et al. , “A survey on federated learning for resource-constrained IoT devices,” IEEE Internet of Things Journal , vol. 9, no. 1, 2022. [17] J. Mills, J. Hu, and G. Min, “Communication-efficient federated learning for wireless edge intelligence in IoT,” IEEE Internet of Things Journal ,vol. 7, no. 7, 2020. [18] M. K. Mulayim, F. Schwenker, and M. Beigl, “A systematic re-view of real-world deployed machine learning-based HVAC con-trollers,” Energy and Buildings , vol. 312, p. 114189, 2024. DOI: 10.1016/j.enbuild.2024.114189. [19] A. Ajagekar et al. , “Deep reinforcement learning with robust op-timization for greenhouse climate control,” Computers & Chemical Engineering , 2023. [20] Z. Chen et al. , “Adaptive knowledge transfer for federated greenhouse vegetable disease recognition,” Frontiers in Plant Science , 2025. [21] K. Zhang et al. , “Federated learning for weed detection in precision agriculture,” Computers and Electronics in Agriculture , 2024. [22] C. Grossiord et al. , “Plant responses to rising vapor pressure deficit,” 
+
+New Phytologist , vol. 226, no. 6, pp. 1550–1566, 2020. [23] R. R. Shamshiri et al. , “Advances in greenhouse automation and controlled environment agriculture: A transition to plant factories and urban farming,” Int. J. Agricultural and Biological Engineering , vol. 11, no. 1, pp. 1–22, 2018. DOI: 10.25165/j.ijabe.20181101.3210. [24] T. Li et al. , “Federated optimization in heterogeneous networks,” in Proc. MLSys , 2020. [25] S. P. Karimireddy, S. Kale, M. Mohri, S. J. Reddi, S. Stich, and A. T. Suresh, “SCAFFOLD: Stochastic controlled averaging for fed-erated learning,” in Proc. ICML , 2020. [26] A. Arivazhagan et al. , “Federated learning with personalization layers,” 
+
+arXiv preprint arXiv:1912.00818 , 2019. [27] X. Li, M. Jiang, X. Zhang, M. Kamp, and Q. Dou, “FedBN: Federated learning on non-IID features via local batch normalization,” in Proc. ICLR , 2021. [28] A. Fallah, A. Mokhtari, and A. Ozdaglar, “Personalized federated learning with Moreau envelopes,” in Proc. NeurIPS , 2020. [29] X. Cao et al. , “FLTrust: Byzantine-robust federated learning via trust bootstrapping,” in Proc. NDSS , 2021. [30] A. Ghosh, J. Chung, D. Yin, and K. Ramchandran, “An efficient framework for clustered federated learning,” in Proc. NeurIPS , 2020. [31] H. B. McMahan et al. , “Learning differentially private recurrent lan-guage models,” in Proc. ICLR , 2018. [32] R. Bassily, A. Smith, and A. Thakurta, “Private empirical risk mini-mization: Efficient algorithms and tight error bounds,” in Proc. FOCS ,2014. [33] K. J. ˚ Astr¨ om and T. H¨ agglund, Advanced PID Control . ISA, 2006. IEEE INTERNET OF THINGS JOURNAL 7
+
+[34] Google, “dp-accounting: Differential privacy accounting library,” 2023. [Online]. Available: https://github.com/google/differential-privacy [35] Y. Su et al. , “Distributed HVAC control with edge computing,” IEEE Internet of Things Journal , vol. 9, 2022. 
+
+Andrii Vakhnovskyi received the B.S. degree in computer engineering and the M.S. degree in systems engineering from the National Technical University “Kharkiv Polytechnic Institute” (NTU “KhPI”), Ukraine, in 2009 and 2011, respectively. He is the Founder and CEO of IOGRU LLC, New York, NY, where he develops AI-driven IoT plat-forms for climate control in controlled environment agriculture. His systems have been deployed across 30+ commercial facilities in 8 U.S. climate zones. He is a Senior Member of ISA and a Member of IEEE. His research interests include federated learning for industrial IoT, neural network control, and privacy-preserving edge intelligence.

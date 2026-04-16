@@ -1,0 +1,2202 @@
+Title: From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation
+
+URL Source: https://arxiv.org/pdf/2604.13573v1
+
+Published Time: Thu, 16 Apr 2026 00:38:02 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation 
+
+# Jundong Chen 
+
+Beijing Jiaotong University Beijing, China jundongchen@bjtu.edu.cn 
+
+# Honglei Zhang 
+
+Beijing Jiaotong University Beijing, China honglei.zhang@bjtu.edu.cn 
+
+# Xiangmou Qu 
+
+OPPO Research Institute Shenzhen, China lokinko.cs@gmail.com 
+
+# Haoxuan Li 
+
+Peking University Beijing, China hxli@stu.pku.edu.cn 
+
+# Han Yu 
+
+Nanyang Technological University Singapore han.yu@ntu.edu.sg 
+
+# Yidong Li ∗
+
+Beijing Jiaotong University Beijing, China ydli@bjtu.edu.cn 
+
+## Abstract 
+
+Cross-market recommendation (CMR) aims to enhance recommen-dation performance across multiple markets. Due to its inherent characteristics, i.e. , data isolation, non-overlapping users, and mar-ket heterogeneity, CMR introduces unique challenges and funda-mentally differs from cross-domain recommendation (CDR). Exist-ing CMR approaches largely inherit CDR by adopting the one-to-one transfer paradigm, where a model is pretrained on a source market and then fine-tuned on a target market. However, such a paradigm suffers from CH1. source degradation , where the source market sacrifices its own performance for the target mar-kets, and CH2. negative transfer , where market heterogeneity leads to suboptimal performance in target markets. To address these challenges, we propose FeCoSR, a novel federated collaboration framework for cross-market sequential recommendation. Specifi-cally, to tackle CH1 , we introduce a many-to-many collaboration paradigm that enables all markets to jointly participate in and ben-efit from training. It consists of a federated pretraining stage for capturing shared behavior-level patterns, followed by local fine-tuning for market-specific item-level preferences. For CH2 , we theoretically and empirically show that vanilla Cross-Entropy (CE) exacerbates market heterogeneity, undermining federated optimiza-tion. To address this, we propose a Semantic Soft Cross-Entropy (S 2CE) that leverages shared semantic information to facilitate col-laborative behavioral learning across markets. Then, we design a market-specific adaptation module during fine-tuning to capture local item preferences. Extensive experiments on the real-world datasets demonstrate the advantages of FeCoSR over other methods. Our code is available at https://github.com/jundongchen13/FeCoSR.  
+
+> ∗Corresponding author Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+> Conference acronym ’XX, Woodstock, NY
+> ©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM. ACM ISBN 978-1-4503-XXXX-X/2018/06 https://doi.org/XXXXXXX.XXXXXXX
+
+## CCS Concepts 
+
+• Information systems → Recommender systems ; • Security and privacy → Social aspects of security and privacy .
+
+## Keywords 
+
+Cross-Market Recommendation, Sequential Recommendation, Fed-erated Recommendation, Federated Collaboration 
+
+ACM Reference Format: 
+
+Jundong Chen, Honglei Zhang, Xiangmou Qu, Haoxuan Li, Han Yu, and Yi-dong Li. 2026. From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation. In Proceedings of Make sure to enter the correct conference title from your rights confirmation email (Conference acronym ’XX). ACM, New York, NY, USA, 15 pages. https: //doi.org/XXXXXXX.XXXXXXX 
+
+## 1 INTRODUCTION 
+
+Recommender systems [ 13 , 22 , 40 ] play a crucial role in suggesting items of interest to users, generating substantial commercial value for multimedia platforms such as TikTok, Spotify, and Amazon. As these companies continue to expand beyond their domestic markets, cross-market recommendation (CMR) has emerged to improve recommendation performance across multiple markets. Unlike cross-domain recommendation (CDR) [ 32 , 42 ], CMR exhibits unique characteristics, including data isolation, non-overlapping users, and market preference heterogeneity, making it a distinct and increasingly important research problem [2, 29]. Early CMR methods, such as FOREC [ 2] and MA [ 1], achieve promising results by collecting geographically isolated data for centralized training. However, the introduction of privacy regula-tions, e.g. , the GDPR in Europe and the CCPA in the United States, renders such centralized approaches impractical. To enable privacy-preserving CMR, adopting the one-to-one transfer paradigm from CDR has become a prevalent solution. For example, CAT-SR [ 29 ], inspired by UniSRec [ 11 ], pretrains a transferable model on source markets to improve recommendation performance in target mar-kets. Despite their effectiveness, we argue that such paradigms face two fundamental challenges: CH1. Source degradation . The source market is required to learn a market-agnostic model to ensure transferability, which can significantly sacrifice its own per-formance. As illustrated in Figure 1(a), the models pretrained by UniSRec and CAT-SR show degraded performance on the source                   
+
+> arXiv:2604.13573v1 [cs.IR] 15 Apr 2026 Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al. One -to -one Transfer
+> CCPA GDPR
+> CCPA GDPR
+> Many -to -many Collaboration
+> 0.05
+> 0.09
+> 0.13
+> 0.17
+> UniSRec CAT-SR
+> HR@10
+> LocalTrain Pretrain Finetune
+> 0.03
+> 0.06
+> 0.09
+> 0.12
+> UniSRec CAT-SR
+> NDCG@10
+> 0.05 0.15 0.25 0.35
+> jp
+> in
+> de
+> fr
+> uk
+> us
+> mx
+> ca
+> NDCG@10
+> Cen
+> LO
+> Fed
+> (a) One -to -One Transfer Paradigm
+> …
+> …
+> Source Market
+> …
+> …
+> Target Market
+> …
+> …
+> Market B
+> …
+> …
+> Market C
+> …
+> …
+> Market A
+> …
+> …
+> Target Market
+> (b) Many -to -Many Collaboration Paradigm
+
+Figure 1: Paradigm comparison. One-to-one transfer suffers from performance degradation on the source market and negative transfer to the target market. Many-to-many collab-oration is promising but not well explored by existing meth-ods, motivating our federated collaboration framework. 
+
+market. Even after fine-tuning, they still fail to reach the perfor-mance of locally trained models. CH2. Negative transfer . Due to heterogeneous market preferences, pretraining on a single mar-ket fails to identify truly market-agnostic knowledge. As a result, source-specific preference patterns are inevitably transferred to the target market, which can even harm its performance. To overcome the limitations of the one-to-one transfer paradigm, we explore a many-to-many collaboration paradigm. Specifically, we conduct exploratory experiments comparing two representa-tive collaborative strategies, centralized (Cen) and federated (Fed) learning with FedAvg [ 24 ], along with local-only (LO) training. The results in Figure 1(b) reveal two key findings: i) Cen can partially exploit cross-market collaboration but is often impractical due to privacy constraints. Compared with LO, it improves some markets, 
+
+e.g. , mx, uk, while degrading others, e.g. , us. ii) Although Fed pre-serves data privacy, the traditional Fed strategy fails to achieve ef-fective collaboration under significant market heterogeneity. These observations motivate us to develop a privacy-preserving collabo-rative framework for CMR that tackles cross-market heterogeneity and enables effective knowledge sharing across markets. In this paper, we focus on cross-market sequential recommen-dation (CMSR) and propose FeCoSR , a Fe derated Co llaboration framework for cross-market S equential R ecommendation. To ad-dress CH1 , we adopt a two-stage strategy. First, all markets col-laboratively pretrain transferable behavior-level patterns by lever-aging the textual modality via federated optimization. Next, each market performs local fine-tuning to further incorporate the ID modality, capturing item-level preferences. This strategy enables all markets to actively participate and benefit, achieving consis-tent improvements across markets. For CH2 , we theoretically and empirically reveal that the widely used one-hot supervision in vanilla Cross-Entropy (CE), i.e. , treating all non–ground-truth items as negative samples, exacerbates market heterogeneity and disturbs federated optimization. To mitigate this, we propose a Semantic Soft Cross-Entropy (S 2CE) that replaces one-hot targets with a semantically smoothed supervision. By emphasizing item textual semantics, S 2CE encourages the learning of behavior-level patterns and alleviates heterogeneity, facilitating robust sharing 
+
+across markets. After that, we employ a market-specific adaptation during fine-tuning to capture precise local item-level preferences. In summary, the main contributions of this work are as follows: 
+
+• We identify two fundamental challenges in the widely adopted one-to-one transfer paradigm for CMR, i.e. , source degradation and negative transfer, and propose a novel two-stage federated collaboration framework to tackle both challenges. 
+
+• In the federated pretraining stage, we theoretically analyze the source of cross-market heterogeneity and introduce a Seman-tic Soft Cross-Entropy objective to mitigate it, encouraging the learning of shared behavior-level patterns. 
+
+• In the local fine-tuning stage, we design a market-specific adap-tation module to capture local item-level preferences, preserving the uniqueness of each market. 
+
+• Extensive experiments on real-world CMR datasets demonstrate that the proposed method effectively overcomes the limitations of existing approaches and achieves superior performance. 
+
+## 2 RELATED WORK 2.1 Cross-market Recommendation 
+
+Cross-market recommendation (CMR) has emerged as a novel prob-lem distinct from cross-domain recommendation (CDR), both aim-ing to mitigate data sparsity. While CDR focuses on transferring knowledge across domains with different feature spaces, CMR em-phasizes knowledge sharing across regions with heterogeneous preferences [ 2]. Due to the inherent geographic isolation of CMR, users are often non-overlapping, and data cannot be directly shared, making it a particularly challenging task [ 29 ]. Existing CMR meth-ods fall into three categories: i) Meta-learning methods such as FOREC [ 2], MAML-CF [ 15 ], and M 3Rec [ 3 ] pretrain models on mul-tiple markets and fine-tune on target markets. They mainly learn global representations and overlook market-specific characteris-tics. ii) Market-aware modeling methods , including MA [ 1 ] and Bert4CMF [ 14 ], incorporate market-aware components to capture regional patterns. However, these methods above typically require full data sharing, which is often infeasible due to privacy or reg-ulatory constraints. iii) Transfer-based methods. CAT-SR [ 29 ]pretrains on a source market and transfers only privacy-insensitive model parameters for target-specific fine-tuning. As discussed in Section 1, this one-to-one transfer paradigm suffers from unfair-ness and negative transfer. To address these issues, we propose a 
+
+federated collaboration paradigm, which enables effective cross-market knowledge sharing while preserving user privacy. 
+
+## 2.2 Federated Recommendation 
+
+Federated recommendation (FR) [ 26 ] is a privacy-preserving par-adigm for personalized services, where a central challenge lies in handling heterogeneous preferences across clients. Existing ap-proaches can be broadly categorized into two groups: i) Cross-user FR [5, 19 , 25 , 36 , 37 ], where each user is treated as a client. From the From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+server perspective, GPFedRec [ 34 ] performs client-specific aggrega-tion based on model similarity, FedCA [ 35 ] further incorporates data complementarity, and FedSC [ 9] adopts stochastic aggregation to preserve diversity in global parameters. From the client perspective, PFedRec [ 33 ] employs dual personalization locally, FedRAP [ 21 ]augments the global model with an additional local module, and FedEA [ 6] selectively absorbs knowledge from the global model. ii) Cross-silo FR [4 , 10 , 30 ], where each client corresponds to a group of users. FR-JVE [ 20 ] studies collaborative recommendation across platforms within a venture ecosystem. However, it requires overlapping users, which is not applicable to CMR. FedDCSR [ 38 ]addresses feature distribution inconsistency in cross-domain rec-ommendation via decoupled learning, whereas CMR focuses on market preference heterogeneity. Overall, existing FR methods are designed for specific settings and are not well-suited for CMR. By leveraging the privacy-preserving advantages of FR, our frame-work further enables effective multi-market collaborative training, thereby improving recommendation performance across markets. 
+
+## 3 METHODOLOGY 3.1 Preliminaries 
+
+3.1.1 Cross-Market Sequential Recommendation. Let M denote the set of markets, where each market 𝑚 ∈ M contains a set of users 
+
+U𝑚 and items I𝑚 . For each user 𝑢 ∈ U 𝑚 , we denote the historical interaction sequence as 𝑠 𝑚 𝑢 = [𝑖 𝑚  
+
+> 1
+
+, 𝑖 𝑚  
+
+> 2
+
+, . . . , 𝑖 𝑚   
+
+> |𝑠 𝑚 𝑢 |
+
+], where 𝑖 𝑚 𝑘 ∈ I 𝑚 .The dataset is defined as S𝑚 = {𝑠 𝑚 𝑢 }𝑢 ∈ U 𝑚 . For each market 𝑚 , the sequential recommendation model is defined as Θ𝑚 = {E𝑚 , 𝑓 𝑚 𝜃 (·)} ,where E𝑚 ∈ R| I 𝑚 | × 𝑑 denotes the item embedding matrix, with 
+
+|I 𝑚 | being the number of items and 𝑑 the embedding dimension. The behavior encoder 𝑓 𝑚 𝜃 (·) maps user’s interaction sequence to a representation h𝑚 𝑢 = 𝑓 𝑚 𝜃 (𝑠 𝑚 𝑢 ) ∈ R𝑑 . The market 𝑚 then computes the scores r𝑚 𝑢 = h𝑚 𝑢 (E𝑚 )⊤ ∈ R| I 𝑚 | to recommend top-k items for each user 𝑢 . The goal of CMR is to leverage knowledge across markets to learn optimal models {Θ𝑚 }𝑚 ∈ M for all markets. 
+
+3.1.2 One-to-One Transfer. Due to privacy constraints and non-overlapping users across markets, existing CMR methods typically adopt the one-to-one transfer paradigm, which pretrains a trans-ferable model Θ𝑚 𝑆  
+
+> pre
+
+on a source market 𝑚 𝑆 and adapts the learned parameters to a target market 𝑚 𝑇 by market-specific fine-tuning. The process can be formalized as: 
+
+Θ𝑚 𝑆  
+
+> pre
+
+= arg min  
+
+> Θ
+
+Lpre (Θ; S𝑚 𝑆 ), (1) 
+
+Θ𝑚 𝑇 = arg min  
+
+> Θ
+
+Lft (Θ𝑚 𝑆  
+
+> pre
+
+; S𝑚 𝑇 ), (2) where Lpre and Lft denote the pretraining and fine-tuning objec-tives on the source and target markets, respectively. Representative methods such as UniSRec [ 11 ] and CAT-SR [ 29 ] adopt fixed se-mantic item embeddings as E and focus on learning transferable behavior encoders 𝑓 𝜃 (·) to facilitate cross-market transfer. However, as analyzed in Section 1, such one-to-one transfer methods suffer from source degradation and negative transfer. 
+
+3.1.3 Federated Collaboration. To promote consistent improve-ments and robust sharing, we propose a federated collaboration framework, consisting of federated pretraining across markets and local fine-tuning for each market. Formally, we have: 
+
+Θfed pre = arg min 
+
+> Θ
+
+∑︁ 𝑚 ∈ M 
+
+𝛼 𝑚 Lpre (Θ; S𝑚 ), (3) 
+
+Θ𝑚 = arg min  
+
+> Θ
+
+Lft (Θfed pre ; S𝑚 ), ∀𝑚 ∈ M , (4) where 𝛼 𝑚 is the weight for market 𝑚 during federated optimization. Eq. (3) enables all markets to collaboratively learn and benefit from shared behavior-level patterns while preserving data privacy. Eq. (4) ensures that each market can further capture its market-specific item-level preferences. 
+
+## 3.2 Overview 
+
+In this paper, we consider a company–market architecture where the company serves as the central server and each market acts as a client. The overall workflow of the framework is illustrated in Figure 2. Our framework consists of two stages: the first stage lever-ages textual modality to learn shared behavior-level patterns via federated collaborative training, while the second stage introduces ID modality to capture market-specific item-level preferences. 
+
+I. Federated Collaborative Pretraining . (1) Global Initialization. 
+
+The server first initializes global semantic item embeddings E using a pretrained text encoder over item descriptions, providing a shared semantic space across markets for behavioral pattern learning. (2) 
+
+Local Pretraining. With E𝑚 = E[I 𝑚 ] fixed, each market trains its local sequential encoder 𝑓 𝑚 𝜃 (·) using semantic soft cross-entropy (S 2CE) objective to learn behavior-level patterns. (3) Global Aggre-gation. The local behavior encoders {𝑓 𝑚 𝜃 (·)} 𝑚 ∈ M are uploaded to the server and aggregated to obtain a global encoder 𝑓 𝑎𝑔𝑔 𝜃 (·) , which is redistributed to markets to replace 𝑓 𝑚 𝜃 (·) for the next round. 
+
+II. Local Market-specific Fine-tuning . (4) After 𝑅 rounds, the global encoder 𝑓 𝑎𝑔𝑔 𝜃 (·) is fixed at each market. Each market then performs low-rank fine-tuning with an ID adapter to incorporate market-specific item-level preferences, optimized by the vanilla cross-entropy (CE) objective. 
+
+## 3.3 Federated Collaborative Pretraining 
+
+3.3.1 Global Initialization. To facilitate behavioral patterns sharing across markets, we leverage the textual modality to construct a shared representation space across markets [ 11 , 29 ]. Specifically, we utilize a pretrained text encoder, e.g. , BERT [ 8], to encode item textual descriptions into dense semantic vectors. For each item 𝑖 ,its textual content is denoted as 𝑡 𝑖 = {𝑤 1, 𝑤 2, . . . , 𝑤 |𝑡 𝑖 | }, where 𝑤 𝑘 
+
+is the 𝑘 -th word. The item embedding is obtained as: 
+
+e𝑖 = TextEncoder ([[ CLS ]; 𝑤 1, 𝑤 2, . . . , 𝑤 |𝑡 𝑖 | ]) ∈ R𝑑 , (5) where the final hidden vector corresponding the first token [CLS ]
+
+is taken as the item embedding, and “[;]” denotes the concatena-tion operation. The server then broadcasts the semantic item em-beddings E = {e𝑖 }𝑖 ∈ I 𝑚 1 ∪···∪I |M| to all markets. During federated pretraining, each client keeps E𝑚 = E[I 𝑚 ] frozen and focuses on collaboratively optimizing the behavior encoder 𝑓 𝑚 𝜃 (·) .
+
+3.3.2 Local Pretraining. Generally, local sequential recommenda-tion models are trained with the vanilla cross-entropy (CE) objective. This loss adopts one-hot supervision, where the ground-truth next Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al. Company as the Server 
+
+Global Initialization ① Global Aggregation ③
+
+> Sony High -Def Headphones , …
+> Instax Retro Instant Camera , …
+
+Text Encoder ❄
+
+Market A
+
+Behavior Encoder 🔥 
+
+Behavior 
+
+Encoder 
+
+❄
+
+## +
+
+## Markets as the Clients 
+
+Market B Market C ground -truth          
+
+> next item
+> Semantic Soft Cross -Entropy (S2CE )
+> Semantic Similarity Soft Target Distribution
+> +--
+> irrelevant
+> negative item
+> relevant
+> negative item
+> mild repulsion hard repulsion Vanilla Cross -Entropy (CE )
+
+ID Encoder 🔥  
+
+> ID Fusion Gate
+
+…
+
+> positive attraction
+
+…
+
+…
+
+…   
+
+> Frozen Semantic Item Embeddings
+
+Behavior 
+
+Encoder 
+
+Behavior 
+
+Encoder 
+
+Behavior 
+
+Encoder 
+
+Behavior 
+
+Encoder 
+
+> …
+
+② Local Pre training ④ Local Fine -tuning       
+
+> ❄Frozen Parameters Trainable Parameters 🔥
+> Item Text Uploaded Models
+> Aggregated Model
+> Aggregator
+
+W
+
+> B
+> A
+
+W
+
+🔥          
+
+> ID -enhanced Semantic Item Embeddings
+> Frozen Semantic Item Embeddings
+> User Interaction Sequence User Interaction Sequence
+
+Figure 2: Overview of FeCoSR for CMR. I. (Orange) Federated pretraining with textual modality for cross-market behavior-level pattern learning; II. (Green) Local fine-tuning with ID modality for market-specific item-level preference modeling. 
+
+item 𝑗 + 
+
+> 𝑢
+
+is assigned probability 1, while all other items are treated as negatives with probability 0. Formally, the CE loss is defined as: 
+
+LCE = −∑︁  
+
+> 𝑢 ∈ U 𝑚
+
+log 𝑝 𝑚 𝜃 ( 𝑗 + 
+
+> 𝑢
+
+|𝑠 𝑚 𝑢 ), (6) 
+
+𝑝 𝑚 𝜃 ( 𝑗 |𝑠 𝑚 𝑢 ) = exp (h𝑚 𝑢 · e𝑚 𝑗 )
+
+Í𝑘 ∈ I 𝑚 exp (h𝑚 𝑢 · e𝑚 𝑘 ) , (7) where 𝑝 𝑚 𝜃 ( 𝑗 |𝑠 𝑚 𝑢 ) denotes the probability of item 𝑗 for user 𝑢 in market 𝑚 . This formulation encourages the user representation 
+
+h𝑚 𝑢 = 𝑓 𝑚 𝜃 (𝑠 𝑚 𝑢 ) to be pulled toward the ground-truth item e𝑗 + 
+
+> 𝑢
+
+while being pushed away from other items, thereby enabling accurate next-item prediction. However, this training strategy overly em-phasizes the ground-truth item, causing the model to focus on precise local preferences. While similar behavioral patterns, e.g. ,purchasing a charger after buying a phone, exist across markets, the specific item preferences differ, e.g. , Apple in market A versus 
+
+Samsung in market B [ 23 ]. Under vanilla CE, this results in het-erogeneity across markets, which disturbs effective collaboration under federated optimization, as formalized in Proposition 3.1. 
+
+Proposition 3.1 (Market Heterogeneity under Vanilla CE). 
+
+In cross-market recommendation, shared behavior-level patterns often exist across markets [ 23 ]. However, local training with the vanilla CE objective drives each market toward one-hot predictions on its item-level preferences, amplifying heterogeneity across markets. 
+
+Proof. Under vanilla CE optimization, the model maximizes the likelihood of the ground-truth item, that is: 
+
+min  
+
+> 𝜃
+
+− log 𝑝 𝑚 𝜃 ( 𝑗 + 
+
+> 𝑢
+
+|𝑠 𝑚 𝑢 ) ⇐⇒ max  
+
+> 𝜃
+
+𝑝 𝑚 𝜃 ( 𝑗 + 
+
+> 𝑢
+
+|𝑠 𝑚 𝑢 ). (8) Consider two users in markets 𝑚 1 and 𝑚 2 with ground-truth items 
+
+𝑎 and 𝑏 . When the model approaches optimality, the predicted probabilities satisfy: 
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) ≥ 1 − 𝜖, 𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑏 |𝑠 𝑚 2 
+
+> 𝑢
+
+) ≥ 1 − 𝜖, (9) with 𝜖 → 0. Thus, the remaining probabilities are bounded by: ∑︁ 
+
+> 𝑗 ≠𝑎
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+) ≤ 𝜖, 𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 2 
+
+> 𝑢
+
+) ≤ 𝜖. (10) The KL divergence between the two predictive distributions is: 
+
+KL (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) =∑︁ 
+
+> 𝑗
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑝 𝑚 2 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 2 
+
+> 𝑢
+
+) (11) 
+
+= 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 2 
+
+> 𝑢
+
+) +∑︁ 
+
+> 𝑗 ≠𝑎
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑝 𝑚 2 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 2 
+
+> 𝑢
+
+) .
+
+(12) Using Eqs. (9)–(10), the first term satisfies: 
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 2 
+
+> 𝑢
+
+) ≥ ( 1 − 𝜖 ) log 1 − 𝜖 𝜖 , (13) and the remaining terms are bounded by 𝑂 (𝜖 ). Thus: 
+
+KL (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) ≥ ( 1 − 𝜖 ) log 1 − 𝜖 𝜖 + 𝑂 (𝜖 ) ≈ log (1/𝜖 ), (14) showing that as 𝜖 → 0, the predictive distributions diverge. This example illustrates that item-level one-hot supervision in-duces substantial distributional differences across markets. Such heterogeneity makes it difficult to achieve effective collaboration through federated optimization [17, 18]. □
+
+To mitigate the heterogeneity induced by vanilla CE, we propose a Semantic Soft Cross-Entropy (S 2CE) loss, which converts the supervision from item-level to behavior-level learning. It encour-ages the model to respect items that are semantically close to the ground-truth item, while hardly pushing away dissimilar negative samples. Formally, the S 2CE loss is defined as: 
+
+LS2 CE = −∑︁  
+
+> 𝑢 ∈ U 𝑚
+
+∑︁ 𝑗 ∈ I 𝑚 
+
+𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) log 𝑝 𝑚 𝜃 ( 𝑗 |𝑠 𝑚 𝑢 ), (15) where 𝑞 sem ( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) is a soft target distribution over all items in market 
+
+𝑚 , reflecting their semantic similarity to the ground-truth next item From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+𝑗 + 
+
+> 𝑢
+
+. Specifically, we define: 
+
+𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) = exp (𝑠𝑖𝑚 (e𝑗 , e𝑗 + 
+
+> 𝑢
+
+)/ 𝜏 )
+
+Í𝑘 ∈ I 𝑚 exp (𝑠𝑖𝑚 (e𝑘 , e𝑗 + 
+
+> 𝑢
+
+)/ 𝜏 ) , (16) where 𝑠𝑖𝑚 (e𝑗 , e𝑗 + 
+
+> 𝑢
+
+) denotes the cosine similarity between the frozen semantic item embeddings, and 𝜏 is a temperature hyperparameter that controls the softness of the distribution. 
+
+Proposition 3.2 (Heterogeneity Mitigation under S 2CE). 
+
+The S 2CE loss encourages the model to tolerate items that are seman-tically similar to the ground-truth. This supervision promotes the learning of shared behavior-level patterns and effectively mitigates the heterogeneity caused by item-level preferences across markets. 
+
+Proof. Following the same setting and notation as in the previ-ous proof, we denote the semantic similarity between items 𝑎 and 
+
+𝑏 as 𝜎 = 𝑠𝑖𝑚 (e𝑎 , e𝑏 ) ∈ [− 1, 1]. Under the S 2CE loss the soft target probability assigned to item 𝑎 in market 𝑚 2 is: 
+
+𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ) = exp (𝑠𝑖𝑚 (e𝑎 , e𝑏 )/ 𝜏 )
+
+Í𝑘 ≠𝑏 exp (𝑠𝑖𝑚 (e⊤ 
+
+> 𝑘
+
+e𝑏 )/ 𝜏 ) + exp (𝑠𝑖𝑚 (e⊤ 
+
+> 𝑏
+
+e𝑏 )/ 𝜏 )≥ exp (𝜎 /𝜏 )|I 𝑚 2 | · exp (1/𝜏 ) = exp (𝜎 − 1/𝜏 )|I 𝑚 2 | .
+
+(17) Thus, the soft target assigns a nonzero probability mass to item 𝑎 
+
+in market 𝑚 2, which depends on the semantic similarity 𝜎 and the temperature parameter 𝜏 .The S 2CE objective in Eq. (15) can be rewritten as: 
+
+L𝑆 2𝐶𝐸 = KL  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+)∥ 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ) + 𝐻 (𝑞 𝑚 
+
+> sem
+
+), (18) where 𝐻 (𝑞 𝑚 
+
+> sem
+
+) is independent of the model parameters. Therefore, minimizing the S 2CE loss is equivalent to: 
+
+arg min  
+
+> 𝜃
+
+KL  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+) ∥ 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ), (19) and at optimality, the distribution satisfies 𝑝 𝑚 𝜃 ( 𝑗 |𝑠 𝑚 𝑢 ) ≈ 𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+).Now consider the KL divergence between the predictive distribu-tions of the two markets in Eq. (12). Under S 2CE, we obtain: 
+
+KL (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) = 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ) + 𝑂 (𝜖 )≤ log 1
+
+𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ) + 𝑂 (𝜖 ).
+
+(20) Ignoring the 𝑂 (𝜖 ) term and substituting the bound in Eq. (17): 
+
+KL (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) ≤ log |I 𝑚 2 | + 1 − 𝜎 𝜏 . (21) As training in each market approaches optimality, i.e. , 𝜖 → 0. Com-paring Eq. (12) and Eq. (21), we have: 
+
+KL 𝑆 2𝐶𝐸 (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) ≪ KL 𝐶𝐸 (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+). (22) This result shows that S 2CE introduces semantic smoothing across markets, emphasizing behavior-level collaboration rather than item-level supervision, which mitigates market heterogeneity and facilitates more effective federated optimization. □
+
+3.3.3 Global Aggregation. When locally pretraining with S 2CE, each market focuses on learning behavior-level patterns. After that, the behavior encoders {𝑓 𝑚 𝜃 (·)} 𝑚 ∈ M are uploaded to the server for global aggregation. Formally, the aggregated model is obtained as: 
+
+𝑓 𝑎𝑔𝑔 𝜃 (·) =∑︁ 
+
+> 𝑚 ∈ M
+
+𝛼 𝑚 𝑓 𝑚 𝜃 (·) , (23) where 𝛼 𝑚 = 1/|M| denotes the aggregation weight following the widely used FedAvg optimization [ 24 ]. In our implementation, the backbone model is SASRec [ 16 ], and aggregation is primarily performed on the attention-related parameters, which have been shown to capture the core sequential patterns [ 27 – 29 ]. After aggre-gation, the global model 𝑓 𝑎𝑔𝑔 𝜃 (·) is broadcast back to all markets for the next round of local pretraining. 
+
+## 3.4 Local Market-specific Fine-tuning 
+
+Through the federated pretraining stage, markets collaboratively learn to predict the semantics of the next item based on the textual modality, yielding a global encoder 𝑓 𝑎𝑔𝑔 𝜃 (·) that captures market-agnostic behavior-level patterns. Building upon this, we perform parameter-efficient adaptation of Θ𝑚 = {𝑓 𝑎𝑔𝑔 𝜃 (·) , E𝑚 } to capture market-specific item-level preferences. 
+
+Behavior Encoder. To enable efficient adaptation while preserving the shared behavioral knowledge, we adopt an efficient strategy by applying low-rank adaptation LoRA [ 12 ] to the frozen global encoder. Specifically, the market-specific encoder is defined as 
+
+𝑓 𝑚 𝜃 (·) = 𝑓 𝑎𝑔𝑔 𝜃 (·) + W𝐴 W𝐵 , where W𝐴 ∈ R𝑑 ×𝑟 and W𝐵 ∈ R𝑟 ×𝑑 
+
+are trainable matrices with rank 𝑟 ≪ 𝑑 . Each market then performs local fine-tuning using the vanilla CE objective in Eq. (6). 
+
+Item Embeddings. To further enhance item-level adaptation, we incorporate ID modality [ 11 , 31 ] on top of unified semantic repre-sentations. The enhanced item embedding is defined as: 
+
+˜e𝑚 𝑖 = e𝑚 𝑖 + 𝛽 𝑖 ⊙ 𝑔 𝑚 𝜃 (e𝑚 𝑖 ), (24) where 𝑔 𝑚 𝜃 (·) is a lightweight multi-layer perceptron (MLP) that produces an ID adjustment conditioned on the semantic embedding, and 𝛽 𝑖 ∈ ( 0, 1) is a learnable gating coefficient controlling the strength of the injected ID information. Extended theoretical proofs and detailed algorithmic procedures for Section 3 are provided in Appendix A and B, respectively. 
+
+Table 1: Statistics of XMarket across different markets.                                         
+
+> Markets ca mx us uk fr de in jp # Users 5,675 1,878 35,916 4,847 2,396 2,373 239 487 # Items 5,772 1,645 31,125 3,392 1,911 2,210 470 955 # Interactions 55,045 17,095 364,339 44,515 22,905 22,247 2,015 4,485 Sparsity 99.83% 99.45% 99.97% 99.73% 99.50% 99.58% 98.21% 99.04%
+
+## 4 EXPERIMENTS 4.1 Experimental Setup 
+
+4.1.1 Datasets. We conduct experiments on XMarket 1, a publicly available real-world cross-market recommendation dataset col-lected from Amazon. The dataset contains user–item interactions  
+
+> 1https://xmrec.github.io Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al.
+
+Table 2: Performance comparison. The best and second-best results are bold and underlined, respectively. “Imp.” indicates the improvement of our approach over the strongest baseline, with “*” denoting significance at the 0.05 level (paired 𝑡 -test). Datasets Metrics Local-only Methods Centralized Methods Federated Methods Transfer Methods Ours Imp. SASRec S3Rec SASRec text MAML FOREC MA SASRec cen FedAvg FedDCSR UnisRec CAT-SR FeCoSR ca HR@10 0.1782 0.1804 0.1763 0.1587 0.1624 0.1706 0.1808 0.1617 0.1761 0.1810 0.1817 0.1877 ∗ +3.30% NDCG@10 0.1132 0.1270 0.1264 0.1086 0.1115 0.1168 0.1253 0.1083 0.1287 0.1163 0.1325 0.1399 ∗ +5.58%                                                                                                                                                                                              
+
+> mx HR@10 0.4627 0.4915 0.5059 0.4186 0.4275 0.4361 0.4963 0.4015 0.4766 0.5075 0.4989 0.5106 +0.61% NDCG@10 0.3351 0.3421 0.3586 0.2947 0.3013 0.3094 0.3236 0.2664 0.3307 0.3056 0.3537 0.3656 ∗+3.36%
+> us HR@10 0.1641 0.1645 0.1421 0.1423 0.1472 0.1518 0.1446 0.1470 0.1400 0.1129 0.1416 0.1654 ∗+0.55% NDCG@10 0.1171 0.1179 0.0935 0.0997 0.1041 0.1049 0.1056 0.0984 0.1094 0.0617 0.0910 0.1191 ∗+1.01%
+> uk HR@10 0.2703 0.3055 0.2986 0.2629 0.2695 0.2784 0.3101 0.2706 0.2909 0.2987 0.3013 0.3132 ∗+1.00% NDCG@10 0.1692 0.1779 0.1991 0.1795 0.1837 0.1908 0.2037 0.1656 0.1938 0.1646 0.2193 0.2265 ∗+3.38%
+> fr HR@10 0.2829 0.2715 0.2742 0.2314 0.2369 0.2453 0.2775 0.2454 0.2748 0.2671 0.2748 0.2824 -NDCG@10 0.1919 0.1903 0.1883 0.1689 0.1724 0.1796 0.1981 0.1669 0.1971 0.1411 0.2024 0.2028 +0.20%
+> de HR@10 0.2928 0.2885 0.2896 0.2143 0.2217 0.2315 0.3025 0.2377 0.2593 0.2474 0.2907 0.2944 -NDCG@10 0.1901 0.1919 0.2013 0.1506 0.1568 0.1643 0.2126 0.1749 0.1986 0.1342 0.2140 0.2204 ∗+2.99%
+> in HR@10 0.4435 0.4310 0.4477 0.3925 0.4018 0.4187 0.4477 0.3933 0.4351 0.3849 0.4561 0.4728 ∗+3.66% NDCG@10 0.2517 0.2726 0.3037 0.2314 0.2386 0.2478 0.2547 0.1781 0.2662 0.1929 0.2840 0.3562 ∗+17.28%
+> jp HR@10 0.2895 0.2854 0.2752 0.1816 0.1882 0.1956 0.2669 0.1971 0.2526 0.2156 0.2936 0.3060 ∗+4.22% NDCG@10 0.1851 0.1775 0.1658 0.1218 0.1267 0.1321 0.1811 0.1162 0.1501 0.1106 0.1781 0.2062 ∗+11.40%
+
+together with rich item textual descriptions. It covers eight elec-tronic markets distributed across three continents and has been widely adopted in previous CMR studies [ 1, 2, 29 ]. The characteris-tics of the datasets are summarized in Table 1. 
+
+4.1.2 Compared Methods. To comprehensively evaluate the ef-fectiveness of our proposed method, we compare it with several representative baselines from four categories: 
+
+i) Single-market local training methods train models indepen-dently on each market without cross-market collaboration. SAS-Rec [16 ] is a Transformer-based sequential recommendation (SR) model. S3-Rec [41 ] is a self-supervised SR model that leverages mul-tiple pretraining tasks. SASRec text is a variant of SASRec where item embeddings are derived from the textual modality. 
+
+ii) Cross-market centralized collaborative methods jointly train models using data from multiple markets in a centralized man-ner. MAML [15 ] is a meta-learning framework that learns transfer-able models across markets. FOREC [ 2] partially freezes the MAML model and performs fine-tuning on the target market. MA [1] lever-ages market embeddings and auxiliary market data to enhance cross-market recommendation. SASRec cen is a centralized variant of SASRec trained on the combined data from all markets. 
+
+iii) Cross-market federated collaborative methods optimize models across all clients under the federated paradigm. FedAvg [24 ]is a classical federated algorithm that averages model parameters across clients. FedDCSR [38 ] addresses feature misalignment in cross-domain sequential recommendation via feature decoupling. 
+
+iv) One-to-one transfer-based methods pretrain a model on a source market and adapt it to target markets. UniSRec [11 ] is a universal SR model that learns transferable representations for downstream adaptation. CAT-SR [ 29 ] mitigates item popularity shift in the source market and transfers the pretrained model for market-specific fine-tuning. 
+
+4.1.3 Evaluation Protocol. To measure recommendation quality, we adopt two widely used metrics, Hit Rate (HR@ 𝑁 ) and Nor-malized Discounted Cumulative Gain (NDCG@ 𝑁 ), where 𝑁 = 10 .Following previous works [ 11 , 29 ], we employ the leave-one-out evaluation protocol, where the last interaction of each user is used for testing, the second-last for validation, and the remaining inter-actions for training. To ensure accurate and stable evaluation, we rank the ground-truth item against all items that the user has not interacted with, i.e. , full ranking. 
+
+4.1.4 Implementation Details. We implement our method using the popular open-source library RecBole 2 [39 ]. To ensure a fair comparison, we adopt the same basic configurations for all RecBole-based methods, including SASRec, S 3Rec, UniSRec, CAT-SR, and our proposed FeCoSR. Specifically, we set the batch size to 256, optimize with Adam optimizer, and search the learning rate in 
+
+{0.01 , 0.001 , 0.0001 }. Other hyperparameters follow the optimal set-tings recommended in the original papers. For MAML, FOREC, and MA, we reproduce their results using the publicly available code 3
+
+and reported settings. For all federated methods, we uniformly set the number of global rounds to 20. For FedAvg and FedDCSR, the re-maining settings are kept consistent with their original papers. For our method, the temperature parameter 𝜏 is tuned within [0.01 , 0.1]
+
+with a step size of 0.01 during pretraining, and the low-rank param-eter 𝑟 is selected from {1, 2, 4, 8, 16 } during fine-tuning. 
+
+## 4.2 Overall Performance 
+
+We evaluate FeCoSR against various baselines across eight markets. From the results in Table 2, we have the following observations: 
+
+i) FeCoSR consistently outperforms all baseline methods ,achieving the best performance on the majority of markets in terms of HR@10 and all markets in terms of NDCG@10. This demon-strates the strong effectiveness of our framework for CMR. We  
+
+> 2https://recbole.io
+> 3https://github.com/samarthbhargav/efficient-xmrec From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY
+
+Table 3: Ablation study of FeCoSR. The best results are bold. HR@10 ca mx us uk fr de in jp FeCoSR 0.1877 0.5106 0.1654 0.3132 0.2824 0.2944 0.4728 0.3060                                                                                 
+
+> w/o Fed 0.1836 0.5037 0.1612 0.3049 0.2775 0.2885 0.4644 0.2854 w/o S 2CE 0.1793 0.4920 0.1506 0.2983 0.2628 0.2804 0.4435 0.2752 w/o LR 0.1851 0.5080 0.1641 0.3058 0.2764 0.2836 0.4770 0.2854 w/o ID 0.1838 0.5037 0.1615 0.3019 0.2677 0.2890 0.4603 0.2895
+> NDCG@10 ca mx us uk fr de in jp FeCoSR 0.1399 0.3656 0.1191 0.2265 0.2028 0.2204 0.3562 0.2062
+> w/o Fed 0.1368 0.3498 0.1154 0.2167 0.1977 0.2074 0.2903 0.1966 w/o S 2CE 0.1348 0.3064 0.1005 0.2103 0.1829 0.2056 0.2446 0.1891 w/o LR 0.1382 0.3630 0.1189 0.2169 0.1876 0.2116 0.3180 0.1972 w/o ID 0.1359 0.3469 0.1142 0.2032 0.1743 0.1905 0.2259 0.1746
+
+note that none of the methods, including FeCoSR, show clear im-provements over SASRec in terms of HR@10 on fr . This may be attributed to the strong inherent preference patterns in this market, making it difficult to benefit from cross-market collaboration. In the market de , FeCoSR performs slightly worse than the centralized SASRec cen on HR@10. This is expected since centralized methods have access to all data, which may be more beneficial. Nevertheless, FeCoSR still outperforms other privacy-preserving methods. 
+
+ii) Our method effectively mitigates source degradation . Pre-vious privacy-preserving CMR approaches typically adopt a one-to-one transfer paradigm, which weakens market-specific preferences in the source market to facilitate transferability. However, this pro-cess leads to irreversible performance degradation in the source market, even after fine-tuning. For example, on the market us , UniS-Rec and CAT-SR perform significantly worse than locally trained SASRec. In contrast, our method enables collaborative pretraining across markets via federated optimization, allowing all markets to benefit without sacrificing their own performance. 
+
+iii) Our method effectively avoids negative transfer through its two-stage design, consistently improving performance over single-market models such as SASRec and S 3Rec. The federated pretraining stage focuses on learning behavior-level patterns, reducing conflicts caused by item-level preference heterogeneity across markets, and promoting knowledge sharing. The local fine-tuning stage further adapts the model to market-specific preferences, achieving a better balance between generalization and localization. 
+
+iv) FeCoSR enables effective and robust collaboration under privacy constraints. Centralized training fails to reconcile hetero-geneous item preferences across markets while also violating pri-vacy. Compared with SASRec, SASRec cen even hurts performance on some markets, e.g. , us , fr , jp . Existing federated methods, e.g. ,FedAvg, FedDCSR, preserve privacy but do not explicitly address market heterogeneity. In contrast, FeCoSR explicitly addresses this issue via the S 2CE objective, achieving more stable performance improvements across markets. 
+
+v) FeCoSR achieves substantial improvements on data-scarce markets such as in and jp , demonstrating its strong capability to leverage cross-market knowledge and effectively address the data sparsity issue in CMR scenarios. 
+
+## 4.3 Ablation Study 
+
+We conduct an ablation study by removing key designs of FeCoSR to examine their individual impacts. For the pretraining stage, Fed (a ) Market Heterogeneity under CE (b) Heterogeneity Mitigation under S 2CE 
+
+Figure 3: Inter-market heterogeneity under CE and S 2CE. 
+
+denotes the collaborative optimization via federated aggregation across markets, and S2CE refers to the semantic-aware objective de-signed to mitigate cross-market heterogeneity. For the fine-tuning stage, LR denotes the low-rank adaptation applied to the sequence encoder, and ID represents the incorporation of ID information into item embeddings. From the results in Table 3, we observe that: i) Removing the federated collaboration (w/o Fed) leads to consis-tent performance degradation across all markets, indicating that knowledge sharing is essential for improving overall performance. ii) Replacing S 2CE with the vanilla CE objective (w/o S 2CE) results in the most significant performance drop across all markets, es-pecially in HR@10. This confirms that S 2CE effectively mitigates cross-market heterogeneity by transforming heterogeneous item-level preferences into shared behavior-level patterns, thereby facili-tating more effective collaboration. iii) Removing item-level adaptation from either the sequence en-coder (w/o LR) or the item embeddings (w/o ID) results in noticeable performance degradation. The impact is particularly evident on ranking-sensitive metrics such as NDCG@10, highlighting the im-portance of both components for accurate item-level modeling. Overall, FeCoSR achieves superior performance by jointly lever-aging cross-market collaboration, behavior-level modeling, and item-level refinement. 
+
+## 4.4 In-depth Analysis 
+
+4.4.1 Heterogeneity Mitigation. To further analyze inter-market heterogeneity, we measure the Jensen–Shannon (JS) divergence between model predictions across markets. As shown in Figure 3, each row represents a market 𝑚 providing behavioral data S𝑚 ,and each column represents a market 𝑚 ′ providing the behavior encoder 𝑓 𝑚 ′ 
+
+> 𝜃
+
+(·) . For each entry, we compute the JS divergence be-tween the overall item prediction distribution of 𝑓 𝑚 ′ 
+
+> 𝜃
+
+(·) and that of the local encoder 𝑓 𝑚 𝜃 (·) . A larger JS divergence indicates that the behavior patterns learned by market 𝑚 ′ are less compatible with those of market 𝑚 . Figure 3(a) presents the JS divergence matrix under the vanilla CE. We observe large divergences between many market pairs, indicating significant heterogeneity across markets. In contrast, Figure 3(b) shows the results under the proposed S 2CE, where the divergences are consistently reduced, suggesting im-proved cross-market collaboration. Notably, the markets in and jp 
+
+exhibit larger divergences from others, which may be attributed to regional differences or their relatively limited training data, leading Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al. ca uk 
+
+fr de
+
+Figure 4: Distributions of inter-user representation similari-ties under behavior encoders trained with CE and S 2CE. 
+
+to less sharable behavioral modeling. Nevertheless, our method effectively mitigates their adverse impact on other markets. 
+
+4.4.2 Behavior-level Patterns. We compute inter-user representa-tion similarities and visualize their distributions using kernel den-sity estimation (KDE) [ 7 ]. As some markets shown in Figure 4, user similarities learned by the vanilla CE are generally lower and exhibit a relatively flat distribution, indicating that user represen-tations are dispersed in the latent space and focus on item-level preferences. In contrast, the S 2CE-based model leads to an overall increase in user similarity, suggesting the emergence of clustered structures in the representation space. The users within the same cluster share similar semantic interests in items, reflecting under-lying behavioral regularities. Importantly, the distribution under S2CE still maintains a reasonable spread rather than collapsing into a narrow peak, indicating that the model captures informative knowledge. Overall, these results demonstrate that S 2CE effectively captures behavior-level patterns from item semantics, rather than focusing on item-level preferences that are often market-specific. 
+
+4.4.3 Item-level Preferences. We further examine the distribution of inter-user representation similarities using KDE. The comparison between the pretrained and fine-tuned behavior encoders is shown in Figure 5 (above). Compared with the pretrained encoder, the overall similarity decreases after fine-tuning, indicating that user representations become less clustered. This suggests a transition from capturing shared semantic signals to modeling fine-grained interests, i.e. , the model refines behavior-level patterns towards item-level preferences. We also visualize the item embedding dis-tributions before and after incorporating ID modality, as shown in Figure 5 (below). The textual modality provides a shared se-mantic space that captures general item semantics and enables cross-market behavior modeling. Building upon this shared space, each market performs localized adjustments by injecting ID signals, resulting in market-specific item-level preferences while retaining global behavioral knowledge. 
+
+## 4.5 Hyperparameter Analysis 
+
+We analyze the impact of the two main hyperparameters as follows: 
+
+i) The temperature coefficient 𝝉 during federated pretraining. For simplicity, we use a uniform 𝜏 value for all markets during pretraining. Figure 6 shows the impact of 𝜏 on HR@10 across differ-ent markets. Most markets achieve their best performance within the range 𝜏 = 0.03 –0.07 , which is consistent with the role of 𝜏 ,
+
+i.e. , controlling the smoothness of the semantic soft supervision. Specifically, a too-small 𝜏 approaches one-hot supervision similar ca uk 
+
+ca uk 
+
+Figure 5: (Above) Distributions of inter-user representation similarities before and after behavior encoder fine-tuning. (Below) Visualization of item embeddings before and after incorporating ID modality. 0.178                 
+
+> 0.181
+> 0.184
+> 0.187
+> 0.19
+> 0.01 0.1
+> 0.493
+> 0.498
+> 0.503
+> 0.508
+> 0.513
+> 0.01 0.1
+> 0.162
+> 0.163
+> 0.164
+> 0.165
+> 0.166
+> 0.01 0.1
+> 0.303
+> 0.306
+> 0.309
+> 0.312
+> 0.315
+> 0.01 0.1
+> 0.264
+> 0.269
+> 0.274
+> 0.279
+> 0.284
+> 0.01 0.1
+> 0.282
+> 0.286
+> 0.29
+> 0.294
+> 0.298
+> 0.01 0.1
+> 0.406
+> 0.427
+> 0.448
+> 0.469
+> 0.49
+> 0.01 0.1
+> 0.251
+> 0.267
+> 0.283
+> 0.299
+> 0.315
+> 0.01 0.1
+> (a) ca(c) us
+> (e) fr (g) in
+> (b) mx (d) uk
+> (f) de (h) jp
+
+Figure 6: Effect of the temperature parameter 𝜏 during feder-ated pretraining, evaluated by HR@10. 
+
+to vanilla CE, exacerbating inter-market heterogeneity and hin-dering collaboration. Conversely, a too-large 𝜏 over-smooths the supervision, causing negative samples to receive non-negligible predicted probabilities and thereby reducing the model’s discrim-inative ability. Additionally, we observe that some markets, e.g. ,
+
+in and jp , show notable drops at extreme 𝜏 values, which can be explained by their limited local training data and greater reliance on cross-market knowledge. Considering all markets, we choose 
+
+𝜏 = 0.05 as a balanced setting for our experiments. 
+
+ii) The low-rank parameter 𝒓 during local fine-tuning. The im-pact of 𝑟 on HR@10 across different markets is shown in Figure 7. When 𝑟 = 0, i.e. , without fine-tuning, the performance is consis-tently worse, while small values of 𝑟 achieve the best results, indi-cating that lightweight adaptation is sufficient to capture market-specific item-level preferences. As 𝑟 increases, the performance first improves and then degrades, suggesting that excessive adaptation may lead to overfitting or disrupt the shared behavior-level pat-terns learned during federated pretraining. Overall, relatively small ranks, e.g. , 𝑟 ∈ { 1, 2, 4}, provide a good trade-off across all markets. Detailed experimental settings and additional results for Sec-tion 4 are provided in Appendix C. From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY w/o fine -tuning r = 1 r = 2 r = 4 r = 8 r = 16 
+
+> 0.178
+> 0.182
+> 0.186
+> 0.19
+> 0.486
+> 0.495
+> 0.504
+> 0.513
+> 0.16
+> 0.162
+> 0.164
+> 0.166
+> 0.296
+> 0.302
+> 0.308
+> 0.314
+> 0.262
+> 0.27
+> 0.278
+> 0.286
+> 0.271
+> 0.28
+> 0.289
+> 0.298
+> 0.416
+> 0.442
+> 0.468
+> 0.494
+> 0.241
+> 0.266
+> 0.291
+> 0.316
+
+(a) ca (b) mx (c) us (d) uk 
+
+(e) fr (f) de (g) in (h) jp 
+
+Figure 7: Effect of the low-rank 𝑟 during local fine-tuning, evaluated by HR@10. 
+
+## 5 CONCLUSION 
+
+In this work, we revisit CMR and identify two fundamental limita-tions of existing one-to-one transfer paradigms, i.e. , source degrada-tion and negative transfer. To this end, we propose FeCoSR, a novel federated collaboration framework that enables many-to-many knowledge sharing across markets. FeCoSR introduces a two-stage design that decouples behavior-level collaboration and item-level preference modeling, allowing all markets to benefit without sac-rificing their own performance. Furthermore, we reveal that the vanilla CE objective exacerbates market heterogeneity and hin-ders effective federated optimization. Then, we propose the S 2CE objective, which leverages semantic soft supervision to promote cross-market behavioral sharing. Extensive experiments on real-world datasets demonstrate that FeCoSR consistently outperforms other methods while preserving privacy. 
+
+## References 
+
+[1] Samarth Bhargav, Mohammad Aliannejadi, and Evangelos Kanoulas. 2023. Market-aware models for efficient cross-market recommendation. In European Conference on Information Retrieval . 134–149. [2] Hamed Bonab, Mohammad Aliannejadi, Ali Vardasbi, Evangelos Kanoulas, and James Allan. 2021. Cross-market product recommendation. In Proceedings of the 30th ACM International Conference on Information & Knowledge Management .110–119. [3] Jiangxia Cao, Xin Cong, Tingwen Liu, and Bin Wang. 2022. Item similarity mining for multi-market recommendation. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval .2249–2254. [4] Gaode Chen, Xinghua Zhang, Yijun Su, Yantong Lai, Ji Xiang, Junbo Zhang, and Yu Zheng. 2023. Win-win: a privacy-preserving federated framework for dual-target cross-domain recommendation. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 37. 4149–4156. [5] Jundong Chen, Honglei Zhang, Haoxuan Li, Chunxu Zhang, Zhiwei Li, and Yidong Li. 2025. Beyond personalization: Federated recommendation with cali-bration via low-rank decomposition. arXiv preprint arXiv:2506.09525 (2025). [6] Jundong Chen, Honglei Zhang, Chunxu Zhang, Fangyuan Luo, and Yidong Li. 2026. Breaking the aggregation bottleneck in federated recommendation: A personalized model merging approach. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 40. 14547–14555. [7] Yen-Chi Chen. 2017. A tutorial on kernel density estimation and recent advances. 
+
+Biostatistics & Epidemiology 1, 1 (2017), 161–187. [8] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. In 
+
+Proceedings of the 2019 Conference of the North American chapter of the Association for Computational Linguistics: Human Language Technologies, volume 1 (long and short papers) . 4171–4186. [9] Xiaoqiang Gui, Bowen Chen, Qiaoyu Tan, Jun Wang, Yongqing Zheng, Qingzhong Li, Lizhen Cui, and Guoxian Yu. 2026. Federated Recommendation via Stochas-tic Aggregation and Consistency Inference. ACM Transactions on Information Systems (2026). [10] Lei Guo, Ziang Lu, Junliang Yu, Quoc Viet Hung Nguyen, and Hongzhi Yin. 2024. Prompt-enhanced federated content representation learning for cross-domain recommendation. In Proceedings of the ACM Web Conference 2024 . 3139–3149. [11] Yupeng Hou, Shanlei Mu, Wayne Xin Zhao, Yaliang Li, Bolin Ding, and Ji-Rong Wen. 2022. Towards universal sequence representation learning for recommender systems. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Dis-covery and Data Mining . 585–593. [12] Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Liang Wang, Weizhu Chen, et al . 2022. Lora: Low-rank adaptation of large language models.. In International Conference on Learning Representations .[13] Jun Hu, Bryan Hooi, Bingsheng He, and Yinwei Wei. 2025. Modality-independent graph neural networks with global transformers for multimodal recommendation. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 39. 11790– 11798. [14] Zheng Hu, Satoshi Nakagawa, Shi-Min Cai, Fuji Ren, and Jiawen Deng. 2024. Enhancing cross-market recommendations by addressing negative transfer and leveraging item co-occurrences. Information Systems 124 (2024), 102388. [15] HyeoungGuk Kang, Donghoon Lee, and Hyunsouk Cho. 2023. Outlier-aware Cross-Market Product Recommendation. In 2023 IEEE International Conference on Big Data and Smart Computing (BigComp) . 120–123. [16] Wang-Cheng Kang and Julian McAuley. 2018. Self-attentive sequential recom-mendation. In 2018 IEEE International Conference on Data Mining . 197–206. [17] Tian Li, Anit Kumar Sahu, Ameet Talwalkar, and Virginia Smith. 2020. Federated learning: Challenges, methods, and future directions. IEEE Signal Processing Magazine 37, 3 (2020), 50–60. [18] Xiang Li, Kaixuan Huang, Wenhao Yang, Shusen Wang, and Zhihua Zhang. 2020. On the convergence of fedavg on non-iid data. In International Conference on Learning Representations .[19] Yuyuan Li, Junjie Fang, Fengyuan Yu, Xichun Sheng, Tianyu Du, Xuyang Teng, Shaowei Jiang, Linbo Jiang, Jianan Lin, and Chaochao Chen. 2026. FedAU2: At-tribute Unlearning for User-Level Federated Recommender Systems with Adap-tive and Robust Adversarial Training. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 40. 23310–23318. [20] Yichen Li, Yijing Shan, Yi Liu, Haozhao Wang, Cheng Wang, Yi Wang, Ruixuan Li, et al . 2025. Efficient Knowledge Transfer in Federated Recommendation for Joint Venture Ecosystem. In The 39th Annual Conference on Neural Information Processing Systems .[21] Zhiwei Li, Guodong Long, and Tianyi Zhou. 2024. Federated recommendation with additive personalization. In International Conference on Learning Represen-tations .[22] Qidong Liu, Jiaxi Hu, Yutian Xiao, Xiangyu Zhao, Jingtong Gao, Wanyu Wang, Qing Li, and Jiliang Tang. 2024. Multimodal recommender systems: A survey. 
+
+Comput. Surveys 57, 2 (2024), 1–17. [23] Julian McAuley, Christopher Targett, Qinfeng Shi, and Anton Van Den Hengel. 2015. Image-based recommendations on styles and substitutes. In Proceedings of the 38th International ACM SIGIR Conference on Research and Development in Information Retrieval . 43–52. [24] Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. 2017. Communication-efficient learning of deep net-works from decentralized data. In Artificial Intelligence and Statistics . 1273–1282. [25] Jiaming Qian, Xinting Liao, Xiangmou Qu, Zhihui Fu, Xingyu Lou, Changwang Zhang, Pengyang Zhou, Zijun Zhou, Jun Wang, and Chaochao Chen. 2025. Per-sonalized Federated Recommendation with Multi-Faceted User Representation and Global Consistent Prototype. In Proceedings of the 34th ACM International Conference on Information and Knowledge Management . 2399–2408. [26] Zehua Sun, Yonghui Xu, Yong Liu, Wei He, Lanju Kong, Fangzhao Wu, Yali Jiang, and Lizhen Cui. 2024. A survey on federated recommendation systems. IEEE Transactions on Neural Networks and Learning Systems 36, 1 (2024), 6–20. [27] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Annual Conference on Neural Information Processing Systems , Vol. 30. [28] Elena Voita, David Talbot, Fedor Moiseev, Rico Sennrich, and Ivan Titov. 2019. Analyzing multi-head self-attention: Specialized heads do the heavy lifting, the rest can be pruned. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics . 5797–5808. [29] Chen Wang, Ziwei Fan, Liangwei Yang, Mingdai Yang, Xiaolong Liu, Zhiwei Liu, and Philip Yu. 2024. Pre-training with transferable attention for addressing market shifts in cross-market sequential recommendation. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 2970– 2979. [30] Li Wang, Shoujin Wang, Quangui Zhang, Qiang Wu, and Min Xu. 2025. Federated user preference modeling for privacy-preserving cross-domain recommendation. 
+
+IEEE Transactions on Multimedia (2025). [31] Yueqi Xie, Peilin Zhou, and Sunghun Kim. 2022. Decoupled side information fusion for sequential recommendation. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval .1611–1621. Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al. 
+
+[32] Tianzi Zang, Yanmin Zhu, Haobing Liu, Ruohan Zhang, and Jiadi Yu. 2022. A survey on cross-domain recommendation: taxonomies, methods, and future directions. ACM Transactions on Information Systems 41, 2 (2022), 1–39. [33] Chunxu Zhang, Guodong Long, Tianyi Zhou, Peng Yan, Zijian Zhang, Chengqi Zhang, and Bo Yang. 2023. Dual personalization on federated recommendation. In Proceedings of the 32nd International Joint Conference on Artificial Intelligence .4558–4566. [34] Chunxu Zhang, Guodong Long, Tianyi Zhou, Zijian Zhang, Peng Yan, and Bo Yang. 2024. Gpfedrec: Graph-guided personalization for federated recommenda-tion. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 4131–4142. [35] Honglei Zhang, Haoxuan Li, Jundong Chen, Sen Cui, Kunda Yan, Abudukelimu Wuerkaixi, Xin Zhou, Zhiqi Shen, and Yidong Li. 2026. Beyond similarity: Person-alized federated recommendation with composite aggregation. ACM Transactions on Information Systems 44, 2 (2026), 1–28. [36] Honglei Zhang, Zhiwei Li, Haoxuan Li, Xin Zhou, Jie Zhang, and Yidong Li. 2026. Transfr: Transferable federated recommendation with adapter tuning on pre-trained language models. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 40. 28212–28220. [37] Honglei Zhang, Fangyuan Luo, Jun Wu, Xiangnan He, and Yidong Li. 2023. LightFR: Lightweight federated recommendation with privacy-preserving matrix factorization. ACM Transactions on Information Systems 41, 4 (2023), 1–28. [38] Hongyu Zhang, Dongyi Zheng, Xu Yang, Jiyuan Feng, and Qing Liao. 2024. FedDCSR: Federated cross-domain sequential recommendation via disentangled representation learning. In Proceedings of the 2024 SIAM International Conference on Data Mining (SDM) . 535–543. [39] Wayne Xin Zhao, Shanlei Mu, Yupeng Hou, Zihan Lin, Yushuo Chen, Xingyu Pan, Kaiyuan Li, Yujie Lu, Hui Wang, Changxin Tian, et al . 2021. Recbole: Towards a unified, comprehensive and efficient framework for recommendation algorithms. In Proceedings of the 30th ACM International Conference on Information & Knowledge Management . 4653–4664. [40] Zihuai Zhao, Wenqi Fan, Jiatong Li, Yunqing Liu, Xiaowei Mei, Yiqi Wang, Zhen Wen, Fei Wang, Xiangyu Zhao, Jiliang Tang, et al . 2024. Recommender systems in the era of large language models (llms). IEEE Transactions on Knowledge and Data Engineering 36, 11 (2024), 6889–6907. [41] Kun Zhou, Hui Wang, Wayne Xin Zhao, Yutao Zhu, Sirui Wang, Fuzheng Zhang, Zhongyuan Wang, and Ji-Rong Wen. 2020. S3-rec: Self-supervised learning for sequential recommendation with mutual information maximization. In Pro-ceedings of the 29th ACM International Conference on Information & Knowledge Management . 1893–1902. [42] Yongchun Zhu, Zhenwei Tang, Yudan Liu, Fuzhen Zhuang, Ruobing Xie, Xu Zhang, Leyu Lin, and Qing He. 2022. Personalized transfer of user preferences for cross-domain recommendation. In Proceedings of the 15th ACM International Conference on Web Search and Data Mining . 1507–1515. 
+
+## A Detailed Theoretical Analysis 
+
+Remark 1 (Cross-Market Shared Behavior and Market-Spe-cific Items). In cross-market recommendation, user behaviors often exhibit shared high-level patterns across markets, while item-level preferences are typically market-specific due to variations in item availability, cultural context, and local interests. Such patterns have been observed in multiple multi-domain datasets. For instance, in Amazon product review datasets [ 23 ], users across different categories often show similar sequential or co-purchase behavior, even though the specific items differ by category. This observation motivates our anal-ysis of how different training objectives balance shared behavior-level learning and market-specific item-level adaptation. 
+
+Based on the above observation, we provide a theoretical analysis of Market Heterogeneity under Vanilla CE and Heterogeneity Mitiga-tion under S 2CE . Compared to the main text, we further investigate how CE and S 2CE respectively influence federated optimization through heterogeneity across markets. For clarity, the formal nota-tions used throughout the paper are summarized in Table 4. 
+
+## A.1 Market Heterogeneity under Vanilla CE 
+
+Proposition A.1 (Market Heterogeneity under Vanilla CE). 
+
+In cross-market recommendation, shared behavior-level patterns may 
+
+Table 4: Notation Table. Notation Meaning 
+
+M, 𝑚 set of markets (clients), index of market 
+
+U𝑚 , I𝑚 , 𝑢 set of users and items, index of user 
+
+|U 𝑚 |, |I 𝑚 |, 𝑑 number of items, item embedding dimension 
+
+S𝑚 , 𝑠 𝑚 𝑢 dataset of market 𝑚 , interaction sequence of user 𝑢 𝑖 𝑚 𝑘 , 𝑗 + 
+
+> 𝑢
+
+the 𝑘 -th interacted item, ground-truth next item of user 𝑢 𝑡 𝑖 , 𝑤 𝑘 textual content of item 𝑖 , the 𝑘 -th word 
+
+Θ𝑚 = {E𝑚 , 𝑓 𝑚 𝜃 (·)} model parameters for market 𝑚 
+
+E𝑚 , e𝑚 𝑖 item embedding matrix, embedding of item 𝑖 𝑓 𝑚 𝜃 (·) , h𝑚 𝑢 sequential behavior encoder, user representation 
+
+r𝑚 𝑢 predicted scores over items 
+
+W𝐴 W𝐵 low-rank matrices for behavior encoder 
+
+𝑔 𝑚 𝜃 (·) a lightweight multi-layer perceptron (MLP) for item embeddings 
+
+Θfed pre , 𝛼 𝑚 federated pretrained model, aggregation weight of market 𝑚 
+
+Lpre , Lft pretraining loss, fine-tuning loss 
+
+LCE , LS2CE cross-entropy loss, semantic soft cross-entropy loss 
+
+𝑠𝑖𝑚 (· , ·) , 𝜏 similarity function (cosine similarity), temperature parameter 
+
+𝑝 𝑚 𝜃 ( 𝑗 | s𝑚 𝑢 ) predicted probability of item 𝑗 𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) semantic soft weight over item 𝑗 
+
+KL (·∥·) , JS (· , ·) Kullback–Leibler divergence, Jensen–Shannon divergence 
+
+𝐻 (· , ·) , 𝐻 (·) cross-entropy and entropy function 
+
+𝜖 , 𝜎 a very small positive constant, semantic similarity 
+
+Θ𝜀 𝑚 , 𝜀 the set of 𝜀 -optimal solutions for market 𝑚 𝑅 , 𝐸 , 𝐵 , 𝜂 global rounds, local epochs, batch size, learning rate 
+
+exist across markets. However, local training with the vanilla CE objective drives each market toward near one-hot predictions over item-level preferences. This induces amplified heterogeneity across markets and disturbs the collaboration of federated optimization. 
+
+Proof. Step 1: One-Hot Predictive Distributions under CE. 
+
+Under the vanilla CE objective, the model maximizes the likeli-hood of the ground-truth item: 
+
+min 
+
+𝜃 − log 𝑝 𝑚 𝜃 ( 𝑗 +
+
+𝑢 |𝑠 𝑚 𝑢 ) ⇐⇒ max 
+
+𝜃 𝑝 𝑚 𝜃 ( 𝑗 +
+
+𝑢 |𝑠 𝑚 𝑢 ). (25) As the model approaches optimality, the predictive distribution becomes highly concentrated on the ground-truth item. Consider two users from markets 𝑚 1 and 𝑚 2 with ground-truth items 𝑎 and 
+
+𝑏 . Then, we have: 
+
+𝑝 𝑚 1
+
+𝜃 (𝑎 |𝑠 𝑚 1
+
+𝑢 ) ≥ 1 − 𝜖, 𝑝 𝑚 2
+
+𝜃 (𝑏 |𝑠 𝑚 2
+
+𝑢 ) ≥ 1 − 𝜖, (26) where 𝜖 → 0, and: ∑︁ 
+
+𝑗 ≠𝑎 
+
+𝑝 𝑚 1
+
+𝜃 ( 𝑗 |𝑠 𝑚 1
+
+𝑢 ) ≤ 𝜖, 𝑝 𝑚 2
+
+𝜃 (𝑎 |𝑠 𝑚 2
+
+𝑢 ) ≤ 𝜖. (27) 
+
+Step 2: Market Heterogeneity by Predictive Divergence. 
+
+The KL divergence between the two predictive distributions is: 
+
+KL  𝑝 𝑚 1
+
+𝜃 (·| 𝑠 𝑚 1
+
+𝑢 ) ∥ 𝑝 𝑚 2
+
+𝜃 (·| 𝑠 𝑚 2
+
+𝑢 ) =∑︁ 
+
+𝑗 
+
+𝑝 𝑚 1
+
+𝜃 ( 𝑗 |𝑠 𝑚 1
+
+𝑢 ) log 𝑝 𝑚 1
+
+𝜃 ( 𝑗 |𝑠 𝑚 1
+
+𝑢 )
+
+𝑝 𝑚 2
+
+𝜃 ( 𝑗 |𝑠 𝑚 2
+
+𝑢 )
+
+= 𝑝 𝑚 1
+
+𝜃 (𝑎 |𝑠 𝑚 1
+
+𝑢 ) log 𝑝 𝑚 1
+
+𝜃 (𝑎 |𝑠 𝑚 1
+
+𝑢 )
+
+𝑝 𝑚 2
+
+𝜃 (𝑎 |𝑠 𝑚 2
+
+𝑢 ) +∑︁ 
+
+𝑗 ≠𝑎 
+
+𝑝 𝑚 1
+
+𝜃 ( 𝑗 |𝑠 𝑚 1
+
+𝑢 ) log 𝑝 𝑚 1
+
+𝜃 ( 𝑗 |𝑠 𝑚 1
+
+𝑢 )
+
+𝑝 𝑚 2
+
+𝜃 ( 𝑗 |𝑠 𝑚 2
+
+𝑢 ) .
+
+(28) Using the concentration bounds in Step 1: 
+
+𝑝 𝑚 1
+
+𝜃 (𝑎 |𝑠 𝑚 1
+
+𝑢 ) log 𝑝 𝑚 1
+
+𝜃 (𝑎 |𝑠 𝑚 1
+
+𝑢 )
+
+𝑝 𝑚 2
+
+𝜃 (𝑎 |𝑠 𝑚 2
+
+𝑢 ) ≥ ( 1 − 𝜖 ) log 1 − 𝜖 𝜖 , (29) while the remaining terms are bounded by 𝑂 (𝜖 ). Hence: 
+
+KL (𝑝 𝑚 1
+
+𝜃 ∥𝑝 𝑚 2
+
+𝜃 ) ≥ ( 1 − 𝜖 ) log 1 − 𝜖 𝜖 + 𝑂 (𝜖 ) ≈ log (1/𝜖 ), (30) From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+which diverges as 𝜖 → 0. This divergence indicates that predic-tive distributions induced by different markets become mutually incompatible, market heterogeneity .
+
+Step 3: Heterogeneity-Disrupted Federated Optimization. 
+
+Define the 𝜀 -optimal set for each market: 
+
+Θ𝜀 𝑚 = 𝜃 : LCE (𝜃 ; S𝑚 ) ≤ inf   
+
+> 𝜃 ′
+
+LCE (𝜃 ′; S𝑚 ) + 𝜀 . (31) From Step 1, for any 𝜃 ∈ S 𝜀 𝑚 , there exists 𝛿 (𝜀 ) → 0 such that: 
+
+𝑝 𝑚 𝜃 ( 𝑗 + 
+
+> 𝑢
+
+|𝑠 𝑚 𝑢 ) ≥ 1 − 𝛿 (𝜀 ), (32) 
+
+i.e. , the predictive distribution is highly concentrated on the ground-truth item. Now consider two markets 𝑚 1 ≠ 𝑚 2 with different ground-truth items 𝑎 ≠ 𝑏 . For any 𝜃 ∈ Θ𝜀 𝑚 1 , the CE loss on market 
+
+𝑚 1 is near its minimum: 
+
+LCE (𝜃 ; S𝑚 1 ) ≈ − log 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) ≤ − log (1 − 𝛿 (𝜀 )) + 𝜀, (33) while the loss on market 𝑚 2 is lower bounded as: 
+
+LCE (𝜃 ; S𝑚 2 ) ≥ − log 𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑏 |𝑠 𝑚 2 
+
+> 𝑢
+
+) ≥ − log (1 − 𝛿 (𝜀 )) + 𝑐, (34) for some constant 𝑐 > 0, since the model concentrated on item 𝑎 in 
+
+𝑚 1 cannot simultaneously assign high probability to 𝑏 in 𝑚 2.By symmetry, the same argument holds if we start from 𝜃 ∈ Θ𝜀 𝑚 2 .Hence, for sufficiently small 𝜀 , the 𝜀 -optimal sets of the two markets do not intersect: 
+
+Θ𝜀 𝑚 1 ∩ Θ𝜀 𝑚 2 = ∅, (35) and more generally, we have: 
+
+Ù
+
+> 𝑚 ∈ M
+
+Θ𝜀 𝑚 = ∅. (36) Since federated learning seeks a single global parameter that mini-mizes a weighted sum of local CE losses: 
+
+𝜃 fed CE = arg min 
+
+> 𝜃
+
+∑︁ 𝑚 ∈ M 
+
+𝛼 𝑚 LCE (𝜃 ; S𝑚 ), (37) the disjointness of the 𝜀 -optimal sets implies that there does not exist a parameter 𝜃 that is simultaneously 𝜀 -optimal for all markets. This formally shows that market heterogeneity induced by the CE objective disturbs federated optimization. 
+
+□
+
+## A.2 Heterogeneity Mitigation under S 2CE 
+
+Proposition A.2 (Heterogeneity Mitigation under S 2CE). 
+
+The S 2CE loss encourages the model to tolerate items that are seman-tically similar to the ground-truth. This supervision promotes the learning of shared behavior-level patterns and effectively mitigates the heterogeneity caused by item-level preferences across markets. 
+
+Proof. Step 1: Soft Predictive Distributions under S 2CE. 
+
+The S 2CE loss is defined as the cross-entropy between the soft target distribution 𝑞 sem (·| 𝑗 + 
+
+> 𝑢
+
+) and the model prediction 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ):
+
+LS2CE (𝜃 ; S𝑚 ) = −∑︁ 
+
+> 𝑗
+
+𝑞 sem ( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) log 𝑝 𝑚 𝜃 ( 𝑗 |𝑠 𝑚 𝑢 ). (38) We start from the definition of cross-entropy between two distribu-tions 𝑞 (·) and 𝑝 (·) :
+
+𝐻 (𝑞, 𝑝 ) = −∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑝 ( 𝑗 ). (39) We add and subtract log 𝑞 ( 𝑗 ) inside the summation: 
+
+𝐻 (𝑞, 𝑝 ) = −∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑝 ( 𝑗 )
+
+= −∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑝 ( 𝑗 )
+
+𝑞 ( 𝑗 ) −∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑞 ( 𝑗 )
+
+=∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑞 ( 𝑗 )
+
+𝑝 ( 𝑗 ) −∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑞 ( 𝑗 ).
+
+(40) Recognizing the two terms: 
+
+KL (𝑞 ∥𝑝 ) =∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑞 ( 𝑗 )
+
+𝑝 ( 𝑗 ) , 𝐻 (𝑞 ) = −∑︁ 
+
+> 𝑗
+
+𝑞 ( 𝑗 ) log 𝑞 ( 𝑗 ), (41) we finally arrive at: 
+
+𝐻 (𝑞, 𝑝 ) = KL (𝑞 ∥𝑝 ) + 𝐻 (𝑞 ). (42) Then, we can rewrite the loss as: 
+
+LS2CE (𝜃 ; S𝑚 ) = KL  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+) ∥ 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ) + 𝐻  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+). (43) Since the entropy term 𝐻 (𝑞 𝑚 
+
+> sem
+
+) does not depend on the model parameters, minimizing LS2CE is equivalent to: 
+
+arg min  
+
+> 𝜃
+
+KL  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+) ∥ 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ), (44) so that at optimality, we have: 
+
+𝑝 𝑚 𝜃 ( 𝑗 |𝑠 𝑚 𝑢 ) ≈ 𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+), (45) 
+
+i.e. , the predictive distribution is softened across semantically simi-lar items, not concentrated on a single item. 
+
+Step 2: Bounded Cross-Market Divergence. 
+
+From Step 1, we have: 
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) ≥ 1 − 𝛿 (𝜀 ), 𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 2 
+
+> 𝑢
+
+) ≈ 𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ), (46) where 𝛿 (𝜀 ) → 0 as 𝜀 → 0.Denote the semantic similarity between items 𝑎 and 𝑏 as 𝜎 =
+
+𝑠𝑖𝑚 (e𝑎 , e𝑏 ) ∈ [− 1, 1]. Under the S 2CE loss, the soft target distribu-tion for item 𝑎 in market 𝑚 2 with ground-truth 𝑏 is: 
+
+𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ) = exp (𝑠𝑖𝑚 (e𝑎 , e𝑏 )/ 𝜏 )
+
+Í𝑘 ∈ I 𝑚 2 exp (𝑠𝑖𝑚 (e𝑘 , e𝑏 )/ 𝜏 )
+
+= exp (𝑠𝑖𝑚 (e𝑎 , e𝑏 )/ 𝜏 )
+
+Í𝑘 ≠𝑏 exp (𝑠𝑖𝑚 (e⊤ 
+
+> 𝑘
+
+e𝑏 )/ 𝜏 ) + exp (𝑠𝑖𝑚 (e⊤ 
+
+> 𝑏
+
+e𝑏 )/ 𝜏 )≥ exp (𝜎 /𝜏 )|I 𝑚 2 | · exp (1/𝜏 ) = exp (𝜎 − 1/𝜏 )|I 𝑚 2 | .
+
+(47) The KL divergence between predictive distributions of the two markets satisfies: 
+
+KL (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) =∑︁ 
+
+> 𝑗
+
+𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑝 𝑚 2 
+
+> 𝜃
+
+( 𝑗 |𝑠 𝑚 2 
+
+> 𝑢
+
+)
+
+= 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑝 𝑚 2 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 2 
+
+> 𝑢
+
+) + 𝑂 (𝜖 )≈ 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+) log 𝑝 𝑚 1 
+
+> 𝜃
+
+(𝑎 |𝑠 𝑚 1 
+
+> 𝑢
+
+)
+
+𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ) + 𝑂 (𝜖 )≤ log 1
+
+𝑞 𝑚 2 
+
+> sem
+
+(𝑎 |𝑏 ) + 𝑂 (𝜖 )≤ log |I 𝑚 2 | + 1 − 𝜎 𝜏 + 𝑂 (𝜖 ).
+
+(48) Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al. 
+
+Hence, unlike vanilla CE where KL diverges as 𝜖 → 0, S 2CE ensures a bounded divergence between markets: 
+
+KL 𝑆 2𝐶𝐸 (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) ≪ KL 𝐶𝐸 (𝑝 𝑚 1 
+
+> 𝜃
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+), (49) indicating that the predictive distributions are now compatible and market heterogeneity is mitigated. 
+
+Step 3: Heterogeneity Mitigation in Federated Optimization. 
+
+Consider two markets 𝑚 1 ≠ 𝑚 2 with ground-truth items 𝑎 ≠ 𝑏 .From the definition of the semantic target, for any item 𝑗 ∈ I 𝑚 , we have: 
+
+𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) = exp (𝑠𝑖𝑚 (e𝑗 , e𝑗 + 
+
+> 𝑢
+
+)/ 𝜏 )
+
+Í𝑘 ∈ I 𝑚 exp (𝑠𝑖𝑚 (e𝑘 , e𝑗 + 
+
+> 𝑢
+
+)/ 𝜏 ) > 0. (50) Hence, the semantic target distributions 𝑞 𝑚 1 
+
+> sem
+
+(·| 𝑎 ) and 𝑞 𝑚 2 
+
+> sem
+
+(·| 𝑏 )
+
+assign strictly positive probability mass to all items, implying that they have fully overlapping support. Moreover, for any item 𝑗 , since 
+
+𝑠𝑖𝑚 (e𝑗 , e𝑗 + 
+
+> 𝑢
+
+) ∈ [− 1, 1], we obtain: 
+
+exp (− 1/𝜏 )|I 𝑚 | · exp (1/𝜏 ) ≤ 𝑞 𝑚  
+
+> sem
+
+( 𝑗 | 𝑗 + 
+
+> 𝑢
+
+) ≤ exp (1/𝜏 )|I 𝑚 | · exp (− 1/𝜏 ) . (51) Thus, the ratio between two semantic distributions is bounded: 
+
+𝑞 𝑚 1 
+
+> sem
+
+( 𝑗 |𝑎 )
+
+𝑞 𝑚 2 
+
+> sem
+
+( 𝑗 |𝑏 ) ≤ 𝐶 0, (52) for some constant 𝐶 0 > 0 depending only on 𝜏 and the item set size. Therefore, the KL divergence between the two semantic distribu-tions is bounded: 
+
+KL  𝑞 𝑚 1 
+
+> sem
+
+∥ 𝑞 𝑚 2
+
+> sem
+
+ =∑︁ 
+
+> 𝑗
+
+𝑞 𝑚 1 
+
+> sem
+
+( 𝑗 |𝑎 ) log 𝑞 𝑚 1 
+
+> sem
+
+( 𝑗 |𝑎 )
+
+𝑞 𝑚 2 
+
+> sem
+
+( 𝑗 |𝑏 ) ≤ log 𝐶 0, (53) for some constant 𝐶 = log 𝐶 0 > 0 depending on 𝜎 and 𝜏 .Define the 𝜀 -optimal set for market 𝑚 under S 2CE: 
+
+Θ𝜀 𝑚 = 𝜃 : LS2CE (𝜃 ; S𝑚 ) ≤ inf   
+
+> 𝜃 ′
+
+LS2CE (𝜃 ′; S𝑚 ) + 𝜀 . (54) From Step 1, minimizing S 2CE is equivalent to minimizing: 
+
+KL  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+) ∥ 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ), (55) thus for any 𝜃 ∈ S 𝜀 𝑚 , we have: 
+
+KL  𝑞 𝑚  
+
+> sem
+
+(·| 𝑗 + 
+
+> 𝑢
+
+) ∥ 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ) ≤ 𝜀. (56) For any 𝜃 ∈ Θ𝜀 𝑚 1 , combining the above and using the smoothness of the semantic distributions, we obtain: 
+
+KL (𝑞 𝑚 2 
+
+> sem
+
+∥𝑝 𝑚 1 
+
+> 𝜃
+
+) ≤ KL  𝑞 𝑚 2 
+
+> sem
+
+∥ 𝑞 𝑚 1
+
+> sem
+
+ + KL  𝑞 𝑚 1 
+
+> sem
+
+∥ 𝑝 𝑚 1
+
+> 𝜃
+
+ ≤ 𝐶 + 𝜀. (57) This shows that the predictive distribution learned from market 
+
+𝑚 1 remains close to the semantic target distribution of market 𝑚 2,
+
+i.e. , cross-market supervision becomes compatible up to a bounded discrepancy. Combined with the bounded divergence in Step 2, this implies that 𝑝 𝑚 2 
+
+> 𝜃
+
+does not deviate arbitrarily from 𝑝 𝑚 1 
+
+> 𝜃
+
+, and thus: 
+
+KL (𝑞 𝑚 2 
+
+> sem
+
+∥𝑝 𝑚 2 
+
+> 𝜃
+
+) ≤ 𝐶 ′ + 𝜀, (58) for some constant 𝐶 ′ > 0. Recall that S 2CE loss can be written as: 
+
+LS2CE (𝜃 ; S𝑚 ) = KL (𝑞 𝑚  
+
+> sem
+
+∥𝑝 𝑚 𝜃 ) + 𝐻 (𝑞 𝑚 
+
+> sem
+
+), (59) where 𝐻 (𝑞 𝑚 
+
+> sem
+
+) is independent of 𝜃 . For any 𝜃 ∈ S 𝜀 𝑚 1 , we have: 
+
+LS2CE (𝜃 ; S𝑚 1 ) ≤ inf   
+
+> 𝜃 ′
+
+LS2CE (𝜃 ′; S𝑚 1 ) + 𝜀, (60) and combining with the above bound, we obtain: 
+
+LS2CE (𝜃 ; S𝑚 2 ) ≤ inf   
+
+> 𝜃 ′
+
+LS2CE (𝜃 ′; S𝑚 2 ) + 𝐶 ′ + 𝜀. (61) This shows that a parameter 𝜃 that is 𝜀 -optimal for market 𝑚 1 is also near-optimal for market 𝑚 2 up to a bounded gap. By symmetry, the same holds when exchanging 𝑚 1 and 𝑚 2. Hence, for sufficiently large tolerance, we have: 
+
+Θ𝜀 𝑚 1 ∩ Θ𝜀 +𝐶 ′ 
+
+> 𝑚 2
+
+≠ ∅,
+
+Ù
+
+> 𝑚 ∈ M
+
+Θ𝜀 +𝐶 ′ 
+
+> 𝑚
+
+≠ ∅. (62) Consequently, the federated objective under S 2CE: 
+
+𝜃 fed S2CE = arg min 
+
+> 𝜃
+
+∑︁ 𝑚 ∈ M 
+
+𝛼 𝑚 LS2CE (𝜃 ; S𝑚 ), (63) admits solutions that lie in the approximate 𝜀 -optimal sets of mul-tiple markets, enabling near-optimal performance across markets up to a bounded gap. This formally shows that S 2CE mitigates market heterogeneity, thereby facilitating more effective federated optimization. 
+
+□
+
+## B Detailed Algorithm Procedure 
+
+In this section, we provide a detailed description of the proposed training pipeline, including the federated collaborative pretraining stage, i.e. , Algorithm 1, and the local market-specific fine-tuning stage, i.e. , Algorithm 2. 
+
+Federated Collaborative Pretraining. We first perform feder-ated pretraining to learn a shared behavior encoder across markets while preserving data privacy. Specifically, the server initializes a unified item semantic embedding matrix E according to Eq. (5), and distributes market-specific subsets E𝑚 to each market 𝑚 . The global encoder 𝑓 𝑎𝑔𝑔 (0) 
+
+> 𝜃
+
+(·) is also initialized and shared. At each global round 𝑟 , each market first performs local pre-training. Specifically, it downloads the global behavior encoder 
+
+𝑓 𝑎𝑔𝑔 (𝑟 −1) 
+
+> 𝜃
+
+(·) from the previous round for local initialization. After that, it optimizes the semantic soft objective L𝑆 2𝐶𝐸 on its private dataset S𝑚 = {𝑠 𝑚 𝑢 }𝑢 ∈ U 𝑚 for local updates. The updated local mod-els {𝑓 𝑚 (𝑟 ) 
+
+> 𝜃
+
+(·)} 𝑚 ∈ M are subsequently aggregated on the server to obtain the updated global model 𝑓 𝑎𝑔𝑔 (𝑟 ) 
+
+> 𝜃
+
+(·) , which is then broadcast to all markets for the next round of local training. This process re-peats for 𝑅 rounds, yielding the final pretrained encoder 𝑓 𝑎𝑔𝑔 (𝑅 ) 
+
+> 𝜃
+
+(·) .Note that throughout the entire pretraining stage, the item em-beddings E𝑚 remain frozen, and only 𝑓 𝑚 𝜃 (·) is updated to capture behavior-level patterns. 
+
+Local Market-specific Fine-tuning. During local fine-tuning, the model shifts from capturing shared behavior-level patterns to fo-cusing on market-specific item-level preferences. For the pretrained encoder 𝑓 𝑎𝑔𝑔 𝜃 (·) , we freeze its parameters and introduce lightweight trainable LoRA parameters W𝐴 , W𝐵 for efficient adaptation. For the item embeddings E𝑚 , we still keep them frozen and apply a trainable ID encoder 𝑔 𝑚 𝜃 (·) to enhance item representations. During this process, each market optimizes the vanilla cross-entropy loss L𝐶𝐸 over its local dataset S𝑚 for accurate next-item prediction, and only the LoRA parameters W𝐴 W𝐵 and the ID en-coder 𝑔 𝑚 𝜃 (·) are updated. Overall, the proposed two-stage framework achieves a balance between cross-market knowledge sharing and market-specific adap-tation, leading to improved performance and robustness across heterogeneous markets. From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+Algorithm 1 Federated Collaborative Pretraining 
+
+Input: markets M, local datasets { S 𝑚 }𝑚 ∈M , global rounds 𝑅 , local epochs 𝐸 , batch size 𝐵 , learning rate 𝜂 .
+
+Output: pretrained models { 𝑓 𝑎𝑔𝑔 𝜃 (·) , E𝑚 }𝑚 ∈M .
+
+Server executes:  
+
+> 1:
+
+Generate unified item semantic embeddings E according to Eq. (5).  
+
+> 2:
+
+Initialize the global behavior encoder 𝑓 𝑎𝑔𝑔 (0) 
+
+> 𝜃
+
+(·) . 
+
+> 3:
+
+for each market 𝑚 ∈ M do  
+
+> 4:
+
+Initialize and freeze item embeddings E𝑚 = E[ I 𝑚 ]. 
+
+> 5:
+
+Initialize encoder 𝑓 𝑚 (0) 
+
+> 𝜃
+
+(·) ← 𝑓 𝑎𝑔𝑔 (0) 
+
+> 𝜃
+
+(·) . 
+
+> 6:
+
+end for  
+
+> 7:
+
+for each global round 𝑟 = 1, 2, · · · , 𝑅 do  
+
+> 8:
+
+for each market 𝑚 ∈ M in parallel do  
+
+> 9:
+
+𝑓 𝑚 (𝑟 ) 
+
+> 𝜃
+
+(·) ← LocalPretrain (𝑓 𝑎𝑔𝑔 (𝑟 −1) 
+
+> 𝜃
+
+(·) , S𝑚 ). 
+
+> 10:
+
+end for  
+
+> 11:
+
+𝑓 𝑎𝑔𝑔 (𝑟 ) 
+
+> 𝜃
+
+← Aggregate { 𝑓 𝑚 (𝑟 ) 
+
+> 𝜃
+
+}𝑚 ∈M according to Eq. (23).  
+
+> 12:
+
+Broadcast aggregated 𝑓 𝑎𝑔𝑔 (𝑟 ) 
+
+> 𝜃
+
+(·) to all markets.  
+
+> 13:
+
+end for  
+
+> 14:
+
+return { 𝑓 𝑎𝑔𝑔 (𝑅 ) 
+
+> 𝜃
+
+(·) , E𝑚 }𝑚 ∈M 
+
+LocalPretrain (𝑓 𝑎𝑔𝑔 (𝑟 −1) 
+
+> 𝜃
+
+(·) , S𝑚 ): 
+
+> 1:
+
+Initialize 𝑓 𝑚 (𝑟 −1) 
+
+> 𝜃
+
+(·) ← 𝑓 𝑎𝑔𝑔 (𝑟 −1) 
+
+> 𝜃
+
+(·) . 
+
+> 2:
+
+for each local epoch 𝑒 = 1, 2, · · · , 𝐸 do  
+
+> 3:
+
+for each batch 𝑏 ∈ S 𝑚 do  
+
+> 4:
+
+Minimize the semantic soft cross-entropy loss L𝑆 2𝐶𝐸 in Eq. (15).  
+
+> 5:
+
+Update 𝑓 𝑚 (𝑟 −1) 
+
+> 𝜃
+
+(·) using 𝜂 ∇ L 𝑆 2𝐶𝐸 . 
+
+> 6:
+
+end for  
+
+> 7:
+
+end for  
+
+> 8:
+
+return 𝑓 𝑚 (𝑟 ) 
+
+> 𝜃
+
+(·) 
+
+Algorithm 2 Local Market-specific Fine-tuning 
+
+Input: markets M, local datasets { S 𝑚 }𝑚 ∈M , pretrained models 
+
+{ 𝑓 𝑎𝑔𝑔 𝜃 (·) , E𝑚 }𝑚 ∈M , local epochs 𝐸 , batch size 𝐵 , learning rate 𝜂 .
+
+Output: fine-tuned models { 𝑓 𝑚 𝜃 (·) , ˜E𝑚 }𝑚 ∈M . 
+
+> 1:
+
+for each market 𝑚 ∈ M in parallel do  
+
+> 2:
+
+Freeze 𝑓 𝑎𝑔𝑔 𝜃 (·) and apply trainable LoRA parameters W𝐴 , W𝐵 . 
+
+> 3:
+
+Freeze E𝑚 and apply a trainable ID encoder 𝑔 𝑚 𝜃 (·) . 
+
+> 4:
+
+for each local epoch 𝑒 = 1, 2, · · · , 𝐸 do  
+
+> 5:
+
+for each batch 𝑏 ∈ S 𝑚 do  
+
+> 6:
+
+Enhance item embeddings to obtain ˜E𝑚 via Eq. (24).  
+
+> 7:
+
+Compute the vanilla cross-entropy loss L𝐶𝐸 in Eq. (6).  
+
+> 8:
+
+Update W𝐴 , W𝐵 and 𝑔 𝑚 𝜃 (·) using 𝜂 ∇ L 𝐶𝐸 . 
+
+> 9:
+
+end for  
+
+> 10:
+
+end for  
+
+> 11:
+
+end for  
+
+> 12:
+
+return { 𝑓 𝑚 𝜃 (·) , ˜E𝑚 }𝑚 ∈M 
+
+## C Additional Experiment Results C.1 Heterogeneity Mitigation 
+
+C.1.1 Inter-market Heterogeneity. To quantify inter-market het-erogeneity, we measure the divergence between prediction dis-tributions induced by behavior encoders from different markets. Specifically, for each market 𝑚 ∈ M , we use its local dataset 
+
+S𝑚 = {𝑠 𝑚 𝑢 }𝑢 ∈ U 𝑚 as evaluation data. Given a behavior encoder 
+
+𝑓 𝑚 ′ 
+
+> 𝜃
+
+(·) from another market 𝑚 ′, we compute the predicted item distribution for each sequence 𝑠 𝑚 𝑢 using the instance-level predic-tive distribution 𝑝 𝑚 ′ 
+
+> 𝜃
+
+(𝑖 |𝑠 𝑚 𝑢 ). The overall prediction distribution is (a ) Market Heterogeneity under CE    
+
+> (b) Heterogeneity Mitigation under S 2CE (c ) Heterogeneity reduction
+
+Figure 8: Inter-market heterogeneity under CE and S 2CE. 
+
+obtained by averaging over all users: 
+
+𝑃 𝑚 ′→𝑚 (𝑖 ) = 1
+
+|U 𝑚 |∑︁ 𝑢 ∈ U 𝑚 
+
+𝑝 𝑚 ′ 
+
+> 𝜃
+
+(𝑖 |𝑠 𝑚 𝑢 ), (64) which measures how well the behavioral patterns learned from another market 𝑚 ′ generalize to the local data of market 𝑚 in terms of the induced prediction distribution. Meanwhile, this formulation extends the instance-level predictive distribution 𝑝 𝑚 𝜃 (·| 𝑠 𝑚 𝑢 ) used in the theoretical analysis to a population-level distribution over all local items, providing a quantitative basis for measuring inter-market heterogeneity. To measure the heterogeneity between two markets 𝑚 and 𝑚 ′,we compute the Jensen–Shannon (JS) divergence between their prediction distributions: 
+
+JS (𝑃 𝑚 →𝑚 , 𝑃 𝑚 ′→𝑚 ) = 12 KL (𝑃 𝑚 →𝑚 ∥ 𝑀 ) + 12 KL (𝑃 𝑚 ′→𝑚 ∥ 𝑀 ), (65) where 𝑀 = 12 (𝑃 𝑚 →𝑚 + 𝑃 𝑚 ′→𝑚 ) and KL (·∥·) denotes the Kullback– Leibler divergence. Here, 𝑃 𝑚 →𝑚 captures the intrinsic preference distribution of market 𝑚 , while 𝑃 𝑚 ′→𝑚 represents the prediction distribution induced by applying the behavior encoder from market 
+
+𝑚 ′ to the data of market 𝑚 . The JS divergence then quantifies the alignment between the two distributions. A larger JS divergence indicates stronger heterogeneity between markets. 
+
+C.1.2 Results Analysis. Figure 8 compares inter-market hetero-geneity under the CE and S 2CE objectives, and also presents a difference matrix highlighting the reduction achieved by S 2CE. In the matrices, each row corresponds to the local data from a given market 𝑚 , and each column corresponds to the behavior encoder from another market 𝑚 ′.This empirical observation is consistent with the theoretical anal-ysis. Under the CE objective, behavioral patterns learned from other markets exhibit limited transferability to the local data, resulting in large divergence values and thus strong inter-market heterogeneity, as shown in Figure 8(a). In contrast, S 2CE significantly reduces the divergence across markets, as shown in Figure 8(b). This improve-ment can be attributed to the shift from item-level discrimination to behavior-level pattern learning. By encouraging the model to capture shared semantic structures rather than market-specific item preferences, S 2CE alleviates the heterogeneity across markets. The Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Chen et al. 
+
+difference matrix in Figure 8(c) further provides empirical evidence for the effectiveness of S 2CE. ca mx    
+
+> us uk
+> fr de
+> in jp
+
+Figure 9: Distributions of inter-user representation similari-ties under behavior encoders trained with CE and S 2CE. 
+
+## C.2 Behavior-level Patterns 
+
+C.2.1 Inter-user Representation Similarity. Let h𝑚 𝑢 = 𝑓 𝑚 𝜃 (𝑠 𝑚 𝑢 ) de-note the representation of user 𝑢 in market 𝑚 . For any two users 
+
+𝑢, 𝑣 ∈ U 𝑚 , we define their similarity based on the ℓ2 distance as: sim (𝑢, 𝑣 ) = 11 + ∥ h𝑚 𝑢 − h𝑚 𝑣 ∥2
+
+, (66) which maps distances to the range (0, 1], where larger values indi-cate higher similarity. We adopt this formulation instead of cosine similarity, as cosine similarity in high-dimensional spaces is often less discriminative, making it harder to distinguish variations in user representations. Let the similarities across all user pairs, i.e. , {𝑠𝑖𝑚 (𝑢, 𝑣 )| 𝑢, 𝑣 ∈U𝑚 , 𝑢 ≠ 𝑣 }, be denoted by {𝑠 𝑖 }𝑁 𝑖 =1 for brevity, where 𝑁 = | U 𝑚 | ( | U 𝑚 | − 1) 
+
+> 2
+
+.To examine their distribution, we apply kernel density estimation (KDE), which provides a smooth estimate of the underlying density: 
+
+ˆ𝑝 𝑚 (𝑠 ) = 1
+
+𝑁 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝐾 
+
+ 𝑠 − 𝑠 𝑖 
+
+ℎ
+
+
+
+, (67) where 𝐾 (·) denotes a kernel function (e.g., Gaussian), and ℎ is the bandwidth parameter. This enables us to characterize the dispersion of user representations in the latent space. 
+
+C.2.2 Results Analysis. We compare the inter-user representation similarity learned under the CE and S 2CE objectives, as shown in Fig. 9. Under the CE objective, the similarity values are concen-trated in a relatively low range, indicating that user representations are more dispersed and primarily capture individual item-level pref-erences. suggesting the emergence of clustered structures, where users within the same cluster share similar semantic interests over items. This implies that S 2CE encourages the model to capture more holistic behavior-level patterns. Importantly, the similarity distribu-tion under S 2CE still maintains sufficient spread, indicating that the model learns informative behavioral patterns without collapsing to a trivial solution. We further analyze two representative markets, us and in , cor-responding to the largest and smallest datasets, respectively. For us ,CE-based similarities are mainly concentrated in [0.1, 0.2] with a sharp distribution, whereas S 2CE leads to a wider distribution range. This is likely due to the larger number of users, which allows for more diverse similarity patterns. For in , the increase in similarity under S 2CE is less pronounced. A possible reason is that the limited number of users restricts the formation of shared patterns. Overall, S2CE yields consistently higher similarity values than CE across different markets, which overall supports the aforementioned ob-servations and analysis. 
+
+## C.3 Item-level Preferences 
+
+C.3.1 Experimental Setup. We experimentally validate the two key components of the sequential recommendation model, i.e. , the be-havior encoder and the item embeddings. For the behavior encoder, we analyze the distribution of inter-user representation similarity to compare the model before and after applying low-rank fine-tuning to 𝑓 𝑚 𝜃 (·) . For the item embeddings, we employ t-SNE to visualize the embeddings before and after applying 𝑔 𝑚 𝜃 (·) to incorporate the ID modality, i.e. , E𝑚 and ˜E𝑚 . For clearer visualization, we randomly sample up to 400 items. 
+
+C.3.2 Results Analysis. Figure 10 shows the distribution of inter-user representation similarity before and after fine-tuning the be-havior encoder. A consistent trend is observed across all markets, that is, after fine-tuning, the similarity values are significantly re-duced and become concentrated in the range of [0, 0.2]. This indi-cates that user representations become more discriminative, focus-ing more on item-level distinctions rather than the shared behavior-level patterns observed before fine-tuning. Moreover, since we adopt low-rank fine-tuning, most pretrained weights are preserved. This suggests that the underlying behavioral patterns are largely retained, while the model shifts toward capturing more market-specific characteristics. Figure 11 visualizes the item embeddings before and after incor-porating the ID modality. During pretraining, we initialize item em-beddings using text modality to obtain a stable representation space, facilitating collaborative learning of behavioral patterns. Based on this, incorporating the ID modality further refines the item embed-dings. It can be observed that the updated embeddings remain in a similar representation space while exhibiting clearer structure, in-dicating that the pretrained information is largely preserved while enabling item-level adaptation to market-specific characteristics. 
+
+## C.4 Hyperparameter Analysis 
+
+We further provide additional experimental results in Section 4.5 to analyze the impact of hyperparameters, reported by NDCG@10. 
+
+C.4.1 The temperature coefficient 𝜏 . As shown in Fig. 12, the ob-served trend is consistent with that of HR@10. Specifically, al-though different datasets exhibit varying sensitivity to 𝜏 , they all achieve near-optimal performance within a moderate range, i.e. ,
+
+𝜏 ∈ [ 0.03 , 0.07 ]. This reflects the trade-off induced by 𝜏 , i.e. , small 𝜏 
+
+yields a highly peaked distribution with one-hot-like supervision, From Transfer to Collaboration: A Federated Framework for Cross-Market Sequential Recommendation Conference acronym ’XX, June 03–05, 2018, Woodstock, NY ca mx uk 
+
+defr
+
+us 
+
+in jp
+
+Figure 10: Distributions of inter-user representation similarities before and after behavior encoder fine-tuning. uk us 
+
+in jp
+
+ca mx 
+
+defr
+
+Figure 11: Visualization of item embeddings before and after incorporating the ID modality. 
+
+whereas large 𝜏 results in over-smoothing and reduced discrim-inability. In our experiments, we adopt a shared 𝜏 across all markets for training consistency. In practice, allowing each market to ex-plore its own 𝜏 may further improve performance. However, it would require more sophisticated tuning strategies to maintain con-sistency and effective coordination across markets. Nevertheless, using a unified setting of 𝜏 = 0.05 still consistently outperforms baseline methods, demonstrating both the effectiveness of our ap-proach and its robustness to the choice of hyperparameters. 0.131         
+
+> 0.134
+> 0.137
+> 0.14
+> 0.143
+> 0.01 0.1
+> 0.322
+> 0.336
+> 0.35
+> 0.364
+> 0.378
+> 0.01 0.1
+> 0.116
+> 0.117
+> 0.118
+> 0.119
+> 0.12
+> 0.01 0.1
+> 0.213
+> 0.217
+> 0.221
+> 0.225
+> 0.229
+> 0.01 0.1
+> 0.185
+> 0.19
+> 0.195
+> 0.2
+> 0.205
+> 0.01 0.1
+> 0.197
+> 0.204
+> 0.211
+> 0.218
+> 0.225
+> 0.01 0.1
+> 0.216
+> 0.254
+> 0.292
+> 0.33
+> 0.368
+> 0.01 0.1
+> 0.142
+> 0.162
+> 0.182
+> 0.202
+> 0.222
+> 0.01 0.1
+
+(a) ca (c) us (b) mx (d) uk 
+
+(e) fr (g) in (f) de (h) jp 
+
+Figure 12: Effect of the temperature parameter 𝜏 during fed-erated pretraining, evaluated by NDCG@10. 
+
+C.4.2 The low-rank parameter 𝑟 . As the NDCG@10 results shown in Table 13, the best performance is achieved after fine-tuning. 0.117 
+
+> 0.1178
+> 0.1186
+> 0.1194
+> 0.127
+> 0.132
+> 0.137
+> 0.142
+> 0.331
+> 0.344
+> 0.357
+> 0.37
+> 0.208
+> 0.215
+> 0.222
+> 0.229
+> 0.178
+> 0.187
+> 0.196
+> 0.205
+> 0.177
+> 0.193
+> 0.209
+> 0.225
+> 0.187
+> 0.251
+> 0.315
+> 0.379
+> 0.132
+> 0.162
+> 0.192
+> 0.222
+
+(e) fr (f) de (g) in (h) jp 
+
+(a) ca (b) mx (c) us (d) uk           
+
+> w/o fine -tuning r= 1 r= 2 r= 4 r= 8 r= 16
+
+Figure 13: Effect of the low-rank 𝑟 during local fine-tuning, evaluated by NDCG@10. 
+
+Specifically, smaller rank values, e.g. , 𝑟 ∈ { 1, 2, 4}, tend to yield better performance across most markets. For example, 𝑟 = 2 or 4
+
+achieves the best or near-best results on several datasets such as 
+
+mx , uk , and in , while larger ranks, e.g. , 16, do not bring further improvements and may even slightly degrade performance. These results suggest that the pretrained model has already captured sufficiently rich behavioral patterns, and only lightweight item-level adaptation is needed to fit local market characteristics.

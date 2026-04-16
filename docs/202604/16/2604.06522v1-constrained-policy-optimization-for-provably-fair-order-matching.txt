@@ -1,0 +1,753 @@
+Title: Constrained Policy Optimization for Provably Fair Order Matching
+
+URL Source: https://arxiv.org/pdf/2604.06522v1
+
+Published Time: Thu, 09 Apr 2026 00:19:34 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Constrained Policy Optimization for Provably Fair Order Matching 
+
+Zehua Cheng 1 Zhipeng Wang 2 Wei Dai 3 Wenhu Zhang 4 Vadzim Mahilny 3 David Shi 5 Elena Jia 5
+
+Jiahao Sun 3
+
+## Abstract 
+
+Automated matching engines execute millions of orders per session, yet systematic asymmetries in latency, order size, and market access com-pound into persistent execution disparities that erode participant trust. We formulate provably fair order matching as a Constrained Markov Decision Process and propose CPO-FOAM (Constrained Policy Optimization with Feedback-Optimized Adaptive Margins). An inner loop computes an analytic trust-region step on the Fisher informa-tion manifold; a PID-controlled outer loop dy-namically tightens safety margins, suppressing the sawtooth oscillations endemic to Lagrangian methods under non-stationary dynamics. Group fairness (demographic parity, equalized odds) en-ters the CMDP cost vector while individual Lip-schitz fairness is enforced deterministically via spectral normalization. We prove BIBO stability and that the integral term drives steady-state vi-olations to zero. On LOBSTER NASDAQ data across six market regimes, CPO-FOAM recovers 95.9% of unconstrained throughput at 2.5% con-straint violation frequency; on crypto-asset LOB data under MEV injection it captures 98.4% of the reward envelope at 3.2% CVF. The method scales sub-linearly to M =8 constraints, settles on-chain within one Ethereum block, and yields a 2.1×
+
+reward improvement on Safety-Gymnasium (Ji et al., 2023), confirming domain-agnostic gener-alization. 
+
+> 1
+
+Department of Computer Science, University of Oxford, Ox-ford, UK 2Department of Computer Science, University of Manch-ester, Manchester, UK 3FLock.io, London, UK 4Department of Computer Science and Engineering, Hong Kong University of Sci-ence and Technology, Hong Kong SAR 5deluthium.ai. Correspon-dence to: Zehua Cheng, Elena Jia, Jiahao Sun <zehuac@ieee.org, elena@deluthium.ai, sun@flock.io >.
+
+WIP Paper , Copyright 2025 by the author(s). 
+
+## 1. Introduction 
+
+Automated trading infrastructure now mediates the majority of global financial transactions, executing millions of order-matching decisions per session across equities, derivatives, and digital asset exchanges. The design of these match-ing engines carries significant implications: even moderate, systematic asymmetries—arising from differential latency, heterogeneous order sizes, or privileged market access— compound over time into persistent execution disparities that erode participant trust and suppress market participa-tion (Aquilina et al., 2022). As regulatory emphasis shifts toward auditable algorithmic governance, there is growing institutional demand for mechanism designs that internalize fairness as an explicit, enforceable constraint rather than an after-the-fact diagnostic. We frame the formal problem as learning an order-matching policy that optimizes long-run market-quality objectives— effective spreads, order book depth, fill rates, and execu-tion throughput—subject to hard group-level and individual-level fairness constraints measured at high frequency and subjected to continuous regulatory audit. This formulation naturally maps to a Constrained Markov Decision Process (CMDP), where the reward signal captures composite mar-ket quality and the cost vector encodes demographic parity gaps, equalized-odds-type conditional disparities, and Lip-schitz individual fairness violations computed over rolling observation windows. Existing algorithmic approaches encounter fundamental limitations in this setting. Rule-based mechanisms such as First-In-First-Out (FIFO) and Pro-Rata allocation are structurally incapable of jointly optimizing efficiency and fairness: our experiments show that FIFO achieves only 4,200 orders/s throughput with effective spreads of 2.45 basis points and 100% constraint violation frequency (Ta-ble 1). Unconstrained deep reinforcement learning agents— specifically Proximal Policy Optimization (PPO) (Schulman et al., 2017)—reach theoretical efficiency ceilings but vio-late all fairness constraints. Among constrained methods, Lagrangian PPO and RCPO (Tessler et al., 2018) suffer from dual-variable oscillations under non-stationary data, producing transient recovery lengths exceeding 145 opti-mization steps and large violation areas under the curve. 1
+
+> arXiv:2604.06522v1 [cs.GT] 7 Apr 2026 Constrained Policy Optimization for Provably Fair Order Matching
+
+Vanilla CPO (Achiam et al., 2017) provides per-update near-feasibility guarantees but struggles with noisy constraint estimates and the combinatorial structure of matching ac-tion spaces. Interior-Point Policy Optimization (IPO) (Liu et al., 2020) introduces barrier-coefficient tuning sensitivi-ties without bounding transient violations. These limitations motivate the central question of this paper: can we design a fairness-sensitive matching algorithm that preserves per-update near-feasibility across multiple fairness constraints while making monotone progress on market quality, under stable multiplier dynamics and tractable computation? 
+
+We answer this question affirmatively by introducing CPO-FOAM (Constrained Policy Optimization with Feedback-Optimized Adaptive Margins). On each iteration, an inner loop computes the optimal update direction by solving a low-dimensional dual problem over the Fisher information mani-fold, analytically recovering the trust-region-constrained reward-maximizing step. An outer loop governed by a discrete-time PID controller then dynamically adjusts safety margins ξi,k to buffer the linearized constraint boundary against stochastic estimation noise, proactively tightening the feasible set before violations materialize. Individual Lipschitz fairness is enforced deterministically via per-layer spectral normalization, decoupling architectural regularity from the probabilistic CMDP constraints. We prove that the closed-loop system satisfies the Jury stability criterion and that the integrator term drives steady-state violations to zero via the Final Value Theorem. Our contributions are as follows: 1. CMDP Formulation for Auditable Fair Matching. 
+
+We formulate fair order matching as a discounted CMDP whose cost vector encodes demographic-parity gaps, equalized-odds-type conditional disparities, and Lipschitz individual fairness violations computed over rolling windows, providing an auditable interface be-tween microstructure telemetry and enforceable fair-ness constraints. 2. CPO-FOAM Algorithm. We construct a two-stage update combining a trust-region improvement step with a KL-nearest fairness projection and PID-controlled adaptive safety margins. We prove BIBO stability of the closed-loop system and asymptotic feasibility under bounded stochastic disturbances, with a pure recovery step guaranteeing descent on the cumulative violation energy when the feasible set is empty. 3. Comprehensive Empirical Validation. We provide a reproducible evaluation stack spanning LOBSTER NASDAQ reconstructions across six non-stationary market regimes, hardware scalability profiling up to 
+
+K = 500 action dimensions and M = 8 simultaneous constraints, on-chain output-verifiable Ethereum set-tlement with gas cost analysis, and domain-agnostic generalization on Safety-Gymnasium (Ji et al., 2023). CPO-FOAM achieves strict Pareto dominance: 0.95 bps spread, 2.5% CVF, violation transient length of 5 steps, and 2.1× reward improvement on SafetyAntVe-locity over the nearest baseline. 
+
+## 2. Related Work 
+
+2.1. Constrained Reinforcement Learning 
+
+Constrained Markov Decision Processes (CMDPs) pro-vide the foundational framework for optimizing sequen-tial objectives under inequality constraints (Altman, 1999). Constrained Policy Optimization (CPO) (Achiam et al., 2017) performs trust-region updates with theoretical guar-antees for near-constraint satisfaction at each iterate by solving a linearized-quadratic subproblem over the Fisher information manifold. However, CPO assumes accurate constraint estimates and encounters practical difficulties with noisy cost signals and combinatorial action spaces. Reward-Constrained Policy Optimization (RCPO) (Tessler et al., 2018) reformulates constraints as multi-timescale La-grangian penalties, achieving computational simplicity at the cost of oscillatory multiplier dynamics and delayed con-vergence to feasibility. Interior-Point Policy Optimization (IPO) (Liu et al., 2020) translates inequality constraints into log-barrier penalties but introduces barrier-coefficient tun-ing sensitivities and provides no guarantees on transient violation magnitude. To address the instability of integral-only multiplier updates, PID-Lagrangian methods (Stooke et al., 2020) augment the dual variable dynamics with pro-portional and derivative terms drawn from classical control theory, substantially dampening oscillations on benchmark suites such as Safety-Gymnasium (Ji et al., 2023). Our ap-proach unifies the geometric projection guarantees of CPO with the anticipatory stabilization of PID control, achieving the convergence benefits of both paradigms. 
+
+2.2. Algorithmic Fairness in Sequential Decision-Making 
+
+Fairness criteria originally developed for supervised classification—including demographic parity (Calders et al., 2009), equalized odds (Hardt et al., 2016), and individual (Lipschitz) fairness (Dwork et al., 2012)—have been increas-ingly adapted to sequential settings. Recent work extends group fairness constraints to contextual bandits and Markov decision processes, typically encoding fairness as trajectory-level cost constraints within CMDP formulations (Wen et al., 2021). Individual fairness, formalized as Lipschitz conti-nuity of the decision mapping, has been enforced via spec-tral normalization of neural network parameters (Miyato et al., 2018). However, directly applying these criteria to high-frequency financial matching introduces unique chal-lenges: execution outcomes are discrete, constraint esti-2Constrained Policy Optimization for Provably Fair Order Matching 
+
+mates are autocorrelated rather than i.i.d., and the combi-natorial structure of multi-counterparty allocations resists standard convex relaxations. Our work bridges this gap by deriving differentiable fairness surrogates compatible with gradient-based policy optimization and cleanly separating group-level rate constraints (handled by the CMDP projec-tion) from individual-level regularity constraints (enforced architecturally via spectral normalization). 
+
+2.3. Market Microstructure and Mechanism Design 
+
+The design of electronic matching engines has been stud-ied extensively within market microstructure theory (Gould et al., 2013). Traditional rule-based mechanisms—FIFO price-time priority, pro-rata allocation, and size-time interpolation—are deployed across major global exchanges but lack the capacity to jointly optimize multiple market quality dimensions or adapt to non-stationary order flow. Recent proposals such as frequent batch auctions (Budish et al., 2015) and speed bumps address latency arbitrage but do not formalize multi-dimensional fairness constraints. Machine learning approaches to order execution and mar-ket making have leveraged deep reinforcement learning for optimal placement (Nevmyvaka et al., 2006) and inventory management, but typically treat fairness as an exogenous reporting metric rather than an endogenous constraint. The JAX-LOB simulator (Frey et al., 2023) provides a GPU-accelerated limit order book environment enabling the large-sample policy optimization and ablation studies required by our algorithm. Our work extends this line by embedding the matching engine within a CMDP framework that simultane-ously optimizes market quality, enforces multi-dimensional fairness, and provides formal convergence guarantees. 
+
+2.4. Verifiable Machine Learning on Distributed Ledgers 
+
+The deployment of learned models in trustless decentralized environments demands cryptographic verification of both outputs and processes. Output-verifiable computation frame-works submit settlement commitments (state hashes, allo-cation Merkle roots, fairness metrics) alongside challenge-response protocols that enable any participant to dispute inconsistencies via on-chain adjudication (Teutsch & Re-itwiesner, 2019). Process-verifiable approaches—including open replay with model weights stored on IPFS (Benet, 2014)/Arweave (Williams et al., 2019) and permissioned re-play via threshold key-sharing committees with BLS multi-signatures (Boneh et al., 2001)—provide stronger prove-nance guarantees at the cost of model confidentiality or trusted verifier assumptions. Our on-chain proof system integrates both paradigms, demonstrating that CPO-FOAM settlements clear within standard Ethereum finality windows (≤12 seconds) at economically viable gas costs ( ≤725k per batch), with false challenge rates driven below 0.001% by rapid off-chain recomputation. 
+
+## 3. Preliminaries 
+
+We model the Limit Order Book (LOB) matching problem as a CMDP, defined by the tuple M = ( S, A, P, r, c, γ, d),where: • State Space (S ⊆ Rds ): The state st comprises the LOB features (price levels p ∈ RL, volumes v ∈ RL), order flow imbalance, and a sliding-window history of fairness telemetry. • Action Space (A): The agent outputs a continuous matching weight vector at ∈ ∆K , representing the probability distribution over K available matching counterparts (limit orders). • Transition Kernel (P ): P (st+1 |st, a t) governs the stochastic evolution of the market. • Reward Function (r): r : S × A → R quantifies mar-ket quality (e.g., spread reduction, liquidity provision). • Cost Functions (c): A vector of M fairness costs 
+
+c : S × A → RM .• Thresholds (d): A vector d ∈ RM>0 defining strict upper bounds for expected costs. 
+
+3.1. Differentiable Fairness Surrogates 
+
+A critical challenge in LOBs is that execution outcomes are discrete. To enable gradient-based optimization, we derive importance-weighted surrogates. 
+
+Group Fairness (Demographic Parity) : Let g ∈ { 0, 1}
+
+denote the sensitive attribute of an incoming order. To ensure differentiability, we formulate the cost as the squared disparity in expected allocation. We define the instantaneous cost cDP (st, a t) utilizing the policy’s predicted fill mass:          
+
+> cDP (st, a t) =
+> I(gt= 1) · ⟨ at,mt⟩
+> ˆμ1
+> −I(gt= 0) · ⟨ at,mt⟩
+> ˆμ0
+> 2
+> (1)
+
+where mt ∈ { 0, 1}K is a binary mask of feasible matches, and ˆμg is the exponential moving average (EMA) of the ar-rival rate for group g. This function is strictly differentiable w.r.t. at.
+
+Remark 3.1 (From Instantaneous Cost to Trajectory-Level Constraint) . The per-step cost cDP (st, a t) is inherently high-variance because only one group contributes a nonzero term per timestep ( I(gt=1) and I(gt=0) are mutually ex-clusive). However, the CMDP objective JCDP (π) =
+
+Eτ [P 
+
+> t
+
+γtcDP (st, a t)] aggregates over the full trajectory; under the mixing-time concentration bound (Proposi-tion 5.5), the sample variance of ˆJCDP scales as σ2τmix /T ,where the integrated autocorrelation time τmix accounts for 3Constrained Policy Optimization for Provably Fair Order Matching Limit Order Book  
+
+> (LOB)
+> Environment
+> 𝑀 Fairness
+> Costs ( 𝑐 !)
+> Thresholds ( 𝑑 ")
+
+Figure 1. Overview of the CPO-FOAM (Constrained Policy Optimization with Feedback-Optimized Adaptive Margins) framework. Top: The fair order-matching problem is formulated as a Constrained Markov Decision Process (CMDP). The policy network ( πθ )structurally enforces individual (Lipschitz) fairness via spectral normalization, effectively decoupling it from the probabilistic group fairness constraints. The Limit Order Book (LOB) environment outputs a reward signal (market quality) and M fairness costs. Bottom Left: The outer loop utilizes a discrete-time PID controller to compute adaptive safety margins ξi,k . This proactively buffers the linearized constraint boundaries against stochastic estimation noise, suppressing the sawtooth oscillations typical of Lagrangian methods under non-stationary dynamics. Bottom Right: The inner loop computes an analytic trust-region projection on the Fisher information manifold. By solving a low-dimensional dual problem, it dictates the optimal primal step ∆θ∗. If the feasible set is empty, a pure recovery step is executed to strictly minimize constraint violation energy. 
+
+the temporal dependence between successive cost samples. The EMA denominators ˆμg (decay rate β=0 .999 ) act as control variates that track shifting group arrival rates, re-ducing estimator variance while introducing a controlled 
+
+O(1 −β) bias. The squared formulation ensures differen-tiability but amplifies outliers; the trust-region constraint (Equation 4) bounds the per-step impact of such outliers by limiting ∥∆θ∥, and the PID safety margin absorbs residual estimation noise. 
+
+Individual Fairness (Architectural Constraint) : We re-quire L-Lipschitz continuity: DT V (π(s), π (s′)) ≤ L∥s −
+
+s′∥. Instead of a Lagrangian penalty, we enforce this struc-turally. For a policy network parameterized by weights 
+
+{Wl}Dl=1 , we enforce the spectral norm constraint: 
+
+> D
+
+Y
+
+> l=1
+
+∥Wl∥2 ≤ L (2) This is implemented via Spectral Normalization (Miyato et al., 2018; Gouk et al., 2021), projecting weights Wl ←
+
+Wl/ max(1 , ∥Wl∥2/σ l) at every step. This guarantees πθ ∈
+
+ΠLip by construction. At time t, the state st ∈ S encompasses the LOB state (price levels, volumes) and historical fairness telemetry. The policy 
+
+πθ (a|s) outputs a continuous allocation vector at ∈ ∆K
+
+(the simplex over matched orders). The environment emits a scalar reward r(s, a ) (market quality) and a vector of fairness costs c(s, a ) ∈ RM .The optimization objective is: 
+
+max 
+
+> πθ
+
+JR(π) = Eτ ∼π
+
+" ∞X
+
+> t=0
+
+γtr(st, a t)
+
+#
+
+s.t. JCi (π) = Eτ ∼π
+
+" ∞X
+
+> t=0
+
+γtci(st, a t)
+
+#
+
+≤ di,
+
+∀i ∈ { 1, . . . , M }
+
+Lip (πθ ) ≤ L (Architectural Constraint )
+
+(3) 4Constrained Policy Optimization for Provably Fair Order Matching 
+
+## 4. Constrained Policy Optimization for Fair Order-Matching 
+
+To solve Equation 3 directly via primal-dual methods is unstable in financial markets due to the high variance of JCi
+
+estimates. We propose Constrained Policy Optimization with Feedback-Optimized Adaptive Margins (CPO-FOAM), which decouples the problem into two orthogonal processes: 1. Inner Loop (Geometric Optimization) : An analytic trust-region projection to find the optimal search direc-tion on the linearized manifold. 2. Outer Loop (Adaptive Margin Control) : A PID con-troller that adjusts the constraint thresholds to buffer against stochastic noise. 
+
+4.1. Inner Loop: Analytic Trust-Region Projection 
+
+At iteration k, we seek an update θk+1 = θk + ∆ θ. We form local approximations around θk where: • Objective: ∇θ JR(πk)T ∆θ
+
+• Constraints: JCi (πk) + ∇θ JCi (πk)T ∆θ ≤ di − ξi,k 
+
+• Trust Region: ∆θT Hk∆θ ≤ 2δ.Here, Hk is the Fisher Information Matrix, and ξi,k ≥ 0 is the adaptive safety margin (formally defined in Section 4.2). We first approximate the reward and cost functions locally around the current policy πk using first-order lineariza-tion for costs and second-order approximation for the KL-divergence constraint (Trust Region). Let g = ∇θ JR(πk) be the reward gradient, b = ∇θ JC (πk)
+
+be the Jacobian of the costs (matrix of size M × | θ|), and 
+
+H be the Fisher Information Matrix (approximating the Hessian of the KL divergence). The update direction ∆θ is the solution to the convex opti-mization problem: 
+
+max  
+
+> ∆θ
+
+gT ∆θ
+
+s.t. bTi ∆θ + JCi (πk) ≤ di − ξi,k ∀i
+
+∆θT H∆θ ≤ 2δ
+
+(4) where g = ∇JR, bi = ∇JCi , and κi = di −JCi (πk)−ξi,k 
+
+is the effective budget. The term ξi,k ≥ 0 is the Adaptive Safety Margin. In stan-dard CPO, ξ = 0 . However, due to the high variance of financial data, ”exact” feasibility on the linearized manifold often leads to mean-reverting violations in the true environ-ment. We dynamically tune ξ to buffer the projection (see Section 4.2.). The primal update direction is given analytically by the dual solution. Let ν ∈ RM 
+
+> ≥0
+
+be the Lagrange multipliers for the costs, and λ ∈ R≥0 for the trust region. 
+
+∆θ∗ = 1
+
+λ H−1(g − bT ν∗) (5) where B = [ b1, . . . , bM ]T . The optimal dual variables 
+
+(λ∗, ν∗) are found by maximizing the dual function:              
+
+> D(λ, ν) = −12λ(g−BTν)TH−1
+> k(g−BTν)+ νTκ−λδ
+> 2(6)
+
+This dual problem is low-dimensional ( M + 1 variables) and is solved efficiently via Newton-Conjugate Gradient. If the feasible set is empty, we execute a pure recovery step minimizing constraint violation. 
+
+4.2. Outer Loop: PID-Controlled Safety Margins 
+
+Standard CPO assumes accurate estimates of JC (π). In LOB environments, JC is stochastic. To prevent the “sawtooth” oscillation of constraints (violating → over-correcting → violating), we use a discrete-time PID con-troller to adjust the safety margin ξi,k .Let ei,k = JCi (πk) − di be the realized constraint violation at step k. The safety margin update follows:            
+
+> ξi,k +1 = [ ξi,k +KPei,k +KIkX
+> τ=0
+> ei,τ
+> +KD(ei,k −ei,k −1)] +
+> (7)
+
+If the policy violates constraints ( e > 0), the margin ξ
+
+increases. Equation 7 tightens the constraint in Equation 4, forcing the projection to target a value strictly below di and creating a buffer zone proportional to the system’s noise. Equation 7 separation ensures mathematical consistency. The CPO step remains a memoryless geometric projection (guaranteeing the update direction is optimal locally), while the PID controller manages the system’s memory and noise robustness. If Equation 4 is infeasible (empty intersection of trust region and constraints), we execute a Pure Recovery Step: 
+
+θk+1 = θk − ηH−1 X
+
+> i
+
+∇θ JCi (πk) (8) This update ignores the reward signal solely to reduce con-straint violations, ensuring the agent rapidly returns to the feasible region. 
+
+## 5. Theoretical Guarantees 
+
+We provide a rigorous analysis of CPO-FOAM, character-izing its convergence, stability, and feasibility properties. 5Constrained Policy Optimization for Provably Fair Order Matching 
+
+We model the training process as a discrete-time dynamical system subject to bounded stochastic disturbances. Our cen-tral result proves that the feedback loop between the Inner Loop (Optimization) and Outer Loop (Control) guarantees asymptotic feasibility. 
+
+5.1. Assumptions and Structural Properties 
+
+Let Θ ⊆ RN be the policy parameter space. The market state st evolves according to a Markov transition kernel 
+
+Pθ (s′|s). We define the ”True” cost surface JCi (θ) and the empirical estimator ˆJCi (θ) derived from trajectories of length T .To analyze the optimization of a constrained non-convex policy on a stochastic manifold, we introduce standard regu-larity assumptions. 
+
+Assumption 5.1 (Regularity of Objectives) . The reward function JR(θ) and fairness cost functions JCi (θ) are twice continuously differentiable on Θ. There exist constants 
+
+Lg , L H , μ > 0 such that: 1. Lipschitz Gradients : ∥∇ JCi (θ) − ∇ JCi (θ′)∥2 ≤
+
+Lg ∥θ − θ′∥2.2. Bounded Curvature : The Hessian spectral norms are bounded, ∥∇ 2JCi (θ)∥2 ≤ LH .3. Fisher Non-Singularity : The Fisher Information Ma-trix H(θ) is positive definite: μI ⪯ H(θ) ⪯ M I.
+
+Assumption 5.2 (Slater’s Condition) . The constrained prob-lem is well-posed. There exists a strictly feasible policy πθ†
+
+such that JCi (πθ† ) ≤ di − ϵ for some ϵ > 0. Furthermore, the gradients of active constraints are linearly independent. 
+
+Assumption 5.3 (Geometric Ergodicity) . The Markov Chain induced by any policy πθ on the LOB state space S is geometrically ergodic (Bradley, 2005). The β-mixing coeffi-cient satisfies β(k) ≤ Cρ k for constants C > 0, ρ ∈ (0 , 1) .
+
+Justification : Financial time-series are strongly autocorre-lated. This assumption ensures that the dependence between samples decays exponentially, allowing us to apply mixing-time concentration bounds (Paulin, 2015; Yu, 1994) rather than invalid I.I.D. assumptions. 
+
+Remark 5.4 (Robustness to Ergodicity Violations) . Dur-ing extreme structural breaks (flash crashes, circuit break-ers, stablecoin depegs), the geometric mixing assumption may be transiently violated, inflating the effective distur-bance bound Wmax . In this regime, the BIBO guarantee of Theorem 5.8 degrades gracefully: the steady-state viola-tion bound scales linearly with Wmax rather than diverging, since the Jury-stable transfer function H(z) attenuates dis-turbances by a finite gain ∥H∥∞. The PID controller’s derivative term further dampens transient spikes from sud-den regime shifts. Our regime experiments (Table 2) em-pirically validate this: even under 5× news shocks—which substantially violate stationarity—CVF remains below 6.8%. A practical safeguard is to reset the integral accumulator upon detection of a regime change (e.g., via a CUSUM test on violation energy), preventing the integrator from accu-mulating stale error from a structurally different regime. 
+
+5.2. Inner Loop: Trust-Region Fidelity 
+
+The Inner Loop optimizes a linear surrogate ˜JC (θ) subject to a quadratic trust region. We first quantify the ”Simulation Gap”—the worst-case error between this surrogate and the true cost surface. 
+
+Lemma 5.5 (Surrogate Approximation Bound) . Let ∆θ be the update computed by the Inner Loop subject to the trust region 12 ∆θT Hk∆θ ≤ δ. The discrepancy between the linear surrogate and the true cost is bounded by: 
+
+|JCi (θ + ∆ θ) − ˜JCi (θ + ∆ θ)| ≤ LH
+
+μ δ ≜ ϵmodel 
+
+Proof. Consider the Taylor expansion with Lagrange re-mainder: 
+
+JCi (θ + ∆ θ) = JCi (θ) + ∇JTCi ∆θ + 12 ∆θT ∇2JCi (¯θ)∆ θ
+
+The surrogate corresponds to the first two terms. The error is the quadratic remainder. Error = 12 ∆θT ∇2JCi (¯θ)∆ θ ≤ LH
+
+2 ∥∆θ∥22
+
+From the trust region constraint and Assumption 1 ( H ⪰
+
+μI): 
+
+μ
+
+2 ∥∆θ∥22 ≤ 12 ∆θT H∆θ ≤ δ =⇒ ∥ ∆θ∥22 ≤ 2δμ
+
+Substituting this into the error bound yields LH 
+
+> 2
+
+( 2δμ ) =  
+
+> LH
+> μ
+
+δ.
+
+5.3. Estimation: The Stochastic Disturbance 
+
+Standard error bounds (e.g., Hoeffding) underestimate risk in financial markets due to autocorrelation. We derive a concentration bound that accounts for the Variance Inflation Factor (VIF). 
+
+Proposition 5.6 (Mixing-Time Concentration) . Let ˆJCi be estimated from a trajectory of length T . Under Assumption 3, for any confidence ζ ∈ (0 , 1) , there exists a bound ϵest 
+
+such that: 
+
+P
+
+
+
+| ˆJCi − JCi | ≤ ϵest 
+
+
+
+≥ 1 − ζ
+
+with ϵest ∝ σ
+
+r τmix ln(1 /ζ )
+
+T
+
+where τmix = 1+ ρ 
+
+> 1−ρ
+
+is the integrated autocorrelation time. 
+
+6Constrained Policy Optimization for Provably Fair Order Matching 
+
+Definition 5.7. The aggregated disturbance wk acting on the control loop is the sum of the deterministic model bias (Lemma 5.1), the smoothing bias from the differentiable surrogate (Eq. 1), and the stochastic sampling noise (Prop 5.2). With high probability: 
+
+|wk| ≤ Wmax ≜ ϵmodel + ϵsmooth + ϵest 
+
+5.4. Outer Loop: Robust Stability Analysis 
+
+This section contains the core result: proving that the PID controller stabilizes the constraint violation despite the bounded disturbances defined above. We define the con-straint violation state as ek ≜ JCi (πk) − di.
+
+Step 1: The Plant Dynamics (Optimization) The CPO projection solves for ∆θ to satisfy the linearized constraint 
+
+˜JCi ≤ di − ξk. The realized cost is the surrogate plus errors: 
+
+JCi (πk+1 ) = ( di − ξk) + wk
+
+Subtracting di from both sides yields the error evolution equation: 
+
+ek+1 = −ξk + wk (9) 
+
+Step 2: The Controller Dynamics (PI) We analyze a Proportional-Integral controller (setting derivative gain 
+
+αD = 0 for clarity, though the result extends to PID). The positional form, consistent with the outer loop update (Equa-tion 7) under KD = 0 , is: 
+
+ξk+1 = ξk + αP ek+1 + αIk+1 X
+
+> j=0
+
+ej (10) To obtain the velocity (incremental) form, we subtract 
+
+ξk = ξk−1 + αP ek + αI
+
+Pkj=0 ej from both sides. Since 
+
+Pk+1  
+
+> j=0
+
+ej − Pkj=0 ej = ek+1 , we obtain ξk+1 − ξk =
+
+αP (ek+1 −ek)+ αI ek+1 , which is the standard incremental PI form with gains αP = KP and αI = KI from Equa-tion 7. 
+
+Theorem 5.8 (Asymptotic Feasibility & Stability) . Assume the total disturbance is bounded |wk| ≤ Wmax . If the gains satisfy the conditions below, the closed-loop system is Bounded-Input Bounded-Output (BIBO) stable (Ogata, 1995) and the expected violation converges to zero. 
+
+αI > 0, αP < 1, 2αP + αI < 4
+
+Proof .We analyze the closed-loop transfer function in the Z-domain. Let E(z), Ξ( z), W (z) be the Z-transforms of the error, margin, and disturbance. 1. Plant : From Equation 9, E(z) = W (z) − z−1Ξ( z).2. Controller : Expressing Equation 10 in velocity form 
+
+ξk+1 − ξk = αP (ek+1 − ek) + αI ek+1 , we get: 
+
+(z − 1)Ξ( z) = (αP + αI )z − αP
+
+ E(z)=⇒ C(z) = Ξ( z)
+
+E(z) = (αP + αI )z − αP
+
+z − 1
+
+(11) 3. Closed Loop : The transfer function H(z) = E(z)  
+
+> W(z)
+
+= 
+
+> 11+ z−1C(z)
+
+simplifies to: 
+
+H(z) = z(z − 1) 
+
+z2 + ( αP + αI − 1) z − αP
+
+(12) 4. Stability : The poles are the roots of the denomina-tor D(z) = z2 + a1z + a0. Applying the Jury Sta-bility Criterion (Ogata, 1995) ( |a0| < 1, D (1) >
+
+0, D (−1) > 0) yields the inequalities in the theorem statement. 5. Bias Rejection : By the Final Value Theorem (Ogata, 1995), for a constant bias disturbance W (z) = ¯ w zz−1
+
+(representing linearization error), the steady-state error is: ess = lim 
+
+> z→1
+
+(z − 1) H(z)W (z)= lim 
+
+> z→1
+
+z2(z − 1) 
+
+D(z)¯wz z − 1 = 0 
+
+(13) The integrator pole at z = 1 ensures infinite DC gain in the feedback path, forcing ess → 0. The margin ξ
+
+automatically adapts to ξss = ¯ w, canceling the bias. 
+
+Remark 5.9 (Extension to Multiple Constraints) . When 
+
+M > 1 constraints are enforced simultaneously, each con-straint i is governed by an independent PID loop with its own error signal ei,k and margin ξi,k . The plant dynam-ics (Equation 9) generalize to a vector system ek+1 =
+
+−ξk + wk, where the coupling between constraints en-ters through the shared policy update: changing ξi in the inner-loop projection (Equation 4) may affect the re-alized cost ej for j̸ = i. Formally, the cross-coupling is captured by the off-diagonal entries of the Jacobian 
+
+∂e i,k +1 /∂ξ j,k . If this coupling is sufficiently weak—i.e., 
+
+∥∂e i/∂ξ j ∥ ≪ ∥ ∂e i/∂ξ i∥ for i̸ = j—the multi-loop system can be treated as M parallel SISO loops, and the Jury sta-bility conditions apply independently to each. This is the typical regime when constraints target distinct fairness di-mensions (e.g., demographic parity vs. Lipschitz continuity). Our experiments with M =8 constraints (Table 3) confirm empirically that cross-metric contamination remains below 0.022, validating the weak-coupling assumption. 
+
+5.5. Recoverability Analysis 
+
+If the safety margin ξk becomes too large, or if the market experiences a shock, the trust region intersection may be 7Constrained Policy Optimization for Provably Fair Order Matching 
+
+empty. We prove the Recovery Step (Equation 8) guarantees progress. 
+
+Lemma 5.10 (Descent Property of Recovery) . Define the cumulative violation energy L(θ) = 12
+
+P
+
+> i
+
+( ˆJCi (θ) − di)2+.The recovery update θk+1 = θk − ηH−1∇L guarantees 
+
+L(θk+1 ) < L(θk) for sufficiently small η > 0.Proof .The update direction is p = −H−1∇L . The directional derivative of the energy is: 
+
+pT ∇L = −∇L T H−1∇L 
+
+Since H is positive definite ( H ⪰ μI), its inverse is also positive definite ( H−1 ⪰ 1 
+
+> M
+
+I). Thus: 
+
+pT ∇L ≤ − 1
+
+M ∥∇L∥ 22 < 0
+
+Unless ∇L = 0 (implying the policy is already feasible or at a local optimum), the update is a strictly descending direction. This ensures that even when the primary CPO step fails, the agent asymptotically approaches the feasible set. 
+
+5.6. Architectural Guarantee: Individual Fairness 
+
+Finally, we formalize the separation between the probabilis-tic CMDP constraints and the deterministic architectural constraints. 
+
+Proposition 5.11 (Spectral Norm Propagation) . Let the policy πθ (s) = Softmax (fθ (s)) be parameterized by a net-work with layers satisfying ∥Wl∥2 ≤ σl. Then πθ satisfies 
+
+(L, ℓ 2)-Individual Fairness deterministically: 
+
+∥πθ (s) − πθ (s′)∥1 ≤ √K Y
+
+> l
+
+σl
+
+!
+
+∥s − s′∥2
+
+Proof. 
+
+1. Network Sensitivity : The Lipschitz constant of the logit generator fθ is bounded by the product of the spectral norms of its layers: Lip (f ) ≤ Q σl.2. Softmax Sensitivity : The Softmax function is 1-Lipschitz w.r.t the ℓ2 norm. However, the Individual Fairness metric uses the ℓ1 norm (Total Variation dis-tance). Using the norm equivalence ∥x∥1 ≤ √K∥x∥2
+
+for x ∈ RK , the output sensitivity is scaled by √K.3. Deterministic Enforcement : Since the spectral pro-jection operator Pspec is applied after every gradient step, the condition holds for all θk, independent of the optimization outcome or estimation noise. 
+
+## 6. On-Chain Proof System 
+
+The proposed proof system aims to guarantee the integrity, fairness, and reproducibility of the settlement process in a probabilistic matching environment. Unlike determinis-tic rule-based engines, where the verification of a replayed decision is trivial, the introduction of ML-driven policies requires a verification layer that is both auditable and eco-nomically secure. We propose the following methods. 
+
+6.1. Output Verifiable 
+
+In the output-verifiable setting, the blockchain does not at-tempt to reconstruct or validate the internal decision-making process of the model. Instead, it verifies that the final settle-ment outcome satisfies a set of publicly defined constraints. At each settlement, the matching engine submits crypto-graphic commitments — including the market state hash (state hash ), the model version hash ( model hash ), the Merkle root of the allocation ( allocation root ), fairness metrics ( ∆DP , ∆EO , Lipschitz), and net token balances ( fund balance ) — to the smart contract. The raw state and allocation data are stored off-chain in a decen-tralized storage layer (e.g., Arweave (Williams et al., 2019) or EigenDA (Sreeram, 2023)), enabling public access for independent recomputation. Upon submission, the contract checks two classes of invari-ants: 1. Fund conservation: the total inflows and outflows must satisfy: 
+
+X token in = X token out + X fee 2. Fairness constraints: statistical parity, equal oppor-tunity, and Lipschitz continuity must remain within predefined thresholds. If all conditions hold, the settlement is provisionally ac-cepted, and a challenge period is opened. During this pe-riod, any participant may recompute the fairness metrics and fund balances from the published data. If inconsistencies are found, they can submit a Merkle proof to challenge the settlement. A successful challenge results in penalties for the submitter and rewards for the challenger, while an un-successful challenge leads to a slashing of the challenger’s stake. This mechanism ensures incentives for honest verifi-cation without revealing the ML model logic. 
+
+6.2. Process Verifiable 
+
+Output verification alone cannot guarantee that a submitted allocation was actually generated by the declared model. To strengthen trust guarantees, we introduce a process-8Constrained Policy Optimization for Provably Fair Order Matching 
+
+verifiable approach in which the provenance of the decision-making process itself is auditable. 
+
+Open Replay In the simplest variant, the model param-eters are stored in a public repository (e.g., IPFS (Benet, 2014) or Arweave (Williams et al., 2019)), and their hash is recorded on-chain. Anyone can retrieve the model and input state to re-run the inference: 
+
+πθ (s) → a′
+
+A mismatch between the recomputed allocation a′ and the submitted result constitutes a valid challenge. This approach offers maximal transparency but risks exposing proprietary models. 
+
+Permissioned Replay To address the privacy concern, we consider a permissioned verification variant. The model weights are encrypted and stored off-chain, with decryp-tion keys held by a verifier committee using a threshold key-sharing protocol. During a challenge, the committee performs the replay and collectively signs the result (e.g., using a BLS multi-signature (Boneh et al., 2001)) to attest whether the allocation is consistent with the model. The contract then adjudicates based on this attestation, alongside the fairness and conservation checks. Although this method introduces a trusted verifier set, it can preserve the model confidentiality while maintaining verifiability. 
+
+## 7. Experimental Setup 
+
+This section details the parameters necessary to reproduce our evaluations across traditional finance (TradFi), decen-tralized finance (DeFi), and continuous control domains. 
+
+7.1. Datasets 
+
+We used datasets spanning TradFi, DeFi, and continuous control domains. 
+
+TradFi: LOBSTER NASDAQ. Two LOBSTER datasets spanning 60 trading days. The High-Liquidity set comprised Level-3 limit order book reconstructions from NASDAQ-100 constituents (e.g., AAPL, MSFT). The Mid/Low-Liquidity set captured sparser execution dynamics of smaller-cap constituents. Data was split chronologically: 40 days training, 10 validation, 10 held-out test. Prices were normal-ized to basis points relative to the daily open mid-price, and extreme order sizes were capped at the 99.9th percentile. 
+
+DeFi: Crypto-Asset LOB. Three crypto datasets span-ning 90 calendar days of continuous market data. The Blue-Chip L1 dataset comprised deeply liquid pairs (BTC/USDT, ETH/USDT, SOL/USDT) sourced from Tardis.dev and Kaiko, containing over 450M tick-level order book up-dates. The Memecoin dataset targeted extreme volatility (DOGE/USDT, SHIB/USDT, PEPE/USDT), isolating en-vironments with severe retail-to-whale capital imbalances. The CEX Perpetuals dataset consolidated tick-level futures data (BTC-PERP, ETH-PERP) integrated with on-chain metadata to model leveraged derivatives and cascading liq-uidations. Data was split into 60 days training, 15 validation, and 15 held-out test. Pre-processing normalized variable tick sizes relative to rolling-window mid-prices, discretized event streams into a 100ms grid, and standardized volumes via USD-equivalent z-scores. We calibrated a self-exciting Hawkes process (Bacry et al., 2015) to simulate clustered crypto-native order arrivals and augmented training data by stochastically injecting MEV adversarial agents (Daian et al., 2020). 
+
+Safety-Gymnasium. The standard Safety-Gymnasium suite (Point, Car, Ant) (Ji et al., 2023) was used for domain-agnostic continuous control evaluation. 
+
+7.2. Evaluation Metrics TradFi. Market utility: effective spread, Depth@5, fill rate, throughput. Fairness: ∆DP, Lipschitz violation per-centage (Lip-Viol%), CVF, transient recovery length, viola-tion AUC. 
+
+DeFi. In addition to spread and fill rate, we report a com-posite Market Quality Score (MQS), defined as MQS = 13
+
+ s∗
+
+s + ff ∗ + dd∗
+
+
+
+where s is effective spread, f is fill rate, and d is depth-weighted throughput, each normalized by the unconstrained PPO ceiling values s∗, f ∗, d ∗. We also report oscillation amplitude (sawtooth magnitude of constraint violations) and single-decision inference latency. DeFi-specific fairness scenarios include MEV-induced ∆DP, whale-to-retail fill ratio, cross-chain bridging ∆DP, liquidation rate disparity, depeg fill quality gap, and token-launch bot-to-organic ratio. 
+
+Safety-Gymnasium. Standard episodic reward and episodic cost. 
+
+7.3. Baselines TradFi (9 methods). Rule-based: FIFO, Pro-Rata, Size-Time Interpolation. Unconstrained: PPO (Schulman et al., 2017). Constrained RL: Lagrangian PPO, RCPO (Tessler et al., 2018), IPO (Liu et al., 2020), Vanilla CPO (Achiam et al., 2017), PID-Lagrangian (Stooke et al., 2020). 
+
+DeFi (12 methods). The six constrained RL baselines above, plus six DeFi-native mechanisms: on-chain FIFO 9Constrained Policy Optimization for Provably Fair Order Matching 
+
+(CLOB), Constant-Product AMM (CPAMM) (Angeris et al., 2020), Concentrated Liquidity AMM (CLAMM) (Adams et al., 2021), Pro-Rata, MEV-Aware FIFO with encrypted mempool simulation (Daian et al., 2020), and Frequent Batch Auctions (Budish et al., 2015). We also evaluated universal model variants (zero-shot transfer and fine-tuned) and a random matching baseline. 
+
+7.4. Implementation Details Shared Architecture. All methods used a 3-layer MLP with [256 , 256 , 128] hidden units and ReLU activations, op-timized with Adam (Kingma & Ba, 2015) (learning rate 
+
+3 × 10 −4, ϵ = 10 −5, momentum 0.9, weight decay 10 −4). Core RL hyperparameters: batch size 4096, trust-region radius δ = 0 .01 , γ = 0 .99 , GAE (Schulman et al., 2016) 
+
+λ = 0 .95 , dropout (Srivastava et al., 2014) 0.1. PID gains: 
+
+KP = 0 .5, KI = 0 .1, KD = 0 .05 . Spectral normaliza-tion (Miyato et al., 2018) bounded the Lipschitz constant at 
+
+L = 5 .0.
+
+TradFi. Training ran for 5M steps with cosine anneal-ing (Loshchilov & Hutter, 2017) and KL-divergence early stopping on 8 NVIDIA H100 GPUs ( ∼6.5 hours per config-uration). 
+
+DeFi. The DeFi variant added a 16-dimensional asset-category embedding. Training used linear learning rate decay, mini-batch size 512, and gradient clipping at norm 0.5. Convergence was determined by loss stabilization over a 1000-step rolling window ( ∼18 hours per configuration on 8 ×H100). 
+
+## 8. Results 
+
+We report TradFi (NASDAQ) and DeFi (crypto) evaluations in separate subsections with dedicated tables, followed by scalability analysis and cross-domain Safety-Gymnasium validation. All methods were trained for 5M environment steps using the GPU-accelerated JAX-LOB simulator (Frey et al., 2023). 
+
+8.1. TradFi: Market Quality, Fairness, and Constraint Dynamics 
+
+The results reveal a sharp dichotomy between tradi-tional heuristics and unconstrained learned policies (Ta-ble 1). Rule-based systems—FIFO, Pro-Rata, and Size-Time Interpolation—produced wide spreads ( ≥2.45 bps), low throughput ( ≤4,200 orders/s), and 100% constraint violation frequency, reflecting their inability to adapt to het-erogeneous order flow. Unconstrained PPO achieved the tightest spread (0.85 bps) and highest throughput (8,500 or-ders/s) but violated fairness constraints in every evaluation step, with a maximum Lipschitz exceedance of 45.5%. Among constrained baselines, reactive Lagrangian methods exhibited the characteristic sawtooth instability predicted by our theoretical analysis. Lagrangian PPO and RCPO required 145 and 112 recovery steps, respectively, after each constraint breach, with overshoots of 0.85 and 0.72. This delayed correction produced large violation AUCs (45.2 and 38.4), reflecting sustained periods of non-compliance. Vanilla CPO and IPO reduced violation frequency but at the cost of substantial market quality degradation (spreads 
+
+≥1.35 bps). CPO-FOAM achieved the best tradeoff across all metrics. It maintained an effective spread of 0.95 bps and throughput of 8,150 orders/s—recovering 95.9% of the unconstrained ceiling—while compressing CVF to 2.5%, transient recov-ery to 5 steps, overshoot to 0.05, and violation AUC to 1.8. The PID margins proactively dampened dual-variable oscil-lations, preventing the retroactive correction cycles observed in baseline Lagrangian methods. 
+
+Ablation Studies. Targeted ablations isolated the contri-bution of each component. Removing the PID controller increased transient recovery from 5 to 75 steps and viola-tion AUC from 1.8 to 19.5, confirming that integral-only multiplier updates are insufficient for non-stationary en-vironments. Removing spectral normalization preserved competitive spreads (0.98 bps) but increased Lipschitz ex-ceedance from 1.2% to 22.5%, demonstrating that the archi-tectural constraint is essential for individual fairness. Elimi-nating the trust region yielded the most severe degradation— transient length expanded to 130 steps with 0.82 overshoot— closely replicating standard Lagrangian failure modes and confirming that localized loss penalties alone cannot main-tain coherent constraint satisfaction. The “No Recovery Step” ablation merits specific atten-tion, as the relatively low CVF (5.5%) and transient length (15) may appear counterintuitive. Without a recovery mechanism, the PID controller’s margins grow persistently larger because the system never receives the feasibility “re-set” that successful recovery provides. The result is an over-conservative policy that sacrifices substantial market quality—spread widens from 0.95 to 1.40 bps and fill rate drops from 0.91 to 0.68—to avoid entering infeasible re-gions entirely. The low CVF therefore reflects conservative avoidance rather than effective recovery: the agent pays a heavy efficiency penalty to remain within bounds. The recovery step enables aggressive optimization with a safety net, achieving both high market quality and rapid return to feasibility when violations do occur. 
+
+8.2. TradFi: Regime-Dependent Market Robustness 
+
+To assess robustness under distribution shift, we evalu-ated the converged model across six non-stationary market 10 Constrained Policy Optimization for Provably Fair Order Matching 
+
+Table 1. Comprehensive evaluation of market quality, fairness, and constraint dynamics. Spread in basis points (bps); Depth@5 = cumulative depth at five ticks; T-Put = throughput (orders/s); Impact = Amihud price impact (Amihud, 2002); R.Vol = realized volatility ratio; Lip-Max = maximum Lipschitz exceedance (%); CVF = constraint violation frequency; Trans. Length = violation transient recovery steps; Viol. AUC = violation area under the curve. ↑/↓ indicate higher/lower is better. Bold marks the best result.                                                                                                                                                                                                                  
+
+> Method / Variant Spread (↓)Depth@5 (↑)Fill Rate (↑)T-Put (↑)Impact (↓)R.Vol (↓)Lip-Max (↓)CVF (%) (↓)Trans. Len. (↓)Overshoot (↓)Viol. AUC (↓)
+> Rule-Based Baselines
+> FIFO 2.45 1,250 0.42 4,200 0.85 1.45 18.5 100.0 N/A N/A N/A Pro-Rata 3.10 1,840 0.38 3,850 0.92 1.60 25.4 100.0 N/A N/A N/A Size-Time Interp. 2.65 1,650 0.40 4,100 0.88 1.52 20.1 100.0 N/A N/A N/A
+> Learned Baselines
+> Unconstrained PPO 0.85 5,250 0.95 8,500 0.12 0.95 45.5 100.0 N/A N/A N/A Lagrangian PPO 1.15 3,840 0.76 6,250 0.25 1.12 12.4 28.5 145 0.85 45.2 RCPO 1.25 3,650 0.72 5,850 0.30 1.18 10.5 22.4 112 0.72 38.4 IPO 1.45 3,420 0.68 5,200 0.35 1.25 8.2 15.6 85 0.55 25.4 Vanilla CPO 1.35 3,580 0.70 5,450 0.32 1.20 6.5 12.4 64 0.45 18.2 PID-Lagrangian 1.20 3,750 0.74 6,100 0.28 1.15 9.5 14.5 45 0.35 12.5
+> Ours: CPO-FOAM 0.95 4,850 0.91 8,150 0.15 1.02 1.2 2.5 50.05 1.8
+> Ablation Studies
+> No PID ( ξ= 0 )1.05 4,250 0.85 7,450 0.18 1.08 5.8 11.2 75 0.28 19.5 No Trust Region 1.18 3,800 0.78 6,450 0.28 1.14 11.5 25.5 130 0.82 41.0 No KL Projection 1.38 3,500 0.72 5,800 0.36 1.22 4.5 9.5 42 0.22 11.5 No Spectral Norm 0.98 4,680 0.89 7,950 0.16 1.05 22.5 6.5 25 0.15 8.5 P-only Controller 1.02 4,550 0.88 7,650 0.17 1.06 2.8 7.2 35 0.20 9.5 PI-only Controller 0.98 4,720 0.90 7,850 0.16 1.04 1.8 4.5 18 0.12 4.5 No Recovery Step 1.40 3,250 0.68 5,100 0.42 1.28 1.5 5.5 15 0.10 3.8
+
+Table 2. Regime-dependent market robustness and constraint dynamics under CPO-FOAM. Six non-stationary market regimes with increasing structural adversity. Deg. Ratio = degradation ratio relative to the calm market baseline. 
+
+Evaluation Regime Spread (bps) (↓) Depth@5 (↑) ∆DP (↓) Lip-Viol (%) (↓) CVF (%) (↓) Trans. Len. (↓) Deg. Ratio (↓)Calm Market 0.95 4,850 0.015 1.5 1.8 5 1.00 Volatile Stress 1.15 3,500 0.018 2.2 3.5 12 1.21 Flash Event 1.45 1,800 0.024 3.8 5.2 18 1.52 Liquidity Drought 1.85 850 0.028 4.5 5.8 22 1.94 Auction Open/Close 1.35 2,200 0.022 3.1 4.2 15 1.42 News Shock ( 5×) 2.15 650 0.035 5.2 6.8 28 2.26 
+
+regimes of increasing adversity (Table 2): calm markets, volatile periods, flash events, liquidity droughts, auction crosses, and synthetically injected news shocks with 5× the baseline Poisson arrival rate. As expected, structural market shocks compressed avail-able liquidity, widening execution costs. During calm peri-ods, CPO-FOAM maintained spreads of 0.95 bps with full depth retention (4,850). Under the most extreme regime— 
+
+5× news shocks—spreads widened to 2.15 bps and depth dropped to 650, reflecting fundamental liquidity constraints rather than algorithmic failure. Despite this 2.26 × degra-dation ratio, the system maintained continuous operation without the cascading withdrawal failures observed in un-constrained agents. Critically, fairness compliance degraded gracefully. Even under the 5× news shock, CVF remained below 6.8% and transient recovery length stayed at 28 steps. Standard La-grangian baselines, by contrast, abandon fairness mandates entirely during such regime shifts, prioritizing reward ac-quisition. The PID controller’s adaptive margins absorbed the increased estimation variance, automatically expanding the safety buffer to maintain compliance without manual retuning. 
+
+8.3. Hardware Scalability, Web3 Telemetry, and Attribute Sensitivity 
+
+Deploying constrained optimization in decentralized infras-tructure requires profiling computational scalability along-side on-chain verification overhead. We systematically var-ied the constraint dimensionality ( M ∈ { 1, 3, 5, 8}), action space size ( K up to 500), trajectory length ( T up to 4096), and Fisher approximation method. Output allocations were deployed on localized Ethereum settlement networks inte-grated with EigenDA and Arweave storage (Table 3). The diagonal Fisher approximation avoided the quadratic bottleneck of exact second-order methods: throughput re-mained above 6,250 steps/s even at M =8 , whereas the exact Fisher computation reduced throughput to 850 steps/s with 11 Constrained Policy Optimization for Provably Fair Order Matching 
+
+Table 3. Hardware scalability, distributed Web3 verification telemetry, and protected attribute sensitivity. Steps/s = environment throughput; Dual Solve/Spec Norm = per-update latency (ms); Gas = on-chain verification cost (thousands); Verif Lat. = Ethereum finality latency (s); Recomp = off-chain challenge recomputation time (s); Cross-Contam = cross-metric ∆DP contamination. N/A entries indicate inapplicable configurations. 
+
+Configuration Steps/s (↑) GPU Mem (↓) Dual Solve (↓) Spec Norm (↓) Gas (k) (↓) Verif Lat. (↓) Recomp (s) (↓) Storage ($) (↓) False Chal. (↓) Cross-Contam (↓)
+
+Constraint Dimensionality 
+
+M = 1 Constraint 8,500 12.4 1.8 1.2 185 12.0 0.45 0.005 <0.001 0.012 
+
+M = 3 Constraints 8,150 14.5 4.2 2.5 315 12.0 0.85 0.012 <0.001 0.015 
+
+M = 5 Constraints 7,450 18.2 8.5 4.8 480 12.0 1.45 0.025 <0.001 0.018 
+
+M = 8 Constraints 6,250 24.5 18.4 7.5 725 24.0 2.85 0.045 <0.001 0.022 
+
+Action Space Scaling 
+
+K = 10 8,850 11.5 1.2 1.8 — — — — — —
+
+K = 50 8,150 14.5 4.2 2.5 — — — — — —
+
+K = 100 7,250 18.5 9.5 4.2 — — — — — —
+
+K = 500 5,100 28.4 28.5 12.4 — — — — — —
+
+Trajectory Length Scaling 
+
+T = 256 8,650 10.5 2.8 2.5 — — — — — —
+
+T = 1024 8,150 14.5 4.2 2.5 — — — — — —
+
+T = 4096 4,250 32.5 12.4 2.5 — — — — — —
+
+Fisher Approximation 
+
+Exact Fisher 850 48.5 145.0 2.5 — — — — — —Diagonal Fisher 8,150 14.5 4.2 2.5 — — — — — —K-FAC 6,850 22.4 14.5 2.5 — — — — — —
+
+Protected Attribute Definitions 
+
+Latency Proxy 8,150 14.5 4.2 2.5 315 12.0 0.85 0.012 <0.001 0.015 Order Size 8,140 14.6 4.3 2.5 320 12.0 0.88 0.012 <0.001 0.016 Participant Type 8,125 14.8 4.5 2.6 325 12.0 0.92 0.015 <0.001 0.018 Continuous (Label-Free) 8,650 12.5 2.5 1.8 210 12.0 0.45 0.005 <0.001 0.000 
+
+145 ms per dual solve. Dual-solve and spectral-norm pro-jection overhead remained in the low single-digit millisec-onds across all practical configurations. Scaling to K=500 
+
+reduced throughput to 5,100 steps/s with 28.4 GB GPU memory, confirming manageable growth. On-chain verification cleared within a single 12-second Ethereum block for M ≤ 5 constraints (315k gas), extend-ing to two blocks at M =8 (725k gas). Off-chain recomputa-tion for challenge resolution completed in under 3 seconds even at maximum trajectory complexity, and no false chal-lenges succeeded across all configurations ( <0.001%). When varying the definition of protected attributes—latency proxy, order size, participant type, and a continuous label-free Lipschitz formulation—throughput and overhead re-mained stable, and cross-metric contamination (the ∆DP induced on non-targeted attributes) stayed below 0.022. The continuous formulation achieved the lowest computational cost and zero cross-contamination, confirming that label-free individual fairness can be enforced without categorical routing overhead. 
+
+8.4. Safety-Gymnasium Continuous Control Generalization 
+
+To validate that CPO-FOAM generalizes beyond financial microstructure, we deployed the unmodified algorithm on 
+
+Table 4. Safety-Gymnasium domain generalization benchmark on SafetyPointGoal1 (SPG1), SafetyCarGoal1 (SCG1), and SafetyAntVelocity (SAV) environments. Episodic Reward ( ↑) and Episodic Cost ( ↓).                                                 
+
+> Method SPG1-Rew (↑)SPG1-Cost (↓)SCG1-Rew (↑)SCG1-Cost (↓)SAV-Rew (↑)SAV-Cost (↓)Lagrangian PPO 18.5 38.4 22.1 48.5 35.2 85.4 RCPO 17.2 32.5 19.8 41.2 32.8 72.5 IPO 16.5 28.6 18.5 33.6 28.4 55.6 Vanilla CPO 17.4 24.5 20.2 25.4 33.6 45.2 PID-Lagrangian 16.8 18.5 19.5 20.8 30.5 35.8
+> Ours: CPO-FOAM 24.5 8.5 26.8 10.2 45.5 18.4
+
+the Safety-Gymnasium suite (Ji et al., 2023): SafetyPoint-Goal1 (SPG1), SafetyCarGoal1 (SCG1), and SafetyAntVe-locity (SAV). No order-book-specific features or hyperpa-rameters were changed; the models trained for the same number of environment steps under identical PID gains. The results (Table 4) mirror the failure modes observed in fi-nancial experiments. Lagrangian PPO accumulated episodic costs of 38.4, 48.5, and 85.4 across the three environments, vastly exceeding safety limits. The reactive multiplier up-dates failed to adapt to the complex articulated dynamics of the Ant morphology, where delayed feedback produced the worst cost violations. PID-Lagrangian achieved the low-est cost among baselines (18.5, 20.8, 35.8) but at reduced reward. 
+
+Baseline Tuning Protocol. All baselines were tuned via grid search over their published hyperparameter 12 Constrained Policy Optimization for Provably Fair Order Matching       
+
+> Table 5. DeFi market quality, constraint dynamics, and ablation analysis. MQS = composite Market Quality Score; Spread in basis points (bps); ∆DP = demographic parity gap; CVF = constraint violation frequency; Osc. Amp. = oscillation amplitude; Lat. = inference latency (ms). ↑/↓indicate higher/lower is better. Bold marks the best result among full methods.
+
+Method / Variant MQS (↑) Spread (↓) Fill Rate (%) (↑) ∆DP (↓) CVF (%) (↓) Osc. Amp. (↓) Lat. (ms) (↓)
+
+DeFi-Native Mechanism Baselines 
+
+FIFO (CLOB) 0.652 4.15 58.2 0.245 84.1 N/A 0.05 CPAMM 0.521 8.42 99.9 0.381 91.2 N/A 0.02 CLAMM 0.714 3.88 82.1 0.320 86.5 N/A 0.03 Pro-Rata 0.618 5.21 62.3 0.154 62.3 N/A 0.08 MEV-Aware FIFO 0.687 4.05 55.1 0.142 71.4 N/A 145.00 Batch Auction 0.741 6.10 48.9 0.091 22.5 N/A 12000.00 
+
+Constrained RL Baselines 
+
+Unconstrained PPO 0.984 1.82 89.4 0.291 92.3 12.45 0.82 Lagrangian PPO 0.865 2.14 81.2 0.112 18.4 4.82 0.84 RCPO 0.881 2.10 83.1 0.104 14.2 4.15 0.84 IPO 0.825 2.35 78.5 0.081 11.5 3.95 0.86 CPO (Vanilla) 0.854 2.05 80.4 0.092 15.6 3.10 0.95 PID-Lagrangian 0.892 2.12 82.7 0.071 8.2 2.85 0.88 
+
+Ablation Variants 
+
+No PID ( ξ = 0 ) 0.941 2.01 86.1 0.084 14.3 2.98 0.84 No Trust Region 0.812 2.44 75.2 0.121 19.8 4.51 0.75 No KL Projection 0.915 2.08 84.6 0.064 8.5 1.85 0.82 No Spectral Norm 0.952 1.88 87.9 0.051 6.4 0.92 0.65 No Recovery Step 0.852 2.25 72.8 0.091 11.2 0.88 0.85 
+
+Transfer Variants 
+
+Universal Zero-Shot 0.860 2.65 81.5 0.041 4.2 0.85 0.85 Universal Fine-Tuned 0.925 1.95 87.1 0.015 0.5 0.72 0.85 Random Matching 0.125 25.40 15.2 0.010 0.0 0.00 0.01 
+
+Ours: CPO-FOAM 0.968 1.91 88.5 0.021 3.2 0.65 0.85 
+
+ranges. For PID-Lagrangian specifically, we swept 
+
+KP ∈ {0.1, 0.5, 1.0}, KI ∈ {0.01 , 0.05 , 0.1}, KD ∈{0, 0.01 , 0.05 } and report the best configuration per environ-ment. Differences from the results reported by Stooke et al. (2020) are attributable to the updated Safety-Gymnasium v1.0 environments (Ji et al., 2023), which feature revised dynamics and cost functions relative to the legacy Safety-Gym v0.x used in the original paper. The reported 2.1×
+
+reward improvement is measured relative to the best PID-Lagrangian run under our evaluation protocol; we release all tuning sweeps and per-seed results in the supplementary material. CPO-FOAM achieved an episodic reward of 45.5 on SAV while limiting cost to 18.4—a 2.1× reward improvement and 1.9× cost reduction over PID-Lagrangian. On the sim-pler SPG1 and SCG1 tasks, CPO-FOAM similarly domi-nated, reaching rewards of 24.5 and 26.8 with costs of 8.5 and 10.2. The predictive error signals in the PID controller anticipated proximity to constraint boundaries, throttling agent velocity before violations occurred rather than correct-ing afterward. This cross-domain consistency confirms that the PID-bounded trust-region formulation provides a gen-eral mechanism for safe constrained reinforcement learning, not one limited to financial applications. 
+
+8.5. DeFi: Market Quality, Constraint Dynamics, and Ablations 
+
+Table 5 reports DeFi results evaluated on 500,000 held-out steps across 15 unseen calendar days, using Hawkes-process order arrivals (Bacry et al., 2015) and MEV adversarial injection (Daian et al., 2020). The results parallel TradFi findings but with wider absolute spreads reflecting crypto-native volatility. DeFi-native mechanisms exhibited a clear market quality– fairness tradeoff. CPAMMs achieved near-perfect fill rates (99.9%) by design but produced the widest spreads (8.42 bps) and highest ∆DP (0.381), reflecting their inability to distinguish participant types. CLAMMs improved spread (3.88 bps) but maintained high CVF (86.5%). Batch Auc-tions achieved the lowest ∆DP among DeFi baselines (0.091) at the cost of 12-second latency, precluding real-time deployment. MEV-Aware FIFO reduced ∆DP to 0.142 through encrypted mempool simulation but intro-13 Constrained Policy Optimization for Provably Fair Order Matching  
+
+> Table 6. DeFi regime robustness, adversarial stress testing, and cross-domain safety validation. Target column indicates the governance threshold. All DeFi-specific scenarios evaluated under Hawkes-process MEV injection.
+
+Scenario / Metric Target FIFO (CLOB) Lagrangian PPO CPO 
+
+(Vanilla) 
+
+CPO-FOAM 
+
+(Ours) 
+
+Adversarial Fairness Stress Tests 
+
+MEV ∆DP ( p = 0 .20 ) ( ↓) < 0.05 0.185 0.112 0.092 0.038 
+
+Whale/Retail Fill Ratio ( ↑) > 0.85 0.581 0.720 0.785 0.895 
+
+Cross-Chain ∆DP (10-block) ( ↓) < 0.05 0.224 0.145 0.110 0.042 
+
+Liquidation Rate Disparity ( ↓) < 0.10 0.280 0.180 0.155 0.061 
+
+Depeg Fill Quality Gap ( ↓) < 0.08 0.195 0.142 0.115 0.065 
+
+Token Launch Bot/Org Ratio ( ↑) > 0.70 0.254 0.542 0.580 0.745 
+
+On-Chain Verification 
+
+L2 Verification Cost (USD) ( ↓) < 0.01 0.005 0.008 0.008 0.009 
+
+Cross-Domain Safety 
+
+Safety Gym Cost Rate ( ↓) < 0.02 N/A 0.122 0.085 0.014 
+
+duced 145ms latency overhead. Among constrained RL methods, the same sawtooth insta-bility observed in TradFi persisted. Lagrangian PPO and RCPO sustained oscillation amplitudes of 4.82 and 4.15, with CVFs of 18.4% and 14.2%. These reactive correc-tions are particularly problematic in permissionless systems where transient fairness violations are immutably recorded on-chain. CPO-FOAM achieved a market quality score of 0.968— capturing 98.4% of the unconstrained reward envelope— while compressing CVF to 3.2% and oscillation amplitude to 0.65. Compared to TradFi results (CVF 2.5%), the slightly higher DeFi violation rate reflects the increased non-stationarity of crypto microstructure. Inference latency remained at 0.85ms, well within the 250ms block times of optimistic rollups. 
+
+Ablation Studies. DeFi ablations mirrored TradFi pat-terns. Removing the PID controller increased CVF from 3.2% to 14.3% and oscillation amplitude from 0.65 to 2.98. Removing spectral normalization improved market quality (MQS 0.952) but degraded fairness ( ∆DP from 0.021 to 0.051), confirming that the Lipschitz bound remains essen-tial for individual fairness. The trust region removal caused the most severe degradation (MQS 0.812, CVF 19.8%), replicating Lagrangian failure modes. These consistent ab-lation profiles across TradFi and DeFi domains confirm that the algorithmic contributions are not domain-specific. 
+
+Zero-Shot Transfer. The universal model trained on blue-chip assets achieved MQS of 0.860 when deployed zero-shot on unseen memecoin microstructures—a 10% degradation from the fine-tuned configuration. Fine-tuning recovered performance to MQS 0.925 with CVF of 0.5%, demonstrat-ing that learned fairness constraints transfer across liquidity regimes without architectural modification. 
+
+8.6. DeFi: Regime Robustness and Cross-Domain Validation 
+
+Table 6 evaluates robustness under DeFi-specific adversar-ial scenarios: MEV sandwich attacks, stablecoin depeg-ging events, cascading liquidations, and zero-history token launches. These conditions were injected via the calibrated Hawkes-process framework with 5× the baseline arrival rate. Under simulated MEV stress ( p=0 .20 sandwich probabil-ity), CPO-FOAM maintained ∆DP at 0.038, below the 0.05 governance threshold. FIFO CLOBs exhibited ∆DP of 0.185, reflecting deterministic front-running vulnerabil-ity. During token launch events—where optimized sniper bots traditionally monopolize block space—CPO-FOAM achieved a bot-to-organic fill ratio of 0.745, compared to 0.254 under FIFO, demonstrating effective algorithmic in-clusion of organic participants. Under 10-block cross-chain bridging latencies, the policy maintained ∆DP at 0.042 by proactively compensating for deterministic latency disad-vantages. The whale-to-retail fill ratio of 0.895 confirmed that fair-ness constraints did not inadvertently degrade institutional execution quality. Liquidation rate disparity (0.061) and depeg fill quality gap (0.065) remained within governance targets, indicating that constrained optimization adapts to both sudden liquidity shocks and stablecoin stress events. Layer-2 verification costs of $0.009 per trade were achieved by amortizing proof generation across batch settlements, enabling fee abstraction at daily matched volumes exceeding $1M. 14 Constrained Policy Optimization for Provably Fair Order Matching   
+
+> Figure 2. Performance trade-offs, training dynamics, and transfer efficiency of CPO-FOAM. (A) Pareto frontier illustrating the trade-off between Market Quality Score and Aggregate Fairness Violation ( ∆DP). Our method (CPO-FOAM) effectively pushes the efficiency frontier, achieving near-optimal market quality while maintaining the lowest fairness violation compared to standard reinforcement learning baselines. (B) Constraint satisfaction dynamics over training updates. Unlike Lagrangian PPO, which exhibits oscillatory “sawtooth” instability around the regulatory threshold ( di= 0 .05 ), CPO-FOAM demonstrates stable, monotonic convergence toward strict constraint satisfaction. (C) Cross-domain transfer learning efficiency (%). The heatmap demonstrates that representations learned via joint training generalize robustly across distinct market environments (TradFi and Crypto), mitigating performance degradation during zero-shot domain transfer.
+
+8.7. Algorithmic Efficacy, Constraint Dynamics, and Generalization 
+
+Figure 2 synthesizes the trade-offs between execution qual-ity, constraint stability, and cross-domain transferability. The three panels jointly demonstrate that optimizing purely for market efficiency degrades fairness, motivating the con-strained architecture. Panel A shows the Pareto frontier between MQS and ∆DP. Unconstrained PPO occupies the lower-right extreme (high MQS, high violation), while rule-based heuristics perform poorly on both axes. CPO-FOAM reaches the upper-left quadrant, retaining 96% of optimal market quality while reducing the demographic parity gap to near zero. This confirms that embedding fairness directly into the trust-region projection preserves market efficiency. Panel B plots constraint satisfaction over training. Un-der non-stationary order arrivals, standard Lagrangian up-dates exhibit characteristic sawtooth oscillations, repeatedly breaching and over-correcting around the regulatory thresh-old. The PID margin controller suppresses these transients: the derivative term anticipates gradient momentum while the integral term eliminates steady-state bias, producing smooth convergence below the safety bound. Panel C evaluates cross-domain transfer. Despite substan-tial microstructural differences between TradFi equities and crypto assets—including varied latency profiles and MEV adversarial dynamics—joint training produces transfer ef-ficiencies consistently above 85%. This indicates that the constrained projection learns an abstract fairness manifold that generalizes across market domains. 
+
+8.8. Microstructural Robustness and On-Chain Scalability 
+
+Figure 3 evaluates out-of-distribution robustness and on-chain verification overhead. Panel A reports CVF under synthetic market shocks. While Lagrangian baselines exceeded 50% CVF during flash events and cascading liquidations, CPO-FOAM’s trust-region bound confined worst-case CVF below 8% across all regimes—including stablecoin depegs and 5× arrival-rate shocks. The bounded disturbance model (Definition 5.4) provides a theoretical explanation: Wmax increases under regime stress, but the BIBO-stable controller prevents un-bounded violation accumulation. Critically, the degradation profile is monotonic rather than catastrophic: as regime adversity increases from calm to 5× news shocks, CVF rises smoothly from 1.8% to 6.8%, whereas Lagrangian PPO exhibits a phase transition—jumping from 12% to over 50%—once the dual-variable update rate can no longer track the non-stationarity. The PID derivative term is the key dif-ferentiator: by responding to the rate of change of violation energy, it anticipates emerging constraint pressure before the integral accumulator registers the shift, effectively providing a one-step lookahead into regime transitions. Panel B projects amortized verification costs for the challenge-response settlement protocol (Section 6). As daily settlement volume scales toward one million events, batch amortization contracts per-transaction cost sub-linearly. Ethereum L1 remains expensive at low volumes ( ∼$0.15 per trade at 1,000 daily settlements), but Arbitrum L2 and Solana reduce amortized costs below $0.01 per trade at volumes exceeding 10,000 daily events, confirming eco-nomic viability for on-chain fairness auditing at scale. For 15 Constrained Policy Optimization for Provably Fair Order Matching  
+
+> Figure 3. Regime-specific robustness and on-chain verification cost scaling. (A) Constraint Violation Frequency (CVF) across extreme market regimes. CPO-FOAM maintains safety compliance during flash events and liquidity cascades, whereas Vanilla CPO and Lagrangian PPO suffer severe constraint degradation. (B) Amortized challenge-response verification costs per transaction across execution layers (Ethereum L1, Arbitrum L2, Solana). Batch amortization reduces per-transaction cost sub-linearly with daily settlement volume.
+
+institutional deployment, this cost structure enables a prac-tical operating model: matching engines batch settlements into fixed-interval windows (e.g., every 100 blocks), submit Merkle commitments with fairness attestations, and amor-tize the fixed gas overhead across all trades in the batch. At the daily volumes typical of mid-tier crypto exchanges (>$1M matched notional), the verification overhead be-comes negligible relative to trading fees. 
+
+## 9. Conclusion 
+
+We have presented CPO-FOAM, a constrained policy opti-mization framework for provably fair order matching in tra-ditional and decentralized financial markets. By formulating matching as a CMDP with demographic parity, equalized odds, and Lipschitz individual fairness costs, we establish an auditable interface between microstructure telemetry and en-forceable constraints. The two-stage algorithm—combining analytic trust-region projection on the Fisher manifold with PID-controlled safety margins—achieves CPO-grade geo-metric optimality while eliminating the oscillatory instabili-ties of standard Lagrangian methods, with provable BIBO stability and asymptotic feasibility under bounded stochas-tic disturbances. Empirically, CPO-FOAM recovers 95.9% (TradFi) and 98.4% (DeFi) of the unconstrained reward en-velope while compressing constraint violation frequency to 2.5% and 3.2%, respectively. Fairness compliance degrades gracefully across six stress regimes and DeFi-specific adver-sarial scenarios (MEV attacks, depegging, cascading liqui-dations). Zero-shot cross-domain transfer retains MQS of 0.860, on-chain settlement clears within a single Ethereum block at $0.009 per trade, and Safety-Gymnasium experi-ments yield 2.1× reward improvement and 1.9× cost reduc-tion, confirming the universality of the formulation. 
+
+## References 
+
+Achiam, J., Held, D., Tamar, A., and Abbeel, P. Constrained policy optimization. In International conference on ma-chine learning , pp. 22–31. PMLR, 2017. Adams, H., Zinsmeister, N., Salem, M., Robinson, D., and Zhen, T. Uniswap v3 core. Uniswap Whitepa-per, 2021. Available at: https://uniswap.org/ whitepaper-v3.pdf .Altman, E. Constrained Markov Decision Processes: Stochastic Modeling . Chapman and Hall/CRC, 1999. Amihud, Y. Illiquidity and stock returns: cross-section and time-series effects. Journal of Financial Markets , 5(1): 31–56, 2002. Angeris, G., Kao, H.-T., Chiang, R., Noyes, C., and Chitra, T. An analysis of Uniswap markets. Cryptoeconomic Systems , 1(1), 2020. Aquilina, M., Budish, E., and O’Neill, P. Quantifying the high-frequency trading “arms race”. The Quarterly Jour-nal of Economics , 137(1):493–564, 2022. Bacry, E., Mastromatteo, I., and Muzy, J.-F. Hawkes pro-cesses in finance. Market Microstructure and Liquidity , 1 (1):1550005, 2015. Benet, J. IPFS – content addressed, versioned, P2P file system. arXiv preprint arXiv:1407.3561, 2014. Boneh, D., Lynn, B., and Shacham, H. Short signatures from the Weil pairing. In Advances in Cryptology – ASI-ACRYPT 2001 , volume 2248 of Lecture Notes in Com-puter Science , pp. 514–532. Springer, 2001. 16 Constrained Policy Optimization for Provably Fair Order Matching 
+
+Bradley, R. C. Basic properties of strong mixing conditions. A survey and some open questions. Probability Surveys ,2:107–144, 2005. Budish, E., Cramton, P., and Shim, J. The high-frequency trading arms race: Frequent batch auctions as a market design response. The Quarterly Journal of Economics ,130(4):1547–1621, 2015. Calders, T., Kamiran, F., and Pechenizkiy, M. Building classifiers with independency constraints. In IEEE In-ternational Conference on Data Mining Workshops , pp. 13–18. IEEE, 2009. Daian, P., Goldfeder, S., Kell, T., Li, Y., Zhao, X., Bentov, I., Breidenbach, L., and Juels, A. Flash boys 2.0: Frontrun-ning in decentralized exchanges, miner extractable value, and consensus instability. In 2020 IEEE Symposium on Security and Privacy (SP) , pp. 910–927. IEEE, 2020. Dwork, C., Hardt, M., Pitassi, T., Reingold, O., and Zemel, R. Fairness through awareness. In Proceedings of the 3rd Innovations in Theoretical Computer Science Conference ,pp. 214–226. ACM, 2012. Frey, S. Y., Li, K., Nagy, P., Sapora, S., Lu, C., Zohren, S., Foerster, J., and Calinescu, A. Jax-lob: A gpu-accelerated limit order book simulator to unlock large scale reinforce-ment learning for trading. In Proceedings of the Fourth ACM International Conference on AI in Finance , pp. 583– 591, 2023. Gouk, H., Frank, E., Pfahringer, B., and Cree, M. Reg-ularisation of neural networks by enforcing Lipschitz continuity. Machine Learning , 110(2):393–416, 2021. Gould, M. D., Porter, M. A., Williams, S., McDonald, M., Fenn, D. J., and Howison, S. D. Limit order books. Quan-titative Finance , 13(11):1709–1748, 2013. Hardt, M., Price, E., and Srebro, N. Equality of opportunity in supervised learning. Advances in neural information processing systems , 29, 2016. Ji, J., Zhang, B., Zhou, J., Pan, X., Huang, W., Sun, R., Geng, Y., Zhong, Y., Dai, J., and Yang, Y. Safety gymna-sium: A unified safe reinforcement learning benchmark. 
+
+Advances in Neural Information Processing Systems , 36: 18964–18993, 2023. Kingma, D. P. and Ba, J. Adam: A method for stochastic optimization. In International Conference on Learning Representations , 2015. Liu, Y., Ding, J., and Liu, X. IPO: Interior-point policy optimization under constraints. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 34, pp. 4940–4947, 2020. Loshchilov, I. and Hutter, F. SGDR: Stochastic gradient descent with warm restarts. In International Conference on Learning Representations , 2017. Miyato, T., Kataoka, T., Koyama, M., and Yoshida, Y. Spec-tral normalization for generative adversarial networks. In 
+
+International Conference on Learning Representations ,2018. Nevmyvaka, Y., Feng, Y., and Kearns, M. Reinforcement learning for optimized trade execution. In Proceedings of the 23rd International Conference on Machine Learning ,pp. 673–680. ACM, 2006. Ogata, K. Discrete-Time Control Systems . Prentice Hall, Englewood Cliffs, NJ, 2nd edition, 1995. Paulin, D. Concentration inequalities for Markov chains by Marton couplings and spectral methods. The Annals of Applied Probability , 25(6):3461–3512, 2015. Schulman, J., Moritz, P., Levine, S., Jordan, M. I., and Abbeel, P. High-dimensional continuous control using generalized advantage estimation. In International Con-ference on Learning Representations , 2016. Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and Klimov, O. Proximal policy optimization algorithms. 
+
+arXiv preprint arXiv:1707.06347 , 2017. Sreeram, K. Eigenlayer: The restaking collec-tive. EigenLayer Whitepaper, 2023. Available at: https://docs.eigenlayer.xyz/assets/ files/EigenLayer_WhitePaper.pdf .Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., and Salakhutdinov, R. Dropout: A simple way to prevent neural networks from overfitting. Journal of Machine Learning Research , 15(1):1929–1958, 2014. Stooke, A., Achiam, J., and Abbeel, P. Responsive safety in reinforcement learning by pid lagrangian methods. In 
+
+International Conference on Machine Learning , pp. 9133– 9143. PMLR, 2020. Tessler, C., Mankowitz, D. J., and Mannor, S. Re-ward constrained policy optimization. arXiv preprint arXiv:1805.11074 , 2018. Teutsch, J. and Reitwiesner, C. A scalable verification solu-tion for blockchains. In TrueBit Protocol , 2019. Avail-able at: https://people.cs.uchicago.edu/ ˜teutsch/papers/truebit.pdf .Wen, M., Bastani, O., and Topcu, U. Algorithms for fairness in sequential decision making. In International Confer-ence on Artificial Intelligence and Statistics , pp. 1144– 1152. PMLR, 2021. 17 Constrained Policy Optimization for Provably Fair Order Matching 
+
+Williams, S., Diordiiev, V., Berman, L., Russ, I., and Uem-lianin, I. Arweave: A protocol for economically sustain-able information permanence. Arweave Yellow Paper, 2019. Available at: https://www.arweave.org/ yellow-paper.pdf .Yu, B. Rates of convergence for empirical processes of stationary mixing sequences. The Annals of Probability ,22(1):94–116, 1994. 18

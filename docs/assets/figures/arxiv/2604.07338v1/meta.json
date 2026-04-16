@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-001.webp",
+      "caption": "Table 4: Per-culture performance comparison across models. Acc denotes exact-match accuracy, and Partial denotes partial-match rate.",
+      "page": 6,
+      "index": 1,
+      "width": 506,
+      "height": 947
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-002.webp",
+      "caption": "Figure 4: Example images for Object ID 1513_Celery vase.",
+      "page": 11,
+      "index": 2,
+      "width": 372,
+      "height": 558
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-003.webp",
+      "caption": "Figure 8: Example images for Object ID 2b6e224c-686a-4b43-aa5a-1ef5520ef0ef. Top: full painting. Bottom: object back (left) and framed view (right).",
+      "page": 15,
+      "index": 3,
+      "width": 1056,
+      "height": 736
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-004.webp",
+      "caption": "Figure 3: Example images for Object ID 1055_Butter Pat.",
+      "page": 10,
+      "index": 4,
+      "width": 582,
+      "height": 423
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-005.webp",
+      "caption": "Figure 7: Example images for Object ID 333_Basin.",
+      "page": 14,
+      "index": 5,
+      "width": 444,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-006.webp",
+      "caption": "Table 1: Comparison of existing heritage-related caption datasets and models in terms of cultural scope and caption orientation. Symbols denote the level of support: ✓ indicates full support, ✗ indicates the absence of support.",
+      "page": 3,
+      "index": 6,
+      "width": 902,
+      "height": 303
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-007.webp",
+      "caption": "Figure 6: Example images for Object ID 0f097d4a-4ca1-40fd-b562-ab41a411aff1.",
+      "page": 13,
+      "index": 7,
+      "width": 268,
+      "height": 460
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-008.webp",
+      "caption": "Figure 5: Example images for Object ID 42_Andiron.",
+      "page": 12,
+      "index": 8,
+      "width": 444,
+      "height": 569
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07338v1/fig-009.webp",
+      "caption": "Table 2: Overview of evaluated vision-language models, including openweight and close-source models.",
+      "page": 5,
+      "index": 9,
+      "width": 498,
+      "height": 307
+    }
+  ]
+}
