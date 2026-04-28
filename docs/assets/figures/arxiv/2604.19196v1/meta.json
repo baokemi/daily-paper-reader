@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.19196v1/fig-001.webp",
+      "caption": "Table 1. Comparison of various vision foundation models as feature extractors for FAS. Evaluation metrics are reported in AUC [%]↑.",
+      "page": 6,
+      "index": 1,
+      "width": 1033,
+      "height": 556
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19196v1/fig-002.webp",
+      "caption": "Table 2. Experimental results for MICO [%]. The best and second-best results among vision-only methods are highlighted in bold and underline, respectively. VLM-based multimodal methods are listed at the bottom for reference.",
+      "page": 7,
+      "index": 2,
+      "width": 1029,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19196v1/fig-003.webp",
+      "caption": "Figure 1. Overview of our comprehensive benchmarking framework and the proposed vision-only baseline. (A) Target Models and Categorization: We systematically categorize and evaluate 15 diverse vision foundation models across different pre-training paradigms (Supervised CNNs, Supervised ViTs, and Self-Supervised & Multi-modal ViTs). (B) Vision-Only Baseline Construction: Based on the benchmark insights, we construct a highly efficient baseline utilizing DINOv2 with Registers to mitigate attention artifacts, further enhanced by robust training strategies including FAS-Aug, PDA, and APL. (C) Comprehensive Evaluation: Extensive evaluations under the standard MICO and Limited Source Domain (LSD) protocols demonstrate that our vision-only approach achieves superior domain generalization.",
+      "page": 3,
+      "index": 3,
+      "width": 1036,
+      "height": 239
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19196v1/fig-004.webp",
+      "caption": "Table 3. Experimental results for limited source domains [%]. The best and second-best results are highlighted in bold and underline,",
+      "page": 8,
+      "index": 4,
+      "width": 490,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19196v1/fig-005.webp",
+      "caption": "Figure 2. Overview of our proposed vision-only baseline. During training, input images are augmented by Face Anti-Spoofing Data Augmentation (FAS-Aug) and Patch-wise Data Augmentation (PDA) to simulate diverse spoofing artifacts and enforce robust local representations. The processed images are then fed into the DINOv2 with Registers backbone. Finally, the network is optimized using a dual-level supervision strategy: a global classification loss (Lclass) derived from the class token, and a local Attention-Weighted Patch Loss (LAPL) applied to the patch tokens.",
+      "page": 4,
+      "index": 5,
+      "width": 1036,
+      "height": 456
+    }
+  ]
+}
