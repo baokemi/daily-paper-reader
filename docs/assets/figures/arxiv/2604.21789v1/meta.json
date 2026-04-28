@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.21789v1/fig-001.webp",
+      "caption": "Table 1: Detection Performance Under Different Reporting Strategies",
+      "page": 13,
+      "index": 1,
+      "width": 992,
+      "height": 202
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21789v1/fig-002.webp",
+      "caption": "Figure 1: Performance-efficiency trade-off of risk memory size K (AUPRC and Type II error vs. K, with time per epoch). Performance saturates around K = 10, consistent with K = Θ(log |V |).",
+      "page": 32,
+      "index": 2,
+      "width": 510,
+      "height": 259
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21789v1/fig-003.webp",
+      "caption": "Table 4: Intervention Policy Comparison",
+      "page": 31,
+      "index": 3,
+      "width": 1000,
+      "height": 181
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21789v1/fig-004.webp",
+      "caption": "Table 2: Detection Performance Under Adversarial Adaptation",
+      "page": 16,
+      "index": 4,
+      "width": 752,
+      "height": 284
+    }
+  ]
+}

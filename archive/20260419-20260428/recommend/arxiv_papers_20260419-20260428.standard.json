@@ -1,13 +1,13 @@
 {
   "mode": "standard",
-  "generated_at": "2026-04-28T02:49:53.480162+00:00",
+  "generated_at": "2026-04-28T03:25:16.512583+00:00",
   "stats": {
     "mode": "standard",
     "tag_count": 1,
-    "deep_divecandidates": 24,
+    "deep_divecandidates": 10,
     "deep_cap": 6,
     "deep_selected": 6,
-    "quick_candidates": 43,
+    "quick_candidates": 32,
     "quick_skim_target": 11,
     "quick_selected": 11
   },
@@ -29,17 +29,17 @@
       "published": "2026-04-20T03:04:12+00:00",
       "link": "https://arxiv.org/pdf/2604.17747v1",
       "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
+        "keyword:联邦激励",
+        "query:联邦激励"
       ],
-      "llm_score": 9.5,
-      "llm_evidence_en": "efficient federated RLHF algorithm for resource-constrained agents",
-      "llm_evidence_cn": "针对资源受限代理的高效联邦RLHF算法",
-      "llm_evidence": "针对资源受限代理的高效联邦RLHF算法",
-      "canonical_evidence": "针对资源受限代理的高效联邦RLHF算法",
-      "llm_tldr_en": "Introduces Par-S2ZPO, an efficient federated reinforcement learning algorithm using zeroth-order optimization.",
-      "llm_tldr_cn": "引入Par-S2ZPO，一种利用零阶优化的高效联邦强化学习算法。",
-      "llm_tldr": "引入Par-S2ZPO，一种利用零阶优化的高效联邦强化学习算法。",
+      "llm_score": 10.0,
+      "llm_evidence_en": "combining federated learning and reinforcement learning from human feedback",
+      "llm_evidence_cn": "结合联邦学习与人类反馈强化学习",
+      "llm_evidence": "结合联邦学习与人类反馈强化学习",
+      "canonical_evidence": "结合联邦学习与人类反馈强化学习",
+      "llm_tldr_en": "Proposes an efficient federated RLHF algorithm using zeroth-order policy optimization for edge devices.",
+      "llm_tldr_cn": "提出了一种针对边缘设备的使用零阶策略优化的高效联邦RLHF算法。",
+      "llm_tldr": "提出了一种针对边缘设备的使用零阶策略优化的高效联邦RLHF算法。",
       "llm_tags": [
         "query:flrlvldm:composite"
       ],
@@ -47,520 +47,6 @@
       "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
       "matched_requirement_id": "req-composite-flrlvldm",
       "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2604.17217v1",
-      "source": "arxiv",
-      "title": "Cross-Modal Attention Analysis and Optimization in Vision-Language Models: A Study on Visual Reliability",
-      "abstract": "Vision-Language Models (VLMs) achieve strong cross-modal performance, yet recent evidence suggests they over-rely on textual descriptions while under-utilizing visual evidence -- a phenomenon termed ``text shortcut learning.'' We propose an adversarial evaluation framework that quantifies this cross-modal dependency by measuring accuracy degradation (Drop) when semantically conflicting text is paired with unchanged images. Four adversarial strategies -- shape\\_swap, color\\_swap, position\\_swap, and random\\_text -- are applied to a controlled geometric-shapes dataset ($n{=}1{,}000$). We compare three configurations: Baseline CLIP (ViT-B/32), LoRA fine-tuning, and LoRA Optimized (integrating Hard Negative Mining, Label Smoothing, layer-wise learning rates, Cosine Restarts, curriculum learning, and data augmentation). The optimized model reduces average Drop from 27.5\\% to 9.8\\% (64.4\\% relative improvement, $p{<}0.001$) while maintaining 97\\% normal accuracy. Attention visualization and embedding-space analysis confirm that the optimized model attends more to visual features and achieves tighter cross-modal alignment.",
-      "authors": [
-        "Lijie Zhou"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV",
-        "cs.AI"
-      ],
-      "published": "2026-04-19T02:56:08+00:00",
-      "link": "https://arxiv.org/pdf/2604.17217v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "innovations in CLIP and vision language models; cross modal alignment",
-      "llm_evidence_cn": "CLIP与视觉语言模型的创新；跨模态对齐",
-      "llm_evidence": "CLIP与视觉语言模型的创新；跨模态对齐",
-      "canonical_evidence": "CLIP与视觉语言模型的创新；跨模态对齐",
-      "llm_tldr_en": "Analyzes and optimizes cross-modal attention in CLIP-like models to reduce text shortcut learning.",
-      "llm_tldr_cn": "分析并优化类CLIP模型中的跨模态注意力，以减少文本捷径学习。",
-      "llm_tldr": "分析并优化类CLIP模型中的跨模态注意力，以减少文本捷径学习。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2604.17706v1",
-      "source": "arxiv",
-      "title": "OmniVLA-RL: A Vision-Language-Action Model with Spatial Understanding and Online RL",
-      "abstract": "Visual-Language-Action (VLA) models represent a paradigm shift in embodied AI, yet existing frameworks often struggle with imprecise spatial perception, suboptimal multimodal fusion, and instability in reinforcement learning. To bridge these gaps, we propose OmniVLA-RL, a novel architecture that leverages a Mix-of-Transformers (MoT) design to synergistically integrate reasoning, spatial, and action experts. Furthermore, we introduce Flow-GSPO, which reformulates flow matching as a Stochastic Differential Equation (SDE) process and integrates it with Group Segmented Policy Optimization (GSPO) to enhance action precision and training robustness. Extensive evaluations on the LIBERO and LIBERO-Plus benchmarks demonstrate that OmniVLA-RL significantly outperforms state-of-the-art methods, effectively overcoming the fundamental limitations of current VLA models.",
-      "authors": [
-        "Haoxiang Jie",
-        "Yaoyuan Yan",
-        "Xiangyu Wei",
-        "Kailin Wang",
-        "Hongjie Yan",
-        "Zhiyou Heng",
-        "Daocheng Chen"
-      ],
-      "primary_category": "cs.RO",
-      "categories": [
-        "cs.RO"
-      ],
-      "published": "2026-04-20T01:36:58+00:00",
-      "link": "https://arxiv.org/pdf/2604.17706v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "Vision-Language-Action model with reinforcement learning",
-      "llm_evidence_cn": "结合强化学习的视觉语言动作模型",
-      "llm_evidence": "结合强化学习的视觉语言动作模型",
-      "canonical_evidence": "结合强化学习的视觉语言动作模型",
-      "llm_tldr_en": "OmniVLA-RL integrates reasoning and action experts with policy optimization for embodied AI.",
-      "llm_tldr_cn": "OmniVLA-RL通过混合专家架构和策略优化提升了具身智能模型的空间理解与动作精度。",
-      "llm_tldr": "OmniVLA-RL通过混合专家架构和策略优化提升了具身智能模型的空间理解与动作精度。",
-      "llm_tags": [
-        "query:flrlvldm:composite"
-      ],
-      "matched_query_tag": "query:flrlvldm:composite",
-      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
-      "matched_requirement_id": "req-composite-flrlvldm",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2604.18573v1",
-      "source": "arxiv",
-      "title": "T-REN: Learning Text-Aligned Region Tokens Improves Dense Vision-Language Alignment and Scalability",
-      "abstract": "Despite recent progress, vision-language encoders struggle with two core limitations: (1) weak alignment between language and dense vision features, which hurts tasks like open-vocabulary semantic segmentation; and (2) high token counts for fine-grained visual representations, which limits scalability to long videos. This work addresses both limitations. We propose T-REN (Text-aligned Region Encoder Network), an efficient encoder that maps visual data to a compact set of text-aligned region-level representations (or region tokens). T-REN achieves this through a lightweight network added on top of a frozen vision backbone, trained to pool patch-level representations within each semantic region into region tokens and align them with region-level text annotations. With only 3.7% additional parameters compared to the vision-language backbone, this design yields substantially stronger dense cross-modal understanding while reducing the token count by orders of magnitude. Specifically, T-REN delivers +5.9 mIoU on ADE20K open-vocabulary segmentation, +18.4% recall on COCO object-level text-image retrieval, +15.6% recall on Ego4D video object localization, and +17.6% mIoU on VSPW video scene parsing, all while reducing token counts by more than 24x for images and 187x for videos compared to the patch-based vision-language backbone. The code and model are available at https://github.com/savya08/T-REN.",
-      "authors": [
-        "Savya Khosla",
-        "Sethuraman T",
-        "Aryan Chadha",
-        "Alex Schwing",
-        "Derek Hoiem"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-04-20T17:57:02+00:00",
-      "link": "https://arxiv.org/pdf/2604.18573v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "improves cross-modal alignment and efficiency in vision-language encoders",
-      "llm_evidence_cn": "改进视觉语言编码器的跨模态对齐和效率",
-      "llm_evidence": "改进视觉语言编码器的跨模态对齐和效率",
-      "canonical_evidence": "改进视觉语言编码器的跨模态对齐和效率",
-      "llm_tldr_en": "T-REN improves vision-language alignment and scalability by mapping visual data to compact region tokens.",
-      "llm_tldr_cn": "T-REN通过将视觉数据映射到紧凑的区域标记，改进了视觉语言对齐和可扩展性。",
-      "llm_tldr": "T-REN通过将视觉数据映射到紧凑的区域标记，改进了视觉语言对齐和可扩展性。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2604.20705v1",
-      "source": "arxiv",
-      "title": "SSL-R1: Self-Supervised Visual Reinforcement Post-Training for Multimodal Large Language Models",
-      "abstract": "Reinforcement learning (RL) with verifiable rewards (RLVR) has demonstrated the great potential of enhancing the reasoning abilities in multimodal large language models (MLLMs). However, the reliance on language-centric priors and expensive manual annotations prevents MLLMs' intrinsic visual understanding and scalable reward designs. In this work, we introduce SSL-R1, a generic self-supervised RL framework that derives verifiable rewards directly from images. To this end, we revisit self-supervised learning (SSL) in visual domains and reformulate widely-used SSL tasks into a set of verifiable visual puzzles for RL post-training, requiring neither human nor external model supervision. Training MLLMs on these tasks substantially improves their performance on multimodal understanding and reasoning benchmarks, highlighting the potential of leveraging vision-centric self-supervised tasks for MLLM post-training. We think this work will provide useful experience in devising effective self-supervised verifiable rewards to enable RL at scale. Project page: https://github.com/Jiahao000/SSL-R1.",
-      "authors": [
-        "Jiahao Xie",
-        "Alessio Tonioni",
-        "Nathalie Rauschmayr",
-        "Federico Tombari",
-        "Bernt Schiele"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-04-22T15:46:42+00:00",
-      "link": "https://arxiv.org/pdf/2604.20705v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "self-supervised reinforcement learning for multimodal large language models",
-      "llm_evidence_cn": "多模态大语言模型的自监督强化学习",
-      "llm_evidence": "多模态大语言模型的自监督强化学习",
-      "canonical_evidence": "多模态大语言模型的自监督强化学习",
-      "llm_tldr_en": "SSL-R1 uses self-supervised visual puzzles as rewards to enhance reasoning in multimodal LLMs via RL.",
-      "llm_tldr_cn": "SSL-R1利用自监督视觉谜题作为奖励，通过强化学习增强多模态大模型的推理能力。",
-      "llm_tldr": "SSL-R1利用自监督视觉谜题作为奖励，通过强化学习增强多模态大模型的推理能力。",
-      "llm_tags": [
-        "query:flrlvldm:composite"
-      ],
-      "matched_query_tag": "query:flrlvldm:composite",
-      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
-      "matched_requirement_id": "req-composite-flrlvldm",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2604.18512v1",
-      "source": "arxiv",
-      "title": "S2H-DPO: Hardness-Aware Preference Optimization for Vision-Language Models",
-      "abstract": "Vision-Language Models (VLMs) have demonstrated remarkable progress in single-image understanding, yet effective reasoning across multiple images remains challenging. We identify a critical capability gap in existing multi-image alignment approaches: current methods focus primarily on localized reasoning with pre-specified image indices (``Look at Image 3 and...''), bypassing the essential skills of global visual search and autonomous cross-image comparison. To address this limitation, we introduce a Simple-to-Hard (S2H) learning framework that systematically constructs multi-image preference data across three hierarchical reasoning levels requiring an increasing level of capabilities: (1) single-image localized reasoning, (2) multi-image localized comparison, and (3) global visual search. Unlike prior work that relies on model-specific attributes, such as hallucinations or attention heuristics, to generate preference pairs, our approach leverages prompt-driven complexity to create chosen/rejected pairs that are applicable across different models. Through extensive evaluations on LLaVA and Qwen-VL models, we show that our diverse multi-image reasoning data significantly enhances multi-image reasoning performance, yielding significant improvements over baseline methods across benchmarks. Importantly, our approach maintains strong single-image reasoning performance while simultaneously strengthening multi-image understanding capabilities, thus advancing the state of the art for holistic visual preference alignment.",
-      "authors": [
-        "Nitish Shukla",
-        "Surgan Jandial",
-        "Arun Ross"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-04-20T17:06:20+00:00",
-      "link": "https://arxiv.org/pdf/2604.18512v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 8.5,
-      "llm_evidence_en": "preference optimization and alignment for vision-language models",
-      "llm_evidence_cn": "视觉语言模型的偏好优化与对齐",
-      "llm_evidence": "视觉语言模型的偏好优化与对齐",
-      "canonical_evidence": "视觉语言模型的偏好优化与对齐",
-      "llm_tldr_en": "Introduces S2H-DPO to improve multi-image reasoning and alignment in vision-language models.",
-      "llm_tldr_cn": "引入S2H-DPO，通过硬度感知偏好优化提升视觉语言模型的多图推理与对齐能力。",
-      "llm_tldr": "引入S2H-DPO，通过硬度感知偏好优化提升视觉语言模型的多图推理与对齐能力。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch"
-    }
-  ],
-  "quick_skim": [
-    {
-      "id": "2604.18829v1",
-      "source": "arxiv",
-      "title": "DUALVISION: RGB-Infrared Multimodal Large Language Models for Robust Visual Reasoning",
-      "abstract": "Multimodal large language models (MLLMs) have achieved impressive performance on visual perception and reasoning tasks with RGB imagery, yet they remain fragile under common degradations, such as fog, blur, or low-light conditions. Infrared (IR) imaging, a well-established complement to RGB, offers inherent robustness in these conditions, but its integration into MLLMs remains underexplored. To bridge this gap, we propose DUALVISION, a lightweight fusion module that efficiently incorporates IR-RGB information into MLLMs via patch-level localized cross-attention. To support training and evaluation and to facilitate future research, we also introduce DV-204K, a dataset of ~25K publicly available aligned IR-RGB image pairs with 204K modality-specific QA annotations, and DV-500, a benchmark of 500 IR-RGB image pairs with 500 QA pairs designed for evaluating cross-modal reasoning. Leveraging these datasets, we benchmark both open- and closed-source MLLMs and demonstrate that DUALVISION delivers strong empirical performance under a wide range of visual degradations. Our code and dataset are available at https://abrarmajeedi.github.io/dualvision.",
-      "authors": [
-        "Abrar Majeedi",
-        "Zhiyuan Ruan",
-        "Ziyi Zhao",
-        "Hongcheng Wang",
-        "Jianglin Lu",
-        "Yin Li"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-04-20T20:51:39+00:00",
-      "link": "https://arxiv.org/pdf/2604.18829v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 8.5,
-      "llm_evidence_en": "multimodal large language models integrating visual and textual information",
-      "llm_evidence_cn": "整合视觉和文本信息的多模态大语言模型",
-      "llm_evidence": "整合视觉和文本信息的多模态大语言模型",
-      "canonical_evidence": "整合视觉和文本信息的多模态大语言模型",
-      "llm_tldr_en": "DUALVISION integrates RGB and Infrared data into MLLMs for robust visual reasoning in degraded conditions.",
-      "llm_tldr_cn": "DUALVISION将红外与RGB信息整合进多模态大模型，提升恶劣环境下的视觉推理。",
-      "llm_tldr": "DUALVISION将红外与RGB信息整合进多模态大模型，提升恶劣环境下的视觉推理。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "8plus"
-    },
-    {
-      "id": "2604.18429v1",
-      "source": "arxiv",
-      "title": "Revisiting Change VQA in Remote Sensing with Structured and Native Multimodal Qwen Models",
-      "abstract": "Change visual question answering (Change VQA) addresses the problem of answering natural-language questions about semantic changes between bi-temporal remote sensing (RS) images. Although vision-language models (VLMs) have recently been studied for temporal RS image understanding, Change VQA remains underexplored in the context of modern multimodal models. In this letter, we revisit the CDVQA benchmark using recent Qwen models under a unified low-rank adaptation (LoRA) setting. We compare Qwen3-VL, which follows a structured vision-language pipeline with multi-depth visual conditioning and a full-attention decoder, with Qwen3.5, a native multimodal model that combines a single-stage alignment with a hybrid decoder backbone. Experimental results on the official CDVQA test splits show that recent VLMs improve over earlier specialized baselines. They further show that performance does not scale monotonically with model size, and that native multimodal models are more effective than structured vision-language pipelines for this task. These findings indicate that tightly integrated multimodal backbones contribute more to performance than scale or explicit multi-depth visual conditioning for language-driven semantic change reasoning in RS imagery.",
-      "authors": [
-        "Yakoub Bazi",
-        "Mohamad M. Al Rahhal",
-        "Mansour Zuair",
-        "Faroun Mohamed"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV",
-        "cs.AI"
-      ],
-      "published": "2026-04-20T15:47:52+00:00",
-      "link": "https://arxiv.org/pdf/2604.18429v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 7.5,
-      "llm_evidence_en": "research on vision-language models for remote sensing and multimodal understanding",
-      "llm_evidence_cn": "用于遥感和多模态理解的视觉语言模型研究",
-      "llm_evidence": "用于遥感和多模态理解的视觉语言模型研究",
-      "canonical_evidence": "用于遥感和多模态理解的视觉语言模型研究",
-      "llm_tldr_en": "Evaluates modern multimodal Qwen models for change visual question answering in remote sensing.",
-      "llm_tldr_cn": "评估现代多模态Qwen模型在遥感变化视觉问答任务中的表现。",
-      "llm_tldr": "评估现代多模态Qwen模型在遥感变化视觉问答任务中的表现。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "7"
-    },
-    {
-      "id": "2604.18460v1",
-      "source": "arxiv",
-      "title": "Learning Invariant Modality Representation for Robust Multimodal Learning from a Causal Inference Perspective",
-      "abstract": "Multimodal affective computing aims to predict humans' sentiment, emotion, intention, and opinion using language, acoustic, and visual modalities. However, current models often learn spurious correlations that harm generalization under distribution shifts or noisy modalities. To address this, we propose a causal modality-invariant representation (CmIR) learning framework for robust multimodal learning. At its core, we introduce a theoretically grounded disentanglement method that separates each modality into `causal invariant representation' and `environment-specific spurious representation' from a causal inference perspective. CmIR ensures that the learned invariant representations retain stable predictive relationships with labels across different environments while preserving sufficient information from the raw inputs via invariance constraint, mutual information constraint, and reconstruction constraint. Experiments across multiple multimodal benchmarks demonstrate that CmIR achieves state-of-the-art performance. CmIR particularly excels on out-of-distribution data and noisy data, confirming its robustness and generalizability.",
-      "authors": [
-        "Sijie Mai",
-        "Shiqin Han"
-      ],
-      "primary_category": "cs.LG",
-      "categories": [
-        "cs.LG"
-      ],
-      "published": "2026-04-20T16:16:36+00:00",
-      "link": "https://arxiv.org/pdf/2604.18460v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 6.5,
-      "llm_evidence_en": "robust multimodal learning and cross-modal representation alignment",
-      "llm_evidence_cn": "鲁棒多模态学习与跨模态表示对齐",
-      "llm_evidence": "鲁棒多模态学习与跨模态表示对齐",
-      "canonical_evidence": "鲁棒多模态学习与跨模态表示对齐",
-      "llm_tldr_en": "Proposes a causal modality-invariant representation framework for robust multimodal affective computing.",
-      "llm_tldr_cn": "提出一种因果模态不变表示框架，用于实现鲁棒的多模态情感计算。",
-      "llm_tldr": "提出一种因果模态不变表示框架，用于实现鲁棒的多模态情感计算。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "6"
-    },
-    {
-      "id": "2604.18867v1",
-      "source": "arxiv",
-      "title": "Hierarchically Robust Zero-shot Vision-language Models",
-      "abstract": "Vision-Language Models (VLMs) can perform zero-shot classification but are susceptible to adversarial attacks. While robust fine-tuning improves their robustness, existing approaches align fixed text embeddings with an image embedding, sacrificing natural performance and robustness. A robustness degradation also occurs when a model faces adversarial attacks targeting superclasses (parent classes, e.g., mammal) in addition to their base (leaf) classes (e.g., cat). Thus, to enhance adversarial robustness and leverage the inherent hierarchical properties of class space, we propose a novel adversarial fine-tuning framework based on hierarchical embeddings and several levels of adversarially robust alignment of image-text modalities. Additional mechanisms place visual embeddings at the desired depth of hierarchy, and we provide a theoretical connection between the depth of embedding in the hierarchy and the maximum viable margin size. Our model naturally realizes several margin sizes, boosting generalization of adversaries for robustification. As various trees with different parent labels can share the same leaf labels, we also consider aligning over multiple trees to boost semantic variety. Experiments across several datasets are performed.",
-      "authors": [
-        "Junhao Dong",
-        "Yifei Zhang",
-        "Hao Zhu",
-        "Yew-Soon Ong",
-        "Piotr Koniusz"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV",
-        "cs.AI",
-        "cs.LG"
-      ],
-      "published": "2026-04-20T21:42:14+00:00",
-      "link": "https://arxiv.org/pdf/2604.18867v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 8.5,
-      "llm_evidence_en": "adversarial fine-tuning framework for vision-language models",
-      "llm_evidence_cn": "视觉语言模型的对抗性微调框架",
-      "llm_evidence": "视觉语言模型的对抗性微调框架",
-      "canonical_evidence": "视觉语言模型的对抗性微调框架",
-      "llm_tldr_en": "Proposes a hierarchical embedding framework to enhance the adversarial robustness of zero-shot VLMs.",
-      "llm_tldr_cn": "提出一种基于层次化嵌入的框架，旨在增强零样本视觉语言模型的对抗鲁棒性。",
-      "llm_tldr": "提出一种基于层次化嵌入的框架，旨在增强零样本视觉语言模型的对抗鲁棒性。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "8plus"
-    },
-    {
-      "id": "2604.19196v1",
-      "source": "arxiv",
-      "title": "Benchmarking Vision Foundation Models for Domain-Generalizable Face Anti-Spoofing",
-      "abstract": "Face Anti-Spoofing (FAS) remains challenging due to the requirement for robust domain generalization across unseen environments. While recent trends leverage Vision-Language Models (VLMs) for semantic supervision, these multimodal approaches often demand prohibitive computational resources and exhibit high inference latency. Furthermore, their efficacy is inherently limited by the quality of the underlying visual features. This paper revisits the potential of vision-only foundation models to establish a highly efficient and robust baseline for FAS. We conduct a systematic benchmarking of 15 pre-trained models, such as supervised CNNs, supervised ViTs, and self-supervised ViTs, under severe cross-domain scenarios including the MICO and Limited Source Domains (LSD) protocols. Our comprehensive analysis reveals that self-supervised vision models, particularly DINOv2 with Registers, significantly suppress attention artifacts and capture critical, fine-grained spoofing cues. Combined with Face Anti-Spoofing Data Augmentation (FAS-Aug), Patch-wise Data Augmentation (PDA) and Attention-weighted Patch Loss (APL), our proposed vision-only baseline achieves state-of-the-art performance in the MICO protocol. This baseline outperforms existing methods under the data-constrained LSD protocol while maintaining superior computational efficiency. This work provides a definitive vision-only baseline for FAS, demonstrating that optimized self-supervised vision transformers can serve as a backbone for both vision-only and future multimodal FAS systems. The project page is available at: https://gsisaoki.github.io/FAS-VFMbenchmark-CVPRW2026/ .",
-      "authors": [
-        "Mika Feng",
-        "Pierre Gallin-Martel",
-        "Koichi Ito",
-        "Takafumi Aoki"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-04-21T08:05:21+00:00",
-      "link": "https://arxiv.org/pdf/2604.19196v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 7.5,
-      "llm_evidence_en": "benchmarking vision foundation models and VLMs for face anti-spoofing",
-      "llm_evidence_cn": "对用于人脸防欺诈的视觉基础模型和VLM进行基准测试",
-      "llm_evidence": "对用于人脸防欺诈的视觉基础模型和VLM进行基准测试",
-      "canonical_evidence": "对用于人脸防欺诈的视觉基础模型和VLM进行基准测试",
-      "llm_tldr_en": "Evaluates vision foundation models and VLMs for robust, efficient domain-generalizable face anti-spoofing.",
-      "llm_tldr_cn": "评估视觉基础模型和VLM在鲁棒且高效的跨域人脸防欺诈中的表现。",
-      "llm_tldr": "评估视觉基础模型和VLM在鲁棒且高效的跨域人脸防欺诈中的表现。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "7"
-    },
-    {
-      "id": "2604.20062v1",
-      "source": "arxiv",
-      "title": "Federated Learning over Blockchain-Enabled Cloud Infrastructure",
-      "abstract": "The rise of IoT devices and the uptake of cloud computing have informed a new era of data-driven intelligence. Traditional centralized machine learning models that require a large volume of data to be stored in a single location have therefore become more susceptible to data breaches, privacy violations, and regulatory non-compliance. This report presents a thorough examination of the merging of Federated Learning (FL) and blockchain technology in a cloud-edge setting, demonstrating it as an effective solution to the stated concerns. We are proposing a detailed four-dimensional architectural categorization that meticulously assesses coordination frameworks, consensus algorithms, data storage practices, and trust models that are significant to these integrated systems. The manuscript presents a comprehensive comparative examination of two cutting-edge frameworks: the Multi-Objectives Reinforcement Federated Learning Blockchain (MORFLB), which is designed for intelligent transportation systems, and the Federated Blockchain-IoT Framework for Sustainable Healthcare Systems (FBCI-SHS), elucidating their distinctive contributions and inherent limitations. Lastly, we engage in a thorough evaluation of the literature that integrates a comparative perspective on current frameworks to discern the singular nature of this research within existing knowledge systems. The manuscript culminates in delineating the principal challenges and offering a strategic framework for prospective research trajectories, emphasizing the advancement of adaptive, resilient, and standardized BCFL systems across diverse application domains.",
-      "authors": [
-        "Saloni Garg",
-        "Amit Sagtani",
-        "Kamal Kant Hiran"
-      ],
-      "primary_category": "cs.LG",
-      "categories": [
-        "cs.LG",
-        "cs.CR",
-        "cs.DC"
-      ],
-      "published": "2026-04-21T23:51:00+00:00",
-      "link": "https://arxiv.org/pdf/2604.20062v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 6.5,
-      "llm_evidence_en": "federated learning over blockchain-enabled cloud infrastructure",
-      "llm_evidence_cn": "基于区块链云基础设施的联邦学习",
-      "llm_evidence": "基于区块链云基础设施的联邦学习",
-      "canonical_evidence": "基于区块链云基础设施的联邦学习",
-      "llm_tldr_en": "Examines the integration of Federated Learning and blockchain for privacy and trust in cloud-edge settings.",
-      "llm_tldr_cn": "研究联邦学习与区块链的集成，以解决云边缘环境中的隐私和信任问题。",
-      "llm_tldr": "研究联邦学习与区块链的集成，以解决云边缘环境中的隐私和信任问题。",
-      "llm_tags": [
-        "query:flrlvldm:composite"
-      ],
-      "matched_query_tag": "query:flrlvldm:composite",
-      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
-      "matched_requirement_id": "req-composite-flrlvldm",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "6"
-    },
-    {
-      "id": "2604.21921v1",
-      "source": "arxiv",
-      "title": "Context Unrolling in Omni Models",
-      "abstract": "We present Omni, a unified multimodal model natively trained on diverse modalities, including text, images, videos, 3D geometry, and hidden representations. We find that such training enables Context Unrolling, where the model explicitly reasons across multiple modal representations before producing predictions. This process enables the model to aggregate complementary information across heterogeneous modalities, facilitating a more faithful approximation of the shared multimodal knowledge manifold and improving downstream reasoning fidelity. As a result, Omni achieves strong performance on both multimodal generation and understanding benchmarks, while demonstrating advanced multimodal reasoning capabilities, including in-context generation of text, image, video, and 3D geometry.",
-      "authors": [
-        "Ceyuan Yang",
-        "Zhijie Lin",
-        "Yang Zhao",
-        "Fei Xiao",
-        "Hao He",
-        "Qi Zhao",
-        "Chaorui Deng",
-        "Kunchang Li",
-        "Zihan Ding",
-        "Yuwei Guo",
-        "Fuyun Wang",
-        "Fangqi Zhu",
-        "Xiaonan Nie",
-        "Shenhan Zhu",
-        "Shanchuan Lin",
-        "Hongsheng Li",
-        "Weilin Huang",
-        "Guang Shi",
-        "Haoqi Fan"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-04-23T17:58:38+00:00",
-      "link": "https://arxiv.org/pdf/2604.21921v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 8.5,
-      "llm_evidence_en": "unified multimodal model trained on diverse modalities",
-      "llm_evidence_cn": "在多种模态上训练的统一多模态模型",
-      "llm_evidence": "在多种模态上训练的统一多模态模型",
-      "canonical_evidence": "在多种模态上训练的统一多模态模型",
-      "llm_tldr_en": "Presents Omni, a multimodal model that uses context unrolling to reason across heterogeneous representations.",
-      "llm_tldr_cn": "介绍Omni，一种通过上下文展开在异构表示间进行推理的多模态模型。",
-      "llm_tldr": "介绍Omni，一种通过上下文展开在异构表示间进行推理的多模态模型。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "8plus"
-    },
-    {
-      "id": "2604.21326v1",
-      "source": "arxiv",
-      "title": "MiMIC: Mitigating Visual Modality Collapse in Universal Multimodal Retrieval While Avoiding Semantic Misalignment",
-      "abstract": "Universal Multimodal Retrieval (UMR) aims to map different modalities (e.g., visual and textual) into a shared embedding space for multi-modal retrieval. Existing UMR methods can be broadly divided into two categories: early-fusion approaches, such as Marvel, which projects visual features into the language model (LM) space for integrating with text modality, and late-fusion approaches, such as UniVL-DR, which encode visual and textual inputs using separate encoders and obtain fused embeddings through addition. Our pilot study reveals that Marvel exhibits visual modality collapse, which is characterized by the model's tendency to disregard visual features while depending excessively on textual cues. In contrast, although UniVL-DR is less affected by this issue, it is more susceptible to semantic misalignment, where semantically related content is positioned far apart in the embedding space. To address these challenges, we propose MiMIC, which introduces two key innovations: (1) a fusion-in-decoder architecture for effective multimodal integration, and (2) robust training through single modality mixin and random caption dropout. Experiments on the WebQA+ and EVQA+ datasets, where image in documents or queries might lack captions, indicate that MiMIC consistently outperforms both early- and late-fusion baselines.",
-      "authors": [
-        "Juan Li",
-        "Chuanghao Ding",
-        "Xujie Zhang",
-        "Cam-Tu Nguyen"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV",
-        "cs.AI"
-      ],
-      "published": "2026-04-23T06:29:42+00:00",
-      "link": "https://arxiv.org/pdf/2604.21326v1",
-      "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
-      ],
-      "llm_score": 7.5,
-      "llm_evidence_en": "multimodal retrieval and cross-modal alignment in vision-language models",
-      "llm_evidence_cn": "视觉语言模型中的多模态检索与跨模态对齐",
-      "llm_evidence": "视觉语言模型中的多模态检索与跨模态对齐",
-      "canonical_evidence": "视觉语言模型中的多模态检索与跨模态对齐",
-      "llm_tldr_en": "Proposes MiMIC to mitigate visual modality collapse and semantic misalignment in multimodal retrieval.",
-      "llm_tldr_cn": "提出MiMIC框架以缓解多模态检索中的视觉模态崩溃和语义失配问题。",
-      "llm_tldr": "提出MiMIC框架以缓解多模态检索中的视觉模态崩溃和语义失配问题。",
-      "llm_tags": [
-        "query:vlm-clip:composite"
-      ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "7"
     },
     {
       "id": "2604.19015v1",
@@ -583,17 +69,281 @@
       "published": "2026-04-21T03:06:24+00:00",
       "link": "https://arxiv.org/pdf/2604.19015v1",
       "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Federated fine-tuning of Large Language Models (LLMs)",
+      "llm_evidence_cn": "大语言模型（LLM）的联邦微调",
+      "llm_evidence": "大语言模型（LLM）的联邦微调",
+      "canonical_evidence": "大语言模型（LLM）的联邦微调",
+      "llm_tldr_en": "Introduces FedProxy for federated LLM fine-tuning using proxy small models to protect IP and handle heterogeneity.",
+      "llm_tldr_cn": "引入FedProxy，通过代理小模型进行联邦大模型微调，保护知识产权并处理异构性。",
+      "llm_tldr": "引入FedProxy，通过代理小模型进行联邦大模型微调，保护知识产权并处理异构性。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.22562v1",
+      "source": "arxiv",
+      "title": "Data-Free Contribution Estimation in Federated Learning using Gradient von Neumann Entropy",
+      "abstract": "Client contribution estimation in Federated Learning is necessary for identifying clients' importance and for providing fair rewards. Current methods often rely on server-side validation data or self-reported client information, which can compromise privacy or be susceptible to manipulation. We introduce a data-free signal based on the matrix von Neumann (spectral) entropy of the final-layer updates, which measures the diversity of the information contributed. We instantiate two practical schemes: (i) SpectralFed, which uses normalized entropy as aggregation weights, and (ii) SpectralFuse, which fuses entropy with class-specific alignment via a rank-adaptive Kalman filter for per-round stability. Across CIFAR-10/100 and the naturally partitioned FEMNIST and FedISIC benchmarks, entropy-derived scores show a consistently high correlation with standalone client accuracy under diverse non-IID regimes - without validation data or client metadata. We compare our results with data-free contribution estimation baselines and show that spectral entropy serves as a useful indicator of client contribution.",
+      "authors": [
+        "Asim Ukaye",
+        "Mubarak Abdu-Aguye",
+        "Nurbek Tastan",
+        "Karthik Nandakumar"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV",
+        "cs.DC"
+      ],
+      "published": "2026-04-24T13:55:10+00:00",
+      "link": "https://arxiv.org/pdf/2604.22562v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Estimating client contribution for providing fair rewards in federated learning",
+      "llm_evidence_cn": "联邦学习中估计客户端贡献以提供公平奖励",
+      "llm_evidence": "联邦学习中估计客户端贡献以提供公平奖励",
+      "canonical_evidence": "联邦学习中估计客户端贡献以提供公平奖励",
+      "llm_tldr_en": "Introduces a data-free contribution estimation method using spectral entropy to ensure fair rewards in FL.",
+      "llm_tldr_cn": "引入一种基于谱熵的无数据贡献估计方法，用于确保联邦学习中的公平奖励。",
+      "llm_tldr": "引入一种基于谱熵的无数据贡献估计方法，用于确保联邦学习中的公平奖励。",
+      "llm_tags": [
+        "query:q2"
+      ],
+      "matched_query_tag": "query:q2",
+      "matched_query_text": "research on federated learning under budget or incentive mechanisms",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.20658v1",
+      "source": "arxiv",
+      "title": "Cooperative Profiles Predict Multi-Agent LLM Team Performance in AI for Science Workflows",
+      "abstract": "Multi-agent systems built from teams of large language models (LLMs) are increasingly deployed for collaborative scientific reasoning and problem-solving. These systems require agents to coordinate under shared constraints, such as GPUs or credit balances, where cooperative behavior matters. Behavioral economics provides a rich toolkit of games that isolate distinct cooperation mechanisms, yet it remains unknown whether a model's behavior in these stylized settings predicts its performance in realistic collaborative tasks. Here, we benchmark 35 open-weight LLMs across six behavioral economics games and show that game-derived cooperative profiles robustly predict downstream performance in AI-for-Science tasks, where teams of LLM agents collaboratively analyze data, build models, and produce scientific reports under shared budget constraints. Models that effectively coordinate games and invest in multiplicative team production (rather than greedy strategies) produce better scientific reports across three outcomes, accuracy, quality, and completion. These associations hold after controlling for multiple factors, indicating that cooperative disposition is a distinct, measurable property of LLMs not reducible to general ability. Our behavioral games framework thus offers a fast and inexpensive diagnostic for screening cooperative fitness before costly multi-agent deployment.",
+      "authors": [
+        "Shivani Kumar",
+        "Adarsh Bharathwaj",
+        "David Jurgens"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-22T15:07:54+00:00",
+      "link": "https://arxiv.org/pdf/2604.20658v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "behavioral economics games and cooperative profiles for multi-agent LLM coordination",
+      "llm_evidence_cn": "多智能体大语言模型协调的行为经济学博弈与合作概况",
+      "llm_evidence": "多智能体大语言模型协调的行为经济学博弈与合作概况",
+      "canonical_evidence": "多智能体大语言模型协调的行为经济学博弈与合作概况",
+      "llm_tldr_en": "Uses behavioral economics games to predict the performance of multi-agent LLM teams under shared constraints.",
+      "llm_tldr_cn": "利用行为经济学博弈预测共享约束下多智能体大语言模型团队的性能。",
+      "llm_tldr": "利用行为经济学博弈预测共享约束下多智能体大语言模型团队的性能。",
+      "llm_tags": [
+        "query:q5"
+      ],
+      "matched_query_tag": "query:q5",
+      "matched_query_text": "explore mechanism design and game theory approaches for federated learning incentives",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.19053v1",
+      "source": "arxiv",
+      "title": "CHRONOS: A Hardware-Assisted Phase-Decoupled Framework for Secure Federated Learning in IoT",
+      "abstract": "We propose CHRONOS, a hardware-assisted framework that decouples the cryptographic setup required for private gradient aggregation from the active training phase. CHRONOS executes a once-per-epoch server-relayed Diffie-Hellman key exchange during a device's idle window. It generates ephemeral keypairs and derives PRG keys entirely within an ARM TrustZone enclave, ensuring private keys never exist in Normal World memory. Pairwise secrets are sealed in the enclave, and Shamir secret shares of the ephemeral private key are distributed to peers. During training, clients mask gradients with a single stream-cipher evaluation and transmit them in one communication round. A hardware-backed round counter enforces single-use freshness. If clients drop out mid-round, the server reconstructs their masks from peer-held Shamir shares, preserving correct aggregation without repeating the round.   Evaluation on Rock Pi 4 devices using OP-TEE demonstrates that CHRONOS achieves OS-level compromise resistance and thwarts state-of-the-art gradient inversion attacks. It reduces active-phase aggregation latency by up to 74% compared to synchronous secure aggregation for 20 clients. The system maintains a persistent Secure World storage footprint of fewer than 700 bytes per device, scaling independently of model dimension.",
+      "authors": [
+        "Hung Dang"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.DC"
+      ],
+      "published": "2026-04-21T04:00:49+00:00",
+      "link": "https://arxiv.org/pdf/2604.19053v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架和优化方法的最新研究",
+      "llm_evidence": "联邦学习框架和优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架和优化方法的最新研究",
+      "llm_tldr_en": "Presents a hardware-assisted framework for secure and efficient gradient aggregation in federated learning.",
+      "llm_tldr_cn": "提出了一种硬件辅助框架，用于联邦学习中安全高效的梯度聚合。",
+      "llm_tldr": "提出了一种硬件辅助框架，用于联邦学习中安全高效的梯度聚合。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.21789v1",
+      "source": "arxiv",
+      "title": "Compliance Moral Hazard and the Backfiring Mandate",
+      "abstract": "Competing firms that serve shared customer populations face a fundamental information aggregation problem: each firm holds fragmented signals about risky customers, but individual incentives impede efficient collective detection. We develop a mechanism design framework for decentralized risk analytics, grounded in anti-money laundering in banking networks. Three strategic frictions distinguish our setting: compliance moral hazard, adversarial adaptation, and information destruction through intervention. A temporal value assignment (TVA) mechanism, which credits institutions using a strictly proper scoring rule on discounted verified outcomes, implements truthful reporting as a Bayes--Nash equilibrium (uniquely optimal at each edge) in large federations. Embedding TVA in a banking competition model, we show competitive pressure amplifies compliance moral hazard and poorly designed mandates can reduce welfare below autarky, a ``backfiring'' result with direct policy implications. In simulation using a synthetic AML benchmark, TVA achieves substantially higher welfare than autarky or mandated sharing without incentive design.",
+      "authors": [
+        "Jian Ni",
+        "Lecheng Zheng",
+        "John R Birge"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "cs.LG"
+      ],
+      "published": "2026-04-23T15:46:24+00:00",
+      "link": "https://arxiv.org/pdf/2604.21789v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "mechanism design framework for decentralized analytics in large federations",
+      "llm_evidence_cn": "大型联邦中去中心化分析的机制设计框架",
+      "llm_evidence": "大型联邦中去中心化分析的机制设计框架",
+      "canonical_evidence": "大型联邦中去中心化分析的机制设计框架",
+      "llm_tldr_en": "Develops a mechanism design framework for truthful reporting in decentralized risk analytics networks.",
+      "llm_tldr_cn": "为去中心化风险分析网络中的真实报告开发了一个机制设计框架。",
+      "llm_tldr": "为去中心化风险分析网络中的真实报告开发了一个机制设计框架。",
+      "llm_tags": [
+        "query:q5"
+      ],
+      "matched_query_tag": "query:q5",
+      "matched_query_text": "explore mechanism design and game theory approaches for federated learning incentives",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.20031v1",
+      "source": "arxiv",
+      "title": "Decision-Focused Federated Learning Under Heterogeneous Objectives and Constraints",
+      "abstract": "We consider what we refer to as {Decision-Focused Federated Learning (DFFL)} framework, i.e., a predict-then-optimize approach employed by a collection of agents, where each agent's predictive model is an input to a downstream linear optimization problem, and no direct exchange of raw data is allowed. Importantly, clients can differ both in objective functions and in feasibility constraints. We build on the well-known SPO+ approach and develop heterogeneity bounds for the SPO+ surrogate loss in this case. This is accomplished by employing a support function representation of the feasible region, separating (i) objective shift via norm distances between the cost vectors and (ii) feasible-set shift via shape distances between the constraint sets. In the case of strongly convex feasible regions, sharper bounds are derived due to the optimizer stability. Building on these results, we define a heuristic local-versus-federated excess risk decision rule which, under SPO+ risk, gives a condition for when federation can be expected to improve decision quality: the heterogeneity penalty must be smaller than the statistical advantage of pooling data. We implement a FedAvg-style DFFL set of experiments on both polyhedral and strongly convex problems and show that federation is broadly robust in the strongly convex setting, while performance in the polyhedral setting degrades primarily with constraint heterogeneity, especially for clients with many samples. In other words, especially for the strongly convex case, an approach following a direct implementation of FedAvg and SPO+ can still yield promising performance even when the downstream optimization problems are noticeably different.",
+      "authors": [
+        "Konstantinos Ziliaskopoulos",
+        "Alexander Vinel"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-04-21T22:22:39+00:00",
+      "link": "https://arxiv.org/pdf/2604.20031v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Federated learning framework addressing heterogeneous objectives and constraints in optimization.",
+      "llm_evidence_cn": "处理优化中异构目标和约束的联邦学习框架。",
+      "llm_evidence": "处理优化中异构目标和约束的联邦学习框架。",
+      "canonical_evidence": "处理优化中异构目标和约束的联邦学习框架。",
+      "llm_tldr_en": "Develops a decision-focused federated learning framework for predict-then-optimize tasks under heterogeneity.",
+      "llm_tldr_cn": "开发了一个针对异构环境下预测再优化任务的决策聚焦联邦学习框架。",
+      "llm_tldr": "开发了一个针对异构环境下预测再优化任务的决策聚焦联邦学习框架。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.17179v1",
+      "source": "arxiv",
+      "title": "Decentralised Trust and Security Mechanisms for IoT Networks at the Edge: A Comprehensive Review",
+      "abstract": "INTRODUCTION: The proliferation of the amalgamation of IoT and edge computing has increased the demand for decentralised trust and security mechanisms capable of operating across heterogeneous and resource-limited devices. Approaches such as federated learning, Zero Trust architectures, lightweight blockchain and distributed neural models offer alternatives to centralised control. OBJECTIVES: This review examines various state-of-the-art decentralised mechanisms and evaluates their effectiveness in terms of securing IoT networks at the edge. METHODS: Thirty recent studies were analysed to compare how decentralised architectures establish trust, support secure communication and enable intrusion and anomaly detection. Frameworks, such as DFGL-LZTA, SecFedDNN and COSIER were assessed. RESULTS: Decentralised designs enhance privacy, reduce single points of failure and improve adaptive threat response, though challenges remain in scalability, efficiency and interoperability. CONCLUSION: The study identifies key considerations and future research needs for building secure and resilient trust-aware IoT edge ecosystems.",
+      "authors": [
+        "Khandoker Ashik Uz Zaman",
+        "Mahdi H. Miraz",
+        "Mohammed N. M. Ali"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI",
+        "cs.NI"
+      ],
+      "published": "2026-04-19T00:39:15+00:00",
+      "link": "https://arxiv.org/pdf/2604.17179v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Review of federated learning frameworks and security mechanisms for IoT edge networks.",
+      "llm_evidence_cn": "综述了物联网边缘网络中的联邦学习框架和安全机制。",
+      "llm_evidence": "综述了物联网边缘网络中的联邦学习框架和安全机制。",
+      "canonical_evidence": "综述了物联网边缘网络中的联邦学习框架和安全机制。",
+      "llm_tldr_en": "A review of decentralized trust and security mechanisms, including federated learning, for IoT edge networks.",
+      "llm_tldr_cn": "综述了物联网边缘网络中包括联邦学习在内的去中心化信任与安全机制。",
+      "llm_tldr": "综述了物联网边缘网络中包括联邦学习在内的去中心化信任与安全机制。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.18312v1",
+      "source": "arxiv",
+      "title": "Scale-free adaptive planning for deterministic dynamics & discounted rewards",
+      "abstract": "We address the problem of planning in an environment with deterministic dynamics and stochastic rewards with discounted returns. The optimal value function is not known, nor are the rewards bounded. We propose Platypoos, a simple scale-free planning algorithm that adapts to the unknown scale and smoothness of the reward function. We provide a sample complexity analysis for Platypoos that improves upon prior work and holds simultaneously over a broad range of discount factors and reward scales, without the algorithm knowing them. We also establish a matching lower bound showing our analysis is optimal up to constants.",
+      "authors": [
+        "Peter L. Bartlett",
+        "Victor Gabillon",
+        "Jennifer Healey",
+        "Michal Valko"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-20T14:17:52+00:00",
+      "link": "https://arxiv.org/pdf/2604.18312v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
       ],
       "llm_score": 6.0,
-      "llm_evidence_en": "federated fine-tuning of LLMs and privacy challenges",
-      "llm_evidence_cn": "大语言模型的联邦微调与隐私挑战",
-      "llm_evidence": "大语言模型的联邦微调与隐私挑战",
-      "canonical_evidence": "大语言模型的联邦微调与隐私挑战",
-      "llm_tldr_en": "Proposes FedProxy for federated fine-tuning of LLMs using proxy models to protect IP and handle heterogeneity.",
-      "llm_tldr_cn": "提出FedProxy框架，通过代理模型实现大语言模型的联邦微调，保护知识产权并处理异构性。",
-      "llm_tldr": "提出FedProxy框架，通过代理模型实现大语言模型的联邦微调，保护知识产权并处理异构性。",
+      "llm_evidence_en": "Advances and strategies in reinforcement learning algorithms (planning and rewards)",
+      "llm_evidence_cn": "强化学习算法的进展与策略（规划与奖励）",
+      "llm_evidence": "强化学习算法的进展与策略（规划与奖励）",
+      "canonical_evidence": "强化学习算法的进展与策略（规划与奖励）",
+      "llm_tldr_en": "Presents a scale-free planning algorithm for deterministic environments with unknown reward scales.",
+      "llm_tldr_cn": "针对具有未知奖励尺度的确定性环境，提出了一种无尺度规划算法。",
+      "llm_tldr": "针对具有未知奖励尺度的确定性环境，提出了一种无尺度规划算法。",
       "llm_tags": [
         "query:flrlvldm:composite"
       ],
@@ -604,82 +354,317 @@
       "quick_tier": "6"
     },
     {
-      "id": "2604.17320v1",
+      "id": "2604.20596v1",
       "source": "arxiv",
-      "title": "Towards Joint Quantization and Token Pruning of Vision-Language Models",
-      "abstract": "Deploying Vision-Language Models (VLMs) under aggressive low-bit inference remains challenging because inference cost is dominated by the long visual-token prefix during prefill and the growing KV cache during autoregressive decoding. Token pruning and low-bit quantization are complementary for reducing these costs, yet naive stage-wise combinations are often brittle due to a mismatch between quantization calibration and pruning execution. We present a collaborative quantization-and-pruning framework that unifies low-bit inference and deterministic visual-token pruning in a single deployable pipeline. The framework introduces the \\textbf{Q}uantization \\textbf{U}nified \\textbf{O}ffline \\textbf{T}oken \\textbf{A}llocator (\\textbf{QUOTA}), which converts low-bit calibration signals into a layer-wise token allocation schedule and materializes it as a pruning recipe. Token importance is evaluated under deployed W4A4 operators with a quantized KV cache by combining activation magnitude, attention cues, and an explicit low-bit risk signal, enabling consistent budgeted top-$k$ selection. Experiments on standard VLM benchmarks show improved robustness over stage-wise baselines under the same low-bit regime, achieving 95.65\\% average retention while retaining only 30\\% of visual tokens, compared with about 94.3\\% retention for representative stage-wise combinations. The code will be released.",
+      "title": "Differentially Private Clustered Federated Learning with Privacy-Preserving Initialization and Normality-Driven Aggregation",
+      "abstract": "Federated learning (FL) enables training of a global model while keeping raw data on end-devices. Despite this, FL has shown to leak private user information and thus in practice, it is often coupled with methods such as differential privacy (DP) and secure vector sum to provide formal privacy guarantees to its participants. In realistic cross-device deployments, the data are highly heterogeneous, so vanilla federated learning converges slowly and generalizes poorly. Clustered federated learning (CFL) mitigates this by segregating users into clusters, leading to lower intra-cluster data heterogeneity. Nevertheless, coupling CFL with DP remains challenging: the injected DP noise makes individual client updates excessively noisy, and the server is unable to initialize cluster centroids with the less noisy aggregated updates. To address this challenge, we propose PINA, a two-stage framework that first lets each client fine-tune a lightweight low-rank adaptation (LoRA) adapter and privately share a compressed sketch of the update. The server leverages these sketches to construct robust cluster centroids. In the second stage, PINA introduces a normality-driven aggregation mechanism that improves convergence and robustness. Our method retains the benefits of clustered FL while providing formal privacy guarantees against an untrusted server. Extensive evaluations show that our proposed method outperforms state-of-the-art DP-FL algorithms by an average of 2.9% in accuracy for privacy budgets (epsilon in {2, 8}).",
       "authors": [
-        "Xinqing Li",
-        "Xin He",
-        "Xindong Zhang",
-        "Ming-Ming Cheng",
-        "Lei Zhang",
-        "Yun Liu"
+        "Jie Xu",
+        "Haaris Mehmood",
+        "Rogier Van Dalen",
+        "Karthikeyan Saravanan",
+        "Mete Ozay"
       ],
-      "primary_category": "cs.CV",
+      "primary_category": "cs.LG",
       "categories": [
-        "cs.CV"
+        "cs.LG",
+        "cs.CR"
       ],
-      "published": "2026-04-19T08:18:29+00:00",
-      "link": "https://arxiv.org/pdf/2604.17320v1",
+      "published": "2026-04-22T14:12:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.20596v1",
       "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
+        "keyword:联邦激励",
+        "query:联邦激励"
       ],
       "llm_score": 8.0,
-      "llm_evidence_en": "efficiency and optimization of vision-language models for deployment",
-      "llm_evidence_cn": "视觉语言模型部署的效率与优化",
-      "llm_evidence": "视觉语言模型部署的效率与优化",
-      "canonical_evidence": "视觉语言模型部署的效率与优化",
-      "llm_tldr_en": "Presents QUOTA, a framework for joint quantization and token pruning to optimize VLM inference.",
-      "llm_tldr_cn": "提出QUOTA框架，通过联合量化和标记裁剪优化视觉语言模型的推理效率。",
-      "llm_tldr": "提出QUOTA框架，通过联合量化和标记裁剪优化视觉语言模型的推理效率。",
+      "llm_evidence_en": "recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架和优化方法的最新研究",
+      "llm_evidence": "联邦学习框架和优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架和优化方法的最新研究",
+      "llm_tldr_en": "Proposes a clustered federated learning framework with differential privacy to handle data heterogeneity.",
+      "llm_tldr_cn": "提出了一种结合差分隐私的聚类联邦学习框架，以处理数据异构性。",
+      "llm_tldr": "提出了一种结合差分隐私的聚类联邦学习框架，以处理数据异构性。",
       "llm_tags": [
-        "query:vlm-clip:composite"
+        "query:flrlvldm:composite"
       ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
       "selection_source": "fresh_fetch",
       "quick_tier": "8plus"
     },
     {
-      "id": "2604.17319v1",
+      "id": "2604.17201v1",
       "source": "arxiv",
-      "title": "E2E-GMNER: End-to-End Generative Grounded Multimodal Named Entity Recognition",
-      "abstract": "Grounded Multimodal Named Entity Recognition (GMNER) aims to jointly identify named entity mentions in text, predict their semantic types, and ground each entity to a corresponding visual region in an associated image. Existing approaches predominantly adopt pipeline-based architectures that decouple textual entity recognition and visual grounding, leading to error accumulation and suboptimal joint optimization. In this paper, we propose E2E-GMNER, a fully end-to-end generative framework that unifies entity recognition, semantic typing, visual grounding, and implicit knowledge reasoning within a single multimodal large language model. We formulate GMNER as an instruction-tuned conditional generation task and incorporate chain-of-thought reasoning to enable the model to adaptively determine when visual evidence or background knowledge is informative, reducing reliance on noisy cues. To further address the instability of generative bounding box prediction, we introduce Gaussian Risk-Aware Box Perturbation (GRBP), which replaces hard box supervision with probabilistically perturbed soft targets to improve robustness against annotation noise and discretization errors. Extensive experiments on the Twitter-GMNER and Twitter-FMNERG benchmarks demonstrate that E2E-GMNER achieves highly competitive performance compared with state of the art methods, validating the effectiveness of unified end-to-end optimization and noise-aware grounding supervision. Code is available at:https://github.com/Finch-coder/E2E-GMNER",
+      "title": "Robust Resource Allocation in RIS-Assisted Wireless Networks Integrating NOMA and Over-the-Air Federated Learning",
+      "abstract": "This paper addresses the critical issue of spectrum scarcity and the need to support diverse services, including communication and learning tasks, by presenting a reconfigurable intelligent surface (RIS)-aided wireless network framework that integrates non-orthogonal multiple access (NOMA) with over-the-air federated learning (AirFL). The proposed system leverages the ability of RIS to adaptively shape wireless channels, aiming to enhance overall network performance for both communication and learning through concurrent uplink transmissions. To tackle critical challenges such as co-channel interference, imperfect channel state information (CSI), and successive interference cancellation (SIC), we develop an optimization framework that focuses on minimizing the optimality gap. This joint optimization is formulated as a non-convex problem, complicated by the intricate interactions between NOMA and AirFL users as well as the impact of imperfect CSI and SIC. To overcome these challenges and reduce the optimality gap, we reformulate the optimization problem as a Markov decision process and solve it using a long short-term memory deep deterministic policy gradient (LSTM-DDPG) algorithm, a memory-based approach within deep reinforcement learning (DRL). Simulation results demonstrate that the proposed approach achieves faster convergence, lower variance, and improved robustness under channel uncertainty, outperforming baseline DRL algorithms such as DDPG, soft actor-critic (SAC), and advantage actor-critic (A2C).",
       "authors": [
-        "Meng Zhang",
-        "Jinzhong Ning",
-        "Xiaolong Wu",
-        "Hongfei Lin",
-        "Yijia Zhang"
+        "Saeid Pakravan",
+        "Mohsen Ahmadzadeh",
+        "Ming Zeng",
+        "Ghosheh Abed Hodtani",
+        "Xingwang Li",
+        "Ji Wang",
+        "Gongpu Wang"
       ],
-      "primary_category": "cs.CV",
+      "primary_category": "eess.SP",
       "categories": [
-        "cs.CV",
-        "cs.CL"
+        "eess.SP"
       ],
-      "published": "2026-04-19T08:18:06+00:00",
-      "link": "https://arxiv.org/pdf/2604.17319v1",
+      "published": "2026-04-19T02:07:48+00:00",
+      "link": "https://arxiv.org/pdf/2604.17201v1",
       "tags": [
-        "keyword:VisFed",
-        "query:VisFed"
+        "keyword:联邦激励",
+        "query:联邦激励"
       ],
       "llm_score": 7.0,
-      "llm_evidence_en": "end-to-end generative grounded multimodal named entity recognition",
-      "llm_evidence_cn": "端到端生成式多模态命名实体识别",
-      "llm_evidence": "端到端生成式多模态命名实体识别",
-      "canonical_evidence": "端到端生成式多模态命名实体识别",
-      "llm_tldr_en": "Proposes an end-to-end generative framework for multimodal entity recognition and visual grounding.",
-      "llm_tldr_cn": "提出一种用于多模态实体识别和视觉定位的端到端生成式框架。",
-      "llm_tldr": "提出一种用于多模态实体识别和视觉定位的端到端生成式框架。",
+      "llm_evidence_en": "Federated learning frameworks and optimization methods in wireless networks",
+      "llm_evidence_cn": "无线网络中的联邦学习框架和优化方法",
+      "llm_evidence": "无线网络中的联邦学习框架和优化方法",
+      "canonical_evidence": "无线网络中的联邦学习框架和优化方法",
+      "llm_tldr_en": "Integrates RIS and NOMA to optimize resource allocation for over-the-air federated learning in wireless networks.",
+      "llm_tldr_cn": "整合 RIS 和 NOMA，优化无线网络中空中联邦学习的资源分配。",
+      "llm_tldr": "整合 RIS 和 NOMA，优化无线网络中空中联邦学习的资源分配。",
       "llm_tags": [
-        "query:vlm-clip:composite"
+        "query:flrlvldm:composite"
       ],
-      "matched_query_tag": "query:vlm-clip:composite",
-      "matched_query_text": "Papers central to 基于视觉语言模型的研究，聚焦CLIP创新方向的论文检索, especially work that connects or combines: L; research on vision-language models integrating visual and textual information; recent innovations and research trends in CLIP and vision language models; methods improving cross modal alignment and efficiency in CLIP like models.",
-      "matched_requirement_id": "req-composite-vlm-clip",
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.20024v1",
+      "source": "arxiv",
+      "title": "Replicable Bandits with UCB based Exploration",
+      "abstract": "We study replicable algorithms for stochastic multi-armed bandits (MAB) and linear bandits with UCB (Upper Confidence Bound) based exploration. A bandit algorithm is $ρ$-replicable if two executions using shared internal randomness but independent reward realizations, produce the same action sequence with probability at least $1-ρ$. Prior work is primarily elimination-based and, in linear bandits with infinitely many actions, relies on discretization, leading to suboptimal dependence on the dimension $d$ and $ρ$. We develop optimistic alternatives for both settings. For stochastic multi-armed bandits, we propose RepUCB, a replicable batched UCB algorithm and show that it attains a regret $O\\!\\left(\\frac{K^2\\log^2 T}{ρ^2}\\sum_{a:Δ_a>0}\\left(Δ_a+\\frac{\\log(KT\\log T)}{Δ_a}\\right)\\right)$. For stochastic linear bandits, we first introduce RepRidge, a replicable ridge regression estimator that satisfies both a confidence guarantee and a $ρ$-replicability guarantee. Beyond its role in our bandit algorithm, this estimator and its guarantees may also be of independent interest in other statistical estimation settings. We then use RepRidge to design RepLinUCB, a replicable optimistic algorithm for stochastic linear bandits, and show that its regret is bounded by $\\widetilde{O}\\!\\big(\\big(d+\\frac{d^3}ρ\\big)\\sqrt{T}\\big)$. This improves the best prior regret guarantee by a factor of $O(d/ρ)$, showing that our optimistic algorithm can substantially reduce the price of replicability.",
+      "authors": [
+        "Rohan Deb",
+        "Udaya Ghai",
+        "Karan Singh",
+        "Arindam Banerjee"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-21T22:04:35+00:00",
+      "link": "https://arxiv.org/pdf/2604.20024v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "reinforcement learning exploration strategies in multi-armed bandits",
+      "llm_evidence_cn": "多臂老虎机中的强化学习探索策略",
+      "llm_evidence": "多臂老虎机中的强化学习探索策略",
+      "canonical_evidence": "多臂老虎机中的强化学习探索策略",
+      "llm_tldr_en": "Develops replicable UCB-based exploration algorithms for stochastic multi-armed and linear bandits.",
+      "llm_tldr_cn": "为随机多臂和线性老虎机开发了可复制的基于 UCB 的探索算法。",
+      "llm_tldr": "为随机多臂和线性老虎机开发了可复制的基于 UCB 的探索算法。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.20745v1",
+      "source": "arxiv",
+      "title": "Lifecycle-Aware Federated Continual Learning in Mobile Autonomous Systems",
+      "abstract": "Federated continual learning (FCL) allows distributed autonomous fleets to adapt collaboratively to evolving terrain types across extended mission lifecycles. However, current approaches face several key challenges: 1) they use uniform protection strategies that do not account for the varying sensitivities to forgetting on different network layers; 2) they focus primarily on preventing forgetting during training, without addressing the long-term effects of cumulative drift; and 3) they often depend on idealized simulations that fail to capture the real-world heterogeneity present in distributed fleets. In this paper, we propose a lifecycle-aware dual-timescale FCL framework that incorporates training-time (pre-forgetting) prevention and (post-forgetting) recovery. Under this framework, we design a layer-selective rehearsal strategy that mitigates immediate forgetting during local training, and a rapid knowledge recovery strategy that restores degraded models after long-term cumulative drift. We present a theoretical analysis that characterizes heterogeneous forgetting dynamics and establishes the inevitability of long-term degradation. Our experimental results show that this framework achieves up to 8.3\\% mIoU improvement over the strongest federated baseline and up to 31.7\\% over conventional fine-tuning. We also deploy the FCL framework on a real-world rover testbed to assess system-level robustness under realistic constraints; the testing results further confirm the effectiveness of our FCL design.",
+      "authors": [
+        "Beining Wu",
+        "Jun Huang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-04-22T16:34:17+00:00",
+      "link": "https://arxiv.org/pdf/2604.20745v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "federated continual learning framework for distributed autonomous fleets",
+      "llm_evidence_cn": "分布式自主车队的联邦持续学习框架",
+      "llm_evidence": "分布式自主车队的联邦持续学习框架",
+      "canonical_evidence": "分布式自主车队的联邦持续学习框架",
+      "llm_tldr_en": "Proposes a lifecycle-aware federated continual learning framework to address forgetting and drift in autonomous fleets.",
+      "llm_tldr_cn": "提出一种生命周期感知的联邦持续学习框架，解决自主车队中的遗忘和漂移问题。",
+      "llm_tldr": "提出一种生命周期感知的联邦持续学习框架，解决自主车队中的遗忘和漂移问题。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.17681v1",
+      "source": "arxiv",
+      "title": "FedCRF: A Federated Cross-domain Recommendation Method with Semantic-driven Deep Knowledge Fusion",
+      "abstract": "As user behavior data becomes increasingly scattered across different platforms, achieving cross-domain knowledge fusion while preserving privacy has become a critical issue in recommender systems. Existing PPCDR methods usually rely on overlapping users or items as a bridge, making them inapplicable to non-overlapping scenarios. They also suffer from limitations in the collaborative modeling of global and local semantics. To this end, this paper proposes a Federated Cross-domain Recommendation method with deep knowledge Fusion (FedCRF). Using textual semantics as a cross-domain bridge, FedCRF achieves cross-domain knowledge transfer via federated semantic learning under the non-overlapping scenario. Specifically, FedCRF constructs global semantic clusters on the server side to extract shared semantic information, and designs a FGSAT module on the client side to dynamically adapt to local data distributions and alleviate cross-domain distribution shift. Meanwhile, it builds a semantic graph based on textual features to learn representations that integrate both structural and semantic information, and introduces contrastive learning constraints between global and local semantic representations to enhance semantic consistency and promote deep knowledge fusion. In this framework, only item semantic representations are shared, while user interaction data remains locally stored, effectively mitigating privacy leakage risks. Experimental results on multiple real-world datasets show that FedCRF significantly outperforms existing methods in terms of Recall@20 and NDCG@20, validating its effectiveness and superiority in non-overlapping cross-domain recommendation scenarios.",
+      "authors": [
+        "Lei Guo",
+        "Ting Yang",
+        "Hui Liu",
+        "Xu Yu",
+        "Xiaohui Han",
+        "Xinhua Wang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-04-20T00:37:40+00:00",
+      "link": "https://arxiv.org/pdf/2604.17681v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Federated learning framework using textual semantics for cross-domain knowledge transfer",
+      "llm_evidence_cn": "利用文本语义进行跨域知识迁移的联邦学习框架",
+      "llm_evidence": "利用文本语义进行跨域知识迁移的联邦学习框架",
+      "canonical_evidence": "利用文本语义进行跨域知识迁移的联邦学习框架",
+      "llm_tldr_en": "Proposes FedCRF for cross-domain recommendation using federated semantic learning to bridge non-overlapping data.",
+      "llm_tldr_cn": "提出FedCRF，通过联邦语义学习在非重叠场景下实现跨域推荐知识迁移。",
+      "llm_tldr": "提出FedCRF，通过联邦语义学习在非重叠场景下实现跨域推荐知识迁移。",
+      "llm_tags": [
+        "query:visfed:composite"
+      ],
+      "matched_query_tag": "query:visfed:composite",
+      "matched_query_text": "Papers central to 查询基于视觉语言模型的联邦学习相关论文, especially work that connects or combines: s; research on federated learning frameworks for multimodal models; find recent research papers on federated learning for visual language models; survey multimodal federated learning approaches combining vision and text; analyze privacy and efficiency challenges in vision language federated systems.",
+      "matched_requirement_id": "req-composite-visfed",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.21381v1",
+      "source": "arxiv",
+      "title": "Privacy-Preserving Distributed Stochastic Optimization with Homomorphic Encryption and Heterogeneous Stepsizes",
+      "abstract": "Distributed stochastic optimization enables multi-agent collaboration in applications such as distributed learning and sensor networks, but also raises critical privacy concerns due to the involvement of sensitive data. While existing privacy-preserving approaches often face limitations in balancing accuracy with efficiency, we propose a novel distributed stochastic gradient descent algorithm that integrates Paillier homomorphic encryption with heterogeneous and time-varying random stepsizes. The proposed algorithm provides inherent privacy protection against both internal honest-but-curious agents and external eavesdroppers, without relying on any trusted neighbors. Furthermore, we incorporate an attenuation factor to effectively mitigate quantization error induced by the encryption process, ensuring almost sure convergence to the optimal solution while maintaining privacy preservation. Numerical simulations demonstrate the effectiveness and efficiency of the proposed approach.",
+      "authors": [
+        "Haoqiang Zhou",
+        "Chi Chen",
+        "Yongfeng Zhi",
+        "Huan Gao"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY"
+      ],
+      "published": "2026-04-23T07:51:55+00:00",
+      "link": "https://arxiv.org/pdf/2604.21381v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Distributed stochastic optimization and privacy-preserving distributed learning",
+      "llm_evidence_cn": "分布式随机优化和隐私保护分布式学习",
+      "llm_evidence": "分布式随机优化和隐私保护分布式学习",
+      "canonical_evidence": "分布式随机优化和隐私保护分布式学习",
+      "llm_tldr_en": "Proposes a privacy-preserving distributed SGD algorithm using homomorphic encryption and heterogeneous stepsizes.",
+      "llm_tldr_cn": "提出了一种利用同态加密和异构步长的隐私保护分布式随机梯度下降算法。",
+      "llm_tldr": "提出了一种利用同态加密和异构步长的隐私保护分布式随机梯度下降算法。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.20825v1",
+      "source": "arxiv",
+      "title": "FedSIR: Spectral Client Identification and Relabeling for Federated Learning with Noisy Labels",
+      "abstract": "Federated learning (FL) enables collaborative model training without sharing raw data; however, the presence of noisy labels across distributed clients can severely degrade the learning performance. In this paper, we propose FedSIR, a multi-stage framework for robust FL under noisy labels. Different from existing approaches that mainly rely on designing noise-tolerant loss functions or exploiting loss dynamics during training, our method leverages the spectral structure of client feature representations to identify and mitigate label noise.   Our framework consists of three key components. First, we identify clean and noisy clients by analyzing the spectral consistency of class-wise feature subspaces with minimal communication overhead. Second, clean clients provide spectral references that enable noisy clients to relabel potentially corrupted samples using both dominant class directions and residual subspaces. Third, we employ a noise-aware training strategy that integrates logit-adjusted loss, knowledge distillation, and distance-aware aggregation to further stabilize federated optimization. Extensive experiments on standard FL benchmarks demonstrate that FedSIR consistently outperforms state-of-the-art methods for FL with noisy labels. The code is available at https://github.com/sinagh72/FedSIR.",
+      "authors": [
+        "Sina Gholami",
+        "Abdulmoneam Ali",
+        "Tania Haghighi",
+        "Ahmed Arafa",
+        "Minhaj Nur Alam"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV",
+        "cs.DC",
+        "eess.SP"
+      ],
+      "published": "2026-04-22T17:49:20+00:00",
+      "link": "https://arxiv.org/pdf/2604.20825v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "recent research on federated learning frameworks and optimization methods",
+      "llm_evidence_cn": "联邦学习框架和优化方法的最新研究",
+      "llm_evidence": "联邦学习框架和优化方法的最新研究",
+      "canonical_evidence": "联邦学习框架和优化方法的最新研究",
+      "llm_tldr_en": "Introduces FedSIR, a framework to identify and mitigate label noise in federated learning using spectral analysis.",
+      "llm_tldr_cn": "引入了FedSIR框架，利用谱分析识别并减轻联邦学习中的标签噪声。",
+      "llm_tldr": "引入了FedSIR框架，利用谱分析识别并减轻联邦学习中的标签噪声。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.17956v1",
+      "source": "arxiv",
+      "title": "Federated Rule Ensemble Method in Medical Data",
+      "abstract": "Machine learning has become integral to medical research and is increasingly applied in clinical settings to support diagnosis and decision-making; however, its effectiveness depends on access to large, diverse datasets, which are limited within single institutions. Although integrating data across institutions can address this limitation, privacy regulations and data ownership constraints hinder these efforts. Federated learning enables collaborative model training without sharing raw data; however, most methods rely on complex architectures that lack interpretability, limiting clinical applicability. Therefore, we proposed a federated RuleFit framework to construct a unified and interpretable global model for distributed environments. It integrates three components: preprocessing based on differentially private histograms to estimate shared cutoff values, enabling consistent rule definitions and reducing heterogeneity across clients; local rule generation using gradient boosting decision trees with shared cutoffs; and coefficient estimation via $\\ell_1$-regularized optimization using a Federated Dual Averaging algorithm for sparse and consistent variable selection. In simulation studies, the proposed method achieved a performance comparable to that of centralized RuleFit while outperforming existing federated approaches. Real-world analysis demonstrated its ability to provide interpretable insights with competitive predictive accuracy. Therefore, the proposed framework offers a practical and effective solution for interpretable and reliable modeling in federated learning environments.",
+      "authors": [
+        "Ke Wan",
+        "Kensuke Tanioka",
+        "Toshio Shimokawa"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ME"
+      ],
+      "published": "2026-04-20T08:38:26+00:00",
+      "link": "https://arxiv.org/pdf/2604.17956v1",
+      "tags": [
+        "keyword:联邦激励",
+        "query:联邦激励"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "federated learning framework for interpretable global models in medical data",
+      "llm_evidence_cn": "医疗数据中可解释全局模型的联邦学习框架",
+      "llm_evidence": "医疗数据中可解释全局模型的联邦学习框架",
+      "canonical_evidence": "医疗数据中可解释全局模型的联邦学习框架",
+      "llm_tldr_en": "Proposes a federated RuleFit framework to create interpretable global models for distributed medical datasets.",
+      "llm_tldr_cn": "提出一种联邦 RuleFit 框架，为分布式医疗数据集创建可解释的全局模型。",
+      "llm_tldr": "提出一种联邦 RuleFit 框架，为分布式医疗数据集创建可解释的全局模型。",
+      "llm_tags": [
+        "query:flrlvldm:composite"
+      ],
+      "matched_query_tag": "query:flrlvldm:composite",
+      "matched_query_text": "Papers central to 联邦学习、强化学习、视觉语言模型、扩散模型相关论文检索, especially work that connects or combines: advances and strategies in reinforcement learning algorithms; v; d; a; i; recent research on federated learning frameworks and optimization methods; find recent studies and reviews on federated learning, reinforcement learning, vision language, and diffusion models; explore cross domain methods combining federation, reinforcement, and multimodal generative techniques; retrieve surveys and benchmark comparisons of FL, RL, VLM, and diffusion approaches.",
+      "matched_requirement_id": "req-composite-flrlvldm",
       "selection_source": "fresh_fetch",
       "quick_tier": "7"
     }

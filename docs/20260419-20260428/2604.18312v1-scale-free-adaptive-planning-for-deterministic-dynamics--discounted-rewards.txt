@@ -1,0 +1,2724 @@
+Title: Scale-free adaptive planning for deterministic dynamics & discounted rewards
+
+URL Source: https://arxiv.org/pdf/2604.18312v1
+
+Published Time: Tue, 21 Apr 2026 02:57:49 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Peter L. Bartlett 1 Victor Gabillon 2 Jennifer Healey 3 Michal Valko 4
+
+Abstract 
+
+We address the problem of planning in an envi-ronment with deterministic dynamics and stochas-tic discounted rewards under a limited numeri-cal budget where the ranges of both rewards and noise are unknown. We introduce PlaT γPOOS , an adaptive, robust, and efficient alternative to the 
+
+OLOP (open-loop optimistic planning) algorithm. Whereas OLOP requires a priori knowledge of the ranges of both rewards and noise, PlaT γPOOS 
+
+dynamically adapts its behavior to both. This al-lows PlaT γPOOS to be immune to two vulnerabil-ities of OLOP : failure when given underestimated ranges of noise and rewards and inefficiency when these are overestimated. PlaT γPOOS additionally adapts to the global smoothness of the value func-tion. PlaT γPOOS acts in a provably more efficient manner vs. OLOP when OLOP is given an overes-timated reward and show that in the case of no noise, PlaT γPOOS learns exponentially faster. 
+
+1. Introduction 
+
+We consider the problem of planning in a general stochastic environment with deterministic dynamics and discounted rewards . Our goal is to recommend the best first action for an agent to take from a given state. We envision that the discount factor γ is known and that our learner has a limited allocation of n interactions to spend querying a generative model of the environment. The objective is to maximize the sum of discounted rewards of the best sequence of actions following from the recommended first action. This is equiv-alent to minimizing the simple regret . We introduce the algorithm PlaT γPOOS , Pla nning wiTh γ Plus an Online Op-timization Strategy, as a robust and efficient scale-free alter-native to the OLOP algorithm (open-loop optimistic planning, Bubeck & Munos, 2010; Leurent & Maillard, 2019) for this  
+
+> 1
+
+University of California, Berkeley, USA 2 Noah’s Ark Lab, Huawei Technologies, London, UK 3 Adobe Research, San Jose, USA 4 SequeL team, INRIA Lille - Nord Europe, France. Corre-spondence to: Victor Gabillon <victor.gabillon@huawei.com >.
+
+Proceedings of the 36 th International Conference on Machine Learning , Long Beach, California, PMLR 97, 2019. Copyright 2019 by the author(s). 
+
+setting. Our algorithm implements a scale-free function op-timization strategy similar to SequOOL (Bartlett et al., 2019) rather than an upper-confidence-bound approach which al-lows us to efficiently adapt to the problem space without prior knowledge of the ranges of the noise or the rewards .Planning in a stochastic environment is an important setting often modeled by Markov decision processes (MDPs, Put-erman, 1994; Bertsekas & Tsitsiklis, 1996). One approach to solving these settings is to find the optimal policy that maximizes the expected sum of rewards and then generate an action recommendation according to that optimal pol-icy. Unfortunately, in most practical settings where we are limited by computational resources, finding this optimal policy is often not possible, especially when the state space becomes large. Therefore, instead of trying to estimate the optimal policy of the MDP, we focus only on finding the 
+
+best first action given our budget. We evaluate the perfor-mance of the recommendation in terms of the simple regret, the difference in reward between choosing the optimal first action vs. choosing our recommended first action and then in both cases choosing an optimal sequence of actions fol-lowing the first action. This metric is often used to evaluate planning strategies that optimize numeric budgets (Bubeck & Munos, 2010; Bu s¸ oniu & Munos, 2012; Grill et al., 2016), in contrast to the cumulative regret where we are penalized during the search for querying sub-optimal actions. Once the agent takes the first action and moves to the next state, our evaluation can be repeated with a new budget allocation and the following best first action can be recommended. This allows us to approximately follow an optimal policy, action by action, in an online way. Previously, there have been several strategies proposed on how to efficiently allo-cate a numeric budget to search for an optimal value in a stochastic space. Many of these have been successfully im-plemented using methods based on upper confidence bounds (UCBs) such as UCT (Upper Confidence Trees, Kocsis & Szepesv ´ari, 2006). This approach has been proven to be very efficient in practice (Coulom, 2007; Gelly et al., 2006; Silver et al., 2016), however, UCT can badly misbehave on some problems (Coquelin & Munos, 2007) and more the-oretically sound approaches have been proposed (Hren & Munos, 2008; Bubeck & Munos, 2010; Bu s¸ oniu & Munos, 2012; Feldman & Domshlak, 2014; Sz ¨or ´enyi et al., 2014; Kaufmann & Koolen, 2017; Shah et al., 2019). Some of 
+
+> arXiv:2604.18312v1 [cs.LG] 20 Apr 2026 Scale-free adaptive planning for deterministic dynamics & discounted rewards
+
+these methods are connected to the ones from function op-timization (Bubeck et al., 2011; Munos, 2011; Valko et al., 2013) as shown by Munos (2014), however, one key differ-ence is that in planning, as opposed to function optimization, the structure of the reward is a discounted reward, specifi-cally a sum of rewards discounted by factor γ. This reward structure influences the behavior of the optimizers (Bubeck & Munos, 2010), in particular, the discount factor brings smoothness to the value function which in turn makes it easier to optimize. PlaT γPOOS exploits the effect of the discount factor to efficiently manage an adaptive planning strategy in the face of unknown ranges of noise and rewards. This adaptive strategy of PlaT γPOOS makes it more robust and efficient in practice than other planning strategies. For example, even though they are theoretically sound, the em-pirical performance of UCB-based approaches depends on the careful tuning of the upper confidence bound. If the upper confidence bound is too large then the UCB-based learner plays very conservatively by overestimating sub-optimal options for many rounds. Moreover, these UCBs might depend on instance parameters that are simply not known such as the range of the rewards and the range of the noise . We build on the function optimization approach of Bartlett et al. (2019) that does not use UCBs and obtains improved results over the state-of-the-art by adapting to the problem difficulty with a scale-free approach. PlaT γPOOS 
+
+adapts this scale-free optimization to planning. This scale-free property becomes a desired feature as machine learning gets closer to applications, whether it is online (Ross et al., 2013; Orabona & P ´al, 2018) or deep learning (Orabona & Tommasi, 2017), since many parameters are never known. In terms of planning strategy, the PlaT γPOOS algorithm is an adaptive, robust, and efficient alternative to OLOP .Whereas OLOP requires the knowledge of where the ranges of both rewards and noise , PlaT γPOOS dynamically adapts its behavior to the both ranges, as well as some potential additional global smoothness of the value function. Our algorithm’s ability to adapt allows it to avoid failure in cases where the ranges of noise and rewards are underestimated and to act more efficiently in cases where they are over-estimated. PlaT γPOOS recovers the results of OLOP while allowing improvements in various classes of problems. 
+
+Our contributions We show that PlaT γPOOS 
+
+• adapts its behavior to an unknown range of rewards, • requires no apriori assumptions or knowledge on noise, • empirically learns much faster than UCB approaches, • gets the fast rate of deterministic planning in low noise for all regime; in particular, it learns exponentially faster than OLOP when there happens to be no noise, • adapts also the global smoothness ρ and ν beyond the base smoothness provided by γ.We additionally address a realistic constraint where the agent can only reset to the original state and not to any state it wishes. Our results hold for MDPs with deterministic dynamics and can equally be applied to open loop planning problems (as discussed by Munos 2014) where we search for the best sequence of actions, ignoring the actual states that are reached after each action (Bubeck & Munos, 2010). Related algorithms, where the objective is to find the value of the state rather than to identify the best action, include 
+
+TrailBlazer (Grill et al., 2016) and StOP (Sz ¨or ´enyi et al., 2014). A key difference is that these algorithms are fixed confidence and output a value using a small number of samples given an accuracy/probability, whereas our algo-rithm does exploration under a fixed budget of samples and guarantees how good the found action is. Even for sim-ple multi-arm bandits, these two problems have different complexity (Carpentier & Locatelli, 2016) and can only be equivalent under unrealistic side knowledge (Gabillon et al., 2012). These related algorithms are also impractical for our setting. TrailBlazer uses confidence bounds that are humongous and StOP takes exponential time. Similar to 
+
+OLOP , both also need to know noise and reward ranges. 
+
+2. Background 
+
+We model our problem with an MDP with state space X,action space A and dynamics such that taking the chosen action at at time t deterministically transitions the system from xt ∈ X to state xt+1 ≜ f (xt, a t) generating a reward 
+
+rt ≜ r(xt, a t) + εt, with εt being the noise. We consider: 
+
+deterministic rewards The evaluations are noiseless, that is for all t, εt ≜ 0 and rt ≜ r(xt, a t).
+
+stochastic rewards The evaluations are perturbed by a noise of range b ∈ R+: At any round, εt is a random variable, independent from noise at previous rounds, 
+
+E [rt | xt] ≜ r(xt, a t) and |rt − r(xt, a t)| ≤ b. (1) We assume that all rewards lie in the interval [0 , R max ]
+
+and while the state space may be large and possibly infi-nite, that the action space is finite, with K available ac-tions. We treat an infinite time-horizon problem with dis-counted rewards where the discount factor ( 0 ≤ γ < 1)is known . For any possible policy π : X → A, we de-fine the value function V π : X → R associated to π as 
+
+V π (x) ≜ P γtr(xt, π (xt)) , where xt is the state of the system at time t when starting from x (i.e., x0 ≜ x) and following policy π. In the next definition, we also define the 
+
+Q-value function Qπ : X × A → R associated to policy π,for each state-action pair ( x, a), as the value of playing action a in state x and the following π thereafter. 
+
+Definition 1. The Q-value function Qπ of policy π is 
+
+Qπ (x, a ) ≜ r(x, a ) + γV π (f (x, a )) .Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Notice that V π (x) = Qπ (x, π (x)) . We define the op-timal value function, and Q-value function respectively, as V ⋆(x) ≜ sup π V π (x) and Q⋆(x, a ) ≜ sup π Qπ (x, a ),which corresponds to playing a first and optimally after. From the dynamic programming, we have the Bellman equa-tions (Bertsekas & Tsitsiklis, 1996; Puterman, 1994), 
+
+V ⋆(x) = max  
+
+> a∈A
+
+r(x, a ) + γV ⋆(f (x, a )) ,Q⋆(x, a ) = r(x, a ) + γ max  
+
+> b∈A
+
+Q⋆(f (x, a ), b ).
+
+Let [a : c] ≜ {a, a + 1 , . . . , c } with a, c ∈ N, a ≤ c, and 
+
+[a] ≜ [1 : a]. Let log d be the logarithm in base d, d ∈ R
+
+and log without a subscript be the natural logarithm. 
+
+2.1. Optimistic planning under finite numerical budget 
+
+We assume that we have a generative model of f and r
+
+that generates simulated transitions and rewards. We want to make the best possible use of this model in order to recommend a best next action a(n) such that the sum of the rewards resulting from playing a(n) and then optimally afterwards is as close as possible to playing optimally from the beginning. For that purpose, we define the performance loss that we aim to minimize rn as 
+
+rn ≜ max  
+
+> a∈A
+
+Q⋆ (x, a ) − Q⋆ (x, a (n)) .
+
+2.2. The planning tree 
+
+For a given initial state x, consider the (infinite) planning tree defined by all possible sequences of actions (thus all possible reachable states starting from x). Let A∞ be the set of infinite sequences ( a0, a 1, a 2, . . . ) where at ∈ A.The branching factor of this tree is the number of actions 
+
+K ≜ |A|. Since the dynamics are deterministic, to each finite sequence a ∈ Ad of length d we assign a state that is reachable starting from x by following this sequence of d actions. Using standard notation for alphabets, we write A0 ≜ {∅} and A• for the set of finite sequences. For a ∈ A•, we let h(a) be the length of a, and aA h ≜
+
+{aa ′, a ′ ∈ Ah}, where aa ′ denotes the sequence a followed by a′. We identify the set of finite sequences a ∈ A• with the set of nodes of the tree. With h′ ≤ h and a ∈ Ah, we denote a[h′] the sequence of action composed of the h′ first actions from a, i.e., {a0, . . . , a h′−1}. We fix a[0] ≜ ∅. The value v(a) of an infinite sequence a ∈ A∞ is the discounted sum of rewards along the trajectory starting from the initial state x and defined by the choice of this sequence of actions, 
+
+v(a) ≜ X
+
+> t≥0
+
+γtr(xt, a t), where x0 = x; xt+1 ≜ f (xt, a t)·
+
+Now, for any finite sequence a ∈ A•, or node, we define the value v(a) ≜ sup a′∈A∞ v(aa ′). We write v⋆ ≜ v(∅) = sup a∈A∞ v(a) for the optimal value at the initial state which is the root of the tree, v⋆ = V ⋆(x). We denote the set of optimal infinite sequence of action as A⋆ which contains any 
+
+a ∈ A∞ such that v(a) = v⋆. We note the set of optimal finite sequence of actions of depth h as A⋆,h which contains any a ∈ Ah such that v(a) = v⋆. We also define the u- and 
+
+b-values for the lower- and upper- bounds on v(a) as 
+
+u(a) ≜
+
+> h(a)−1
+
+X
+
+> t=0
+
+γtr(xt, a t), and b(a) ≜ u(a) + γh(a)Rmax 
+
+1 − γ ·
+
+Indeed, since all rewards are in [0 , R max ], we trivially have that u(a) ≤ v(a) ≤ b(a). At any finite time t an algo-rithm has opened a set of nodes, which defines the expanded tree Tt . We say the learner opens (or expands) a node a
+
+with m evaluations if uses the generative model f and r
+
+to generate m transitions and rewards for the K children nodes aA . In the deterministic reward feedback, m = 1 .The bounds reported in this paper are in terms of the total number of openings n, instead of evaluations. The num-ber of function evaluations is upper bounded by Kn . Tx,a 
+
+denotes the total number of evaluations allocated to action 
+
+a ∈ A in state x. We define, especially for the noisy case, the estimated value of the reward br(x, a ) of action a ∈ A
+
+in state x. Given the Tx,a evaluations r1, . . . , r Tx,a , we let br(x, a ) ≜ 1
+
+> Tx,a
+
+PTx,a  
+
+> s=1
+
+rs be the empirical average of re-wards obtained at when performing action action a ∈ A
+
+in state x. To ease notation, for a ∈ Am and h ≤ m, we write Ta ≜ E[Txh(a)−1,a h(a)−1 |xt+1 ∼ P (·| xt, a t), x 0 = x]
+
+for the number of pulls to the last action in a. Simi-larly, brh(a) ≜ E[br(xh, a h)|xt+1 ∼ P (·| xt, a t), x 0 = x]
+
+and rh(a) ≜ E[r(xh, a h)|xt+1 ∼ P (·| xt, a t), x 0 = x].
+
+In the case of deterministic dynamics, xh is such that 
+
+xt+1 ∼ P (·| xt, a t) and x0 ≜ x is a fixed state from which we can sample from if we have a full access to the generative model. Hence, for a finite sequence a ∈ A• or a node, 
+
+bu(a) ≜
+
+> h(a)−1
+
+X
+
+> t=0
+
+γtbr(xt, a t) = 
+
+> h(a)−1
+
+X
+
+> t=0
+
+γtbrt(a).
+
+We assume the existence of at least one a⋆ ∈ A∞ for which 
+
+V ⋆(x) = sup a∈A∞ v(a) and define a smoothness for v.
+
+Proposition 1. There exists ν ∈ (0 , R max / (1 − γ)] and 
+
+ρ ∈ (0 , γ ] such that ∀h ≥ 0, ∀a ∈ Ah, u (a) ≥ v(a) − νρ h.
+
+Note that this holds automatically for ν = Rmax / (1 − γ)
+
+and ρ = γ. For problems with an extra regularity this may also hold for some ν < R max / (1 − γ) and ρ < γ . Note that our results automatically adapt to ρ without knowing its value. Moreover, note that while having a smoothness ρ
+
+means having rewards diminishing geometrically with depth with a ratio of ρ, the constant ν is linked to the scale of variation of the V which can often be realistically smaller than ν < R max / (1 − γ). We now define a measure of the quantity of near-optimal sequences for the smoothness ν, ρ .Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Definition 2. For any ν > 0 and ρ ∈ (0 , 1) , the branching factor κv (ν, ρ ) with associated constant C, is defined as 
+
+κv (ν, ρ ) ≜ inf κ ≥ 1 : ∃C > 1, ∀h ≥ 0, N vh (3 νρ h) ≤ Cκ h ,
+
+where N vh (ε) is the number of nodes a ∈ Ah of depth h
+
+such that v(a) ≥ v⋆ − ε.
+
+We also define a related quantity but different from κv (ν, ρ ).In particular, we define κu(ν, ρ ) that uses N uh (ε) instead of N vh (ε) where N uh (ε) is the number of nodes a ∈ Ah
+
+of depth h such that u(a) ≥ v⋆ − ε. Our results use the new quantity κu(ν, ρ ), recover the previous results using 
+
+κv (ν, γ ) in the method of Bubeck & Munos (2010) and go beyond them. Indeed, theirs are only formulated for ρ = γ
+
+while we prove the following claim in Appendix A. 
+
+Proposition 2. κu(ν/ 2, γ ) ≤ κv (ν, γ ) ≤ κu(2 ν, γ ).
+
+3. Optimization vs. planning 
+
+Our PlaT γPOOS approach is a very close sibling to the flat optimization algorithm, StroquOOL (Bartlett et al., 2019), however, we explain how the structure of the planning set-ting and the discount factor γ shaped our approach. The optimal application of an optimization algorithm to the plan-ning setting is not straightforward as discussed by Bubeck & Munos (2010). In their Section 2.2, Bubeck & Munos (2010) show that optimization can be applied to the plan-ning problem either in a na ¨ıve way or a good way. The authors take as an example the uniform planning problem. The na ¨ıve and good strategies are evaluated by comparing the uncertainty |u(a) − bu(a)| of their estimates bu(a). Both strategies collect rewards identically, evaluating u(a) for all the KH nodes a ∈ AH at a fixed depth H ≜ h(a) by allo-cating one episode (of length H) for each a and receiving 
+
+rh,a , 1 ≤ h ≤ H. In the na ¨ıve version, for all sequences a,the estimation of u(a) uses only the H samples collected in the one episode related to a. Here bu(a) ≜ Ph(a)−1 
+
+> h=0
+
+γtrh,a 
+
+and Ta[h] = 1 . In contrast, the good planning strategy 
+
+reuses estimates. For two distinct sequences a and a′,the good strategy reuses any sample of rh,a it gets for the estimation of both u(a) and u(a′) if a[h] = a′
+
+> [h]
+
+. In this case, bu(a) ≜ Ph(a)−1 
+
+> h=0
+
+γt 1
+
+> KH−h
+
+P
+
+> a′:a[h]=a′
+> [h]
+
+rh,a ′ and 
+
+Ta[h] = KH−h. This comparison is used to demonstrate the advantage of the use of the cross-sequence information to concentrate the estimate of the mean reward associated with each action more efficiently. It is by using this type of cross-sequence information that OLOP is able to obtain a reduced regret over a na ¨ıve application of HOO for optimiza-tion (Bubeck et al., 2011) to the planning problem. The previous discussion on cross-sequence information is tied to the case of uniform exploration strategies. Good uniform strategies guarantee Ta[h] = KHu−h by exploring 
+
+Input: n, A
+
+Initialization: open t0,1; hmax ← n/ log( n)
+
+For h = 1 to hmax 
+
+open ⌊hmax /h ⌋ nodes ah,i of depth h
+
+with largest values u(ah,i )
+
+Output x(n) ← arg max 
+
+> ah,i :∈T
+
+u(ah,i ) 
+
+> Figure 1. Algorithm for free planning with no reset condition
+
+until a reasonably shallow depth Hu but sampling all KHu
+
+nodes and sharing cross sequence information. In the case of 
+
+OLOP , HOO , or, particularly StroquOOL , only a subset S of size |S| ≪ KHu of the most promising nodes are explored but at a deeper depth Hs ≫ Hu. Therefore, obtaining a lower bound on the number of sequence of actions at depth 
+
+Hs that contains a for a given sub-sequence of actions a
+
+at depth h < H s is complex in general. Actually one can design a problem with two actions that would drastically limit the amount of cross-sequence information for the op-timal sequence of actions a⋆ in StroquOOL . As a result, applying StroquOOL with information sharing may not be enough and we chose to algorithmically ensure hat a node at depth h + 1 will be pulled γ2 times less than a node at depth h. Indeed, using Chernoff-Hoeffding inequalities, we have |u(a) − bu(a)| ≤ Ph(a)−1 
+
+> h=0
+
+γh/pTa[h] . However, 
+
+PlaT γPOOS , through some simple reparametrization, re-mains very close to StroquOOL and we leave as an open question whether equivalent theoretical guarantees could be proved directly for StroquOOL applied to planning. 
+
+4. Deterministic dynamics and rewards 
+
+In this section, we consider a simpler case of deterministic rewards in order to introduce our new ideas. The evaluations are noiseless, that is ∀t, εt ≜ 0 and rt ≜ r(xt, a t).In Figure 1, we provide the SequOOL (Bartlett et al., 2019) algorithm applied to planning. In this case, it is straightfor-ward to follow the analysis of SequOOL in order to obtain the same rates of simple regret as the state of the art algo-rithm OPD for the doubly deterministic case (Hren & Munos, 2008; Munos, 2014), up to logarithmic factors; and get the result 1 of Theorem 1. This direct usage was already dis-cussed by Munos (2014, Section 5.1). Using SequOOL for planning already permits to have an algorithm that does not use the parameter Rmax and that adapts to extra smoothness in the value function ν, ρ as discussed Section 2. Note that to obtain similar adaptations to Rmax , ν, and ρ, we could have already used SOO (Munos, 2014). However, SOO does not come with optimal simple regret (Bartlett et al., 2019).   
+
+> 1log( n)is the n-th harmonic number
+
+Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Input: n, A
+
+Initialization: open t0,1; hmax ←
+
+j n 
+
+> log n
+
+k
+
+For h = 1 to hmax 
+
+open hmax /h 2 nodes ah,i of depth h
+
+with largest values u(ah,i )
+
+Output x(n) ← arg max 
+
+> ah,i :∈T
+
+u(ah,i )
+
+Figure 2. Algorithm for constraint planning (restart) 
+
+Theorem 1. For any planning problem with associated 
+
+(ν, ρ ), and branching factor κ ≜ κu(ν, ρ ), the simple regret of SequOOL is after n rounds bounded as follows. • If κ = 1 , then rn ≤ νρ 1  
+
+> C
+> jn
+> log n
+> k
+
+.
+
+• If κ > 1, then rn = O ν
+
+ log κC
+
+j n 
+
+> log n
+
+k − log 1 /ρ  
+
+> log κ
+
+!
+
+.
+
+On the reset condition In practice, physical constraints can force the exploration to interact with the unknown en-vironment under a reset condition. This means that there exists a starting state x and a trajectory needs to start from this state and following a given policy. Therefore, if we wish to collect a sample from an arbitrary state x′ after a reset, we must first reach that state from the starting state x.
+
+SequOOL is a strategy that explores the MDP deeper and deeper from an initial starting state x. The original SequOOL 
+
+strategy did not consider any reset condition, so to make a comparable analysis we will say that to ‘open’ a node a you first need to reach a at a budget cost of h(a) which is equal to the depth of a. This additional cost has the consequence that SequOOL with reset will not be able to explore as deeply as without. A na ¨ıve extension is shown in Figure 2. Under a total limited budget of n, the number of nodes now open at depth h is O(n/h 2) instead of O(n/h ) and the maximal depth is now of order of √n instead of n. However, this does not influence the simple regret when κ > 1 by more than numerical constants as shown in Theorem 2. When 
+
+κ > 1, the exponentially diminishing simple regret remains but is changed from ρn to ρ√n.
+
+Theorem 2. For a planning problem with associated (ν, ρ ),and branching factor κ ≜ κu(ν, ρ ), after n rounds, the simple regret of SequOOL with reset condition verifies: • If κ = 1 , then rn ≤ νρ   
+
+> r
+> 1
+> C
+> jn
+> log n
+> k
+
+.
+
+• If κ > 1, then rn ≤ O ν
+
+ log κC
+
+j n 
+
+> log n
+
+k − log 1 /ρ  
+
+> log κ
+
+!
+
+.
+
+5. Deterministic dynamics, stochastic rewards 
+
+We now describe the PlaT γPOOS algorithm detailed in Fig-ure 3. In the presence of noise, it is natural to evaluate the 
+
+Input: n, A
+
+Initialization: open the root node ∅, hmax times 
+
+hmax ←
+
+j n 
+
+> 2(log 2n+1) 2
+
+k, pmax ← ⌊ log 2 (hmax )⌋
+
+For h = 1 to hmax ◀ exploration ▶
+
+For p = log 2(hmax / h2γ2h) down to 0
+
+open h2pγ2h times the at most 
+
+j hmax 
+
+> h⌈h2pγ2h⌉
+
+k
+
+non-opened nodes ah,i ∈ Ah with highest values 
+
+bu(ah,i ) and given Tah,i ≥ (h − 1)2 pγ2( h−1) 
+
+For p ∈ [0 : pmax ] ◀ cross-validation ▶
+
+evaluate (t + 1) γ2thmax (1 − γ2)2 times the actions at round t, apt , of the candidates: 
+
+ap ← arg max  
+
+> a∈A•:∀t∈[2: h(a)] ,T a[t]≥
+
+⌈(t−1)2 pγ2( t−1) ⌉
+
+bu(a)
+
+Output an ← arg max 
+
+> {ap,p ∈[0: pmax ]}
+
+bu(ap)
+
+Figure 3. The PlaT γPOOS algorithm 
+
+cells multiple times, not just one time as in the deterministic case. The amount of times a cell should be evaluated to differentiate its value from the optimal value of the function depends on the gap between these two values as well as the range of noise. As we do not want to make any assumptions on knowing these quantities, our algorithm tries to be robust to any potential values by not making a fixed choice on the number of evaluations. Intuitively, we do this following a path similar to StroquOOL (Bartlett et al., 2019) by using a modified version of SequOOL , denoted SequOOL (m), that allows us to evaluate cells m times, whereas for SequOOL ,
+
+m = 1 . Evaluating cells more times ( m large) leads to a better quality of the mean estimates in each cell, however, as a trade-off, it uses more evaluations per depth. This would normally limit us from exploring deep depths of the partition, however, PlaT γPOOS takes advantage of the knowledge of γ which gives less weight to reward collected deeper in the tree. In order to obtain the concentration re-sults for a node a on bu(a) − u(a) in Lemma 2, PlaT γPOOS 
+
+uses a Chernoff-Hoeffding result that gives with high prob-ability, bu(a) − u(a) ≤
+
+qPh(a)−1 
+
+> h=0
+
+γ2h/T a[h] and balances the range of confidence intervals at different depths. There-fore, PlaT γPOOS tends to pull less with deeper depth as the number of pulls for a fixed m is hmγ 2h where the addi-tional h factor ensures that the sum of confidence interval until depth h is bounded for any h. PlaT γPOOS then implic-itly performs log n instances of SequOOL (m) each with a number of evaluations of m = 2 p, where p ∈ [0 : log n].In Figure 3, remember that ‘opening’ a node means ‘eval-uating’ its children actions. The algorithm opens nodes by sequentially diving them deeper and deeper from the root Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+node h = 0 to a maximal depth of hmax . At depth h,we allocate, in an almost decreasing fashion, different number of evaluations h2pγ2h to the nodes with high-est value of that depth, with p starting at ⌊log 2(hmax /h )⌋
+
+down to 0. The best node that has been evaluated at least 
+
+O(hmax /h ) times is opened with O(hmax /h ) evaluations, the two next best cells that have been evaluated at least 
+
+O(hmax /(2 h) times are opened with O(hmax /(2 h)) evalu-ations, the four next best cells that have been evaluated at least O(hmax /(4 h)) times are opened with O(hmax /(4 h)) 
+
+evaluations and so on, until some O(hmax /h ) next best cells that have been evaluated at least once are opened with one evaluation. More precisely, given, p and h, we open, with h2pγ2h evaluations, the hmax /(h h2pγ2h) non-previously-opened nodes ah,i ∈ Ah with highest values 
+
+bu(ah,i ) and given that Tah,i ≥ (h − 1)2 pγ2( h−1) . The maximum number of evaluations of any node is 2pmax , with 
+
+2pmax = O(hmax ) as pmax ≜ ⌊log 2 (hmax )⌋. For each 
+
+p ∈ [0 : pmax ], the candidate output ap is the node a with the highest estimated value such that all actions leading to that node have been evaluated in the following way 
+
+∀t ∈ [2 : h(a)] , T a[t] ≥ (t − 1)2 pγ2( t−1) . We set 
+
+hmax ≜ n/ (2(log 2 n + 1) 2).
+
+5.1. Analysis of PlaT γPOOS 
+
+⊥h,p is the depth of the deepest opened node, a with at least h2pγh evaluations such that there is a a⋆ ∈ A⋆ with 
+
+a⋆ ≜ ab , with b ∈ A∞, at the end of the opening of depth h.
+
+Lemma 1. For any planning problem with associated (ν, ρ )
+
+as in Property 1), on event ξ defined in Appendix C, for any depth h ∈ [hmax ] , for any p ∈ [0 : log 2(hmax /(h2γ2h)) ],we have ⊥h,p = h if (1) and (2) simultaneously hold: (1) bplog(4 n/δ )/2p+1 ≤ νρ h
+
+(2) We distinguish cases and express the condition in each: 
+
+Case 1) h2pγ2h ≤ 1 : 
+
+hmax 
+
+h = hmax 
+
+h ⌈h2pγ2h⌉ ≥ Cκ (ν, ρ )h
+
+and for all h′ ∈ [h], hmax 
+
+h′22p+1 γ2h′ ≥ Cκ (ν, ρ )h′
+
+Case 2) h2pγ2h ≥ 1 : 
+
+Case 2.1) γ2κu ≥ 1 : hmax 
+
+h22p+1 γ2h ≥ Cκ (ν, ρ )h
+
+Case 2.2) γ2κu ≤ 1 : hmax 
+
+h22p+1 ≥ C
+
+Lemma 1 gives two conditions so that the cell contain-ing a a⋆ ∈ A⋆ is opened at depth h. This holds if (1) PlaT γPOOS opens, with h2pγ2h evaluations, more cells at depth h than the number of near-optimal cells at depth h (hmax /  h22pγ2h ≥ Cκ (ν, ρ )h if γ2κu ≥ 1 and 
+
+hmax /h 2p ≥ C if γ2κu ≤ 1) and (2) the h2pγ2h evalu-ations are sufficient to discriminate the empirical average of near-optimal cells from the empirical average of sub-optimal cells ( bplog(4 n/δ )/2p+1 ≤ νρ h). To state the next theorems, we introduce eh, eh1, and eh2 three positive real numbers satisfying respectively the equations: 
+
+hmax ν2ρ2eh1 /
+
+eh1b2gδ,R max  
+
+> n,b
+
+γ2eh1
+
+
+
+= Cκ eh1 and 
+
+hmax ν2ρ2eh2 /
+
+eh2b2gδ,R max 
+
+> n,b
+
+
+
+= C, where 
+
+eh1 = 1log( γ2κ/ρ 2) log 
+
+ n1 
+
+> log n1
+
+
+
++ o(1) and 
+
+eh2 = 1log(1 /ρ 2) log 
+
+ n2 
+
+> log n2
+
+
+
++ o(1) with 
+
+n1 ≜ ν2hmax log( γ2κ/ρ 2)
+
+> Cb 2gδ,R max
+> n,b
+
+, n2 ≜ ν2hmax log(1 /ρ 2)
+
+> Cb 2gδ,R max
+> n,b
+
+,where gδ,R max  
+
+> n,b
+
+≜ pmax log( Rmax n3/2/b (1 − δ)) . eh is de-fined similarly in Equation 5 in Appendix D. The quantities 
+
+eh1 and eh2 give the respective depths of deepest cell opened by PlaT γPOOS that contains a a⋆ with high probability in the cases γ2κ ≥ 1 and γ2κ ≤ 1. Additionally, eh1 and eh2
+
+also let us characterize for which regime of the noise range b
+
+we recover results similar to the loss of the deterministic case. Discriminating on the noise regimes, we now state two of our results, Theorem 3 for a high noise and Theorem 4 for a low one. A more exhaustive list of results is in the Appendix D or in the Table 1. 
+
+Theorem 3. High-noise regime If the noise b is high enough to verify both high-noise conditions as defined in the cap-tion of Table 1, then after n rounds, for any problem with associated (ν, ρ ), and branching factor κ ≜ κu(ν, ρ ), the simple regret of PlaT γPOOS obeys 
+
+Ern =
+
+eO
+
+  nb2
+
+− 12
+
+
+
+if γ 2κ ≤ 1,
+
+eO
+
+  nb2
+
+− log(1 /ρ )log( γ2κ/ρ 2)
+
+
+
+if γ 2κ > 1.
+
+The proofs are in appendix D. They are quite technical but they are simply based on checking the conditions of Lemma 1 under different b, ρ, γ, κ regimes. 
+
+Theorem 4. Low-noise regime If the noise b is low enough to verify both high-noise conditions as defined in the cap-tion of Table 1, then after n rounds, for any problem with associated (ν, ρ ), and branching factor κ ≜ κu(ν, ρ ), the simple regret of PlaT γPOOS obeys 
+
+Ern =
+
+eO (νρ n) if κ = 1 ,
+
+eO
+
+
+
+ν   nb2
+
+− log(1 /ρ )log( κ)
+
+
+
+if κ > 1.Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+γ2κ ≤ 1 γ2κ ≥ 1
+
+High noise (ii) Low noise (ii) High noise (iii) Low noise (iii) 
+
+High noise (i) mν,γ 
+
+  nb2
+
+− 12 νρ √n mν,γ 
+
+  nb2
+
+− log(1 /ρ )log( γ2κ/ρ 2) ν   nb2
+
+− log(1 /ρ )log( κ)
+
+Low noise (i) mν,γ 
+
+  nb2
+
+− log(1 /ρ )log( κ)
+
+κ = 1 : νρ n
+
+mν,γ 
+
+  nb2
+
+− log(1 /ρ )log( κ) ν   nb2
+
+− log(1 /ρ )log( κ)
+
+κ > 1 : ν   nb2
+
+− log(1 /ρ )log( κ)
+
+Table 1. Rates of the our upper bounds on the simple regret of PlaT γPOOS for various classes. The condition on noise (i) is whether the noise b verifies ν2ρ2eh/(γ2ehehb 2gδ,R max  
+
+> n,b
+
+) ≤ 1 The condition on noise (ii) is whether ν2ρ2eh2 /(b2gδ,R max  
+
+> n,b
+
+) ≤ 1. The condition on noise (iii) is whether ν2ρ2eh1 /(b2gδ,R max  
+
+> n,b
+
+) ≤ 1. Moreover, mν,γ ≜ max(1 /1 − γ2, ν ).
+
+Worst-case comparison with OLOP when b is large and known In Table 1, we give our results for various classes of problems depending on the whether γ2κ ≥ 1, whether 
+
+κ = 1 or κ > 1, and several conditions for the range of the noise b. The results for OLOP were distinguishing the results based on γ2κ being greater or smaller than 1. For these two cases, we recover the same rate in term of n for the simple regret, as displayed in Table 1 with a grey background color, for instance taking b = 1 like in OLOP and having ρ = γ. 
+
+However, we provide more specific treatment for sub-cases with associated improvements that we list and detail next. 
+
+Adaptation to the range of the noise b without a prior knowledge Our analysis shows that PlaT γPOOS adapts favorably to the unknown range of noise. Already, in the standard cases discussed above, where the noise is large, our bound already adapts to the amount of noise as it scales with 
+
+n/b 2. OLOP requires an estimate eb of b and has a regret scal-ing with n/ eb2 which is problematic in case of a wrong esti-mate eb ≫ b. Moreover, we give technical conditions on the range of noise that shows when PlaT γPOOS gets improved rates. When γ2κ ≥ 1, OLOP was already obtaining rates that were the same as the rates of deterministic reward case. Therefore, beyond the n/b 2 improvement and the adaptation to extra smoothness that will be discussed latter, no more rate improvement should be expected. In the case γ2κ ≤ 1,the improvement are even more striking. When the noise is very low, then contrary to the OLOP rate of O(1 /√n), we obtain the deterministic rate of OPD (Hren & Munos, 2008; Munos, 2014) which is either n− log(1 /ρ )/ log κ or ρn. These improved rates could not be obtained by OLOP . Indeed, OLOP 
+
+relies on upper confidence bound (UCB) that uses a range of the noise eb as input, 
+
+u(a) = O
+
+b u(a) + 
+
+> h(a)−1
+
+X
+
+> h=0
+
+γheb
+
+s 1
+
+Ta[a]
+
++ Rmax γh(a)
+
+1 − γ
+
+·
+
+This works if eb = b. However, the true b is unknown. If 
+
+b = 0 , using any eb > 0 will not result in an improved rate. 
+
+Adaptation to additional smoothness ν and ρ beyond γ
+
+As defined in Section 2, we aim to adapt to the true smooth-ness ν, ρ of V which can go beyond γ. We show that 
+
+PlaT γPOOS is able to take advantage of ν, ρ in a large por-tion of cases. In most cases, the rate γ in OLOP is replaced by ρ in PlaT γPOOS . In the case where γ2κ ≥ 1 we have 
+
+rOLOP = O(n− log(1 /γ )log( κ) ) ≤ O (n− log(1 /ρ )log( γ2κ/ρ 2) ) = rPlaT γPOOS .
+
+Adaptation to the deterministic case and κ = 1
+
+PlaT γPOOS adapts to the branching factor κ of the problem that under low noise conditions, leads to an exponentially decreasing simple regret rPlaT γPOOS  
+
+> n
+
+= O(νρ √n). This is a light-years improvement over OLOP for these conditions, as 
+
+OLOP ’s regret is at best rPlaT γPOOS  
+
+> n
+
+= O(n−1/2). This result is possible because PlaT γPOOS explores much deeper than 
+
+OLOP , as its maximal depth is of order n. Actually, in most scenarios, the actual larger depth explored will be of order √n due to sampling limitations. On the other hand, OLOP 
+
+can only go log n deep. Moreover, κ = 1 is a common case in planning. Indeed, as discussed by Bubeck & Munos (2010), κ = 1 is equivalent to having near-optimal dimension d = 0 in an optimization task (Munos, 2014) which is a common value as shown by Valko et al. (2013). Therefore, we expect the case when 
+
+γκ 2 ≤ 1, that is, where we get the most significant improve-ment other OLOP , to be the most common in practice. 
+
+The reset condition As discussed in Section 4, in the stochastic reward case, the effect of the reset condition affects, PlaT γPOOS as follows. First, all polynomial rates stay the same. Next, only the exponential rates change. A ρn rate without the condition becomes a ρ√n with it. Next, a ρ√n rate becomes a ρn1/3
+
+one. Scale-free adaptive planning for deterministic dynamics & discounted rewards 1000 2000 3000 4000 5000 
+
+budget n    
+
+> 020 40 60 80 100
+> return
+> PlaT γPOOS OLOP 1000 2000 3000 4000 5000
+
+budget n    
+
+> 020 40 60 80 100
+> return
+> PlaT γPOOS OLOP 1000 2000 3000 4000 5000
+
+budget n    
+
+> 020 40 60 80 100
+> return
+> PlaT γPOOS OLOP 1000 2000 3000 4000 5000
+
+budget n    
+
+> 020 40 60 80 100
+> return
+> PlaT γPOOS OLOP 1000 2000 3000 4000 5000
+
+budget n            
+
+> 020 40 60 80 100
+> return
+> OLOP ,˜b= 5
+> OLOP ,˜b= 10
+> OLOP ,˜b= 20
+> OLOP ,˜b= 40 1000 2000 3000 4000 5000
+
+budget n          
+
+> 020 40 60 80 100 120
+> return
+> OLOP ,˜Rmax = 110
+> OLOP ,˜Rmax = 120
+> OLOP ,˜Rmax = 130
+> OLOP ,˜Rmax = 140
+> OLOP ,˜Rmax = 150
+
+Figure 4. Top and bottom left: Average cumulative discounted return collected by OLOP and PlaT γPOOS with different range of noise, 
+
+b = 1 (top left), b = 10 (top center), b = 20 , (top right), and b = 50 (bottom left). Bottom center: the sensitivity of OLOP to different 
+
+eRmax parameters. Bottom right: the sensitivity of OLOP to different range of the input noise eb as parameters while the true b is set to 10 .
+
+6. Numerical experiments 
+
+In this section, we empirically illustrate the benefits of 
+
+PlaT γPOOS . We chose a simple MDP, shown in Figure 5. In this MDP, a state x ≜ (bin , d ) is a pair of a binary vari-able bin and a non-negative integer d. The MDP has two actions that are also binary. If bin ̸ = a, the base reward is 2, in which case, the next state is (a, 0) . Otherwise, if 
+
+bin = a, then r = d and the next state is (a, d + 1) . The reward is then shifted by adding 100 to it so that the noises with different ranges can be added on top without making the reward negative. 0 1
+
+r =#consecutive visits r = 2 
+
+r = 2 
+
+r =#consecutive visits 
+
+Figure 5. MDP used for our experiments 
+
+The initial state is (0 , 0) . Therefore, the agent has a choice. It can, for instance, remain in the same binary state bin, starting with a null reward but sees its instant reward grow-ing with time if it keeps taking the same action in the future. Alternatively, it could greedily switch to the other binary state bin and obtain a reward of 2 but delaying the hope of obtaining growing reward as in the first scenario. We set 
+
+γ = 0 .95 . Therefore, Rmax ≈ 130 .Figure 4 reports the results. All the figures show the cumu-lative discounted return collected by OLOP and PlaT γPOOS 
+
+after having interacted for 20 steps with the MDP, having chosen each time an action following their planning strategy and then being transferred to the state resulting of applying the recommended action in the current state; therefore also collecting a reward that is composing the final return. Note that the return reported are shifted in order to not take into account the fixed 100 part of each the reward. The figures in the top row, as well as the figure at the bottom left, reports the comparison between the two returns of OLOP and 
+
+PlaT γPOOS for different ranges of noise b. PlaT γPOOS is systematically outperforming OLOP while in this case OLOP 
+
+is given the correct eRmax as input, eRmax = Rmax and the correct range of the noise eb, that is eb = b.In Figure 4, bottom center and right, we illustrate the sensi-tivity of OLOP to misleading input parameters. Notice that the performance of OLOP is very vulnerable to these mis-specifications while PlaT γPOOS is not using such inputs. 
+
+Acknowledgments The research presented was supported by European CHIST-ERA project DELTA, French Ministry of Higher Education and Research, Nord-Pas-de-Calais Re-gional Council, Inria and Otto-von-Guericke-Universit ¨at Magdeburg associated-team north-European project Allo-cate, and French National Research Agency project BoB (grant n.ANR-16-CE23-0003), FMJH Program PGMO with the support of this program from Criteo. Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+References 
+
+Bartlett, P. L., Gabillon, V., and Valko, M. A simple parameter-free and adaptive approach to optimization under a minimal local smoothness assumption. In Algo-rithmic Learning Theory (ALT) , 2019. Bertsekas, D. and Tsitsiklis, J. Neuro-dynamic program-ming . Athena Scientific, Belmont, MA, 1996. Bubeck, S. and Munos, R. Open-loop optimistic planning. In Conference on Learning Theory (COLT) , 2010. Bubeck, S., Munos, R., Stoltz, G., and Szepesv ´ari, C. X -armed bandits. Journal of Machine Learning Research ,12:1587–1627, 2011. Bu s¸ oniu, L. and Munos, R. Optimistic planning for Markov decision processes. In International Conference on Artifi-cial Intelligence and Statistics (AISTATS) , 2012. Carpentier, A. and Locatelli, A. Tight (lower) bounds for the fixed budget best-arm identification bandit problem. In Conference on Learning Theory (COLT) , 2016. Coquelin, P.-A. and Munos, R. Bandit algorithms for tree search. In Conference on Uncertainty in Artificial Intelli-gence (UAI) , 2007. Coulom, R. Efficient selectivity and backup operators in Monte-Carlo tree search. Computers and games , 4630: 72–83, 2007. Feldman, Z. and Domshlak, C. Simple regret optimization in online planning for Markov decision processes. Journal of Artificial Intelligence Research , 2014. Gabillon, V., Ghavamzadeh, M., and Lazaric, A. Best-arm identification: A unified approach to fixed budget and fixed confidence. In Neural Information Processing Systems (NeurIPS) , 2012. Gelly, S., Yizao, W., Munos, R., and Teytaud, O. Modifica-tion of UCT with patterns in Monte-Carlo Go. Technical report, Inria, 2006. Grill, J.-B., Valko, M., and Munos, R. Blazing the trails before beating the path: Sample-efficient Monte-Carlo planning. In Neural Information Processing Systems (NeurIPS) , 2016. Hoorfar, A. and Hassani, M. Inequalities on the lambert w function and hyperpower function. Journal of Inequalities in Pure and Applied Mathematics , 9(2):5–9, 2008. Hren, J.-F. and Munos, R. Optimistic planning of determin-istic systems. In European Workshop on Reinforcement Learning , 2008. Kaufmann, E. and Koolen, W. M. Monte-carlo tree search by best-arm identification. In Neural Information Processing Systems (NeurIPS) , 2017. Kocsis, L. and Szepesv ´ari, C. Bandit-based Monte-Carlo planning. In European Conference on Machine Learning (ECML) , 2006. Leurent, E. and Maillard, O.-A. Practical Open-Loop Opti-mistic Planning. arXiv preprint arXiv:1904.04700 , 2019. Munos, R. Optimistic optimization of deterministic func-tions without the knowledge of its smoothness. In Neural Information Processing Systems (NeurIPS) , 2011. Munos, R. From bandits to Monte-Carlo tree search: The optimistic principle applied to optimization and planning. 
+
+Foundations and Trends in Machine Learning , 7(1):1– 130, 2014. Orabona, F. and P ´al, D. Scale-free online learning. Theoret-ical Computer Science , 2018. Orabona, F. and Tommasi, T. Training deep networks with-out learning rates through coin betting. In Neural Infor-mation Processing Systems (NeurIPS) , 2017. Puterman, M. L. Markov Decision Processes: Discrete Stochastic Dynamic Programming . John Wiley & Sons, New York, NY, 1994. Ross, S., Mineiro, P., and Langford, J. Normalized on-line learning. In Conference on Uncertainty in Artificial Intelligence (UAI) , 2013. Shah, D., Xie, Q., and Xu, Z. On reinforcement learn-ing using Monte-Carlo tree search with supervised learning: Non-asymptotic analysis. arXiv preprint arXiv:1902.05213 , 2019. Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., van den Driessche, G., Schrittwieser, J., Antonoglou, I., Panneershelvam, V., Lanctot, M., Dieleman, S., Grewe, D., Nham, J., Kalchbrenner, N., Sutskever, I., Lillicrap, T., Leach, M., Kavukcuoglu, K., Graepel, T., and Hassabis, D. Mastering the game of Go with deep neural networks and tree search. Nature , 529(7587):484–489, 2016. Sz ¨or ´enyi, B., Kedenburg, G., and Munos, R. Optimistic planning in Markov decision processes using a genera-tive model. In Neural Information Processing Systems (NeurIPS) , 2014. Valko, M., Carpentier, A., and Munos, R. Stochastic simul-taneous optimistic optimization. In International Confer-ence on Machine Learning (ICML) , 2013. Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+A. On the branching factor 
+
+Proposition 2. κu(ν/ 2, γ ) ≤ κv (ν, γ ) ≤ κu(2 ν, γ ).
+
+Proof. For any global optimum and for h ≥ 0, we prove that 
+
+N vh (ε) ≤ N uh
+
+
+
+ε + γh
+
+1 − γ
+
+
+
+·
+
+Let a node a ∈ Ah be such that v(a) ≥ v⋆ − ε. Then, we have 
+
+u(a) ≥ v(a) − γh
+
+1 − γ ≥ v⋆ − ε − γh
+
+1 − γ ·
+
+Similarly, for h ≥ 0, we have that for any global optimum, 
+
+N uh (ε) ≤ N vh
+
+
+
+ε + γh
+
+1 − γ
+
+
+
+·
+
+Using Definition 2, we get the claimed result. 
+
+B. PlaT γPOOS is not using a budget larger than n + 1 
+
+Notice that for any given depth h ∈ [1 : hmax ], PlaT γPOOS never uses more evaluations than (pmax + 1) hmax  
+
+> h
+
+because 
+
+⌊log 2(hmax /⌈hγ 2h⌉)⌋X
+
+> p=0
+
+ hmax 
+
+h ⌈h2pγ2h⌉
+
+ h2pγ2h ≤   log 2(hmax / hγ 2h) + 1  hmax 
+
+h ·
+
+Summing over the depths, PlaT γPOOS never uses more evaluations than the budget n + 1 during its depth exploration as 
+
+1 + ( pmax + 1) 
+
+> hmax
+
+X
+
+> h=1
+
+ hmax 
+
+h
+
+
+
+≤ 1 + ( pmax + 1) hmax 
+
+> hmax
+
+X
+
+> h=1
+
+1
+
+h
+
+= 1 + hmax log( hmax )( pmax + 1) ≤ 1 + hmax (pmax + 1) 2
+
+≤ n
+
+2 + 1 .
+
+We need to add the additional evaluation for the cross-validation at the end, 
+
+> pmax
+
+X
+
+> p=0
+> hmax
+
+X
+
+> t=0
+
+(t + 1) γ2thmax 
+
+(1 − γ2)2 ≤
+
+> pmax
+
+X
+
+> p=0
+
+ n
+
+2(log 2 n + 1) 2
+
+
+
+≤ n
+
+2 ·
+
+Therefore, the total budget is never more than n/ 2 + n/ 2 + 1 = n + 1 . Again, notice we use the budget of n + 1 only for the notational convenience, we could also use n/ 4 for the evaluation in the end to fit under n. Nonetheless, it’s important that the amount of openings is linear in n.
+
+C. Proofs of the lemmas 
+
+We first define favorable event ξ and prove that it holds with high probability. 
+
+Lemma 2. Let C be the set of sequence of actions evaluated by PlaT γPOOS during one of its runs. C is a random quantity. Let ξ be the event under which all average estimates for the reward of the state-action pairs receiving at least one evaluation from PlaT γPOOS are within their confidence interval, then P (ξ) ≥ 1 − δ, where 
+
+ξ ≜
+
+(
+
+∀a ∈ C , ∀h ∈ [2 : h(a)] , p ∈ [0 : pmax ] : if Ta[h] ≥
+
+l
+
+(h − 1)2 pγ2( h−1) k
+
+, then |bu(a)−u(a)| ≤ b
+
+r pmax log(4 n/δ )2p+1 
+
+)
+
+·Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Proof. The idea of the proof follows the line of proof of the statement given for StoSOO (Valko et al., 2013). The crucial point is that while we have potentially exponentially many combinations of cells that can be evaluated, given any particular execution we need to consider only a polynomial number of estimators, m, for which we can use a Azuma-Hoeffding concentration inequality. We denote ∀h ∈ [0 : hmax ], p ∈ [0 : pmax ] : ai,h,p ∈ C , the i-th evaluated node of depth h such that ∀t ∈ [2 : h], T ai,h,p 
+
+> [t]
+
+≥
+
+(t − 1)2 pγ2( t−1) . Note that in PlaT γPOOS we have Tai,h,p 
+
+> [1]
+
+= hmax .Though ai,h,p is random, we study the quantity bu(ai,h,p ) − u(ai,h,p ) . We recall that 
+
+bu(ai,h,p ) − u(ai,h,p ) = 
+
+> h−1
+
+X
+
+> t=0
+
+γt(brt(ai,h,p ) − rt(ai,h,p )) (2) 
+
+=
+
+> h−1
+
+X
+
+> t=0
+
+γtTai,h,p 
+
+> [t+1]
+
+X
+
+> s=0
+
+bri,h,p t,s − rt(ai,h,p )
+
+Tai,h,p 
+
+> [t+1]
+
+(3) This quantity is composed of the elements bri,h,p t,s − rt(ai,h,p ) that form a martingale. Therefore using a Azuma-Hoeffding concentration inequality with a union bound already on the values of T we have 
+
+P
+
+b u(ai,h,p ) − u(ai,h,p ) ≤ b
+
+vuuth−1X
+
+> t=0
+
+γ2t log( pmax /δ )2Tai,h,p 
+
+> [t+1]
+
+ ≥ 1 − δ/p max 
+
+Moreover we have for all h ≥ t > 1,
+
+γ2t
+
+Tai,h,p 
+
+> [t+1]
+
+≤ γ2t
+
+⌈t2pγ2t⌉ ≤ γ2t
+
+t2pγ2t = 1
+
+t2p (4) For t = 0 , γ2t
+
+> Tai,h,p
+> [t+1]
+
+= 1 
+
+> hmax
+
+≤= 12p for all p ≤ pmax .Therefore we have 
+
+P bu(ai,h,p ) − u(ai,h,p ) ≤ b
+
+r log hmax log(? /δ )2p+1 
+
+!
+
+≥ 1 − δ/ ?
+
+Then we had an extra union bound other all cells that is bounded by n
+
+Lemma 3. For any planning problem with associated (ν, ρ ) (see Property 1), on event ξ, for any depths h ∈ [hmax ], for any 
+
+p ∈ [0 : log 2(hmax /(h2γ2h)) ], we have ⊥h,p = h if conditions (1) and (2) simultaneously hold true. (1) bplog(4 n/δ )/2p+1 ≤ νρ h
+
+(2) For all h′ ∈ [h], h max /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ m 
+
+≥ Cκ (ν, ρ )h′
+
+.Finally we have ⊥0,p = 0 .Proof. We place ourselves on event ξ defined in Lemma 2 and for which we proved that P (ξ) ≥ 1 − δ. We fix p.We prove the statement of the lemma, given that event ξ holds, by induction in the following sense. For a given h and p, we assume the hypotheses of the lemma for that h and p are true and we prove by induction that ⊥h′,p = h′ for h′ ∈ [h].
+
+1◦ For h = 0 , we trivially have that ⊥h,p ≥ 0.
+
+2◦ Now consider h′ > 0, and assume ⊥h′−1,p = h′ − 1 with the objective to prove that ⊥h′,p = h′.Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Therefore, at the end of the processing of depth h′ − 1, during which we were opening the nodes of depth h′ − 1 we managed to open an optimal node that we denote a⋆,h ′−1 ∈ A⋆,h ′−1. Moreover if we consider all the sequence of actions b that one can build by appending any action in A to a⋆,h ′−1 ∈ A⋆,h ′−1, we have for all such b that Tb[t] ≥ (t − 1)2 pγt−1 for 
+
+t ∈ [h′].Note that by definition there exist an optimal infinite sequence of actions a⋆ ∈ A⋆ such that a⋆,h ′−1 = a⋆
+
+> [h′−1]
+
+During phase h′ the 
+
+j
+
+hmax /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ mk 
+
+evaluated nodes from Ah′−1 with highest values {bu(ah′−1,i )}h′−1,i are opened. For the purpose of contradiction, let us assume that a⋆ 
+
+> [h′]
+
+is not one of them. This would mean that there exist at least 
+
+j
+
+hmax /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ mk 
+
+nodes from Ah′
+
+, distinct from a⋆
+
+> [h′]
+
+, satisfying bu(ah′,i ) ≥ bu(a⋆
+
+> [h′]
+
+) and each verifying 
+
+Tah′,i 
+
+> [t]
+
+≥ ⌈ t2pγt⌉ for t ∈ [h′]. This means that, for these nodes we have: u(ah′,i ) + νρ h′
+
+≥ u(ah′,i ) + νρ h (a) 
+
+≥ u(ah′,i ) + 
+
+bplog(4 n/δ )/2p+1 (b) 
+
+≥ bu(ah′,i ) ≥ bu(ah′,i ⋆h′ ) (b) 
+
+≥ u(ah′,i ⋆h′ ) − bplog(4 n/δ )/2p+1 (a) 
+
+≥ u(ah′,i ⋆h′ ) − νρ h ≥ u(ah′,i ⋆h′ ) − νρ h′
+
+,where (a) is by assumption of the lemma, (b) is because ξ holds. As u(ah′,i ⋆h′ ) ≥ v⋆ − νρ h′
+
+by Proposition 1, this means we have N uh′ (3 νρ h′
+
+) ≥
+
+j
+
+hmax /
+
+
+
+h′
+
+l
+
+h′2pγh′ mk 
+
++ 1 (the +1 is for ah,i ⋆h ). However, by assumption of the lemma hmax /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ m 
+
+≥ Cκ (ν, ρ )h′
+
+. It follows that in general N uh′ (3 νρ h′
+
+) >
+
+j
+
+Cκ (ν, ρ )h′ k
+
+. This leads to having a contradiction with the κu(ν, ρ ) with associated constant C as defined in Definition 2. Indeed, the condition 
+
+N uh′ (3 νρ h′
+
+) ≤ Cκ (ν, ρ )h′
+
+in Definition 2 is equivalent to the condition N uh′ (3 νρ h′
+
+) ≤
+
+j
+
+Cκ (ν, ρ )h′ k
+
+as N uh′ (3 νρ h′
+
+) is an integer. 
+
+Lemma 1. For any planning problem with associated (ν, ρ ) as in Property 1), on event ξ defined in Appendix C, for any depth h ∈ [hmax ] , for any p ∈ [0 : log 2(hmax /(h2γ2h)) ], we have ⊥h,p = h if (1) and (2) simultaneously hold: (1) bplog(4 n/δ )/2p+1 ≤ νρ h
+
+(2) We distinguish cases and express the condition in each: 
+
+Case 1) h2pγ2h ≤ 1 : 
+
+hmax 
+
+h = hmax 
+
+h ⌈h2pγ2h⌉ ≥ Cκ (ν, ρ )h
+
+and for all h′ ∈ [h], hmax 
+
+h′22p+1 γ2h′ ≥ Cκ (ν, ρ )h′
+
+Case 2) h2pγ2h ≥ 1 : 
+
+Case 2.1) γ2κu ≥ 1 : hmax 
+
+h22p+1 γ2h ≥ Cκ (ν, ρ )h
+
+Case 2.2) γ2κu ≤ 1 : hmax 
+
+h22p+1 ≥ C
+
+Proof. To prove this statement we just need to show that we verify the hypotheses of Lemma 3. This means we need to prove that for all h′ ∈ [h], h max /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ m 
+
+≥ Cκ (ν, ρ )h′
+
+.We first consider the case 2) where h2pγh ≥ 1. If h = 1 we already know ⊥0,p ≥ 0. Let us now look at the case h > 1.First notice that h2pγ2h ≥ 1 gives (h − 1)2 pγ2( h−1) ≥ 1. If γ2κu ≥ 1 we have that for all h′ ∈ [h − 1] ,
+
+hmax 
+
+h′22p+1 ≥ hmax 
+
+h22p+1 ≥ C  γ2κ(ν, ρ )h ≥ C  γ2κ(ν, ρ )h′
+
+If h > 1, and if γ2κu ≤ 1 we have that for all h′ ∈ [h − 1] ,
+
+hmax 
+
+h′2p+1 ≥ hmax 
+
+h2p+1 ≥ C ≥ C  γ2κ(ν, ρ )h′
+
+.Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+For both γ2κu ≤ 1 and γ2κu ≥ 1, we then have, 
+
+hmax 
+
+h′ ⌈h′2pγ2h′ ⌉ ≥ hmax 
+
+h′h′2p+1 γ2h′
+
+as h2pγ2h ≥ 1.For both γ2κu ≤ 1 and γ2κu ≥ 1, the previous equations mean that for h′ ∈ [h − 1] , h′ verifies hmax /h ′22p+1 γ2h′
+
+≥
+
+Cκ (ν, ρ )h′
+
+≥ 1. Therefore p ≤
+
+j
+
+log 2(hmax /(h′2γ2h′
+
+)) 
+
+k
+
+.We now consider case 1) where h2pγ2h ≤ 1. We prove by induction that for all h′ ∈ [h], h max /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ m 
+
+≥
+
+Cκ (ν, ρ )h′
+
+.
+
+1◦ By assumption of the lemma we say: hmax /  h h2pγ2h ≥ Cκ (ν, ρ )h
+
+2◦ We further assume hmax /
+
+
+
+h′
+
+l
+
+h′2pγ2h′ m 
+
+≥ Cκ (ν, ρ )h′
+
+is true for some h′ ≤ h with h′2pγ2h′
+
+≤ 1
+
+We want to prove that either: both (h′ − 1)2 pγ2( h′−1) ≤ 1
+
+and hmax 
+
+> (h′−1)
+
+⌈(h′−1)2 pγ2( h′−1) ⌉ ≥ Cκ (ν, ρ )h′−1
+
+or (h′ − 1)2 pγ2( h′−1) ≥ 1
+
+then hmax /
+
+
+
+(h′′ )
+
+l
+
+(h′′ )2 pγ2( h′′ )
+
+m 
+
+≥ Cκ (ν, ρ )h′′ 
+
+is already true for all h′′ ∈ [h′]. If 
+
+l
+
+(h′ − 1)2 pγ2( h′−1) 
+
+m
+
+= 1 then we have 
+
+hmax 
+
+(h′ − 1) ≥ hmax 
+
+h′ ≥ Cκ (ν, ρ )h′
+
+≥ Cκ (ν, ρ )h′−1
+
+If 
+
+l
+
+(h′ − 1)2 pγ2( h′−1) 
+
+m
+
+> 1, then we have that 
+
+hmax /
+
+
+
+h′
+
+l
+
+(h′ − 1)2 pγ2( h′−1) 
+
+m 
+
+≥
+
+hmax /
+
+
+
+(h′ − 1) 22p+1 γ2( h′−1) 
+
+
+
+≥ Cκ (ν, ρ )h′−1
+
+Using this inequality we can now use Case 2) to have that: hmax /
+
+
+
+(h′′ )
+
+l
+
+(h′′ )2 pγ2( h′′ )
+
+m 
+
+≥ Cκ (ν, ρ )h′′ 
+
+is already true for all h′′ ∈ [h′].The previous equations mean that for h′ ∈ [h − 1] , h′ verifies hmax /
+
+
+
+h′22p+1 γ2h′ 
+
+≥ Cκ (ν, ρ )h′
+
+≥ 1. Therefore 
+
+p ≤
+
+j
+
+log 2(hmax /(h′2γ2h′
+
+)) 
+
+k
+
+.
+
+D. Proof of Theorem 3 and Theorem 4 
+
+Theorem 3. High-noise regime If the noise b is high enough to verify both high-noise conditions as defined in the caption of Table 1, then after n rounds, for any problem with associated (ν, ρ ), and branching factor κ ≜ κu(ν, ρ ), the simple regret of PlaT γPOOS obeys 
+
+Ern =
+
+eO
+
+  nb2
+
+− 12
+
+
+
+if γ 2κ ≤ 1,
+
+eO
+
+  nb2
+
+− log(1 /ρ )log( γ2κ/ρ 2)
+
+
+
+if γ 2κ > 1.Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Theorem 4. Low-noise regime If the noise b is low enough to verify both high-noise conditions as defined in the caption of Table 1, then after n rounds, for any problem with associated (ν, ρ ), and branching factor κ ≜ κu(ν, ρ ), the simple regret of 
+
+PlaT γPOOS obeys 
+
+Ern =
+
+eO (νρ n) if κ = 1 ,
+
+eO
+
+
+
+ν   nb2
+
+− log(1 /ρ )log( κ)
+
+
+
+if κ > 1.
+
+Proof of Theorem 3 and Theorem 4. We first place ourselves on the event ξ defined in Lemma 2 and where it is proven that 
+
+P (ξ) ≥ 1 − δ. We bound the simple regret of PlaT γPOOS on ξ.
+
+Step 1) General definition of the regret 
+
+We chose δ = 4b(1 −δ) 
+
+> Rmax
+> √n
+
+for the bound. We consider a problem with associated (ν, ρ ). For simplicity we write κ = κu(ν, ρ ).We have for all p ∈ [0 : pmax ]
+
+v(an) + b
+
+1 − γ2
+
+s
+
+pmax log( Rmax n3/2/b )2hmax 
+
+≥ u(an) + b
+
+1 − γ2
+
+s
+
+pmax log( Rmax n3/2/b )2hmax 
+
+> (a)
+
+≥ bu(an)
+
+> (c)
+
+≥ bu(ap) (b) 
+
+≥ bu
+
+
+
+ap
+
+> [⊥hmax ,p +1]
+
+
+
+> (a)
+
+≥ u
+
+
+
+ap
+
+> [⊥hmax ,p +1]
+
+
+
+− b
+
+1 − γ2
+
+s
+
+pmax log( Rmax n3/2/b )2hmax 
+
+> (d)
+
+≥ v⋆ − νρ ⊥hmax ,p +1 − b
+
+1 − γ2
+
+s
+
+pmax log( Rmax n3/2/b )2hmax 
+
+where (a) is because the actions at time t, at(n, p ), of the candidate a(n, p ) have been evaluated (t+1) γ2thmax  
+
+> (1 −γ)2
+
+times and because ξ holds, (b) is because ap 
+
+> [⊥hmax ,p +1]
+
+∈ { a ∈ A• : ∀t ∈ [2 : h(a)] , T a[t] ≥ (t − 1)2 pγ2( t−1) } and 
+
+ap = arg max  
+
+> a∈A•:∀t∈[2: h(a)] ,T a[t]≥
+
+⌈(t−1)2 pγ2( t−1) ⌉
+
+bu(a), (c) is because an = arg max 
+
+> {ap,p ∈[0: pmax ]}
+
+bu(ap), and (d) is by Assumption 1. From the previous inequality we have rn = v⋆ − Q⋆ (x, a n) ≤ νρ ⊥hmax ,p +1 + 2 b
+
+> 1−γ2
+
+q pmax log( Rmax n3/2/b )2hmax , for p ∈ [0 : 
+
+pmax ].
+
+Step 2) Defining some important depths For the rest of proof we want to lower bound max p∈[0: pmax ] ⊥hmax ,p . Lemma 3 and 1 provide some sufficient conditions on p and h to get lower bounds. These conditions are inequalities in which as 
+
+p gets smaller (fewer samples) or h gets larger (more depth) these conditions are more and more likely not to hold. For our bound on the regret of PlaT γPOOS to be small, we want quantities p and h where the inequalities hold but using as few samples as possible (small p) and having h as large as possible. Therefore we are interested in determining when the inequalities flip signs which is when they turn to equalities. This is what we solve next. We set the notation gδ,R max  
+
+> n,b
+
+= pmax log( Rmax n3/2/b (1 − δ)) .In its most general form we are interested in the real numbers eh and ep are such that eh is the larger real number such that for all h ≤ eh′
+
+hmax 
+
+h22ep+1 γ2h ≥ Cκ (ν, ρ )h while b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep = νρ eh (5) Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+In the case γ2κ ≥ 1 we can simply solve the following equations. We denote eh1, ep1 the real numbers satisfying 
+
+hmax ν2ρ2eh1
+
+2eh21b2gδ,R max  
+
+> n,b
+
+γ2eh1−2 = Cκ eh1 and b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep1 = νρ eh1 γ2. (6) In the case γ2κ ≤ 1 the previous equation can possess two solutions where the largest of these two solutions will not verify Equation 5. Additionally the smallest solution might be hard to express in a close form when γ2κ ≤ 1. Therefore for simplicity we define for the case γ2κ ≤ 1, eh2, ep2 the real numbers satisfying 
+
+hmax ν2ρ2eh2
+
+e2h22b2gδ,R max 
+
+> n,b
+
+= C and b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep2 = νρ eh2 . (7) 
+
+eh1 and ep1 are defined for the case γ2κ ≥ 1 while eh2 and ep2 are defined for the case γ2κ ≤ 1. Our approach is to solve Equation 6 and 7 and then verify that it gives a valid indication of the behavior of our algorithm in term of its optimal p and 
+
+h. We have 
+
+eh1 = 2log( γ2κ/ρ 2) W log( γ2κ/ρ 2)/2
+
+s γ2ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+!eh2 = 2log(1 /ρ 2) W log(1 /ρ 2)/2
+
+s ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+!
+
+where standard W is the Lambert W function. However after a close look at the Equation 7, we notice that it is possible to get values of ep and eh which would lead to a number of evaluations eh2epγeh < 1. This actually corresponds to an interesting case when the noise has a small range and where we can expect to obtain an improved result, that is: obtain a regret rate close to the deterministic case. This low range of noise case then has to be considered separately. Therefore, we distinguish two cases which corresponds to different noise regimes depending on the value of b. Looking at the equation on the right of (7) , we have that eh2epγeh < 1 if ν2ρ2eh
+
+> γ2ehehb 2gδ,R max
+> n,b
+
+> 1. Based on this condition we now consider the two cases. However for both of them we define some generic ¨h and ¨p.
+
+Case 1) γ2κ ≥ 1 : Note that in this case then κ > 1. We subdivide this case into multiple subcases: 
+
+Case 1.1) Noise regime ν2ρ2eh1 
+
+> γ2eh1eh1b2gδ,R max
+> n,b
+
+≤ 1
+
+Case 1.1.1) High-noise regime ν2ρ2eh1
+
+> b2gδ,R max
+> n,b
+
+≤ 1
+
+In this case, we denote ¨h1 = eh1 and ¨p1 = ep1. As ν2ρ2eh1
+
+> b2gδ,R max
+> n,b
+
+≤ 1 by construction, we have ep1 ≥ 0. Using standard properties of the ⌊·⌋ function, we have 
+
+b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2⌊ep1⌋+1 ≤ b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep1 ≤ νρ eh1 ≤ νρ ⌊eh1⌋ (8) and, hmax 
+
+jeh1
+
+k j eh1
+
+k
+
+2⌊ep1⌋+1 γ2⌊eh1⌋ ≥ hmax 
+
+jeh1
+
+k j eh1
+
+k
+
+2ep1+1 γ2⌊eh1⌋≥ hmax 
+
+jeh1
+
+k eh12ep1+1 γ2eh1−2
+
+= hmax ν2ρ2eh1
+
+2eh21b2gδ,R max  
+
+> n,b
+
+γ2eh1
+
+= Cκ eh1 ≥ Cκ ⌊eh1⌋.Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+We will verify that 
+
+j¨h
+
+k
+
+is a reachable depth by PlaT γPOOS in the sense that ¨h ≤ hmax and ⌊¨p⌋ ≤ log 2(hmax /(h2γ2h)) 
+
+and . As κ < 1, and ¨h ≥ 0 we have κ¨h ≥ 1. This gives Cκ ¨h ≥ 1. Finally as hmax  
+
+> ¨h22¨pγ2¨h
+
+≥ Cκ ¨h, we have ¨h2γ2¨h ≤ hmax /2¨p.
+
+Case 1.1.2) Low-noise regime 1 ν2ρ2eh1
+
+> b2gδ,R max
+> n,b
+
+≥ 1
+
+We denote ¨h = h1 and ¨p = p1 where h and p verify, 
+
+hmax 
+
+2h21γ2h1
+
+= Cκ h1 and p1 = 0 . (9) Again, hmax   
+
+> 2h212p1γ2h1
+
+≥ 1.
+
+h1 = 2log( γ2κ) W log( γ2κ)/2
+
+r hmax 
+
+2C
+
+!
+
+Using standard properties of the ⌊·⌋ function, we have 
+
+b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2⌊ ¨p1⌋+1 ≤ b
+
+q
+
+gδ,R max  
+
+> n,b
+
+< νρ eh1
+
+> (a)
+
+≤ νρ h1 ≤ νρ ⌊h1⌋ (10) where (a) is because of the following reasoning. As we have hmax ν2ρ2eh1  
+
+> 2eh21b2gδ,R max
+> n,b γ2eh1
+
+= Cκ eh1 and ν2ρ2eh1
+
+> b2gδ,R max
+> n,b
+
+≥ 1, then, hmax  
+
+> 2eh21γ2eh1
+
+≤
+
+Cκ eh1 . From the inequality hmax 
+
+> 2eh21
+
+≤ Cκ eh1 γ2eh1 and the fact that h1 corresponds to the case of equality hmax 
+
+> 2h21
+
+= Cκ h1 γ2h1 ,we deduce that h1 ≤ eh1, since the left term of the inequality decreases with h while the right term increases (as γ2κ ≥ 1). Having h1 ≤ eh1 gives ρh1 ≥ ρeh1 .Moreover, the term log( γ2κ) of h1 could lead to think that we could potentially obtain a better rate that in the deterministic case where the term is log( γ2κ). However this is not true because as h1 is the solution of h1 = hmax  
+
+> 2h21γ2h1
+
+= Cκ h1 and we have by assumption in this case h1γ2h1 ≥ 1 then h1 ≤ h3 where h3 is defined as the solution of h3 = hmax  
+
+> 2h3γ2h3
+
+= Cκ h3 .We have h3 = 1log( κ) W  log( κ) hmax 
+
+> 2C
+
+. Therefore one can see that this rate is not better that the deterministic rates. 
+
+Case 1.2) Low noise regime 2 ν2ρ2eh1 
+
+> γ2eh1eh1b2gδ,R max
+> n,b
+
+≥ 1
+
+We denote ¨h = bh1 and ¨p = bp1 where bh and bp verify, 
+
+hmax 
+
+2bh1
+
+= Cκ bh1 and bp1 = max(0 , ep1)) . (11) 
+
+bh1 = 1log( κ) W
+
+ hmax log( κ)2C
+
+
+
+Using standard properties of the ⌊·⌋ function, we have 
+
+b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2⌊ ¨p1⌋+1 ≤ b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep1 < νρ eh1
+
+> (a)
+
+≤ νρ bh1 ≤ νρ ⌊bh1⌋ (12) where (a) is because of the following reasoning. As we have hmax ν2ρ2eh1  
+
+> 2eh21b2gδ,R max
+> n,b γ2eh1
+
+= Cκ eh1 and ν2ρ2eh1 
+
+> γ2eh1eh1b2gδ,R max
+> n,b
+
+≥ 1, then, 
+
+> hmax
+> 2eh1
+
+≤ Cκ eh1 . From the inequality hmax 
+
+> 2eh1
+
+≤ Cκ eh1 and the fact that bh1 corresponds to the case of equality hmax 
+
+> 2bh1
+
+= Cκ bh1 , we deduce that bh1 ≤ eh1, since the left term of the inequality decreases with h while the right term increases . Having bh1 ≤ eh1
+
+gives ρbh1 ≥ ρeh1 .Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Case 2) γ2κ ≤ 1
+
+Case 2.1) Noise regime ν2ρ2eh
+
+> γ2ehehb 2gδ,R max
+> n,b
+
+≤ 1
+
+Case 2.1.1) High-noise regime ν2ρ2eh2
+
+> b2gδ,R max
+> n,b
+
+≤ 1
+
+In this case, we denote ¨h = eh2 and ¨p = ep2. As ν2ρ2eh2
+
+> b2gδ,R max
+> n,b
+
+≤ 1 by construction, we have ep2 ≥ 0. Using standard properties of the ⌊·⌋ function, we have 
+
+b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2⌊ep2⌋+1 ≤ b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep2 = νρ eh2 ≤ νρ ⌊eh2⌋ (13) and, hmax 
+
+jeh2
+
+k j eh2
+
+k
+
+2⌊ep2⌋+1 
+
+≥ hmax 
+
+jeh2
+
+k j eh2
+
+k
+
+2ep2+1 
+
+≥ hmax 
+
+eh222ep2+1 = hmax ν2ρ2eh2
+
+2eh22b2gδ,R max 
+
+> n,b
+
+= C. 
+
+We will verify that 
+
+j¨h
+
+k
+
+is a reachable depth by PlaT γPOOS in the sense that ¨h ≤ hmax and ⌊¨p⌋ ≤ log 2(hmax /(h2γ2h)) .As κ < 1, and ¨h ≥ 0 we have κ¨h ≥ 1. This gives Cκ ¨h ≥ 1. Finally as hmax  
+
+> ¨h22¨pγ2¨h
+
+≥ Cκ ¨h, we have ¨h2γ2¨h ≤ hmax /2¨p.
+
+Case 2.1.2) Low-noise regime 1 ν2ρ2eh2
+
+> b2gδ,R max
+> n,b
+
+≥ 1
+
+We denote ¨h = h2 and ¨p = p2 where h and p verify, 
+
+hmax 
+
+2h22
+
+= C and p2 = 0 . (14) Again, hmax   
+
+> 2h222p2γ2h2
+
+≥ 1.
+
+h2 =
+
+r hmax 
+
+2C
+
+Using standard properties of the ⌊·⌋ function, we have 
+
+b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2⌊ ¨p2⌋+1 ≤ b
+
+q
+
+gδ,R max  
+
+> n,b
+
+< νρ eh1
+
+> (a)
+
+≤ νρ h2 ≤ νρ ⌊h2⌋ (15) where (a) is because of the following reasoning. As we have hmax ν2ρ2eh2
+
+> 2eh22b2gδ,R max
+> n,b
+
+= C and ν2ρ2eh2
+
+> b2gδ,R max
+> n,b
+
+≥ 1, then, hmax 
+
+> 2eh22
+
+≤ C. From the inequality hmax 
+
+> 2eh22
+
+≤ C and the fact that h2 corresponds to the case of equality hmax 
+
+> 2h22
+
+= C, we deduce that h2 ≤ eh2, since the left term of the inequality decreases with h while the right term stays constant. Having h2 ≤ eh2 gives ρh2 ≥ ρeh2 .
+
+Case 2.2) Low noise regime 2 ν2ρ2eh
+
+> γ2ehehb 2gδ,R max
+> n,b
+
+≥ 1
+
+We denote ¨h = bh2 and ¨p = bp2 where bh and bp verify, 
+
+hmax 
+
+bh2
+
+= Cκ bh2 (16) 
+
+bh2 = 1log( κ) W
+
+ hmax log( κ)
+
+C
+
+Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+By construction, we have eh2 ≤ eh. We set 
+
+bp2 = max(0 , ep)) . (17) Using standard properties of the ⌊·⌋ function, we have 
+
+b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2⌊ ¨p2⌋+1 ≤ b
+
+s
+
+gδ,R max 
+
+> n,b
+
+2ep = νρ eh (a) 
+
+≤ νρ bh2 ≤ νρ ⌊bh2⌋ (18) where (a) is because of the following reasoning. As we have hmax ν2ρ2eh  
+
+> eh2b2gδ,R max
+> n,b γ2eh
+
+= Cκ eh and ν2ρ2eh
+
+> γ2ehehb 2gδ,R max
+> n,b
+
+≥ 1, then,  
+
+> hmax
+> eh
+
+≤ κeh. From the inequality hmax  
+
+> eh
+
+≤ Cκ eh and the fact that bh2 corresponds to the case of equality hmax 
+
+> 2bh2
+
+= Cκ bh2 , we deduce that bh2 ≤ eh, since the left term of the inequality decreases with h while the right term increases. Having bh2 ≤ eh
+
+gives ρbh2 ≥ ρeh.
+
+Step 3 Given these particular definitions of ¨h and ¨p in two distinct cases we now bound the regret. We always have ⊥hmax ,⌊ ¨p⌋ ≥ 0. If ¨h ≥ 1, as discussed above 
+
+j¨h
+
+k
+
+∈ [hmax ], therefore ⊥hmax ,⌊ ¨p⌋ ≥ ⊥ ⌊¨h⌋,⌊ ¨p⌋, as 
+
+⊥·,⌊p⌋ is increasing for all p ∈ [0 , p max ]. Moreover on event ξ, and for the cases 1.1.1, 1.1.2, 2.1.1 and 2.1.2 described above, ⊥⌊¨h⌋,⌊ ¨p⌋ =
+
+j¨h
+
+k
+
+because of Lemma 1 (Case 2)) which assumptions on 
+
+j¨h
+
+k
+
+and ⌊¨p⌋ are verified in each cases as detailed above and, in general, 
+
+j¨h
+
+k
+
+∈  hmax /2¨p and ⌊¨p⌋ ∈ [0 : pmax ]. So, for the aforementioned cases, we have 
+
+⊥⌊hmax /2¨p⌋,⌊ ¨p⌋ ≥
+
+j¨h
+
+k
+
+. Very similarly cases 1.2 and 2.2. lead to ⊥⌊hmax /2¨p⌋,⌊ ¨p⌋ ≥
+
+j¨h
+
+k
+
+by using Lemma 1 (Case 1)). We bound the regret now discriminating on whether or not the event ξ holds. We have 
+
+rn ≤ (1 − δ)
+
+νρ ⊥hmax , ¨p+1 + 2 b
+
+1 − γ2
+
+s
+
+gδ,R max 
+
+> n,b
+
+2hmax 
+
+ + δ × Rmax 
+
+1 − γ
+
+≤ νρ ⊥hmax , ¨p+1 + 2 b
+
+1 − γ2
+
+s
+
+gδ,R max 
+
+> n,b
+
+2hmax 
+
++ 4b
+
+√n
+
+≤ νρ ⊥hmax , ¨p+1 + 6 b
+
+1 − γ2
+
+s
+
+gδ,R max 
+
+> n,b
+
+hmax 
+
+·
+
+We can now bound the regret in the two regimes. 
+
+Case 1) γ2κ ≥ 1 : Note that in this case then κ > 1. We subdivide this case into multiple subcases: 
+
+Case 1.1) Noise regime ν2ρ2eh1 
+
+> γ2eh1eh1b2gδ,R max
+> n,b
+
+≤ 1
+
+Case 1.1.1) High-noise regime In general,we have 
+
+rn ≤ νρ   
+
+> 2log( γ2κ/ρ 2)W
+> log( γ2κ/ρ 2)/2
+> sγ2ν2hmax 2Cb 2gδ,R max
+> n,b
+> 
+
++ 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+> n,b
+
+hmax 
+
+·
+
+Moreover, as proved by Hoorfar & Hassani (2008), the Lambert W (x) function verifies for x ≥ e, W (x) ≥ log 
+
+ x 
+
+> log x
+
+
+
+.Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+Therefore, if log( γ2κ/ρ 2)/2
+
+r γ2ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+> e we have, 
+
+rn − 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+n,b 
+
+hmax 
+
+≤ νρ 
+
+> 2log( γ2κ/ρ 2)
+
+log 
+
+  
+
+> log( γ2κ/ρ 2)/2
+> vuutγ2ν2hmax 2Cb 2gδ,R max
+> n,b
+> log
+> log( γ2κ/ρ 2)/2
+> vuutγ2ν2hmax 2Cb 2gδ,R max
+> n,b
+> 
+
+
+
+= νe 
+
+> 1log( γ2κ/ρ 2)
+
+log 
+
+  
+
+> log 2(γ2κ/ρ 2)/2γ2ν2hmax 2Cb 2gδ,R max
+> n,b
+> log 2
+> log( γ2κ/ρ 2)/2
+> vuutγ2ν2hmax 2Cb 2gδ,R max
+> n,b
+> 
+
+ log( ρ)
+
+= ν
+
+
+
+log 2(γ2κ/ρ 2)/2 γ2ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+log 2 log( γ2κ/ρ 2)/2
+
+r γ2ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+!
+
+> log( ρ)log( γ2κ/ρ 2)
+
+.
+
+Case 1.1.2) Low-noise regime 1 ν2ρ2eh1
+
+b2gδ,R max 
+
+> n,b
+
+≥ 1
+
+rn ≤ νρ 2log( γ2κ) W
+
+
+
+log( γ2κ)/2
+
+√ hmax 2C
+
+
+
++ 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+n,b 
+
+hmax 
+
+·
+
+Moreover, as proved by Hoorfar & Hassani (2008), the Lambert W (x) function verifies for x ≥ e, W (x) ≥ log 
+
+ x
+
+log x
+
+
+
+.Therefore, if log( γ2κ)/2
+
+q hmax 
+
+2C > e we have, 
+
+rn − 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+n,b 
+
+hmax 
+
+≤ νρ 
+
+> 2log( γ2κ)
+
+log 
+
+ log( γ2κ)/2
+
+√ hmax 2C
+
+> log
+> 
+> log( γ2κ)/2
+
+√ hmax 2C
+
+> 
+
+
+
+= νe 
+
+> 1log( γ2κ)
+
+log 
+
+ log 2(γ2κ)/2 hmax 2C
+
+> log 2
+> 
+> log( γ2κ)/2
+
+√ hmax 2C
+
+> 
+
+ log( ρ)
+
+= ν
+
+
+
+log 2(γ2κ)/2 hmax 
+
+2C
+
+log 2
+
+
+
+log( γ2κ)/2
+
+q hmax 
+
+2C
+
+
+
+> log( ρ)log( γ2κ)
+
+.
+
+We have 6b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 6 νρ eh1
+
+q
+
+gδ,R max 
+
+> n,b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 6νρ eh1 ≤ 6νρ h1 .Therefore rn ≤ νρ ⊥hmax ,p +1 + 6 b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 7νρ h1 .
+
+Case 1.2) Low noise regime 2 ν2ρ2eh1
+
+γ2eh1 eh1b2gδ,R max 
+
+> n,b
+
+≥ 1Scale-free adaptive planning for deterministic dynamics & discounted rewards 
+
+rn − 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+n,b 
+
+hmax 
+
+≤ ν
+
+
+
+hmax log( κ)2C
+
+log 
+
+ hmax log( κ)2C
+
+
+
+> log( ρ)log( κ)
+
+.
+
+Moreover if ν2ρ2eh1
+
+b2gδ,R max 
+
+> n,b
+
+≥ 1, we have 6b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 6 νρ eh1
+
+q
+
+gδ,R max 
+
+> n,b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 6νρ eh1 ≤ 6νρ bh1 .Therefore rn ≤ νρ ⊥hmax ,p +1 + 6 b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 7νρ bh1 .
+
+Case 2) γ2κ ≤ 1
+
+Case 2.1) Noise regime ν2ρ2eh
+
+γ2ehehb 2gδ,R max 
+
+> n,b
+
+≤ 1
+
+Case 2.1.1) High-noise regime ν2ρ2eh2
+
+b2gδ,R max 
+
+> n,b
+
+≤ 1
+
+rn − 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+n,b 
+
+hmax 
+
+≤ ν
+
+
+
+log 2(1 /ρ 2)/2 ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+log 2 log(1 /ρ 2)/2
+
+r ν2hmax 
+
+2Cb 2gδ,R max 
+
+> n,b
+
+!
+
+− 12
+
+.
+
+Case 2.1.2) Low-noise regime 1 ν2ρ2eh2
+
+b2gδ,R max 
+
+> n,b
+
+≥ 1
+
+Here with a similar reasoning as in the case 1.1.2) we have rn ≤ 7νρ h1 ≤ 7νρ 
+
+√ hmax 2C .
+
+Case 2.2) Low noise regime 2 ν2ρ2eh
+
+γ2ehehb 2gδ,R max 
+
+> n,b
+
+≥ 1
+
+rn − 6 b
+
+1 − γ
+
+s
+
+gδ,R max 
+
+n,b 
+
+hmax 
+
+≤ ν
+
+
+
+hmax log( κ)
+
+C
+
+log 
+
+ hmax log( κ)
+
+C
+
+
+
+> log( ρ)log( κ)
+
+.
+
+Moreover if ν2ρ2eh
+
+b2gδ,R max 
+
+> n,b
+
+≥ 1, we have 6b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 6 νρ eh
+
+q
+
+gδ,R max 
+
+> n,b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 6νρ eh ≤ 6νρ bh2 .Therefore rn ≤ νρ ⊥hmax ,p +1 + 6 b
+
+r
+
+gδ,R max 
+
+> n,b
+
+hmax ≤ 7νρ bh1 .Moreover if κ = 1 then rn ≤ 7νρ hmax 
+
+> C
+
+E. Use of the budget 
+
+Remark 1. The algorithm can be made anytime and agnostic to n using the standard doubling trick. 
+
+Remark 2 (More efficient use of the budget) . Because of the use of the floor functions ⌊·⌋ , the budget used in practice can be significantly smaller than n. While this only affects numerical constants in the bounds, in practice, it can noticeably influence the performance. Therefore one should consider, for instance, having hmax replaced by c × hmax with c been the largest number such that the budget is still smaller than n. Additionally, the use of the budget n could be slightly optimized by taking into account that the necessary number of pulls at depth h cannot be larger than Kh.

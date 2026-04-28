@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.18312v1/fig-001.webp",
+      "caption": "Figure 3. The PlaTγPOOS algorithm",
+      "page": 5,
+      "index": 1,
+      "width": 494,
+      "height": 468
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18312v1/fig-002.webp",
+      "caption": "Table 1. Rates of the our upper bounds on the simple regret of PlaTγPOOS for various classes. The condition on noise (i) is whether the noise b verifies ν2ρ2h̃/(γ2h̃h̃b2gδ,Rmax",
+      "page": 7,
+      "index": 2,
+      "width": 910,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18312v1/fig-003.webp",
+      "caption": "Figure 4. Top and bottom left: Average cumulative discounted return collected by OLOP and PlaTγPOOS with different range of noise, b = 1 (top left), b = 10 (top center), b = 20, (top right), and b = 50 (bottom left). Bottom center: the sensitivity of OLOP to different R̃max parameters. Bottom right: the sensitivity of OLOP to different range of the input noise b̃ as parameters while the true b is set to 10.",
+      "page": 8,
+      "index": 3,
+      "width": 984,
+      "height": 482
+    }
+  ]
+}

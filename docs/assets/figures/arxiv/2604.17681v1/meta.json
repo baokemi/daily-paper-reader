@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-001.webp",
+      "caption": "Table 1",
+      "page": 15,
+      "index": 1,
+      "width": 875,
+      "height": 250
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-002.webp",
+      "caption": "Fig. 1: The workflow of FedCRF in Stage 1: 1) Each client uploads its locally encoded item text representations to the",
+      "page": 7,
+      "index": 2,
+      "width": 873,
+      "height": 510
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-003.webp",
+      "caption": "Fig. 5: Visualization of Cross-domain Semantic Alignment across the Kitchen and Food domains",
+      "page": 22,
+      "index": 3,
+      "width": 971,
+      "height": 688
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-004.webp",
+      "caption": "Table 3",
+      "page": 18,
+      "index": 4,
+      "width": 971,
+      "height": 210
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-005.webp",
+      "caption": "Fig. 2: The architecture of the FGSAT component in Stage 1 of FedCKF. First, secondary semantic centers 𝑪 ′ are constructed based on global clusters  and local text representations 𝑻 , and a graph structure is built using 𝑻 and 𝑪 ′.",
+      "page": 8,
+      "index": 5,
+      "width": 769,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-006.webp",
+      "caption": "Fig. 4: Performance sensitivity analysis with respect to three key hyperparameters: (a-d) contrastive loss weight 𝛼, (e-h)",
+      "page": 19,
+      "index": 6,
+      "width": 858,
+      "height": 471
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-007.webp",
+      "caption": "Table 2",
+      "page": 17,
+      "index": 7,
+      "width": 969,
+      "height": 568
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-008.webp",
+      "caption": "Fig. 3: The framework of FedCRF in Stage 2: 1) The client loads the pre-trained semantic representations obtained in",
+      "page": 12,
+      "index": 8,
+      "width": 759,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-009.webp",
+      "caption": "Table 4",
+      "page": 20,
+      "index": 9,
+      "width": 969,
+      "height": 554
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17681v1/fig-010.webp",
+      "caption": "Table 5",
+      "page": 20,
+      "index": 10,
+      "width": 926,
+      "height": 236
+    }
+  ]
+}

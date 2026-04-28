@@ -1,0 +1,1210 @@
+Title: FedCRF: A Federated Cross-domain Recommendation Method with Semantic-driven Deep Knowledge Fusion
+
+URL Source: https://arxiv.org/pdf/2604.17681v1
+
+Published Time: Tue, 21 Apr 2026 01:43:49 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# FedCRF: A Federated Cross-domain Recommendation Method with Semantic-driven Deep Knowledge Fusion 
+
+## Lei Guo a, Ting Yang a, Hui Liu b, Xu Yu c, Xiaohui Han d,∗ and Xinhua Wang e,∗
+
+> a
+
+School of Computer Science and Artificial Intelligence, Shandong Normal University, Jinan, 250358, China 
+
+> b
+
+School of Computing and Artificial Intelligence, Shandong University of Finance and Economics, Jinan, 250014, China 
+
+> c
+
+China University of Petroleum (East China), Qingdao, 266580, China 
+
+> d
+
+Key Laboratory of Computing Power Network and Information Security, Ministry of Education, Shandong Computer Science Center (National Supercomputer Center in Jinan), Qilu University of Technology (Shandong Academy of Sciences), Jinan, China and Shandong Provincial Key Laboratory of Industrial Network and Information System Security, Shandong Fundamental Research Center for Computer Science, Jinan, 250000, China 
+
+> e
+
+Library, Shandong Normal University, Jinan, 250358, China 
+
+A R T I C L E I N F O 
+
+Keywords :Cross-domain Recommendation Data Privacy Graph Contrastive Learning Semantic-driven Information Fusion 
+
+A B S T R A C T 
+
+As user behavior data becomes increasingly scattered across different platforms, achieving cross-domain knowledge fusion while preserving privacy has become a critical issue in rec-ommender systems. Existing Privacy-Preserving Cross-Domain Recommendation (PPCDR) methods usually rely on overlapping users or items as a bridge, making them inapplicable to non-overlapping scenarios. They also suffer from limitations in the collaborative modeling of global and local semantics. To this end, this paper proposes a Federated Cross-domain Recommendation method with deep knowledge Fusion (FedCRF). Using textual semantics as a cross-domain bridge, FedCRF achieves cross-domain knowledge transfer via federated semantic learning under the non-overlapping scenario. Specifically, FedCRF constructs global semantic clusters on the server side to extract shared semantic information, and designs a Fine-Grained Semantic Adaptation and Transfer (FGSAT) module on the client side to dynamically adapt to local data distributions and alleviate cross-domain distribution shift. Meanwhile, it builds a semantic graph based on textual features to learn representations that integrate both structural and semantic information, and introduces contrastive learning constraints between global and local semantic representations to enhance semantic consistency and promote deep knowledge fusion. In this framework, only item semantic representations are shared, while user interaction data remains locally stored, effectively mitigating privacy leakage risks. Experimental results on multiple real-world datasets show that FedCRF significantly outperforms existing methods in terms of Recall@20 and NDCG@20, validating its effectiveness and superiority in non-overlapping cross-domain recommendation scenarios. 
+
+## 1. Introduction 
+
+In recent years, the growing diversity of user behavior across different systems has driven researchers in recommender systems to explore methods for efficiently integrating knowledge from heterogeneous sources to enhance recommendation performance. This has led to the rise of Cross-domain Recommendation (CDR), which seeks to address issues like data sparsity and the cold-start problem in the target domain by leveraging valuable knowledge from other domains. As a result, CDR has garnered significant attention in both academic research and industry applications (Li et al., 2022b; Liu et al., 2022; Zhu et al., 2022; Guo et al., 2022). Traditional CDR methods typically rely on overlapping users between domains to enable the transfer of user preferences (Zhu et al., 2022, 2020). In practical applications, the demand for cross-domain collaboration is growing between different independent entities, such as e-commerce platforms and fresh delivery apps, or offline supermarkets and online shopping guides. These organizations want to leverage each other’s knowledge to optimize recommendations and expand user coverage. However, due to privacy regulations like GDPR (Regulation, 2018) and commercial confidentiality restrictions, they cannot share sensitive information such as user IDs and interaction records. More 
+
+> ∗
+
+Corresponding author 
+
+leiguo.cs@gmail.com (L. Guo); dcongtou@gmail.com (T. Yang); liuh_lh@sdufe.edu.cn (H. Liu); yuxu0532@upc.edu.cn (X. Yu); xiaohhan@gmail.com (X. Han); wangxinhua@sdnu.edu.cn (X. Wang) 
+
+> ORCID
+
+(s): 
+
+First Author et al.: Preprint submitted to Elsevier Page 1 of 24 
+
+> arXiv:2604.17681v1 [cs.IR] 20 Apr 2026 FedCRF: A Federated Cross-domain Recommendation Method
+
+importantly, the users and products of these organizations often do not overlap, making traditional CDR methods that rely on overlapping entities ineffective. The non-overlapping privacy-preserving cross-domain recommendation scenario we focus on aims to solve this issue: enabling cross-domain knowledge transfer without sharing sensitive data or relying on overlapping entities. This approach ensures compliance while enriching isolated domains with knowledge, bridging the gap between "collaboration needs" and "privacy constraints." To overcome this challenge, researchers have developed non-overlapping cross-domain recommendation meth-ods (Li et al., 2022a, 2023; Cao et al., 2022; Li et al., 2022b; Liu et al., 2022; Wang et al., 2019a) to facilitate effective knowledge transfer in settings where users are disjoint. These methods enable cross-domain knowledge transfer by learning latent structural or semantic relationships across domains (e.g., representation disentanglement, structural modeling, or distribution alignment), thereby achieving partial fusion at the representation level without directly sharing user data. While these methods show promising results in non-overlapping scenarios, they often depend on centralized training or the sharing of interaction data across domains, which may violate data compliance and user privacy regulations. This is especially true in situations where user behavior data cannot be transferred outside its local domain, severely limiting the practical applicability of existing approaches. PPCDR has emerged as a crucial research topic. Current approaches to this task typically leverage federated learning frameworks, enabling multiple participants to collaboratively train models without sharing raw interaction data, thereby improving recommendation performance (Liao et al., 2023; Liu et al., 2023; Wu et al., 2022; Lin et al., 2024; Wang et al., 2024, 2025; Jia et al., 2025; Yan et al., 2022). For instance, Wu et al. (2022) developed FedCDR with dual-module structure: a personal module for local feature processing and a transfer module for cross-domain knowledge sharing, preventing negative transfer. Chen et al. (Chen et al., 2022) proposed PriCDR, which introduces a differential privacy mechanism in the source-domain rating matrix publishing stage. It achieves privacy protection by perturbing the data, and then performs cross-domain recommendation modeling based on the published data. However, existing PPCDR methods still have the following limitations: 1) They often depend on overlapping users or items as "bridges" for cross-domain knowledge transfer, which complicates the task of fully utilizing cross-domain information while safeguarding data privacy. In real-world datasets, the overlap of users is typically very limited, making it challenging to achieve both effective knowledge transfer and privacy protection simultaneously. As a result, achieving truly non-overlapping cross-domain knowledge transfer while ensuring privacy remains largely unresolved. 2) Previous methods cannot integrate the local and global domain information well, due to the distribution shift between them. Typical non-overlapping cross-domain methods like FFMSR (Lu et al., 2025) use server-side static clustering to aggregate item information across domains and build a unified global semantic representation. However, the global representation generated via server-side clustering can be viewed as a highly compressed abstraction of cross-domain semantics, mainly capturing domain-agnostic high-level features. In contrast, the local clients tend to model highly granular feature representations (e.g., needing to distinguish between "hard sci-fi" and "romantic sci-fi" rather than relying on coarse "sci-fi" labels). Therefore, there remains a clear semantic distribution gap between the global and local representations, leading to difficulties in cross-domain alignment and degrading model performance. Consequently, there is a need for intelligent systems that can dynamically balance global consistency with local relevance. 3) They primarily concentrate on the ID modality to represent items, while the importance of the text modality is often overlooked (Yan et al., 2022; Zhang et al., 2024b). Many approaches (Wang et al., 2025) merely integrate the two modalities superficially, using techniques such as addition or concatenation, without achieving deep integration. To address the above limitations, we propose a Federated Cross-domain Recommendation method with deep knowledge Fusion (FedCRF) that unifies global semantic consensus, local fine-grained semantics, and ID-based interaction features. Specifically, to address Limitation 1 , we leverage the universality of natural language to bridge disjoint domains. In the semantic space, semantically similar textual content is mapped to similar vector representations. Building on this intuition, we map items from diverse domains into a shared semantic space and employ server-side clustering to create global semantic centers that capture cross-domain consensus. This approach fosters semantic-level associations rather than entity-level dependencies, enabling a seamless knowledge transfer across non-overlapping domains based purely on semantic understanding. To address Limitation 2 , we introduce the FGSAT module. This module leverages the global cluster centers from the server as semantic seeds and dynamically updates the semantic cluster centers with local fine-grained textual features. Through an attention mechanism, it dynamically integrates the global semantic structures with the local, detailed features, facilitating knowledge remapping within the local semantic context. In Stage 2, we further refine the pre-learned domain knowledge from the previous stage through bidirectional contrastive learning. This approach creates dual-view representations and uses contrastive loss to automatically balance the contribution of global and local features. To deal with Limitation 3 , we perform semantic   
+
+> First Author et al.: Preprint submitted to Elsevier Page 2 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+fusion at the modality level, as relying solely on a single modality or simple concatenation fails to capture item-specific variations. To address this, we construct semantic graphs from globally pre-trained and locally learned representations, where each graph injects inter-item relationships into item IDs through graph convolution operations, generating fused text–ID representations. Ultimately, semantic and ID representations are merged into a unified multi-modal representation, achieving significant performance improvements. 
+
+The motivation and main contributions are are summarized as follows: 
+
+In this work, we study the PPCDR task under the non-overlapping scenario by proposing a semantic-driven knowledge fusion method to address the global information fusion and the limited integration of ID and semantic features. To conduct domain knowledge transfer under the non-overlapping scenario, we resort to the federated semantic learning. Specifically, we do not align domains by specific users or items. Instead, we fuse them at the semantic level, where only item information is uploaded to the server, and the user information is only used within the local client. The GNN-based method is exploited as the backbone of our method to learn user preferences and item representations. From the experimental results in Table 6, we can find that user information can be protected to a large extent. To transfer knowledge across domains, we then upload the item representations from local clients to the server for knowledge fusion, where a static clustering method is utilized for this purpose. However, we find that static clustering can only provide coarse-grained semantic fusion (as shown in Figures 5(a), 5(b) and 5(c)). It cannot well capture the distribution of the local data. To deal with this, we further conduct clustering on item representations with an improved clustering method, where the global domain information is introduced as a guidance (the visualization results of this process can be seen in Figures 5(d), 5(e) and 5(f)). To further leverage the global domain knowledge from the server to update local clients, we then design a contrastive learning method based on semantic graphs constructed by local semantic information and pre-learned semantic information during Stage 2 (fine-tuning on local clients with semantic fusion) (as shown in Figure 3). By doing this, we can further transfer the pre-learned domain knowledge to specific domains to enhance its recommendation results. In our method, the attention mechanism is used to adaptively weight and fuse semantic information at different levels (as shown in Figure 3). Specifically, by assigning dynamic weights to the enhanced item semantic representations, global semantic centers, and fine-grained semantic centers, the model can selectively emphasize more discriminative semantic sources according to the semantic characteristics of the current item. This mechanism effectively alleviates the bias caused by single semantic information and improves the flexibility and expressiveness of multi-source semantic fusion. We conduct extensive experiments on three pairs of domains to evaluate our method. From the experimental results in Table 2 and Table 4, we can find that our method can perform best on all the evaluation metrics. These results demonstrate the effectiveness of our method on the privacy-preserving cross-domain recommendation task. 
+
+## 2. Related Work 
+
+This section reviews related work on CDR, Federated Cross-Domain Recommendation, and Semantic Represen-tation Learning for CDR. 
+
+2.1. PPCDR 
+
+CDR aims to use knowledge from a source domain to alleviate data sparsity and cold-start problems in a target domain. Its methods have evolved from relying heavily on overlapping entities to modeling cross-domain knowledge in non-overlapping scenarios. Early methods usually rely on explicit overlapping entities for knowledge transfer. For example, EMCDR (Man et al., 2017) learns an embedding mapping function across domains to achieve representation alignment, while GA-DTCDR (Zhu et al., 2020) introduces graph-based modeling and alignment mechanisms to enhance cross-domain relational representation at the structural level. Later methods relax the requirement of overlap and improve transfer performance through semantic enhancement and representation alignment. SEAGULL (Zhao et al., 2023b) uses semantic enhancement and contrastive learning to reduce domain shift, while CVPM (Zhao et al., 2025) applies projection learning and collaborative modeling to enable transfer in weakly shared spaces. In more weak or even non-overlapping settings, KR-CDR (Huang et al., 2024) builds a unified semantic space using knowledge graphs to support structured transfer, CD2CDR (Zhu et al., 2025) mines latent cross-domain relations through bidirectional mapping or dual learning, and ARISEN (Zhao et al., 2023a) combines time-aligned behavior sequences with semantic   
+
+> First Author et al.: Preprint submitted to Elsevier Page 3 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+decomposition to achieve fine-grained cross-domain knowledge transfer without explicit overlaps. However, most of these methods are still based on centralized learning paradigms, assuming that data from different domains can be collected and jointly trained. As a result, they generally lack explicit privacy-preserving mechanisms, such as federated learning or differential privacy techniques. Recently, PPCDR has emerged as a promising research direction, aiming to achieve secure cross-domain knowledge transfer without sharing raw user data. According to different privacy-preserving mechanisms, existing methods can be roughly divided into two categories. The first category is distributed collaborative modeling based on federated learning (Wu et al., 2022; Zhang et al., 2024b; Zheng et al., 2024; Wang et al., 2025; Zhong et al., 2024; Bao et al., 2026; Gamiz et al., 2025; Jia et al., 2025). These approaches enable joint training among multiple parties without moving local data out of each domain, achieving collaborative modeling of cross-domain information and global knowledge fusion. For example, Bao et al. (2026) introduced a semi-decentralized architecture to enable device-to-device collaboration and improved recommendation performance with a fine-grained personalized aggregation mechanism. Jia et al. (2025) addressed the scale heterogeneity problem in federated graph data by introducing a graph transformer and a hypernetwork, enabling personalized modeling and stable training across different clients. In addition, Zhong et al. (2024) improved personalized POI recommendation in federated settings by modeling spatio-temporal consistency of trajectories and introducing an edge-based collaborative aggregation mechanism. These methods achieve cross-domain or cross-client knowledge sharing while ensuring that raw data remains local. The second category is cross-domain recommendation based on knowledge transfer. These methods perform cross-domain knowledge transfer under privacy constraints by aligning, mapping, or generating user/item representations. For example, Liao et al. (2023) modeled the interaction distribution in the source domain using a generative adversarial network and released synthetic data under differential privacy mechanisms. This enables cross-domain knowledge transfer without sharing raw interaction data, while improving recommendation performance. Although the above methods have achieved significant progress in PPCDR, most existing approaches still rely on overlapping users or shared entities as bridges for knowledge transfer, which limits their applicability in real-world scenarios. In fully non-overlapping settings with strict privacy isolation, how to achieve efficient cross-domain knowledge transfer and high recommendation performance under strong privacy constraints remains a key challenge in federated cross-domain recommendation. 
+
+2.2. Semantic Modeling for CDR 
+
+In CDR, semantic information is widely used to support cross-domain knowledge transfer and alleviate data sparsity caused by non-overlapping users or items. To this end, textual and visual modalities are often used as auxiliary inputs in representation learning to improve cross-domain modeling ability. Existing studies show a clear evolution from simple feature augmentation to semantic structure modeling. Early methods mainly use text as auxiliary features for representation learning. For example, CD2CDR (Zhu et al., 2025) improves user preference modeling by incorporating user reviews and item textual content, but it does not explicitly model cross-domain semantic relationships. Later, methods such as ARISEN (Zhao et al., 2023a) and SEAGULL (Zhao et al., 2023b) further exploit semantic structures from text and images to reduce cross-domain distribution gaps. In addition, KR-CDR (Huang et al., 2024) introduces knowledge graphs to enhance structured representations, while MITrans (Li et al., 2024) improves cross-domain alignment through mutual information modeling, which strengthens performance in non-overlapping scenarios. Under privacy constraints, recent studies have begun to introduce semantic representation learning into federated learning and cross-domain recommendation to enable cross-domain knowledge sharing without accessing raw data. However, most existing methods still rely mainly on ID-based representations, and the use of textual or other semantic modalities remains relatively shallow, with limited integration between semantic information and federated optimization. In this context, some methods attempt to use semantic information for privacy-preserving cross-domain transfer. For example, PFCR (Guo et al., 2024) applies vector quantization techniques to discretize item description texts and combines the resulting representations with joint representation learning for cross-domain knowledge transfer. However, it compresses continuous semantic spaces into discrete codes, which leads to loss of fine-grained semantic information. It also depends on codebook updates, which may introduce representation drift and reduce semantic expressiveness. Further, FFMSR (Lu et al., 2025) works in privacy-preserving settings without overlapping users or items. It builds global semantic prototypes on the server through semantic clustering for cross-domain alignment and transfer. However, these prototypes are based on static clustering results and cannot adapt to local client distributions. As a result, semantic alignment is mainly a one-time global matching process and cannot capture dynamic local semantic patterns.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 4 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+Different from these methods, our approach introduces a semantic center re-estimation mechanism within a global semantic clustering framework. This allows semantic prototypes to be dynamically updated according to local data distributions, enabling joint modeling of global semantic structure and local characteristics. In this way, semantic alignment is extended from static prototype matching to dynamic semantic reconstruction, improving fine-grained cross-domain knowledge transfer. 
+
+2.3. Difference 
+
+In cross-domain recommendation research, existing methods generally follow core steps such as semantic modeling, representation learning, and cross-domain alignment, resulting in certain similarities in their overall frameworks. However, significant differences still exist across methods in terms of task settings, modeling targets, semantic representation forms, cross-domain knowledge transfer mechanisms, and privacy constraints. From these key dimensions, we conduct a systematic comparative analysis between the proposed method and representative works. Overall, under the non-overlapping user setting, our method takes continuous semantic representations as a bridge and achieves effective transfer and fusion of cross-domain knowledge through federated semantic learning and dynamic semantic modeling. The differences between our method and existing works are summarized as follows: (1) Our method has significant differences with the FFMSR method (Lu et al., 2025)in the following aspects: 1) In our method, we focus on devising models to conduct the item prediction task from user-item pairs. Our task is to model users’ preferences on specific items. Different from us, FFMSR aims at modeling users’ sequential preferences by predicting the next item that the user will interact with. 2) In user preference modeling, FFMSR exploits sequential-based methods, such as SASRec (Kang & McAuley, 2018). But this kind of method can only model users’ sequential preferences, and the high-order connections among users and items are largely ignored. Hence, we resort to the graph-based method to improve it for information fusion and domain adaptation. 3) Although FFMSR also uses semantic information as a cross-domain bridge, it maps textual semantics to discrete cluster centers through clustering, which compresses the semantic representation space and easily leads to the loss of fine-grained information. In contrast, our method models based on continuous textual semantic representations to achieve finer-grained cross-domain association. 4) To connect disjoint domains in federated learning, FFMSR exploits a static clustering method at the server to fuse the global item information from different domains. But we find that the resulting global representation has a large distribution gap with the local domain representation, resulting in the distribution shift issue. To resolve this, we further devise an improved clustering method in local clients, which is guided by the global information. From the experimental results in Figure 5, we find that our method can better integrate global and local domain information. (2) Our method is significantly different from the UniCDR method (Cao et al., 2023) in the following aspects: 1) Our research target is to conduct privacy-preserving cross-domain recommendations, while UniCDR tends to devise a unified cross-domain model for different domain settings. But their method relies on joint modeling of multi-domain data, which requires integrating and sharing user interaction information across domains, and cannot protect domain privacy. 2) To conduct domain knowledge transfer, UniCDR needs overlapping users or items as a bridge, while our method studies cross-domain recommendation under the totally non-overlapping scenario. In contrast to UniCDR, which focuses on learning domain-shared information via overlapping users or items, we align domains at the semantic level, not at specific users or items. To achieve this, we devise a global-aware semantic clustering method to fuse the domain-shared information into local domains for knowledge transfer. (3) Our method is significantly different from the FedPCL-CDR method (Wang et al., 2025) in the following aspects: 1) FedPCL-CDR relies on overlapping users for cross-domain transfer and uploads differential prototypes together with related user sets, which brings privacy risks. Meanwhile, its local differential privacy mechanism faces a trade-off between recommendation performance and privacy protection. In contrast, our method only uploads item embeddings under the non-overlapping setting, and user data is always kept locally, which inherently reduces privacy risks. 2) FedPCL-CDR constructs cross-domain prototypes based on overlapping users and achieves knowledge transfer through prototype-level alignment, which is a static prototype-driven mechanism limited by prototype expressiveness and data distribution. In contrast, starting from the semantic representation space, our method dynamically re-estimates semantic centers under global clustering constraints to form secondary semantic centers, and models item relations with semantic graphs, thus achieving deep fusion of global and local information. 3) FedPCL-CDR constructs contrastive objectives based on user representations and prototypes, whose contrastive granularity is restricted by prototype representations. In contrast, our method builds a semantic-aware item graph based on textual features to learn representations fused with structural semantic information, and imposes contrastive constraints between   
+
+> First Author et al.: Preprint submitted to Elsevier Page 5 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+representations from global and local semantic views, thereby achieving finer-grained cross-domain alignment and more sufficient knowledge fusion. (4) Our method is significantly different from the FedDCSR method (Zhang et al., 2024a) in the following aspects: 1) In our method, we focus on devising models to conduct the item prediction task from user-item pairs. Our task is to model users’ preferences on specific items. Different from us, FedDCSR aims at modeling users’ sequential preferences by predicting the next item that she will interact. 2) FedDCSR achieves cross-domain transfer by weighted aggregation of domain-shared representations and model parameters, which is essentially explicit fusion at the user representation level. In contrast, our method starts from item semantics, performs cross-domain clustering on item representations, and dynamically re-estimates semantic centers under global clustering constraints. Meanwhile, it models item relations via semantic graphs to achieve deep fusion of global and local information. This mechanism does not require sharing user-level information, keeping user interaction data local and effectively reducing privacy leakage risks. 3) FedDCSR constructs positive and negative samples by data augmentation on user sequences, which belongs to sample perturbation-based contrastive learning. In contrast, our method imposes contrastive constraints between global fused representations and local fused representations, and by aligning the semantic consistency between global and local representations, achieves finer-grained cross-domain alignment and deeper knowledge fusion. 
+
+## 3. Method 
+
+This chapter systematically elaborates on the proposed FedCRF. The chapter is organized as follows: Section 3.1 defines the problem formulation and explains key notations. Section 3.2 presents the overall architecture and workflow of FedCRF. Section 3.3 describes the learning process of semantic and ID representations that serve as fundamental inputs to the model. Sections 3.4 and 3.5 introduce the server-side clustering mechanism and the client-side fine-grained semantic adaptation and transfer module during the federated pre-training phase. Finally, Section 3.6 comprehensively analyzes the local fine-tuning stage, covering graph-based learning, contrastive fusion mechanisms, and the final recommendation prediction. 
+
+3.1. Preliminaries 
+
+Suppose that we have two domains A and B. Let 𝐴 and 𝐵 denote the user sets, 𝐴 and 𝐵 denote the item sets in domains A and B, respectively. Each item 𝑖 𝐴 ∈ 𝐴 (or 𝑖 𝐵 ∈ 𝐵 ) is identified by a unique item ID and associated with a descriptive text (e.g., its title, description, and brand). Taking domain A as an example, each user 𝑢 ∈ 𝐴 is associated with a set of items 𝑢 with positive feedback, indicating a preference score of 𝑦 𝑢𝑖 = 1 for 𝑖 ∈ 𝑢 . Besides user-item interactions, textual features are used as content information of items. We utilize Sentence-Transformers (Reimers & Gurevych, 2019) to encode the concatenated descriptive text of item 𝑖 into a 1024-dimensional sentence embedding. This is denoted as the textual feature 𝒙 𝑡 𝑖 .Under the non-overlapping cross-domain recommendation setting, there is no overlap in users or items across domains. Our goal is to leverage both textual information and unique IDs to accurately predict users’ preferences by ranking items for each user according to predicted preference scores ̂𝑦 𝑢𝑖 .
+
+3.2. Overview of FedCRF 
+
+As illustrated in Figure 1 and Figure 3, the proposed framework adopts a two-stage federated learning pipeline to address semantic modeling challenges under non-overlapping and privacy-preserving settings. 
+
+Stage 1: Federated Pre-training. 1) First, each client encodes local item texts and uploads the generated textual representations to the server. 2) Subsequently, the server performs global semantic clustering based on the representations from all clients to derive global semantic centers capturing cross-domain shared semantics, after which the results are distributed back to each client. 3) Upon receiving the global semantic centers, each client activates the FGSAT module (as shown in Figure 2). This module regularizes and re-estimates the semantic centers under fixed global semantic assignment constraints, allowing them to adapt to the local data distribution. This process alleviates the discrepancy between global semantics and local distributions, leading to finer-grained semantic modeling and improved cross-domain alignment. Furthermore, the FGSAT module fuses multi-source semantic information via an attention mechanism, and introduces knowledge distillation and feature alignment constraints to facilitate effective transfer and consistency learning of cross-domain shared semantics. 4) On this basis, each client fuses textual semantic representations and ID embeddings, predicts user–item interactions, and computes the recommendation loss to update model parameters. 5) After completing this stage, each client uses the updated encoder to generate enhanced semantic representations and stores them for subsequent semantic learning and recommendation tasks.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 6 of 24
+
+FedCRF: A Federated Cross-domain Recommendation Method Client A 
+
++
+
+> User Rep
+> GNN
+
+yui 
+
+ˆ
+
+> Embedding
+> layer
+> Embedding
+> layer Item ID
+> User ID
+> Encoder
+> Item ID Rep
+> Embedding
+> layer
+> Item texts
+> Updated Item text Rep
+> Item text Rep
+> Global
+> cluster Rep
+> PLM
+> Fused Item Rep
+
+…   
+
+> construct
+> secondary centers
+> GNN
+> Attention
+> KD & FA
+> Stage 1
+> Item text
+> representations
+> from clients
+> ...
+> Global
+> cluster Rep
+> Clustering
+> Server
+> (1) Upload
+> (2) Update
+> (2) Update
+> (1) Upload
+> FGSAT
+> Client B
+
+×
+
++
+
+> User Rep
+> GNN
+> Embedding
+> layer
+> Embedding
+> layer Item ID
+> User ID
+> Encoder
+> Item ID Rep
+> Embedding
+> layer
+> Item texts
+> Updated Item text Rep
+> Item text Rep
+> Global
+> cluster Rep
+> PLM
+> Fused Item Rep
+
+…
+
+> construct
+> secondary centers
+> GNN
+> Attention
+> KD & FA
+> FGSAT
+
+×
+
+yui 
+
+ˆ
+
+Fig. 1: The workflow of FedCRF in Stage 1: 1) Each client uploads its locally encoded item text representations to the server. 2) The server performs global semantic clustering based on the aggregated representations. 3) The clustering results are distributed to each client. 4) Under fixed global semantic assignment constraints, the client regularizes and re-estimates semantic centers through the FGSAT module, and trains by fusing multi-source semantic information. 5) It fuses text representations and ID representations to complete prediction and model optimization. 6) After training, the updated semantic representations are saved for subsequent tasks. 
+
+Stage 2: Fine-tuning on Local Clients with Semantic Fusion. The objective of this stage is to achieve deep semantic fusion and local adaptive optimization based on federated pre-trained knowledge. 1) First, each client loads the pre-trained semantic representations obtained in Stage 1 as well as the representations generated by the local specific encoder, and constructs a pre-trained semantic graph and a local semantic graph, respectively. 2) Subsequently, graph convolution operations are performed on both semantic graphs to model inter-item structural relationships and inject such structural information into item ID representations, thereby generating fused representations that integrate textual semantics and ID information from different perspectives, avoiding the insufficient expressiveness caused by single-modality modeling or simple feature concatenation. 3) Based on the obtained pre-learned fused representation and local fused representation, bidirectional contrastive learning constraints are introduced to achieve finer-grained cross-domain alignment and deeper semantic fusion. 4) Finally, multi-source fused representations are integrated with user representations for the final user–item interaction prediction and recommendation task optimization. This two-stage design of “pre-train then fine-tune locally” not only effectively mitigates potential negative transfer risks in the federated stage, but also promotes deeper semantic fusion and local adaptation, thereby improving the model’s robustness, learning efficiency, and interpretability. 
+
+3.3. Semantic and ID Representations 
+
+Semantic Representation. Our core objective is to learn high-quality semantic representations. In contrast, Large Language Models (LLMs) are mainly designed for open-domain text generation and complex reasoning, which are not fully aligned with the representation learning objective in this work. Therefore, we adopt Pre-trained Language Models (PLMs) for text encoding, specifically using Sentence-Transformers. For each item 𝑖 , we concatenate its title, description, and brand, and feed them into the encoder to obtain a 1024 -dimensional sentence embedding 𝒙 𝑡 𝑖 :
+
+𝒙 𝑡 𝑖 = PLM(Concat( 𝑡𝑖𝑡𝑙𝑒 𝑖 , 𝑑𝑒𝑠𝑐𝑟𝑖𝑝𝑡𝑖𝑜𝑛 𝑖 , 𝑏𝑟𝑎𝑛𝑑 𝑖 )) . (1) 
+
+First Author et al.: Preprint submitted to Elsevier Page 7 of 24 FedCRF: A Federated Cross-domain Recommendation Method +GNN 
+
+> Knowledge D istillation &
+> Feature Alignment
+> 1
+
+c 1
+
+c
+
+> 2
+
+c 2
+
+c
+
+> 3
+
+c 3
+
+c       
+
+> updated cluster centers
+> Fused item Rep
+> the k-th global semantic center
+> that item ibelongs to
+> C
+> Enhanced semantic Rep
+> of item i
+> global
+> cluster center
+> from server
+> Item text Rep
+> Attention Network
+> T
+> the j-th secondary semantic
+> center that item ibelongs to
+> T
+> FGSAT
+> i
+
+t i
+
+t 
+
+> k
+
+c
+
+> j
+
+c
+
+> 
+
+Fig. 2: The architecture of the FGSAT component in Stage 1 of FedCKF. First, secondary semantic centers 𝑪 ′ are constructed based on global clusters  and local text representations 𝑻 , and a graph structure is built using 𝑻 and 𝑪 ′.Next, GNN propagates semantics over the graph, optimizing the semantic representations. Then, a dynamic fusion strategy based on an attention mechanism integrates multi-source semantic information from the global clusters 𝒄 𝑘 , local secondary centers 𝒄 ′ 
+
+> 𝑗
+
+, and enhanced item representations 𝒕 ′ 
+
+> 𝑖
+
+. Finally, knowledge distillation and feature alignment are applied to ensure semantic consistency and effectively integrate knowledge from different semantic sources. 
+
+All item representations are organized into an embedding matrix 𝑿 ∈ ℝ|𝑑 |×1024 , where each row corresponds to the semantic embedding of an item and 𝑑 denotes the item set in domain 𝑑 . Considering that the initial semantic embeddings are high-dimensional and lack domain-specific information, we introduce a domain text encoder 𝜙 emb for each domain to learn more compact and discriminative item representations. The final item embedding 𝒕 𝑖 is defined as: 
+
+𝒕 𝑖 = 𝜙 emb (𝒙 𝑡 𝑖 ), (2) where 𝜙 emb maps the initial semantic embedding into a higher-level representation space that incorporates domain-specific features. This representation preserves the textual semantics of items while enhancing domain-related characteristics, thereby improving the model’s representation capability. The resulting embedding 𝒕 𝑖 will be uploaded to the server for subsequent cross-domain semantic fusion. 
+
+User and Item ID Representation. For the ID embeddings of users and items, we design an ID encoder to generate corresponding embeddings based on the unique ID index of each entity. This is implemented through an ID embedding matrix 𝑬 ∈ ℝ|𝑑 |×𝑑 𝑡 , where 𝑑 𝑡 represents the dimension of the embeddings. Each row 𝒆 𝑖 in the matrix corresponds to the ID embedding of item 𝑖 . Similarly, the user embedding matrix 𝑼 ∈ ℝ|𝑑 |×𝑑 𝑡 is used to generate embeddings for each user, where 𝑑 denotes the user set in domain 𝑑 . Each row 𝒆 𝑢 in the matrix corresponds to the ID embedding of user 𝑢 .Subsequently, these user and item ID embeddings are fed into the Graph Neural Network (GNN) to further aggregate and learn the complex interaction relationships between users and items, yielding the final user and item ID representations 𝒙 𝑢 , 𝒙 𝑖𝑑 𝑖 ∈ ℝ𝑑 𝑡 .
+
+3.4. Global Cluster 
+
+To align disjoint domains within the semantic space, we employ a clustering approach. Upon receiving item text representations from various clients, we perform K-means algorithm as in (Lu et al., 2025) to capture shared semantic structures and bridge different domains. Additionally, to address the issue of inconsistent numerical feature distributions across clients in federated learning environments, we introduce a Domain-Aware Normalization module (Chang et al., 2019). This module standardizes feature scales, improving clustering performance. 
+
+3.4.1. Domain-Aware Normalization 
+
+To improve clustering performance, the domain-aware normalization module maintains a set of statistical parameters for each domain, including the mean and variance, which are used to unify feature scales and reduce 
+
+First Author et al.: Preprint submitted to Elsevier Page 8 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+distribution shifts, thereby improving the separability and stability of multi-domain clustering. Specifically, for each domain, we maintain a running mean 𝝁 and a running variance 𝝈 2. Given a feature vector 𝒕 𝑖 from domain A or B, the normalization process is defined as: ̃
+
+𝒕 𝑖 = 𝒕 𝑖 − 𝝁 
+
+√𝝈 2 + 𝜖 , (3) where 𝜖 is a small constant added to avoid division by zero. This operation ensures that feature values are standardized across dimensions, thereby reducing scale differences between domains. During training, the running statistics are updated by the statistics of the current mini-batch: 
+
+𝝁 = 𝜌 𝝁 + (1 − 𝜌 )̄ 𝒕 , (4) 
+
+𝝈 2 = 𝜌 𝝈 2 + (1 − 𝜌 ) 𝒔 2, (5) where 𝜌 is the momentum parameter balancing historical and current statistics, ̄ 𝒕 is the element-wise mean vector of the current batch samples, and 𝒔 2 is the corresponding element-wise variance vector. These updates are applied across all feature dimensions to keep the running statistics consistent with the evolving data distribution. By maintaining domain-specific normalization parameters, this method allows each client model to preserve personalized feature characteristics while improving the stability and robustness of global clustering. 
+
+3.4.2. Semantic Cluster 
+
+After performing domain-aware normalization, the server further conducts global semantic modeling on the item text representations ̃ 𝒕 𝑖 collected from different clients to learn shared semantic prototypes across domains. To achieve this, we adopt the weighted K-means method to cluster item representations. Compared with hierarchical and density-based clustering methods, K-means offers better computational efficiency and better scalability, and can produce stable and deterministic cluster assignments in large-scale high-dimensional scenarios. Therefore, it is well-suited for global semantic modeling in federated cross-domain recommendation. In our implementation, we follow the improved K-means algorithm proposed in (Lu et al., 2025), which introduces a weighting mechanism to strengthen shared semantic features and thereby enhance semantic alignment across different domains. The clustering process consists of three main steps: 1. Center Initialization: We randomly select initial centers according to the predefined number of clusters 𝐾 . Let 
+
+ = { 1, 2, … , 𝐾 } denote the set of clusters and  = { 𝒄 1, 𝒄 2, … , 𝒄 𝐾 } denote the corresponding set of cluster centers. Each center 𝒄 𝑘 is initialized as: 
+
+𝒄 𝑘 ∼ { ̃𝒕 1,̃ 𝒕 2, … ,̃ 𝒕 ||}, 𝑘 = 1 , … , 𝐾, (6) where  denotes the global item set collected at the server from all clients. 2. Cluster Assignment: For each data point ̃ 𝒕 𝑖 , we calculate its distance to all centers and assign it to the nearest one: 
+
+𝑗 =
+
+{̃
+
+𝒕 𝑖 
+
+|||| 𝑗 = arg min  
+
+> 1≤𝑘 ≤𝐾
+
+‖̃𝒕 𝑖 − 𝒄 𝑘 ‖2
+
+}
+
+(7) 3. Center Update: When updating the cluster centers, we adopt a weighted aggregation strategy. Specifically, the contribution of each data point to the center is determined by its distance, where a smaller distance yields a larger weight. The update formula is defined as: 
+
+𝒄 𝑗 =
+
+∑̃ 
+
+> 𝒕 𝑖 ∈𝑗
+
+𝑤 𝑖 ̃ 𝒕 𝑖 
+
+∑̃ 
+
+> 𝒕 𝑖 ∈𝑗
+
+𝑤 𝑖 
+
+, (8) where 𝑤 𝑖 = 1   
+
+> ‖̃𝒕 𝑖 −𝒄 𝑗 ‖+𝛿
+
+, and 𝛿 is a small constant to prevent numerical instability. Finally, the updated cluster centers  = { 𝒄 1, 𝒄 2, … , 𝒄 𝐾 } are sent back to all clients as global semantic knowledge.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 9 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+3.5. Fine-Grained Semantic Adaptation and Transfer (FGSAT) Module 
+
+The FGSAT module is designed to enhance semantic knowledge transfer in federated cross-domain recommen-dation. Using the global semantic cluster centers generated on the server as semantic seeds, the module constructs fine-grained secondary semantic centers and builds a semantic graph together with local textual features. A GNN is then employed to propagate information over the semantic graph, modeling the correlations between semantics and optimizing the representation learning process. Furthermore, the module incorporates an attention mechanism to achieve adaptive fusion of multi-source semantic information. Meanwhile, knowledge distillation and feature alignment constraints are introduced to improve the consistency of cross-domain semantic representations and enhance transfer performance. Overall, by dynamically re-evaluating semantic centers and performing local adaptive adjustment, the FGSAT module effectively alleviates cross-domain distribution discrepancies, thereby achieving more thorough semantic alignment and fusion. 
+
+Semantic-Driven Two-Level Clustering. To improve the client’s adaptation to global semantics in cross-domain recommendation, we design a mechanism to construct fine-grained semantic centers based on the global cluster centers 
+
+ delivered by the server. Specifically, let the local item text representations in the current batch be denoted as 
+
+𝑻 ∈ ℝ𝐵 ×𝑑 𝑡 , where 𝐵 denotes the batch size and each row 𝒕 𝑖 denotes the textual embedding of the item 𝑖 . After receiving the global cluster centers , the client combines them with local text representations 𝑻 and constructs the cluster indicator matrix 𝒀 ∈ {0 , 1} 𝐵 ×𝐾 via one-hot encoding, where 𝒀 𝑖𝑘 = 1 indicates that the item 𝑖 is assigned to the 𝑘 -th cluster. Then, the normalized secondary semantic centers are computed as: ̃
+
+𝑪 = ( 𝒀 ⊤𝒀 + 𝜂 𝑰 )−1 𝒀 ⊤𝑻 , (9) where 𝜂 is a small constant for numerical stability, and 𝑰 ∈ ℝ𝐾 ×𝐾 denotes the identity matrix, which is used to alleviate matrix singularity caused by sparse local sample distribution. To further enhance the semantic expressiveness, a nonlinear transformation is applied to the secondary semantic centers: 
+
+𝑪 ′ = ReLU( ̃𝑪𝑾 1), (10) where 𝑾 1 ∈ ℝ𝑑 𝑡 ×𝑑 𝑡 is a trainable parameter matrix. This projection maps the secondary semantic centers into a more discriminative representation space, thus strengthening their semantic modeling capability. 
+
+Graph-Structured Knowledge Transfer. Although the secondary semantic centers 𝑪 ′ capture fine-grained local semantic features, fully leveraging their structural relationships with the original text representations 𝑻 is still necessary to facilitate effective semantic information transfer. Following the graph-based relational knowledge transfer method proposed by Li et al. (2023), we stack them to form the node feature matrix 𝒁 = [ 𝑪 ′; 𝑻 ] ∈ ℝ(𝐾 +𝐵 )× 𝑑 𝑡 . The adjacency matrix 𝑨 is constructed in a fully-connected manner by computing pairwise cosine similarity over 𝒁 . Subsequently, a GNN is employed to propagate semantic information across the graph, with its core operation defined as: 
+
+𝑳 = 𝑫 −1∕2 𝑨𝑫 −1∕2 , (11) 
+
+𝒁 ′ = ReLU( 𝑳𝒁𝑾 2), (12) where 𝑫 is the degree matrix, 𝑳 is the symmetric normalized adjacency matrix and 𝑾 2 ∈ ℝ𝑑 𝑡 ×𝑑 𝑡 is a learn-able parameter matrix for graph convolution. Through graph propagation, the model incorporates local adjacency information between nodes. Specifically, each enhanced item semantic representation 𝒕 ′ 
+
+> 𝑖
+
+(extracted from the nodes corresponding to the original items 𝑻 in the updated matrix 𝒁 ′) improves its semantic context awareness by aggregating information from connected semantic centers and other items. This mechanism helps capture richer cross-domain semantic relationships, thus improving the semantic quality and generalization of the transferred representations. 
+
+Attention-Based Fusion Mechanism. After obtaining the item semantic representation 𝒕 ′ 
+
+> 𝑖
+
+enhanced by graph-structured knowledge transfer, we adopt an attention-based dynamic fusion strategy to effectively integrate multi-level semantic information. Specifically, we consider three types of features: the transferred representation 𝒕 ′ 
+
+> 𝑖
+
+of item 𝑖 , the center 𝒄 𝑘 of the 𝑘 -th global cluster to which item 𝑖 belongs, and the center 𝒄 ′ 
+
+> 𝑗
+
+of the 𝑗 -th secondary semantic cluster to which item 𝑖 belongs. Each feature is first fed into a learnable scoring function score (⋅), implemented as a trainable linear transformation layer: score (𝒙 ) = 𝒘 ⊤𝒙 + 𝑏 , where 𝒘 ∈ ℝ𝑑 𝑡 , 𝑏 ∈ ℝ. This design maps the input semantic representation to a scalar score to evaluate the importance of each semantic component.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 10 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+The resulting scores are normalized via the Softmax function to obtain attention weights: 
+
+𝒒 𝑖 = Softmax ([ score (𝒕 ′
+
+> 𝑖
+
+), score (𝒄 𝑘 ), score (𝒄 ′ 
+
+> 𝑗
+
+) ] ), (13) where 𝒒 𝑖 denotes the dynamically computed attention weights for the three semantic components. The final fused representation is computed as: 
+
+𝒕 ′′  
+
+> 𝑖
+
+= 𝑞 𝑖, 1𝒕 ′ 
+
+> 𝑖
+
++ 𝑞 𝑖, 2𝒄 𝑘 + 𝑞 𝑖, 3𝒄 ′ 
+
+> 𝑗
+
+. (14) This mechanism enables the model to adaptively adjust the importance of different semantic sources for each sample, achieving effective multi-source semantic fusion. It enhances the expressiveness and adaptability of the transferred representation while alleviating the bias or information insufficiency caused by relying on a single semantic source. 
+
+Knowledge Distillation and Feature Alignment. This stage focuses on learning federated semantic representa-tions for subsequent semantic transfer and reuse. To this end, we design two complementary objectives: knowledge distillation and feature alignment, which jointly ensure effective semantic transfer and stable model optimization. The knowledge distillation loss minimizes the Kullback-Leibler (KL) divergence between the original prediction 
+
+𝑓 (𝒙 𝑢 , 𝒕 𝑖 ) and the prediction based on the fused representation 𝑓 (𝒙 𝑢 , 𝒕 ′′  
+
+> 𝑖
+
+):
+
+𝐿 KD =
+
+> 𝐵
+
+∑
+
+> 𝑖 =1
+
+KL (𝑓 (𝒙 𝑢 , 𝒕 ′′  
+
+> 𝑖
+
+) ‖ 𝑓 (𝒙 𝑢 , 𝒕 𝑖 )), (15) where 𝑓 (𝒙 𝑢 , 𝒕 𝑖 ) and 𝑓 (𝒙 𝑢 , 𝒕 ′′  
+
+> 𝑖
+
+) denote the predicted probability distributions using the original and fused representations, respectively. This objective enables global semantic knowledge transfer to local models by aligning their predictions. However, due to data heterogeneity across clients, relying solely on knowledge distillation may lead to inconsistent convergence behaviors, potentially causing representation shift and training instability. To mitigate these issues, we introduce a feature alignment loss that constrains the embedding-level consistency between the transferred and fused representations: 
+
+𝐿 FA = 1
+
+𝐵 
+
+> 𝐵
+
+∑
+
+> 𝑖 =1
+
+‖𝒕 ′ 
+
+> 𝑖
+
+− 𝒕 ′′  
+
+> 𝑖
+
+‖22. (16) By enforcing proximity between the two representations in the feature space, this loss acts as a stabilizer during training, reducing client-level drift and improving cross-domain semantic coherence. The overall optimization objective is: 
+
+𝐿 total = 𝐿 rec + 𝜆 KD 𝐿 KD + 𝜆 FA 𝐿 FA , (17) where 𝐿 rec is the recommendation loss, and 𝜆 KD and 𝜆 FA are balancing coefficients. The total loss integrates three components: the recommendation loss 𝐿 rec ensures effective modeling of local user-item interactions; the knowledge distillation loss 𝐿 KD transfers global semantic knowledge to local models by minimizing prediction divergence; and the feature alignment loss 𝐿 FA enhances stability and consistency by aligning fused representations with their transferred counterparts. Together, these losses enable accurate local recommendations while producing robust and transferable semantic representations for the next stage. 
+
+3.6. Fine-Tuning on Local Clients 
+
+After Stage 1, each domain generates pre-trained textual representations 𝒕 pre  
+
+> 𝑖
+
+using the text encoder and organizes them into an embedding matrix 𝑻 pre . These pre-trained representations serve as semantic priors and provide fundamental support for the local optimization in Stage 2. Unlike Stage 1, which mainly focuses on global semantic modeling, Stage 2 aims to further achieve semantic fusion and local guidance based on the pre-trained knowledge. Specifically, the model fuses the global semantic priors obtained from pre-training with the local data characteristics and personalized semantic information of each client, thereby improving personalized modeling capability while maintaining global consistency. This two-stage design of pre-training–then–fusion can effectively alleviate the negative transfer problem in federated learning and promote deeper semantic interaction and local adaptation, thus improving the model’s robustness, training efficiency, and interpretability.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 11 of 24
+
+FedCRF: A Federated Cross-domain Recommendation Method GNN 
+
+> Embedding
+> layer
+> Embedding
+> layer
+> Item ID
+> User ID
+> Encoder
+> specific
+> Item ID Rep
+> Embedding
+> layer
+> GCN
+> GCN
+> Embedding
+> layer
+> User Rep
+> Pre-learned fused Rep
+> Local fused Rep
+> Local text Rep
+> Contrastive
+
+Stage 2 
+
+> Encoder
+> Embedding
+> layer
+> Pre-learned
+> text Rep
+> Local text Rep
+> Local
+> cluster Rep
+> Deep fused item Rep
+> Update
+> Frozen
+> Item texts
+> PLM
+> FGSAT
+
+×
+
++
+
+> local
+
+G
+
+> pre
+
+G
+
+yui 
+
+ˆ
+
+Fig. 3: The framework of FedCRF in Stage 2: 1) The client loads the pre-trained semantic representations obtained in Stage 1 and the representations generated by the local specific encoder, and constructs the pre-trained semantic graph and the local semantic graph respectively; 2) It performs representation learning via graph convolution on the two semantic graphs together with ID embeddings, obtaining the pre-trained fused representation and the local fused representation; 3) A pre-trained-local contrastive learning constraint is introduced between the two kinds of representations; 4) It fuses multi-source representations and completes prediction and recommendation combined with user representations. 
+
+Graph-Based Semantic Representation Learning. We construct two types of semantic graphs with complemen-tary properties: a local semantic graph and a pre-trained semantic graph. Following the semantic graph construction principle proposed by Zhang et al. (2022), we construct the local semantic graph within each client based on cosine similarities between items. The local textual representations are learned by the local FGSAT module, which fully exploits the semantic characteristics of local data and captures personalized item relationships. For each item 𝑖 , its similarity to other items is calculated via the cosine function: 
+
+𝑠 local  
+
+> 𝑖𝑗
+
+= (𝒕 local  
+
+> 𝑖
+
+)⊤𝒕 local 
+
+> 𝑗
+
+‖𝒕 local  
+
+> 𝑖
+
+‖2 ‖𝒕 local  
+
+> 𝑗
+
+‖2
+
+, (18) where 𝒕 local  
+
+> 𝑖
+
+and 𝒕 local  
+
+> 𝑗
+
+denote the local textual representations of items 𝑖 and 𝑗 , respectively, and 𝑠 local  
+
+> 𝑖𝑗
+
+represents their semantic similarity. To obtain a sparse and representative structure, we retain only the top-𝑁 highest similarity connections for each item, forming the adjacency matrix 𝑺 local .To stabilize graph learning, the adjacency matrix is normalized as follows: ̃
+
+𝑺 local = ( 𝑫 local )− 12 𝑺 local (𝑫 local )− 12 , (19) where 𝑫 local denotes the degree matrix with 𝐷 local  
+
+> 𝑖𝑖
+
+= ∑𝑗 𝑠 local  
+
+> 𝑖𝑗
+
+.The pre-trained semantic graph is constructed in the same way as the local semantic graph, but based on the semantic embeddings 𝑻 pre obtained from the pre-training stage. It incorporates shared semantic information across all clients to guide the local model in adapting to cross-domain semantic structures. The resulting ̃ 𝑺 local and ̃ 𝑺 pre are the normalized adjacency matrices of the local and pre-trained graphs, respectively, which are used in subsequent graph convolution propagation. We then apply a Graph Convolutional Network (GCN) to both the local and pre-learned semantic graphs for information propagation and feature fusion. The input embedding matrix 𝐻 0 is initialized with the same item ID embedding matrix 𝐸 . The graph convolution operations are defined as: 
+
+𝐻 local =̃ 𝑺 local 𝐻 0, (20) 
+
+First Author et al.: Preprint submitted to Elsevier Page 12 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+𝐻 pre =̃ 𝑺 pre 𝐻 0, (21) where the 𝑖 -th row 𝒉 local  
+
+> 𝑖
+
+denotes the local structure-aware representation of item 𝑖 . Similarly, the 𝑖 -th row of 𝐻 pre 
+
+represents the pre-learned structure-aware representation 𝒉 pre  
+
+> 𝑖
+
+. Through this operation, item ID embeddings are propagated over the semantic graphs to absorb textual semantics, yielding deeply fused text-ID representations that tightly integrate structural interaction signals with semantic information. 
+
+Pre-trained–Local Contrastive Learning. To achieve deep semantic fusion between pre-trained and local representations, we introduce a bidirectional contrastive learning objective. This mechanism encourages consistency between semantically aligned item representations drawn from both the pre-trained and local spaces, while pushing apart unrelated ones. Such bidirectional supervision enables effective cross-space knowledge alignment and enhances representation robustness. Given the pre-trained and local embeddings 𝒉 pre  
+
+> 𝑖
+
+and 𝒉 local  
+
+> 𝑖
+
+, we first define the similarity function as: 
+
+sim( 𝒉 𝑖 , 𝒉 𝑗 ) = 𝒉 ⊤𝑖 𝒉 𝑗 
+
+‖𝒉 𝑖 ‖ ⋅ ‖𝒉 𝑗 ‖ . (22) Then, the bidirectional contrastive loss is formulated as: 
+
+𝐿 con =
+
+> 𝐵
+
+∑
+
+> 𝑖 =1
+
+[
+
+− log exp ( sim( 𝒉 local  
+
+> 𝑖
+
+, 𝒉 pre  
+
+> 𝑖
+
+)∕ 𝜏 )∑𝐵 𝑗 =1 
+
+> 𝑗 ≠𝑖
+
+exp ( sim( 𝒉 local  
+
+> 𝑖
+
+, 𝒉 pre  
+
+> 𝑗
+
+)∕ 𝜏 )
+
+− log exp ( sim( 𝒉 pre  
+
+> 𝑖
+
+, 𝒉 local  
+
+> 𝑖
+
+)∕ 𝜏 )∑𝐵 𝑗 =1 
+
+> 𝑗 ≠𝑖
+
+exp ( sim( 𝒉 pre  
+
+> 𝑖
+
+, 𝒉 local  
+
+> 𝑗
+
+)∕ 𝜏 )]
+
+, (23) where 𝜏 is the temperature parameter and 𝐵 denotes the batch size. This contrastive objective explicitly aligns the pre-trained and local semantic spaces, facilitating deep knowledge fusion and ensuring that the pre-trained semantic priors are effectively integrated into local representation learning. 
+
+Multi-View Semantic Fusion. After obtaining the local structure-aware representation and the pre-trained structure-aware representation, we integrate multi-view semantic information to form a unified recommendation representation for each item: 
+
+𝒙 𝑖 = 𝒙 𝑖𝑑 𝑖 + 𝒕 local 
+
+> 𝑖
+
+‖𝒕 local  
+
+> 𝑖
+
+‖2
+
++ 𝒉 local 
+
+> 𝑖
+
+‖𝒉 local  
+
+> 𝑖
+
+‖2
+
++ 𝒉 pre 
+
+> 𝑖
+
+‖𝒉 pre  
+
+> 𝑖
+
+‖2
+
+, (24) where 𝒙 𝑖𝑑 𝑖 denotes the item ID embedding, 𝒕 local  
+
+> 𝑖
+
+represents the textual semantics learned from local data, 𝒉 local  
+
+> 𝑖
+
+captures the local structure-aware features obtained via GCN propagation, and 𝒉 pre  
+
+> 𝑖
+
+encodes the pre-trained semantic knowledge transferred from the federated stage. The final user preference score for item 𝑖 by user 𝑢 is computed as: ̂𝑦 𝑢𝑖 = 𝒙 ⊤𝑖 𝒙 𝑢 , (25) where 𝒙 𝑢 denotes the user embedding. Through this fusion mechanism, the model jointly leverages local semantics, structural dependencies, and pre-trained cross-domain knowledge, thereby generating recommendation representations that are both personalized and semantically generalizable. 
+
+Optimization Objective. The overall optimization objective consists of three parts: the Bayesian Personalized Ranking (BPR) loss 𝐿 rec , the pre-trained–local contrastive loss 𝐿 con , and the local adaptation loss 𝐿 kd introduced by the FGSAT model: 
+
+𝐿 = 𝐿 rec + 𝛼𝐿 con + 𝛽𝐿 kd , (26) where 𝛼 and 𝛽 are hyperparameters that control the contributions of the contrastive and knowledge distillation losses, respectively. Specifically, 𝛼 governs the depth of semantic fusion between pre-trained and local representations,   
+
+> First Author et al.: Preprint submitted to Elsevier Page 13 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+Algorithm 1 The Two-stage Training Process of FedCRF 
+
+Input: Item texts and user-item interactions from two domains 𝐴 and 𝐵 ; text encoder 𝜙 emb ; cluster number 𝐾 ; training rounds 𝑅 .
+
+Output: Preference prediction ̂𝑦 𝑢𝑖 for each user-item pair.  
+
+> 1:
+
+Stage 1: Federated Pre-training  
+
+> 2:
+
+Initialization: Initialize text encoder 𝜙 emb on each client  
+
+> 3:
+
+for each communication round 𝑟 = 1 , 2, … , 𝑅 do  
+
+> 4:
+
+Client Executes:  
+
+> 5:
+
+for each client 𝑗 do  
+
+> 6:
+
+for each local batch do  
+
+> 7:
+
+Encode item texts to obtain 𝒕 𝑖 = 𝜙 emb (𝒙 𝑡 𝑖 ) 
+
+> 8:
+
+end for  
+
+> 9:
+
+Upload normalized representations ̃ 𝒕 𝑖 to server  
+
+> 10:
+
+end for  
+
+> 11:
+
+Server Executes:  
+
+> 12:
+
+Aggregate representations from all clients  
+
+> 13:
+
+Perform semantic clustering and obtain global centers  = { 𝒄 𝑘 }𝐾 𝑘 =1  
+
+> 14:
+
+Broadcast  and cluster assignments to all clients  
+
+> 15:
+
+Client Executes:  
+
+> 16:
+
+for each client 𝑗 do  
+
+> 17:
+
+Construct secondary semantic centers 𝑪 ′ using  and local batch 𝑻  
+
+> 18:
+
+Build semantic graph with node features 𝒁 = [ 𝑪 ′; 𝑻 ] 
+
+> 19:
+
+Apply GCN propagation to obtain enhanced representations 𝒕 ′ 
+
+> 𝑖
+> 20:
+
+Fuse multi-source semantics via attention to obtain 𝒕 ′′  
+
+> 𝑖
+> 21:
+
+Update local encoder by minimizing 𝐿 rec + 𝜆 KD 𝐿 KD + 𝜆 FA 𝐿 FA  
+
+> 22:
+
+end for  
+
+> 23:
+
+end for  
+
+> 24:
+
+Each client encodes all items and saves pre-trained semantic embeddings 𝑻 pre  
+
+> 25:
+
+Stage 2: Fine-tuning on Local Clients with Semantic Fusion  
+
+> 26:
+
+for each client 𝑗 do  
+
+> 27:
+
+Construct local semantic graph ̃ 𝑺 local using 𝒕 local  
+
+> 𝑖
+> 28:
+
+Construct pre-trained semantic graph ̃ 𝑺 pre using 𝑻 pre  
+
+> 29:
+
+Perform graph convolution to obtain 𝒉 local  
+
+> 𝑖
+
+and 𝒉 pre  
+
+> 𝑖
+> 30:
+
+Apply contrastive learning to minimize 𝐿 con  
+
+> 31:
+
+Fuse ID and semantic representations to obtain 𝒙 𝑖  
+
+> 32:
+
+Predict preference score ̂𝑦 𝑢𝑖 = 𝒙 ⊤𝑢 𝒙 𝑖  
+
+> 33:
+
+Optimize overall objective 𝐿 = 𝐿 rec + 𝛼𝐿 con + 𝛽𝐿 kd  
+
+> 34:
+
+end for 
+
+promoting meaningful interaction and integration of multi-level semantics, while 𝛽 regulates the strength of local semantic adaptation guided by cluster-based knowledge. This joint optimization strategy enables the model to achieve deep fusion of pre-trained knowledge and local semantics, thereby improving both ranking accuracy and cross-domain generalization capability for personalized recommendation. The details of the total framework are shown in Algorithm 1. 
+
+## 4. Experiment setup 
+
+This section outlines the key research questions investigated in our experiments, and describes the datasets, evaluation protocol, baseline methods for comparison, and implementation details of FedCRF in detail. 
+
+4.1. Research Questions 
+
+We thoroughly assess our model by examining the following issues:                             
+
+> First Author et al.: Preprint submitted to Elsevier Page 14 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+> Table 1
+> Statistics of the preprocessed datasets. “Avg. 𝑛 ” denotes the average length of the user interaction sequence. Datasets #Users #Items #Inters. Avg. 𝑛
+> Kitchen 18,028 9,560 137,799 7.64 Food 14,066 8,272 145,127 10.32 OnlineRetail 16,517 3,466 514,649 31.16 Care 38,609 18,534 346,355 8.97 Beauty 22,363 12,101 198,502 8.88
+
+RQ1 How does the proposed method perform compared with various state-of-the-art recommendation methods? 
+
+RQ2 What are the individual contributions of the key components in FedCRF? 
+
+RQ3 How sensitive is FedCRF to key hyper-parameters, including the contrastive loss weight, the knowledge distillation weight, and the number of global semantic clusters? 
+
+4.2. Datasets 
+
+We conduct experiments on three pairs of cross-domain datasets to evaluate our model, i.e., “Kitchen–Food”, “Care–Beauty”, and “Food-OnlineRetail”. Kitchen, Food, Care, and Beauty are all from Amazon (McAuley, 2014), which is a widely used real-world dataset in recommender systems, containing user reviews and metadata of products on the Amazon platform. The OnlineRetail dataset (Chen, 2015) is from an online retail company in the UK, containing user purchase records and brief descriptions of products. To assess the cross-domain performance of FedCRF, we first construct two cross-domain pairs from the Amazon dataset, namely “Kitchen–Food” and “Care–Beauty”. To further verify the generalization ability of the proposed method in the more challenging cross-platform scenario, we pair the OnlineRetail dataset with the Food dataset from Amazon to build a cross-platform and somewhat heterogeneous cross-domain recommendation scenario, denoted as “OnlineRetail–Food”. For this scenario, we conduct corresponding experiments and analyses, with detailed results shown in Section 6.5. To maintain the non-overlapping characteristic between domains, we do not perform any user alignment. Specifically, we do not match users across domains via identity information. Instead, we reassign user IDs so that they are numbered consecutively from 0. For item text in the Amazon dataset, we follow the standard practice in previous methods and use the product title, description, and brand as item text. In the OnlineRetail dataset, we directly use its default description as item text. To alleviate data sparsity, we adopt a five-core strategy that filters out users and items with fewer than five interactions. The statistics of the final constructed datasets are summarized in Table 1. 
+
+4.3. Evaluation Protocols 
+
+In the evaluation phase, we split each user’s interaction history into training, validation, and test sets, with 80We treat each user-item interaction as a positive sample and adopt full ranking evaluation, where all items not interacted by the user are used as candidate negative items for ranking. To measure recommendation performance, we employ two widely used evaluation metrics: Recall@K and NDCG@K, where K ∈ {10 , 20} .
+
+4.4. Baseline Methods 
+
+To comprehensively verify the effectiveness of the proposed method, we conduct comparative experiments with several representative recommendation methods on multiple public datasets. The selected baselines cover various paradigms, including single-domain graph neural recommendation, cross-domain recommendation, and federated cross-domain recommendation. 1) single-domain graph neural recommendation 
+
+• NGCF (Wang et al., 2019b): A graph neural network-based collaborative filtering method that models user–item interactions as a bipartite graph. It captures high-order connectivity via multi-layer message propagation with feature transformation and non-linear activation, thereby enhancing the representation ability of users and items.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 15 of 24 FedCRF: A Federated Cross-domain Recommendation Method
+
+• LightGCN (He et al., 2020): A simplified variant of NGCF that removes non-linear activation and feature transformation, retaining only neighbor aggregation to model high-order connectivity. 
+
+• XSimGCL (Yu et al., 2023): A contrastive learning-based graph recommendation method that generates contrastive views through simple and efficient noise perturbation, avoiding complex graph augmentation and thus improving representation quality. 2) cross-domain recommendation 
+
+• GWCDR (Li et al., 2022a): Performs distribution-level alignment on representations from the source and target domains through a cross-domain alignment module to achieve knowledge transfer. It does not require sharing specific overlapping users or their behavior data across domains, thus better protecting user privacy. 
+
+• SRTrans (Li et al., 2023): Explores cross-domain associations through item clustering and semantic similarity, and propagates knowledge via the two-tier graph transfer network. It also alleviates negative transfer using task-driven knowledge distillation. 
+
+• MITrans (Li et al., 2024): A cross-domain recommendation method based on mutual information constraints. It decouples domain-shared preferences and domain-specific preferences, and fuses shared preferences via a cross-domain graph structure to achieve knowledge transfer under non-overlapping user scenarios. 3) federated recommendation 
+
+• FFMSR (Lu et al., 2025): A federated semantic learning method for cross-domain recommendation constructs a multi-layer semantic encoder from raw item texts, performs clustering on the server to transfer semantic knowledge, and introduces an FFT-based filter and a gating mechanism to remove irrelevant semantic features. Since the method is designed for sequential recommendation, we adapt our datasets to a sequential format to ensure fair comparison. 
+
+• FedDCSR (Zhang et al., 2024a): This approach aims to protect the data privacy of the domain, by introducing an inter-intra domain sequence representation disentanglement, which decomposes user sequence features into domain-shared and domain-exclusive types and learns global features across different domains through federated learning. Since the method is designed for sequential recommendation, we adapt our datasets to a sequential format to ensure fair comparison. 
+
+4.5. Implementation Details 
+
+FedCRF is implemented based on the PyTorch framework, and all experiments are conducted on an NVIDIA RTX 3090 GPU. The Adam optimizer is adopted for model training with a learning rate of 0.005 and a batch size of 1024. In Stage 1, considering the scale differences among datasets, the number of global semantic clusters 𝐾 is set differently: 50 for Kitchen–Food and 70 for Care–Beauty. To achieve global semantic knowledge transfer and representation consistency optimization, we introduce the knowledge distillation loss 𝐿 𝐾𝐷 and feature alignment loss 𝐿 𝐹 𝐴 . Accordingly, their weight coefficients (𝜆 𝐾𝐷 , 𝜆 𝐹 𝐴 ) are set to (0.2, 0.1) for Kitchen–Food and (0.1, 0.1) for Care–Beauty. Federated training is performed for 20 rounds. In Stage 2, the temperature parameter 𝜏 is set to 0.5. The weight coefficients of the contrastive loss and knowledge distillation loss (𝛼, 𝛽 ) are set to (0.2, 0.2) for Kitchen–Food and (0.1, 0.1) for Care–Beauty. To stabilize model convergence, a learning rate decay strategy and an early stopping mechanism are adopted. Meanwhile, the optimal model is selected based on the Recall@20 metric on the validation set for final testing. All hyperparameters are tuned on the validation set to select the optimal configuration. Specifically, the number of global semantic clusters 𝐾 is chosen from the set {30 , 40 , 50 , 60 , 70} and determined according to the Recall@20 metric. The loss weights 𝛼 , 𝜆 𝐾𝐷 , and 𝜆 𝐹 𝐴 are searched within the range {0 .01 , 0.1, 0.2, 0.3, 0.4} , and the best values are selected accordingly. For all baseline models, we follow the hyperparameter settings in their original papers and conduct appropriate tuning on different datasets to ensure optimal performance. To ensure experimental fairness, all baselines uniformly use the Adam optimizer with a learning rate of 0.005 and a batch size of 1024. Specifically, for graph-based recommendation models, we uniformly adopt LightGCN as the basic architecture, with an embedding dimension of 64 and a network layer count of 2. For models such as SRTrans, MITrans, and FFMSR, we strictly follow the settings   
+
+> First Author et al.: Preprint submitted to Elsevier Page 16 of 24
+
+FedCRF: A Federated Cross-domain Recommendation Method 
+
+Table 2 
+
+Performance comparison of different methods on four datasets.                                                                                                                                                                               
+
+> single-domain cross-domain federated Improv. Dataset Metric NGCF LightGCN XSimGCL GWCDR SRTrans MITrans FFMSR FedDCSR Ours (%)
+> Kitchen Recall@10 0.01749 0.03116 0.03032 0.03572 0.03166 0.03159 0.02636 0.02572 0.04465* 22.2
+> NDCG@10 0.00951 0.01833 0.01674 0.02137 0.01681 0.01700 0.01463 0.01421 0.02523* 12.8
+> Recall@20 0.02783 0.04549 0.04556 0.05126 0.04983 0.04747 0.04373 0.04281 0.06601* 22.4
+> NDCG@20 0.01227 0.02212 0.02081 0.02563 0.02158 0.02122 0.01993 0.01936 0.03099* 17.6
+> Food Recall@10 0.05706 0.08191 0.08614 0.08763 0.08354 0.08555 0.06939 0.06741 0.11078* 26.4
+> NDCG@10 0.03519 0.04992 0.05134 0.05416 0.04853 0.04999 0.04358 0.04263 0.06708* 23.8
+> Recall@20 0.09263 0.12058 0.13049 0.13358 0.13053 0.13008 0.12793 0.12486 0.16105* 20.5
+> NDCG@20 0.04584 0.06159 0.06472 0.06855 0.06232 0.06307 0.06264 0.06112 0.08193* 19.5
+> Care Recall@10 0.03619 0.05981 0.05873 0.06086 0.05511 0.05160 0.04763 0.04602 0.07115* 16.9
+> NDCG@10 0.02060 0.03646 0.03627 0.03634 0.03132 0.03001 0.02875 0.02802 0.04250* 16.9
+> Recall@20 0.05521 0.08370 0.08320 0.08687 0.08072 0.07665 0.08411 0.08157 0.09897* 13.9
+> NDCG@20 0.02556 0.04327 0.04338 0.04382 0.03865 0.03728 0.03953 0.03891 0.05001* 14.1
+> Beauty Recall@10 0.05003 0.07704 0.08034 0.07890 0.07281 0.07074 0.06557 0.06321 0.09342* 16.3
+> NDCG@10 0.02818 0.04458 0.04654 0.04640 0.03998 0.03994 0.03960 0.03842 0.05398* 15.9
+> Recall@20 0.07570 0.11159 0.11884 0.11590 0.11101 0.10628 0.10502 0.10188 0.13384* 12.6
+> NDCG@20 0.03538 0.05420 0.05738 0.05700 0.05420 0.04992 0.05146 0.05037 0.06513* 13.5
+
+in their original papers: we use the specified language models to generate text embeddings and retain their original clustering strategies.The number of cluster centers is kept consistent with that of our proposed method to ensure a fair comparison. 
+
+## 5. Experimental Results (RQ1) 
+
+The results of the comparison across all datasets are shown in Table 2, leading to the following conclusions: 1) The proposed FedCRF outperforms all baseline methods across all datasets and evaluation metrics, demonstrating stable and consistent performance advantages. This shows that the method can effectively fuse ID and text modality information and achieve robust bridging of cross-domain semantic knowledge in non-overlapping scenarios. 2) Compared with single-domain methods (NGCF, LightGCN, XSimGCL), FedCRF achieves significant improvements. Single-domain methods only rely on local interaction data and struggle to alleviate data sparsity, whereas our method leverages cross-domain semantic information for knowledge transfer and representation enhancement. Although XSimGCL introduces contrastive learning to improve representation quality, its performance is still limited due to the lack of cross-domain information. 3) Compared with cross-domain methods (GWCDR, SRTrans, MITrans), FedCRF performs better. The ID-based method GWCDR relies on distribution-level alignment but are limited by discrete representations with insufficient semantic expressiveness. Text-based methods (SRTrans, MITrans) possess semantic modeling capabilities yet ignore ID-based collaborative information. In contrast, our method dynamically re-estimates semantic centers in the continuous semantic space and combines semantic graph modeling with ID-based collaborative information to achieve more effective cross-domain fusion. 4) Compared with federated methods (FFMSR, FedPCL-CDR, FedDCSR), FedCRF still exhibits clear advantages. Most existing methods are based on sequential modeling, which makes it difficult to capture high-order user–item structural relations. Moreover, their cross-domain fusion relies on static aggregation mechanisms, which tend to cause information loss and distribution shift. 
+
+First Author et al.: Preprint submitted to Elsevier Page 17 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+Table 3 
+
+Ablation study of FedCRF on four domains                                                                                          
+
+> Variants Kitchen Food Care Beauty Recall NDCG Recall NDCG Recall NDCG Recall NDCG @10 @20 @10 @20 @10 @20 @10 @20 @10 @20 @10 @20 @10 @20 @10 @20
+> FedCRF-Fed 0.04055 0.06144 0.02388 0.02934 0.10169 0.14975 0.06182 0.07607 0.06682 0.09423 0.03988 0.04757 0.09023 0.12894 0.05239 0.06311 FedCRF-CL 0.04301 0.06217 0.02405 0.02878 0.10711 0.15607 0.06372 0.07786 0.06801 0.09564 0.04063 0.04829 0.09156 0.13109 0.05261 0.06348 FedCRF-FGSAT 0.04359 0.06497 0.02492 0.03018 0.10894 0.15749 0.06481 0.07837 0.06891 0.09608 0.04117 0.04869 0.09004 0.13022 0.05259 0.06363
+> FedCRF 0.04465 0.06601 0.02523 0.03112 0.11078 0.16105 0.06708 0.08193 0.07115 0.09897 0.04250 0.05001 0.09342 0.13384 0.05398 0.06513
+
+## 6. MODEL ANALYSIS 
+
+6.1. Ablation Studies (RQ2) 
+
+To systematically verify the effectiveness of each core component in FedCRF, we conduct ablation experiments on the four domains: Kitchen, Food, Care, and Beauty, with results shown in Table 3. The complete FedCRF framework consists of three core components: federated pre-training stage (Fed), client-side fine-grained semantic adaptation and transfer module (FGSAT), and bidirectional contrastive learning module (CL) for aligning global and local representations. As can be seen from the results, the full model achieves the best performance across all four domains, validating the effectiveness of the collaborative design of all modules. 1) In the FedCRF-FGSAT variant, the fine-grained semantic adaptation module is removed, and the client directly uses the server-side global cluster centers without local adaptive optimization. Performance drops in all domains under this setting, indicating that static global clustering struggles to adapt to the local distribution of client data, easily introduces cross-domain semantic distribution shift, and thus weakens semantic alignment. 2) In the FedCRF-CL variant, the bidirectional contrastive learning objective is removed. Although this setting still retains partial global semantic information, the lack of consistency constraints between global and local representations significantly degrades cross-domain semantic alignment, demonstrating the key role of contrastive learning in fine-grained semantic alignment. 3) Finally, in the FedCRF-Fed variant, the federated pre-training stage is completely removed, and each client trains the model independently. This scheme yields the lowest performance among all settings, showing that without cross-domain semantic knowledge sharing, the model degenerates into single-domain learning, which can hardly alleviate data sparsity or effectively capture cross-domain commonalities. This further verifies the core role of federated semantic learning in knowledge transfer. 
+
+6.2. Impact of Hyper-parameters (RQ3) 
+
+To evaluate the sensitivity and stability of the model to key hyperparameters, we systematically analyze the effects of the contrastive loss weight 𝛼 , knowledge distillation weight 𝜆 KD , and the number of semantic clusters 𝐾 . As shown in Figure 4, we report the trends of NDCG@20 and Recall@20 on the Kitchen and Food domains, respectively. 
+
+(1) Contrastive loss weight 𝛼 . As 𝛼 gradually increases, the overall model performance first rises and then declines, reaching optimal or near-optimal performance around 𝛼 = 0 .2. This phenomenon indicates that appropriate contrastive supervision can effectively strengthen the consistency between pre-trained global representations and local semantic representations. However, when 𝛼 is excessively large, contrastive constraints dominate and suppress personalized representation learning, leading to performance degradation. 
+
+(2) Knowledge distillation weight 𝜆 KD . The model performs relatively stably under different values of 𝜆 KD ,demonstrating strong robustness to this hyperparameter. In most settings, the best or superior performance is achieved at 𝜆 KD = 0 .2. This shows that, in the federated pre-training stage, proper knowledge distillation can effectively promote the transfer of global semantic knowledge while avoiding excessive interference with local personalized features. 
+
+(3) The number of global semantic clusters 𝐾 . Model performance exhibits a clear non-monotonic trend with varying 𝐾 , achieving the best performance at a medium scale (e.g., 𝐾 = 50 ). A small 𝐾 leads to overly coarse semantic partitioning, which limits representation capacity. Conversely, an excessively large 𝐾 may introduce semantic fragmentation and noise, weakening the generalization ability of cluster centers. These results suggest that properly controlling semantic granularity is crucial for effective cross-domain knowledge modeling. 
+
+First Author et al.: Preprint submitted to Elsevier Page 18 of 24 FedCRF: A Federated Cross-domain Recommendation Method 0.0 0.2 0.4                           
+
+> Values of
+> 0.030
+> 0.030
+> 0.031
+> 0.031
+> NDCG@20
+> (a) Kitchen
+> 0.0 0.2 0.4
+> Values of
+> 0.06
+> 0.07
+> 0.07
+> Recall@20
+> (b) Kitchen
+> 0.0 0.2 0.4
+> Values of
+> 0.080
+> 0.081
+> 0.082
+> NDCG@20
+> (c) Food
+> 0.0 0.2 0.4
+> Values of
+> 0.16
+> 0.16
+> 0.16
+> Recall@20
+> (d) Food
+> 0.0 0.2 0.4
+> Values of KD
+> 0.030
+> 0.030
+> 0.031
+> 0.031
+> NDCG@20
+> (e) Kitchen
+> 0.0 0.2 0.4
+> Values of KD
+> 0.07
+> 0.07
+> 0.07
+> 0.07
+> Recall@20
+> (f) Kitchen
+> 0.0 0.2 0.4
+> Values of KD
+> 0.080
+> 0.081
+> 0.082
+> NDCG@20
+> (g) Food
+> 0.0 0.2 0.4
+> Values of KD
+> 0.16
+> 0.16
+> 0.16
+> 0.16
+> Recall@20
+> (h) Food
+> 40 60
+> Values of K
+> 0.030
+> 0.031
+> 0.031
+> 0.031
+> NDCG@20
+> (i) Kitchen
+> 40 60
+> Values of K
+> 0.07
+> 0.07
+> 0.07
+> Recall@20
+> (j) Kitchen
+> 40 60
+> Values of K
+> 0.081
+> 0.081
+> 0.082
+> 0.082
+> NDCG@20
+> (k) Food
+> 40 60
+> Values of K
+> 0.16
+> 0.16
+> 0.16
+> Recall@20
+> (l) Food
+
+Fig. 4: Performance sensitivity analysis with respect to three key hyperparameters: (a-d) contrastive loss weight 𝛼 , (e-h) knowledge distillation weight 𝜆 KD , and (i-l) the number of global semantic clusters 𝐾 .
+
+6.3. Comparison Results on Cross-Platform Scenario 
+
+To further evaluate the capability of our method in cross-platform scenarios, we further conduct experiments on the OnlineRetail-Food dataset, and show the results in Table 4. From Table 4, we can have the following observations: 1) The proposed FedCRF method consistently outperforms all baselines on all metrics. This shows that even in cross-platform scenarios with heterogeneous data distributions, our two-stage FedCRF framework can effectively capture and transfer shared semantic knowledge across domains. Meanwhile, the model preserves domain-specific features through fine-grained local modeling, verifying its strong cross-platform generalization ability. 2) The cross-platform scenario significantly impacts the performance of the baselines. Among single-domain methods, XSimGCL improves representation via contrastive learning and performs well on some platforms. However, due to the lack of cross-domain modeling, its performance fluctuates significantly across platforms. Among cross-domain methods, GWCDR has certain advantages in some scenarios, indicating that ID-based explicit alignment can alleviate cross-platform data isolation to some extent, but its overall performance is still unstable. In contrast, the federated method FFMSR performs more steadily across platforms, showing the benefits of cross-domain information aggregation. However, due to the lack of fine-grained semantic modeling, its overall performance is not optimal. 3) We also conduct ablation studies on these two platforms (i.e., FedCRF-Fed, FedCRF-CL, and FedCRF-FGSAT). From the results in Table 1, we can find that our cross-domain semantic transfer and fusion modules are important to the FedCRF method. Without them, the performance of FedCRF is significantly reduced. 
+
+6.4. Time Complexity and Runtime Analysis 
+
+Table 5 compares the theoretical time complexity and practical training runtime of FedCRF with several competitive cross-domain recommendation methods. In terms of theoretical complexity, the computational overhead of different methods mainly comes from three types of operations: 1) pairwise matching or alignment computation between cross-domain entities (e.g., 𝑁 𝑠 𝑁 𝑡 in GWCDR), 2) high-order semantic or sequence-based modeling (e.g., SRTrans, MITrans, and FFMSR), and 3) self-attention computation in sequential modeling (e.g., FedDCSR). These operations typically introduce high computational overhead as the data scale or sequence length increases. In contrast, the computation of FedCRF mainly consists of server-side semantic clustering and client-side graph propagation, which avoids explicit full cross-domain matching and complex sequential modeling, thus achieving higher efficiency in its computational structure. 
+
+First Author et al.: Preprint submitted to Elsevier Page 19 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+Table 4 
+
+Performance comparison of different methods on Food and OnlineRetail domains. 
+
+Variants Food OnlineRetail Recall NDCG Recall NDCG @10 @20 @10 @20 @10 @20 @10 @20 
+
+NGCF 0.01749 0.02783 0.00951 0.01227 0.16147 0.22961 0.13282 0.16482 LightGCN 0.08191 0.12058 0.04992 0.06159 0.21805 0.30070 0.18208 0.21982 XSimGCL 0.03032 0.04556 0.01674 0.02081 0.22377 0.30931 0.18785 0.22951 GWCDR 0.08872 0.12635 0.04791 0.06102 0.21884 0.30615 0.17963 0.21767 SRTrans 0.08111 0.12591 0.04868 0.06173 0.19818 0.28043 0.16253 0.20075 MITrans 0.06840 0.10284 0.04174 0.05219 0.19499 0.27551 0.16212 0.19896 FFMSR 0.08436 0.12318 0.04712 0.06344 0.20142 0.28491 0.16573 0.20384 FedDCSR 0.08194 0.11976 0.04837 0.06102 0.19685 0.27866 0.16104 0.19821 FedCRF-Fed 0.10184 0.14898 0.06157 0.07554 0.22108 0.30757 0.18312 0.22291 FedCRF-CL 0.10727 0.15666 0.06454 0.07894 0.22322 0.31066 0.18500 0.22416 FedCRF-FGSAT 0.10682 0.15854 0.06359 0.07851 0.22401 0.30943 0.18330 0.22242 
+
+FedCRF 0.11142 0.16185 0.06713 0.08189 0.22864 0.31488 0.19232 0.23368 
+
+Table 5 
+
+Time Complexity and Runtime Comparison on the Kitchen-Food Task (Kitchen Domain) 
+
+Algorithm Time Complexity Time per Epoch (Kitchen) 
+
+GWCDR (𝑁 2 
+
+> 𝑠
+
+𝑑 + 𝑁 2 
+
+> 𝑡
+
+𝑑 ) + (𝑇 𝑔 𝑁 𝑠 𝑁 𝑡 
+
+) ∼13s SRTrans ((𝑀 2 
+
+> 𝑠
+
++ 𝑀 2 
+
+> 𝑡
+
+)𝑑 ) + (𝐻 (𝐸 𝑠 + 𝐸 𝑡 )𝑑 ) ∼12s MITrans (𝐾 2𝑑 ) + (𝐾𝑀𝑑 ) + (𝐻𝐸𝑑 ) ∼15s FFMSR (𝑇 𝑘 𝑀𝐾𝑑 ) + ∑𝐽 𝑗 =1 (𝑀 𝑗 𝑘 𝑑 2) ∼17s FedDCSR ∑𝐽 𝑗 =1 (𝐻𝐸 𝑗 𝑑 + 𝐵𝑇 2𝑑 + 𝐵 2𝑑 ) ∼19s FedCRF (Ours) (𝑇 𝑘 𝑀𝐾𝑑 ) + ∑𝐽 𝑗 =1 
+
+(
+
+𝑀 2 
+
+> 𝑗
+
+𝑑 + 𝐻𝐸 𝑗 𝑑 
+
+)
+
+∼11s                                       
+
+> Note. The batch size 𝐵 is set to 1024. 𝑁 𝑠 and 𝑁 𝑡 denote the number of users in the source and target domains, respectively. 𝑀 𝑠
+> and 𝑀 𝑡 represent the number of items in the source and target domains, respectively. 𝑀 𝑗 denotes the number of items on client 𝑗 ,with 𝑀 =∑𝐽 𝑗 =1 𝑀 𝑗 , where 𝐽 is the number of clients (domains). 𝑑 is the embedding dimension. 𝐻 denotes the number of graph propagation layers. 𝐸 𝑠 ,𝐸 𝑡 (or 𝐸 𝑗 ) represent the number of edges in the constructed graph. 𝐾 is the number of semantic clusters.
+> 𝑘 denotes the dimension of the intermediate semantic projection space ( 𝑘 ≪ 𝑑 ). 𝑇 𝑘 is the number of clustering iterations. 𝑇 𝑔 is the number of GW optimization iterations. 𝑇 is the sequence length.
+
+For actual running time, we record the average training time per epoch on the Kitchen domain in the Kitchen– Food task under the same experimental environment. As shown in Table 5, although different methods differ in theoretical complexity, their running time exhibits a consistent trend with their computational structures: models involving complex cross-domain alignment or sequential modeling usually cost more time, while graph-based models achieve better efficiency. FedCRF achieves the shortest training time among all methods, demonstrating its favorable computational efficiency and scalability while maintaining competitive performance. 
+
+6.5. Visualization of Learned Representations 
+
+To verify the effectiveness of the proposed method in cross-domain semantic aggregation, we conduct visualization experiments via t-SNE (Van der Maaten & Hinton, 2008) on the item representations learned during the federated 
+
+First Author et al.: Preprint submitted to Elsevier Page 20 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+pre-training stage. Take the Kitchen and Food domain pair as an example, we visualize the distribution of item representations with or without our FGSAT module in Figure 5. Figures 5 (a), 5 (b), and 5 (c) are the results without our FGSAT module. They only use the global clustering method for representation learning. Figures 5 (d), 5 (e), and 5 (f) are the results with our FGSAT module. As shown in Figures 5 (a) and 5 (b), with global clustering, the cluster centers learned at the server can provide shared semantic guidance for data from different domains. These centers contain common cross-domain semantic information. However, these cluster centers mainly reflect common cross-domain features and do not fully fit the local data distribution of each client. As a result, many local samples are still scattered around or even far from the cluster centers in the semantic space. This shows that global clustering, as a static and global representation, only provides coarse-grained semantic alignment. It cannot well capture the local distribution of client data, which limits the fine-grained performance of cross-domain semantic aggregation. We sample some instances from the two domains separately in Figures 5 (a) and 5 (b), and visualize them jointly in a unified semantic space to obtain Figure 5 (c), so as to observe the cross-domain alignment effect more intuitively. It can be seen that without FGSAT, although the global semantic centers achieve cross-domain alignment to some extent, samples from different domains still show obvious distribution separation, with only limited overlap in local regions.This indicates that when relying only on static global clustering, the model can achieve preliminary semantic alignment, but cannot fully eliminate the distribution gap between different domains, resulting in still limited alignment performance. The results that exploit our FGSAT module are shown in Figures 5 (d) and 5 (e), from which we can observe that: 1) adaptively re-estimating semantic centers via our improved clustering method makes the semantic prototypes better fit the local data distribution, showing clear fine-grained semantic modeling ability. 2) Besides, we also sample corresponding instances from the two domains in Figures 5 (d) and 5 (e) and visualize them jointly to obtain Figure 5 (f), so as to analyze the cross-domain alignment effect after introducing FGSAT. Compared with Figure 5 (c), we can clearly find that the sample distributions of different domains become more continuous, and the degree of overlap is significantly improved, thus forming a more unified semantic space. This result demonstrates that our FGSAT method can effectively alleviate the cross-domain distribution shift via dynamically re-evaluating and locally adapting semantic centers, thereby achieving more sufficient cross-domain semantic alignment and fusion. 
+
+6.6. Analysis of Privacy Risks and Assumptions 
+
+Although our federated framework only uploads item embeddings and keeps user interaction data on local clients, these embeddings may still contain implicit information about user behaviors, leading to potential privacy risks. To evaluate this risk, we exploit the Similarity-based Inference Attack (SIA)(Yuan et al., 2025). Specifically, we assume an attacker can intercept the uploaded item embeddings, and the attacker is tend to infer other items that are interacted by the same user. For any intercepted item, we first retrieve the most similar Top-items via computing the similarities between it and all the other items in the item set. Then, we estimate the potential interacting users of the target item using the interaction data of these similar items (whether they are interacted by the same user). Finally, we compare the predicted user set with the ground-truth set, and use F1 score to measure attack performance and quantify privacy leakage risk. The experimental results are shown in Table 6, from which we can observe that: 1) On all datasets, the overall F1 scores are very low, meaning the attacker cannot easily recover user interactions using only item embeddings, and our model can provide effective privacy protection on users. 2) From Table 6, we can also observe that as Top-K increases, the attack performance consistently drops. This shows that adding more similar items may introduce extra noise, weakening the attacker’s ability to infer the target user set. 3) The attack performance are differ in different datasets. The attack achieves relatively higher performance in the Food–OnlineRetail dataset, while the performance is generally lower in Kitchen–Food and Care–Beauty. This result indicates that the user-item interaction distribution of each dataset impact the SIA method much. When similar items share more overlapping users, the attacker can more easily recover the target item’s user set. 
+
+## 7. Conclusion 
+
+This study addresses the challenge of cross-domain recommendation under privacy constraints by proposing the FedCRF framework, which employs federated semantic clustering to facilitate knowledge transfer through the sharing of item text representations only, thereby ensuring that user behavior data remains strictly localized. The integration of   
+
+> First Author et al.: Preprint submitted to Elsevier Page 21 of 24
+
+FedCRF: A Federated Cross-domain Recommendation Method     
+
+> (a) Global Clustering in Kitchen Domain (b) Global Clustering in Food Domain (c) Embedding Distribution without FGSAT
+> (d) Secondary Clustering via FGSAT in Kitchen Domain (e) Secondary Clustering via FGSAT in Food Domain (f) Embedding Distribution with FGSAT
+
+Fig. 5: Visualization of Cross-domain Semantic Alignment across the Kitchen and Food domains 
+
+Table 6 
+
+The attack performance (F1 scores) for different Top-K settings on three datasets. Lower values indicate better data privacy protection abilities. 
+
+Top-K Kitchen Food Care Beauty Food OnlineRetail 
+
+1 0.0133 0.0335 0.0116 0.0182 0.0311 0.0538 3 0.0123 0.0304 0.0101 0.0162 0.0271 0.0492 5 0.0107 0.0253 0.0086 0.0138 0.0223 0.0436 
+
+a fine-grained semantic transfer module and a multimodal fusion mechanism enables effective combination of global semantics with local personalized features. Nevertheless, the framework exhibits certain limitations: the federated clustering process and multi-round com-munication protocol introduce substantial communication overhead, and the current model relies on the assumption of static data distributions, thus lacking adaptability to dynamic changes in item repositories and user preferences. Future research should prioritize the development of efficient communication compression algorithms and asynchronous update mechanisms to enhance the practicality and scalability of the framework, while also improving its capability to operate in dynamically evolving environments. 
+
+## Data availability 
+
+The data is publicly accessible. 
+
+First Author et al.: Preprint submitted to Elsevier Page 22 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+## References 
+
+Bao, J., Di, Y., Shen, S., Hu, R., & Liu, Y. (2026). Personalized semi-decentralized federated recommender. Information Processing & Management ,
+
+63 (2), 104360. doi: https://doi.org/10.1016/j.ipm.2025.104360 .Cao, J., Li, S., Yu, B., Guo, X., Liu, T., & Wang, B. (2023). Towards universal cross-domain recommendation. In Proceedings of the Sixteenth ACM International Conference on web search and data mining (pp. 78–86). doi: 10.1145/3539597.3570366 .Cao, J., Lin, X., Cong, X., Ya, J., Liu, T., & Wang, B. (2022). Disencdr: Learning disentangled representations for cross-domain recommendation. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval (pp. 267–277). doi: 10.1145/3477495.3531967 .Chang, W.-G., You, T., Seo, S., Kwak, S., & Han, B. (2019). Domain-specific batch normalization for unsupervised domain adaptation. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (pp. 7354–7362). Chen, C., Wu, H., Su, J., Lyu, L., Zheng, X., & Wang, L. (2022). Differential private knowledge transfer for privacy-preserving cross-domain recommendation. In Proceedings of the ACM Web Conference 2022 (pp. 1455–1465). doi: 10.1145/3485447.3512192 .Chen, D. (2015). Online retail data set. https://www.kaggle.com/datasets/carrie1/ecommerce-data . Accessed: Oct. 5, 2025. Gamiz, I., Regueiro, C., Jacob, E., Lage, O., & Higuero, M. (2025). Prot-fl: A privacy-preserving and robust training manager for federated learning. 
+
+Information Processing & Management , 62 (1), 103929. doi: https://doi.org/10.1016/j.ipm.2024.103929 .Guo, L., Lu, Z., Yu, J., Nguyen, Q. V. H., & Yin, H. (2024). Prompt-enhanced federated content representation learning for cross-domain recommendation. In Proceedings of the ACM Web Conference 2024 (pp. 3139–3149). doi: https://doi.org/10.1145/3589334.3645337 .Guo, L., Zhang, J., Tang, L., Chen, T., Zhu, L., & Yin, H. (2022). Time interval-enhanced graph neural network for shared-account cross-domain sequential recommendation. IEEE Transactions on Neural Networks and Learning Systems , 35 (3), 4002–4016. doi: 10.1109/ICDM.2018. 00035 .He, X., Deng, K., Wang, X., Li, Y., Zhang, Y., & Wang, M. (2020). Lightgcn: Simplifying and powering graph convolution network for recommendation. In Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval 
+
+(pp. 639–648). doi: 10.1145/3397271.3401063 .Huang, L., Huang, X.-D., Zou, H., Gao, Y., Wang, C.-D., & Yu, P. S. (2024). Knowledge-reinforced cross-domain recommendation. IEEE Transactions on Neural Networks and Learning Systems , . doi: 10.1109/TNNLS.2024.3500096 .Jia, H., Huang, Y., Yang, M., Xu, X., Zhu, H., & Chai, H. (2025). Perfedgt: A personalized federated graph transformer for scale-heterogeneous graph data. Information Processing & Management , 62 (6), 104230. doi: https://doi.org/10.1016/j.ipm.2025.104230 .Kang, W.-C., & McAuley, J. (2018). Self-attentive sequential recommendation. In 2018 IEEE international conference on data mining (ICDM) 
+
+(pp. 197–206). IEEE. doi: 10.1109/ICDM.2018.00035 .Li, X., Qiu, Z., Zhao, X., Wang, Z., Zhang, Y., Xing, C., & Wu, X. (2022a). Gromov-wasserstein guided representation learning for cross-domain recommendation. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management (pp. 1199–1208). doi: 10.1145/3511808.3557338 .Li, Z., Amagata, D., Zhang, Y., Hara, T., Haruta, S., Yonekawa, K., & Kurokawa, M. (2022b). Debiasing graph transfer learning via item semantic clustering for cross-domain recommendations. In 2022 IEEE International Conference on Big Data (Big Data) (pp. 762–769). IEEE. doi: 10.1109/BigData55660.2022.10020565 .Li, Z., Amagata, D., Zhang, Y., Hara, T., Haruta, S., Yonekawa, K., & Kurokawa, M. (2023). Semantic relation transfer for non-overlapped cross-domain recommendations. In Advances in Knowledge Discovery and Data Mining (pp. 271–283). Springer. Li, Z., Amagata, D., Zhang, Y., Hara, T., Haruta, S., Yonekawa, K., & Kurokawa, M. (2024). Mutual information-based preference disentangling and transferring for non-overlapped multi-target cross-domain recommendations. In Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval (pp. 2124–2133). doi: 10.1145/3626772.3657780 .Liao, X., Liu, W., Zheng, X., Yao, B., & Chen, C. (2023). Ppgencdr: A stable and robust framework for privacy-preserving cross-domain recommendation. In Proceedings of the AAAI Conference on Artificial Intelligence (pp. 4453–4461). volume 37. doi: https://doi.org/ 10.1609/aaai.v37i4.25566 .Lin, Z., Huang, W., Zhang, H., Xu, J., Liu, W., Liao, X., Wang, F., Wang, S., & Tan, Y. (2024). Enhancing dual-target cross-domain recommendation with federated privacy-preserving learning. In Proceedings of the 33rd International Joint Conference on Artificial Intelligence (pp. 2153–2161). doi: 10.24963/ijcai.2024/238 .Liu, W., Chen, C., Liao, X., Hu, M., Yin, J., Tan, Y., & Zheng, L. (2023). Federated probabilistic preference distribution modelling with compactness co-clustering for privacy-preserving multi-domain recommendation. In Proceedings of the Thirty-Second International Joint Conference on Artificial Intelligence (pp. 2206–2214). doi: 10.24963/ijcai.2023/245 .Liu, W., Zheng, X., Hu, M., & Chen, C. (2022). Collaborative filtering with attribution alignment for review-based non-overlapped cross domain recommendation. In Proceedings of the ACM Web Conference 2022 (pp. 1181–1190). doi: 10.1145/3485447.3512166 .Lu, Z., Guo, L., Yu, X., Cheng, Z., Han, X., & Zhu, L. (2025). Federated semantic learning for privacy-preserving cross-domain recommendation. 
+
+ACM Transactions on Information Systems , . doi: 10.1145/3728359 .Van der Maaten, L., & Hinton, G. (2008). Visualizing data using t-sne. Journal of machine learning research , 9(11). Man, T., Shen, H., Jin, X., & Cheng, X. (2017). Cross-domain recommendation: An embedding and mapping approach. In Proceedings of the 26th International Joint Conference on Artificial Intelligence (pp. 2464–2470). volume 17. McAuley, J. (2014). Amazon reviews 2014. http://jmcauley.ucsd.edu/data/amazon/ . Accessed: Oct. 5, 2025. Regulation, P. (2018). General data protection regulation. Intouch , 25 , 1–5. Reimers, N., & Gurevych, I. (2019). Sentence-bert: Sentence embeddings using siamese bert-networks. URL: https://arxiv.org/abs/1908. 10084 . arXiv:1908.10084 .Wang, C., Niepert, M., & Li, H. (2019a). Recsys-dan: discriminative adversarial networks for cross-domain recommender systems. IEEE Transactions on Neural Networks and Learning Systems , 31 (8), 2731–2740. doi: 10.1109/TNNLS.2019.2907430. 
+
+First Author et al.: Preprint submitted to Elsevier Page 23 of 24 FedCRF: A Federated Cross-domain Recommendation Method 
+
+Wang, L., Sang, L., Zhang, Q., Wu, Q., & Xu, M. (2024). A privacy-preserving framework with multi-modal data for cross-domain recommendation. 
+
+Knowledge-Based Systems , 304 , 112529. doi: https://doi.org/10.1016/j.knosys.2024.112529 .Wang, L., Wu, Q., & Xu, M. (2025). Fedpcl-cdr: A federated prototype-based contrastive learning framework for privacy-preserving cross-domain recommendation. Neural Networks , (p. 108380). doi: https://doi.org/10.1016/j.neunet.2025.108380 .Wang, X., He, X., Wang, M., Feng, F., & Chua, T.-S. (2019b). Neural graph collaborative filtering. In Proceedings of the 42nd International ACM SIGIR Conference on Research and Development in Information Retrieval (pp. 165–174). doi: 10.1145/3331184.3331267 .Wu, M., Li, L., Chang, T., Rigall, E., Wang, X., & Xu, C.-Z. (2022). Fedcdr: federated cross-domain recommendation for privacy-preserving rating prediction. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management (pp. 2179–2188). doi: 10.1145/3511808.3557320 .Yan, D., Zhao, Y., Yang, Z., Jin, Y., & Zhang, Y. (2022). Fedcdr: Privacy-preserving federated cross-domain recommendation. Digital Communications and Networks , 8(4), 552–560. doi: https://doi.org/10.1016/j.dcan.2022.04.034 .Yu, J., Xia, X., Chen, T., Cui, L., Hung, N. Q. V., & Yin, H. (2023). Xsimgcl: Towards extremely simple graph contrastive learning for recommendation. IEEE Transactions on Knowledge and Data Engineering , 36 (2), 913–926. doi: 10.1109/TKDE.2023.3288135 .Yuan, W., Yang, C., Ye, G., Chen, T., Nguyen, Q. V. H., & Yin, H. (2025). Fellas: Enhancing federated sequential recommendation with llm as external services. ACM Transactions on Information Systems , 43 (6), 1–24. doi: https://doi.org/10.1145/3709138 .Zhang, H., Zheng, D., Yang, X., Feng, J., & Liao, Q. (2024a). Feddcsr: Federated cross-domain sequential recommendation via disentangled representation learning. In Proceedings of the 2024 SIAM International Conference on Data Mining (SDM) (pp. 535–543). SIAM. doi: https: //doi.org/10.1137/1.9781611978032.62 .Zhang, H., Zheng, D., Zhong, L., Yang, X., Feng, J., Feng, Y., & Liao, Q. (2024b). Fedhcdr: Federated cross-domain recommendation with hypergraph signal decoupling. In Joint European Conference on Machine Learning and Knowledge Discovery in Databases (pp. 350–366). Springer. Zhang, J., Zhu, Y., Liu, Q., Zhang, M., Wu, S., & Wang, L. (2022). Latent structure mining with contrastive modality fusion for multimedia recommendation. IEEE Transactions on Knowledge and Data Engineering , 35 (9), 9154–9167. Zhao, C., Li, X., He, M., Zhao, H., & Fan, J. (2023a). Sequential recommendation via an adaptive cross-domain knowledge decomposition. In 
+
+Proceedings of the 32nd ACM international conference on information and knowledge management (pp. 3453–3463). doi: https://doi.org/ 10.1145/3583780.3615058 .Zhao, C., Zhao, H., He, M., Li, X., & Fan, J. (2025). Cross-domain transfer of valence preferences via a meta-optimization approach. ACM Transactions on the Web , 19 (3), 1–29. doi: https://doi.org/10.1145/3749284 .Zhao, C., Zhao, H., Li, X., He, M., Wang, J., & Fan, J. (2023b). Cross-domain recommendation via progressive structural alignment. IEEE Transactions on Knowledge and Data Engineering , 36 (6), 2401–2415. doi: 10.1109/TKDE.2023.3324912 .Zheng, P., Dou, Y., & Yan, Y. (2024). Fedgkd: Federated graph knowledge distillation for privacy-preserving rumor detection. Knowledge-Based Systems , 304 , 112476. doi: https://doi.org/10.1016/j.knosys.2024.112476 .Zhong, L., Zeng, J., Wang, Z., Zhou, W., & Wen, J. (2024). Scfl: Spatio-temporal consistency federated learning for next poi recommendation. 
+
+Information Processing & Management , 61 (6), 103852. doi: https://doi.org/10.1016/j.ipm.2024.103852 .Zhu, F., Wang, Y., Chen, C., Liu, G., & Zheng, X. (2020). A graphical and attentional framework for dual-target cross-domain recommendation. In 
+
+Proceedings of the 29th International Joint Conference on Artificial Intelligence, IJCAI 2020 (p. 39). volume 21. doi: 10.24963/ijcai.2020/ 415 .Zhu, J., Wang, Y., Zhu, F., & Sun, Z. (2025). Causal deconfounding via confounder disentanglement for dual-target cross-domain recommendation. 
+
+ACM Transactions on Information Systems , 43 (5), 1–33. doi: https://doi.org/10.1145/3737457 .Zhu, Y., Tang, Z., Liu, Y., Zhuang, F., Xie, R., Zhang, X., Lin, L., & He, Q. (2022). Personalized transfer of user preferences for cross-domain recommendation. In Proceedings of the Fifteenth ACM International Conference on Web Search and Data Mining (pp. 1507–1515). doi: 10.1145/3488560.3498392 .
+
+First Author et al.: Preprint submitted to Elsevier Page 24 of 24
