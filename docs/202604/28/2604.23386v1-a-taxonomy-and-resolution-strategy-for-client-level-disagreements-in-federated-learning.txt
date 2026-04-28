@@ -1,0 +1,338 @@
+Title: A Taxonomy and Resolution Strategy for Client-Level Disagreements in Federated Learning
+
+URL Source: https://arxiv.org/pdf/2604.23386v1
+
+Published Time: Tue, 28 Apr 2026 00:47:56 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# A Taxonomy and Resolution Strategy for Client-Level Disagreements in Federated Learning 
+
+Daan Rosendal ∗, Ana Oprescu †
+
+Complex Cyber Infrastructure, University of Amsterdam, Amsterdam, The Netherlands 
+
+∗ , daanrosendal@outlook.com, † , a.m.oprescu@uva.nl 
+
+Abstract —Federated Learning (FL) typically assumes uncon-ditional collaboration, a premise that overlooks the complexities of real-world, multi-stakeholder environments in which clients may need to exclude one another for strategic, regulatory, or competitive reasons. This paper addresses this gap, which we term ‘client-level disagreements,’ by first introducing a taxonomy of such scenarios. We then propose a robust, multi-track resolu-tion strategy that guarantees strict client exclusion by creating and managing isolated model update paths (‘tracks’), thereby preventing the cross-contamination and unfairness issues present in naive strategies. Through an empirical evaluation of our custom simulation system across 34 scenarios using the MNIST and N-CMAPSS datasets, we validate that our approach correctly handles permanent, temporal, and overlapping disagreement pat-terns. Our scalability analysis reveals the server-side resolution algorithm's overhead is negligible ( < 1 ms per round) even under heavy load. The primary scalability constraint is the client-side training load from participating in multiple tracks, a cost that we show can be effectively mitigated by a submodel reuse strategy. This work presents a scalable and architecturally sound method for managing client-level disagreements, and enhances the practical applicability of FL in settings where policy compliance and strategic control are non-negotiable. 
+
+Index Terms —Federated Learning, Client-Level Disagree-ments, Resolution Strategies, Compliance, Governance 
+
+I. I NTRODUCTION 
+
+Federated Learning (FL) provides an approach for training machine learning models collaboratively across decentralized data sources [1]. Its ability to maintain data locality makes it highly suitable for applications in sensitive domains like healthcare, finance, and aviation, where privacy regulations and competitive concerns often prevent data centralization. A limitation in existing FL setups is the implicit assumption of unconditional collaboration, as this premise can fail in prac-tice: competing airlines in a predictive maintenance collabora-tion may block model contributions to protect insights derived from proprietary data; hospitals may be required by policy to exclude patient data from certain sources; or banks may need to enforce mutual isolation to comply with data sovereignty laws. We formally define such scenarios – where autonomous clients selectively exclude others for strategic, regulatory, or competitive reasons – as client-level disagreements .While many studies discuss data-level disagreements across clients [2–11], primarily arising from non-IID data distri-butions and system heterogeneity, there is a notable research gap in addressing the higher-level disagreements that emerge between clients themselves. Similarly, current research largely focuses on submodels for optimizing resource efficiency in FL [12–17], overlooking their potential to address client-level disagreements. This highlights another research gap: lever-aging submodels for excluding specific clients dynamically during FL. Research on Clustered FL [11, 18, 19] aims to optimize model performance for heterogeneous data clusters, and does not explicitly apply it to client-level disagreements. Addressing these gaps requires new approaches that in-tegrate submodel generation with flexible client exclusion mechanisms. We formulate three questions: RQ1 ) What client-level disagreement scenarios can potentially occur in FL? 
+
+RQ2 ) How can client-level disagreements be resolved in FL? and RQ3 ) How can architectural and algorithmic solutions mitigate the resulting scalability challenges? We contribute the following: 1) a formal taxonomy of client-level disagreements, defining a language for expressing exclusion rules and their temporal properties; 2) a robust multi-track resolution algorithm that guarantees strict exclusion and incorporates a submodel reuse mechanism for scalability; 3) an open-source reproducible simulation and validation system; and 4) an empirical validation on two datasets confirming the logical correctness and performance of our algorithm. 
+
+Outline. Sec. II summarizes the relevant foundational concepts and reflects on related work. Sec. III introduces the Federated Learning client-level disagreement taxonomy, and Sec. IV presents our robust resolution strategy. Sec. V describes our system design and implementation. We present the experimen-tal setup in Sec. VI and collect our results in Sec. VII. We answer the research questions and reflect on our findings in Sec. VIII and conclude in Sec. IX. II. B ACKGROUND AND RELATED WORK 
+
+Dalgkitsis et al. [20] validate the enforcement of high-level disagreements in a distributed FL system, yet model them as a binary ‘full exclusion’ where clients either participate or do not. In contrast, our work introduces a granular taxonomy of disagreements, e.g. , inbound, outbound, temporal, and pro-poses a multi-track architectural strategy required to resolve the resulting complexity. Clustered FL (CFL) [11, 19] is not a direct baseline as it automatically groups clients by data heterogeneity to optimize accuracy, whereas our system enforces explicit, policy-based disagreements. Personalized FL methods, e.g. , pFedMe [21], Per-FedAvg [22] assume all clients contribute to a central model before specialization and offer no exclusion mechanism. In contrast, our work defines the scope of collaboration itself. 
+
+© 2025 IEEE. Personal use is permitted. Published in IEEE BigData 2025. DOI: 10.1109/BigData66926.2025.11401516 
+
+> arXiv:2604.23386v1 [cs.DC] 25 Apr 2026
+
+III. D ISAGREEMENT TAXONOMY 
+
+To address client-level disagreements, we define a formal taxonomy categorizing how clients may deviate from uncon-ditional collaboration. This taxonomy provides a structured language for defining exclusion policies based on their impact on communication, data, and temporal properties. Table I lists the primary disagreement types and their exclusion policies. TABLE I: Overview of Disagreement Types        
+
+> Type Description of disagreement scenario Communication-Based Exclusions
+> Full Client completely withdraws from the FL system. Inbound Client rejects model updates from specific participants. Outbound Client prevents its model from contributing to others' global models. Bidirectional Mutual exclusion preventing any model influence between clients.
+> Data-Based Exclusions
+> Partial data Client restricts the use of parts of its local data for training.
+> Temporal Properties
+> Temporary An exclusion automatically expiring after a defined period. Deep (Ret-rospective) An exclusion that retroactively removes historical model contributions.
+
+A. Exclusion Types 
+
+Full Exclusion. The most basic form of disagreement is a full exclusion, where a client completely withdraws from the FL process, as shown in Fig. 1. This entails ceasing to submit local models and no longer receiving any global model updates. 
+
+Fig. 1: Full exclusion: client C 1 fully removes itself from FL. 
+
+Partial Data Exclusion. Fig. 2 shows a client withholding a specific subset of its local data from the training process. This gives fine-grained control, enabling clients to protect sensitive data segments and still contribute to the collaborative model. 
+
+Inbound Exclusion occurs when a client refuses to incorpo-rate the model updates from one or more specific participants into its own version of the global model. Fig. 3 shows a case where C 1 inbound excludes C 2: the server generates a person-alized submodel (GM 1) for C 1 that omits C 2's contribution, while other clients receive the standard global model (GM 2). 
+
+Outbound Exclusion. As the inverse of an inbound exclusion, it allows a client to prevent its local model from being included in the global models of specific other participants. Fig. 4 shows a case where C 2 prevents its model from being used in C3's global model. Consequently, the server must generate a separate model (GM 2) for C 3 that excludes C 2's update, while the other clients receive the standard global model (GM 1). 
+
+Fig. 2: Partial data exclusion, where C 1 withholds a subset of its local data but continues to participate in model aggregation. 
+
+Fig. 3: Inbound exclusion, where C 1 requires a personalized global model (GM 1) that omits C 2's contribution. 
+
+Bidirectional Exclusion is a composite disagreement combin-ing inbound and outbound rules, where two clients mutually prevent any model influence from being exchanged between them. This establishes complete training isolation. Fig. 5illustrates a case where C 1 imposes a bidirectional exclusion on C 2. The server must now generate three distinct models: GM 1 for C 1 (excluding C 2), GM 2 for C 2 (excluding C 1), and GM 3 for C 3, which contains all updates. 
+
+B. Temporal Dynamics 
+
+The exclusion types can be further modified by temporal properties that define their lifecycle and historical impact. 
+
+Exclusion Duration. Disagreements are not necessarily per-
+
+Fig. 4: Outbound exclusion, where C 2 prevents its model from being incorporated into C 3's global model. Fig. 5: Bidirectional exclusion (one excludes one), establishing mutual isolation between C 1 and C 2.
+
+Fig. 6: Multiple exclusion types disagreement scenario with temporal modifiers for duration (clock) and depth (deep icon). manent. An exclusion can be defined as indefinite (persisting until manually revoked) or temporary (automatically expiring after a predefined number of rounds). This enables dynamic collaboration patterns, such as data embargoes. 
+
+Exclusion Depth defines whether an exclusion applies only prospectively or retrospectively. A shallow exclusion affects only future model aggregations, while a deep exclusion, signified by a deep icon (downward arrow over waves), retroactively removes the historical influence of an excluded client's past contributions. Deep exclusions are significantly more complex, requiring mechanisms such as federated un-learning [23, 24] or historical recalculation. Fig. 6 shows a complex scenario combining multiple ex-clusion types with temporal modifiers. Client C 1 enforces a temporary, deep full exclusion, aiming to retroactively remove its historical contributions for a limited period. Client C 2 en-acts a similar temporary, deep partial data exclusion. Client C 3
+
+initiates two separate exclusions: a temporary, deep inbound exclusion against C2 and an indefinite inbound exclusion against C 4. Concurrently, client C 4 applies an indefinite partial data exclusion, while clients C 4 and C 5 engage in an indefinite, deep bidirectional exclusion, establishing complete and mutual isolation. Earlier examples focus on isolated disagreements, while this scenario shows how the complexity escalates rapidly when multiple exclusion rules are layered together. 
+
+Fig. 7: The naive resolution strategy. C 1 inbound excludes C 3,receiving a personalized model (GM 1). However, intermediary clients like C 2 still aggregate all updates. 
+
+Fig. 8: Cross-contamination in the naive approach. The in-fluence of the excluded client (C 3) leaks back to C 1 via the intermediary client C 2 in subsequent rounds. IV. R ESOLUTION STRATEGY 
+
+Resolving the client-level disagreements defined in Sec. III requires an architectural strategy that can enforce client-specified exclusions without compromising the integrity and fairness of the collaborative learning process. 
+
+A. The Naive Approach and its Flaws 
+
+A simple disagreement resolution approach is to generate a personalized global model for each client based on its specific exclusion rules for the current round. Fig. 7 shows how, if client C 1 inbound excludes C 3, the server aggregates models from C 1 and C 2 to create C 1's new global model. Meanwhile, C2 and C 3 might receive a global model aggregating all clients. Although simple, this strategy fails over multiple rounds due to two critical issues: cross-contamination and unfairness. 
+
+Cross-Contamination. Despite a direct exclusion in place, the influence of an excluded client can indirectly propagate to the excluding client through an intermediary. Fig. 8 shows C 1
+
+excluding C 3, while C 2 continues to incorporate updates from C3. In the next round ( i+1), when C 1 aggregates its model with C 2's, it inadvertently re-introduces the influence of C 3.This leakage violates the principle of strict exclusion. 
+
+Unfairness. This approach unfairly imbalances contributions. Fig. 9 shows C 1 training on a model that excludes C 3, while C1's updates contribute to the global model C 3 receives. Thus C3 is influenced by a model trained under different conditions, 
+
+i.e. , from C 1's perspective, without C 3. This undermines the principle of equitable participation where all contributions are generated under consistent training assumptions. Fig. 9: Unfairness in the naive approach. C 1 contributes to C 3's model, but its updates are based on a personalized model that excluded C 3, creating an inequitable aggregation. 
+
+Fig. 10: The robust multi-track approach. Two separate and isolated tracks (GM 1 and GM 2) are created to serve the different disagreement requirements of the clients. 
+
+B. The Robust Multi-Track Approach 
+
+To overcome these limitations, we propose a robust resolu-tion strategy that guarantees strict exclusion and fairness by creating and managing independent model update paths, i.e., 
+
+tracks . Each unique set of client disagreements results in a distinct track, ensuring completely isolated model updates. Fig. 10 shows how the system creates two separate tracks when C 1 excludes C 3. Track GM 1 is the primary track for C 1,aggregating only from C 1 and C 2. Track GM 2 is the primary track for C 2 and C 3, aggregating from all clients. Crucially, to ensure all tracks evolve correctly, clients may need to perform background participation . For example, al-though C 1's primary model is GM 1, it must also train on GM 2
+
+and submit an update for that track separately to ensure C 2 and C3 receive a fairly aggregated model. This mechanism solves the core problems of the naive approach. 
+
+Isolation. The multi-track architecture enforces strict isolation, preventing cross-contamination. Fig. 11 shows how client C 2
+
+participates in both tracks by generating a distinct model up-date for each track based on its respective specific model state. The update for GM 1 is computed without any influence from C3, effectively blocking the indirect contamination pathway. 
+
+Fairness. Our robust approach also ensures fairness. Fig. 12 shows C 1 performing a background participation for track GM 2. This means its contribution to the model C 3 receives is based on training GM 2, which reflects the full set of participants. Thus, C 3 receives a model aggregated from con-tributions generated under consistent, track-specific conditions. 
+
+Fig. 11: Isolation in the robust approach. Updates are track-specific, preventing the influence of an excluded client (C 3)from propagating across tracks. 
+
+Fig. 12: Fairness in the robust approach. Through background participation, C 1's contribution to C 3's track (GM 2) is gener-ated under fair and consistent conditions. V. S YSTEM DESIGN AND IMPLEMENTATION 
+
+To empirically validate our robust multi-track resolution strategy, we design and implement a simulation system 1. The architecture borrows from DYNAMOS, a microservices-based middleware for data exchanges [26], its core principles of modularity and policy-driven control. We use a simulation instead of a full distributed deployment to focus on the cor-rectness and performance of the core disagreement resolution logic and facilitate rapid, reproducible experimentation. Fig. 13a and 13b show our system's architecture, simulating a distributed FL environment by abstracting the key com-ponents and interactions of a DYNAMOS-like system. Our system has three main components: an Orchestrator, an FL Server, and multiple FL Clients. The Orchestrator manages the high-level simulation lifecycle, while the core logic resides in the FL Server, emulating DYNAMOS's policy-driven control. Based on input policies, the server executes the disagreement resolution algorithm, determining the required set of isolated model update paths (‘tracks’), managing their lifecycle, and performing track-specific aggregation. Each client is represented by a FL Client instance, initialized with a private data partition, responsible for local model training, and able to perform multi-track training. Based on server instructions, a client trains not only on its ‘primary’ track to receive its personalized model but also performs background training for other tracks as necessary to ensure system-wide fairness. We simulate the model exchange layer 
+
+> 1All source code, tooling, and experimental configurations are publicly available at https://github.com/DaanRosendal/fl-disagreement-resolution [25]
+
+via a shared file system where the server persists aggregated track models and clients retrieve them for local training. 
+
+Operational Flow. The system operates in an iterative, round-based manner. Each FL round consists of four distinct phases, ensuring disagreements are handled dynamically: 
+
+1. Analyse : The FL server begins each round by discovering all active disagreements from the configuration. It then de-termines the required set of isolated model update paths and creates the necessary model tracks for the current round. 
+
+2. Train : Each FL client loads the appropriate model(s) for its primary and any required background tracks. The client then performs track-based local training on its data and saves the updated models for the server to collect. 
+
+3. Aggregate : The FL server collects the updated models from all participating clients. It aggregates them strictly by track, en-suring that contributions remain isolated within their intended group, and saves these newly aggregated track models. 
+
+4. Evaluate : Finally, the server assesses the training and model performance for each track, measures general system overhead, and logs metadata on track evolution. This cycle repeats until the configured number of rounds is complete. 
+
+Core Algorithm. The server starts each round with Alg. 1. This algorithm translates the high-level disagreement spec-ifications into a concrete set of model tracks. It parses all active disagreements, converting outbound and bidirectional disagreements into an inbound-centric view for each affected client. It then groups clients by their identical exclusion pat-terns. For each unique pattern, a distinct model track is created. This process is optimized by a consolidation step (submodel reuse) that merges any tracks that, despite originating from different exclusions, result in the exact same set of client members. The output is a definitive map of tracks and the assignment of a primary track to every participating client. The time complexity of Alg. 1 is mainly driven by the process of grouping clients based on their exclusion patterns. In the worst-case scenario, where each of the C clients has a dense and unique list of exclusions, the algorithm's complexity is O(Dactive + C2 log C). This is dominated by the need to sort the exclusion list of each client (an operation of up to O(C log C) per client). In contrast, the average-case performance is significantly more efficient, approaching 
+
+O(Dactive + C) under sparse client exclusion lists and limited number of unique disagreement patterns – the cost of sorting each exclusion list becomes negligible compared to the linear cost of iterating through the clients. The space complexity is determined by the intermediate data structures that map clients to their exclusion patterns. Worst case is O(C2) – every client has a unique and dense set of exclusions, requiring the storage of a distinct exclusion list of size up to C − 1 for each of the C clients in the ‘exclusion map’. The final output data structures also contribute, yet their size is bounded by this initial mapping, making the storage of exclusion patterns the dominant factor in memory usage. VI. E XPERIMENTAL SETUP 
+
+We design experiments to: 1) validate the logical correct-ness of the robust multi-track mechanism in handling diverse 
+
+Algorithm 1 Disagreement Resolution and Track Creation  
+
+> 1:
+
+Input: Active Disagreements D, All Client IDs Call  
+
+> 2:
+
+Output: Tracks Tmap , Primary Tracks Pmap  
+
+> 3:
+
+Initialize exclusion map ← client map to excluded set  
+
+> 4:
+
+for each disagreement d ∈ D do  
+
+> 5:
+
+if d.type = ”full” then  
+
+> 6:
+
+Add d.client to f ully excluded  
+
+> 7:
+
+else if d.type = ”inbound” then  
+
+> 8:
+
+Add d.target to exclusion map [d.client ] 
+
+> 9:
+
+else if d.type = ”outbound” then  
+
+> 10:
+
+Add d.client to exclusion map [d.target ] 
+
+> 11:
+
+else if d.type = ”bidirectional” then  
+
+> 12:
+
+Add d.target to exclusion map [d.client ] 
+
+> 13:
+
+Add d.client to exclusion map [d.target ] 
+
+> 14:
+
+end if  
+
+> 15:
+
+end for  
+
+> 16:
+
+pattern map ← map of exclusion pattern to clients  
+
+> 17:
+
+for each client c ∈ Call not in f ully excluded do  
+
+> 18:
+
+pattern ← sorted tuple of exclusion map [c] 
+
+> 19:
+
+Add c to pattern map [pattern ] 
+
+> 20:
+
+end for  
+
+> 21:
+
+Initialize Tmap ← ∅ , Pmap ← ∅  
+
+> 22:
+
+for each pattern p, client group G ∈ pattern map do  
+
+> 23:
+
+track name ← generate track name (G, p ) 
+
+> 24:
+
+track members ← Call \ (p ∪ f ully excluded ) 
+
+> 25:
+
+Tmap [track name ] ← track members  
+
+> 26:
+
+for client c ∈ G do  
+
+> 27:
+
+Pmap [c] ← track name  
+
+> 28:
+
+end for  
+
+> 29:
+
+end for  
+
+> 30:
+
+// Add default global track for clients without exclusions  
+
+> 31:
+
+Consolidate redundant tracks in Tmap (Submodel Reuse)  
+
+> 32:
+
+return Tmap , Pmap 
+
+and dynamic disagreement scenarios; 2) assess the system's scalability under increasing client load and disagreement com-plexity; and 3) quantify the computational overhead of the resolution strategy. We thematically group the scenarios: 
+
+Correctness Validation. A core set of scenarios to validate the logical correctness of the system: handling various permanent communication exclusions (inbound, outbound, bidirectional, full), managing the lifecycle of temporary disagreements (ini-tiation and expiration), verifying the submodel reuse optimiza-tion, and testing the advanced ‘deep’ lifecycle mechanisms like retrospective model rewinding. 
+
+Scalability Analysis. We conduct scalability experiments that measure growth in computational overhead, e.g. , resolution time, client training time, and aggregation time, and the impact on model performance and storage requirements on three dimensions: Total Client Population : evaluate how the system scales as the total number of clients increases, while the size and structure of the disagreeing client group remain constant. 
+
+Scale of Disagreement Participation : measure performance as the number of clients actively engaged in disagreements (a) DYNAMOS abstract design, adapted from [26]. (b) Our DYNAMOS-inspired FL architecture. 
+
+Fig. 13: A comparison of the original DYNAMOS system and our proof-of-concept FL simulation system. grows within a fixed total client population. This tests the system's response to an increasing proportion of the federation enforcing exclusion rules. 
+
+Disagreement Density : We analyze the impact of increasing the number of exclusions enforced by each disagreeing client. This dimension stress-tests the system under conditions of growing fragmentation, from simple one-to-one exclusions to near-total isolation where each client excludes all others. 
+
+Execution Environment: We conduct all experiments on a single machine with Intel Core i7-9750H CPU, 16 GB RAM, and an NVIDIA GeForce GTX 1650 GPU, 4 GB VRAM. 
+
+Datasets and Models. To ensure a comprehensive evaluation, we use two distinct and complementary datasets. 
+
+N-CMAPSS dataset [27] provides non-IID time-series data simulating the run-to-failure trajectories of a fleet of turbofan engines, thus highly relevant to our motivating use case of predictive maintenance in aviation. The prediction task is Remaining Useful Life. We use a Multilayer Perceptron model. The model's simplicity is intentional: we isolate and measure the performance of the disagreement resolution mechanism without the confounding factors of a complex model. 
+
+MNIST dataset [28] is a widely used image classification benchmark, consisting of handwritten digits. Its ease of use enables rapid and extensive testing of our system's core logic across a large number of complex scenarios, which is computationally prohibitive for N-CMAPSS. We use a CNN. VII. R ESULTS 
+
+Correctness Validation. To validate the fundamental cor-rectness of our approach, our tooling automatically confirms the system’s behavior across all scenarios. In S1 2 – a single 
+
+> 2Detailed descriptions and results for all scenarios are available at https: //github.com/DaanRosendal/fl-disagreement-resolution [25]
+
+Fig. 14: Track contributions for Scenario 6. The visualization correctly shows the dynamic creation and expiration of multi-ple tracks in response to overlapping temporary disagreements. permanent inbound exclusion, the system correctly creates two isolated tracks, with a personalized track for the excluding client and a global track for others, while enforcing all neces-sary background participations to ensure fairness. Our tooling generates auditable visualizations: Fig. 14 shows the highly dynamic Scenario 6 (S6) where multiple overlapping perma-nent and temporary disagreements expire at different rounds. The visualization correctly captures the complex, evolving track structure, showing the dynamic creation and dissolu-tion of multiple temporary tracks (e.g., ‘track 0 no1 no2’, ‘track 1 no3 no4’) while permanent tracks persist. We val-idate advanced temporal features through a ‘deep rewind’ scenario, where the system re-aggregates historical models to retroactively enforce an exclusion initiated mid-session. Fig. 15 shows S1 model performance. The isolated person-alized track and the main global track achieve effective model training. The stable learning trend holds across all scenarios. 
+
+Scalability Analysis. We measure the execution time of the core phases (resolution, training, aggregation). Our centralized simulation assumes that excluding network costs allows for an isolated analysis of the core algorithms’ computational over-head. We report the mean performance for scalability results averaged over five distinct runs. Fig. 16 shows the average total FL runtime breakdown per round for two sets of scenarios. Fig. 16a shows a linear increase in runtime as the number of (a) S1 model performance results for MNIST. 
+
+> (b) S1 model performance results for N-CMAPSS.
+
+Fig. 15: Model performance for Scenario 1 (S1) on both datasets. Both tracks demonstrate stable learning, indicating the resolution mechanism does not impede model training. non-disagreeing clients grows while the disagreement structure is constant. Fig. 16b shows a super-linear runtime growth. This is due to testing the most demanding condition where the system scales across three dimensions simultaneously: the total number of clients, the number of clients participating in disagreements, and the disagreement density (the number of exclusions per client). VIII. D ISCUSSION 
+
+Our experimental results validate that the proposed multi-track resolution strategy is a correct and scalable method for resolving client-level disagreements in Federated Learning. We discuss the principal findings and their implications below. 
+
+RQ1 : We define a formal taxonomy of disagreements, catego-rizing them into communication-based types, where a client can reject updates from specific peers (inbound), block its own updates from reaching them (outbound), enforce mutual exclusion (bidirectional), or fully withdraw from the process, alongside data-based (partial) exclusions. We define these further by temporal properties: a duration (indefinite or tem-porary) and a depth, determining if an exclusion is shallow (affecting only future rounds) or deep (requiring retrospective removal of historical influence).                
+
+> (a) Lightest scalability scenario set (S7–S12): Total clients in-crease while disagreements are constant. Total runtime shows lin-ear growth.
+> (b) Heaviest scalability scenario set (S25, S26, S29–S31): Client count, disagreeing participants, and disagreement density in-crease, with super-linear growth.
+
+Fig. 16: Average total FL runtime breakdown for the lightest and heaviest scalability scenarios. Client training time domi-nates cost; resolution and aggregation overheads are minimal. 
+
+RQ2 : Disagreements are resolved using a robust multi-track strategy that creates isolated model update paths (‘tracks’) for each unique set of client exclusions. This strategy guarantees strict isolation, preventing the cross-contamination seen in naive approaches where an excluded client's influence leaks back via intermediaries. It ensures fairness by mandating background participation, such that clients' updates for any track are generated by training on that specific track's model, maintaining consistent training conditions for all contributions. 
+
+RQ3 : We mitigate the combinatorial explosion of tracks scalability challenge in two ways: 1) an efficient server-side resolution algorithm (Alg. 1) that is not a system bottleneck (runtime < 1 ms per round); 2) a submodel reuse optimization consolidates clients with identical exclusion patterns into a single track, reducing model duplication. The main scalability constraint shifts from the server's decision logic to downstream execution workload (client training, aggregation), scaling pre-dictably with the number of unique disagreement patterns. 
+
+Insights Beyond the Research Questions. Our experiments reveal three notable insights: 1) the server-side resolution logic is computationally negligible and does not present a scalability bottleneck – the primary performance constraints lie in the execution phase of multi-track client training and aggregation; 2) the flexibility of disagreements introduces risks of strategic misuse, such as resource exhaustion or model-differencing privacy attacks, underscoring the need for robust governance mechanisms; 3) submodel reuse proves to be a critical optimization, effectively mitigating track multiplication by consolidating clients with identical exclusion preferences. 
+
+Limitations. The centralized simulation does not account for real-world network effects, e.g. , latency. The scale of our experiments is limited (50 clients) and lacks massive datasets, so it may not fully represent large-scale FL dynamics. Our analysis prioritizes computational overhead over communi-cation payloads, albeit our open-source tooling can generate these metrics. Our unscalable track naming scheme requires a more robust method, e.g. , hash-based identifiers. 
+
+Future Work. We identify three directions for future work: 1) strengthening verification and trust using verifiable unlearning and confidential computing to cryptographically audit pol-icy enforcement, while also evaluating privacy implications; 2) adapting the architecture for real-world deployment by transitioning the system to a distributed middleware, e.g. ,DYNAMOS. This will enable testing at massive scale under realistic network conditions, additionally allowing for a shift from explicit client-to-client exclusions to policy-based rules for large, attribute-defined groups, e.g. , geographic location; 3) the resolution mechanism can be extended with more granular partial data exclusions [29], enabling more precise, data-sovereign collaboration, with its value demonstrated through domain-level KPIs, like the predictive maintenance metric. IX. C ONCLUSION 
+
+We introduced a robust multi-track resolution strategy for resolving client-level disagreements in Federated Learning. We demonstrated that by creating and managing isolated model update paths, it is possible to guarantee strict client exclusion and fairness. Our scalability analysis shows the decision-making logic for translating complex disagreements into a track structure is highly efficient and not a system bottleneck. Instead, the primary scalability constraint is the downstream execution workload of multi-track client training, which scales predictably with the number of unique disagreement patterns. By validating the multi-track architecture and its enabling algorithms, our work provides a scalable and architecturally sound method for integrating complex policy compliance directly into the FL lifecycle, ensuring that strategic client autonomy can coexist with effective collaborative learning. ACKNOWLEDGMENTS 
+
+This work is supported by the project: “Budget-neutral sustainable home improvements (MOOI-224049)”. REFERENCES 
+
+[1]B. McMahan et al., “Communication-efficient learning of deep networks from decentralized data,” in Artificial intelligence and statistics , PMLR, 2017. [2]L. Ahmed et al., “Active Learning Based Federated Learning for Waste and Natural Disaster Image Classification,” IEEE Access ,vol. 8, 2020. [3]N. Rodr´ ıguez-Barroso et al., “Federated Learning for Exploiting Annotators’ Disagreements in Natural Language Processing,” 
+
+Transactions of the Association for Computational Linguistics ,vol. 12, May 2024. [4]Y. Deng et al., Adaptive Personalized Federated Learning , Nov. 2020. [Online]. Available: http://arxiv.org/abs/2003.13461 [5]W. Li et al., “Enhancing collaborative intrusion detection via disagreement-based semi-supervised learning in IoT en-vironments,” Journal of Network and Computer Applications ,vol. 161, Jul. 2020. [6]Z. Shen et al., “Share your representation only: Guaranteed improvement of the privacy-utility tradeoff in federated learn-ing,” in The Eleventh International Conference on Learning Representations , 2023. [7]Z. Yang et al., “Hierarchical federated learning with momen-tum acceleration in multi-tier networks,” IEEE Transactions on Parallel and Distributed Systems , vol. 34, no. 10, 2023. [8]Y. Li et al., “Energy-aware edge association for cluster-based personalized federated learning,” IEEE Transactions on Vehicu-lar Technology , vol. 71, no. 6, 2022. [9]L. Zhang et al., “Fine-tuning Global Model via Data-Free Knowledge Distillation for Non-IID Federated Learning,” en, in 
+
+2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , New Orleans, LA, USA: IEEE, Jun. 2022. [10]X. Wang et al., “HetVis: A Visual Analysis Approach for Iden-tifying Data Heterogeneity in Horizontal Federated Learning,” 
+
+IEEE Transactions on Visualization and Computer Graphics ,vol. 29, no. 1, Jan. 2023. [11]F. Sattler et al., “Clustered Federated Learning: Model-Agnostic Distributed Multi-Task Optimization under Privacy Constraints,” 
+
+IEEE Transactions on Neural Networks and Learning Systems ,vol. 32, no. 8, 2020. [12]S. Alam et al., “Fedrolex: Model-heterogeneous federated learn-ing with rolling sub-model extraction,” Advances in neural information processing systems , vol. 35, 2022. [13]F. Wu et al., “Fiarse: Model-heterogeneous federated learning via importance-aware submodel extraction,” Advances in Neural Information Processing Systems , vol. 37, 2024. [14]Y. Ding et al., “Federated Submodel Optimization for Hot and Cold Data Features,” Advances in Neural Information Processing Systems , vol. 35, 2022. [15]R. Balakrishnan et al., “Diverse client selection for federated learning via submodular maximization,” in International Con-ference on Learning Representations , 2022. [16]C. Niu et al., “Billion-scale federated learning on mobile clients: A submodel design with tunable privacy,” in Proceedings of the 26th Annual International Conference on Mobile Computing and Networking , New York, NY, USA, Sep. 2020. [17]J. White et al., “Evaluating Data Distribution Strategies in Federated Learning: A Trade-Off Analysis Between Privacy and Performance for IoT Security,” in AI Applications in Cyber Security and Communication Networks , 2024. [18]A. Ghosh et al., “An efficient framework for clustered federated learning,” IEEE Transactions on Information Theory , 2022. [19]Y. Kim et al., “Dynamic clustering in federated learning,” in 
+
+IEEE International Conference on Communications , 2021. [20]A. Dalgkitsis et al., “Secure Collaborative Model Training with Dynamic Federated Learning in Multi-Domain Environments,” in Workshops of the International Conference for High Perfor-mance Computing, Networking, Storage and Analysis , 2024. [21]C. T. Dinh et al., Personalized federated learning with moreau envelopes , 2022. arXiv: 2006.08848 [cs.LG] . [Online]. Avail-able: https://arxiv.org/abs/2006.08848 [22]A. Fallah et al., Personalized federated learning: A meta-learning approach , 2020. arXiv: 2002.07948 [cs.LG] . [On-line]. Available: https://arxiv.org/abs/2002.07948 [23]X. Gao et al., “Verifi: Towards verifiable federated unlearning,” 
+
+Transactions on Dependable and Secure Computing , 2024. [24]Z. Liu et al., “A Survey on Federated Unlearning: Challenges, Methods, and Future Directions,” ACM Computing Surveys ,vol. 57, no. 1, Oct. 2024. [25]D. E. Rosendal, “Resolution strategies for client-level disagree-ment scenarios in federated learning,” Master’s thesis, University of Amsterdam, 2025. [Online]. Available: https://github.com/ DaanRosendal/fl-disagreement-resolution [26]J. Stutterheim et al., “DYNAMOS: Dynamic microservice com-position for data-exchange systems, lessons learned,” in Interna-tional Conference on Software Architecture , 2024. [27]S. Chatterjee et al., “Exploratory data analysis of the N-CMAPSS dataset for prognostics,” in International Conference on Industrial Engineering and Engineering Management , 2021. [28]Y. LeCun et al., “Gradient-based learning applied to document recognition,” Proceedings of the IEEE , vol. 86, no. 11, 1998. [29]A. K. Routh et al., “A comprehensive review on granularity perspective of the access control models in cloud computing,” in 
+
+IEEE International Conference on Interdisciplinary Approaches in Technology and Management for Social Innovation , 2024.

@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-001.webp",
+      "caption": "Figure 3. Accuracy vs. model size. Log-linear scaling plot across model families. Star markers indicate Pareto-optimal models. Scaling is broadly positive but weak, with non-monotonic behavior within Qwen3.5.",
+      "page": 6,
+      "index": 1,
+      "width": 496,
+      "height": 317
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-002.webp",
+      "caption": "Table 1. Distortion taxonomy. 27 distortion types organized into six perceptual categories, each applied at five severity levels from very mild (level 1) to very strong (level 5).",
+      "page": 2,
+      "index": 2,
+      "width": 479,
+      "height": 310
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-003.webp",
+      "caption": "Figure 4. Per-distortion difficulty ranking. Mean accuracy ± standard deviation across all 18 models for each of the 27 distortion types, sorted by difficulty. The dashed line marks the 25% random baseline.",
+      "page": 7,
+      "index": 3,
+      "width": 496,
+      "height": 427
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-004.webp",
+      "caption": "Figure 5. Accuracy vs. distortion severity level. Base models show a U-shaped curve (high at levels 1 and 5, dip at levels 2–3); thinking variants rise monotonically. GPT-5.4 shows the steepest monotonic climb (38.4%→72.9%).",
+      "page": 7,
+      "index": 4,
+      "width": 496,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-005.webp",
+      "caption": "Figure 6. Error direction analysis. Stacked bars decomposing predictions into correct (green, center) and severity errors by step size: undershoots (left, blues) vs. overshoots (right, yellows/reds). Models sorted by accuracy.",
+      "page": 8,
+      "index": 5,
+      "width": 496,
+      "height": 544
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-006.webp",
+      "caption": "Figure 1. DistortBench dataset examples. (a) A reference image and one representative distortion per category at severity level 5 (very strong), showing the perceptual diversity across the six distortion categories. (b) Severity progression for Gaussian blur from level 1 (very mild) to level 5 (very strong). Models receive only the distorted image (no reference) and must jointly identify the distortion type and severity level.",
+      "page": 4,
+      "index": 6,
+      "width": 752,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-007.webp",
+      "caption": "Table 3. Main results. Answered-only joint accuracy (Acc.) with bootstrap 95% confidence intervals, type-balanced accuracy (TBal.), level-balanced accuracy (L-Bal.), and unparseable-response rate (Unp.) over the full 13,500-prompt evaluation. Models sorted by accuracy. Best result in bold, second-best underlined. Random baseline is 25.0%. † denotes proprietary model. ‡ MoE model (Qwen3.5 35B: total parameters listed, 3B active; Kimi-VL A3B: active parameters listed). “Think.” denotes chain-of-thought variant. All accuracies in %; unparseable-response rate in %.",
+      "page": 5,
+      "index": 7,
+      "width": 539,
+      "height": 462
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19966v1/fig-008.webp",
+      "caption": "Table 2. Evaluated models. 17 open-weight VLMs from five families plus one proprietary model. Parameters indicate total model size; Qwen3.5 35B and Kimi-VL A3B are mixture-ofexperts (MoE) models with 3B active parameters. “Think.” denotes chain-of-thought (thinking) variants.",
+      "page": 5,
+      "index": 8,
+      "width": 502,
+      "height": 510
+    }
+  ]
+}

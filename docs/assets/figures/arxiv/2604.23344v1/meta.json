@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.23344v1/fig-001.webp",
+      "caption": "Table 2. Comparison with state-of-the-art methods on the OV-LVIS dataset [14]. To ensure a fair comparison, all listed methods employ RCNN-style detectors [16]. We report the mean and standard deviation across 3 independent runs. † indicates results obtained from our re-implementation.",
+      "page": 7,
+      "index": 1,
+      "width": 496,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23344v1/fig-002.webp",
+      "caption": "Figure 2. Overview of our framework for OVD, which mainly consists of three steps. First, a set of candidate regions is extracted from an image using an RPN. For each candidate region, we employ the HCC technique for selectively assigning a class label, while LoCLIP estimates an objectness score. Pseudo labels are assigned only to regions with hierarchically consistent predictions and sufficiently high objectness scores. These pseudo labels, together with ground-truth annotations for base object classes, are then used to train an OV detector with classification and regression losses. See the main text for details.",
+      "page": 3,
+      "index": 2,
+      "width": 872,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23344v1/fig-003.webp",
+      "caption": "Figure 3. An illustration of the operations in the HCC technique for an input image (right), where novel object classes are defined as dog and cat, and K is set to 2. Here, the class label estimation from the class level and the sub-category level are consistent for dog, represented in green nodes. Consequently, the HCC technique boosts the confidence score from max(p) = 0.6 to max(rsub) = 0.79. See text for details.",
+      "page": 4,
+      "index": 3,
+      "width": 494,
+      "height": 249
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23344v1/fig-004.webp",
+      "caption": "Figure 4. Illustration of LoCLIP. LoCLIP appends a learnable [OBJ] token into a pretrained ViT encoder of CLIP. The output feature for the [OBJ] token is passed through a FC layer, and predicts an objectness score of an input patch xb. Throughout the adaptation process, all pretrained components, including the [CLS] token, embedding layers and ViT encoders, are kept frozen.",
+      "page": 5,
+      "index": 4,
+      "width": 439,
+      "height": 316
+    }
+  ]
+}

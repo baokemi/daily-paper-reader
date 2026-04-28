@@ -1,0 +1,190 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-001.webp",
+      "caption": "Figure 23: In this example, VLM-as-a-Judge prefers Answer A, which provides more details about the environment but incorrectly states that the cigarette is in the person’s right hand when it is actually in their mouth. The model does recognize the correct location of the cigarette, yet still judges Answer A as correct. Using its own generated answer as a reference helps mitigate this issue.",
+      "page": 25,
+      "index": 1,
+      "width": 950,
+      "height": 1329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-002.webp",
+      "caption": "Figure 24: In this example, VLM-as-a-Judge prefers Answer B, which provides more details about the cat but incorrectly claims the laptop is silver when it is actually black. The model does recognize the correct color of the laptop, yet still judges Answer B as correct. Using its own generated answer as a reference helps mitigate this issue.",
+      "page": 26,
+      "index": 2,
+      "width": 950,
+      "height": 1152
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-003.webp",
+      "caption": "Figure 19: Prompt for generating reference answers in Standard Ref baseline.",
+      "page": 21,
+      "index": 3,
+      "width": 950,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-004.webp",
+      "caption": "Figure 18: Prompt for comparing informativeness. We provide GPT-4o with the original query and two candidate answers (without the image) and ask it to focus only on helpfulness, relevance, depth, and level of detail when determining which answer is more informative, ignoring image alignment correctness.",
+      "page": 21,
+      "index": 4,
+      "width": 950,
+      "height": 760
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-005.webp",
+      "caption": "Figure 28: In this example, Standard Ref rejects the better Answer B, judging “boar foraging at a feeding station” as unsupported because the reference answer does not mention it. This shows how it over-penalizes informativeness. In contrast, BIRCH includes this context in the generated anchor, allowing it to correctly verify Answer B and achieve a better balance between informativeness and correctness.",
+      "page": 30,
+      "index": 5,
+      "width": 950,
+      "height": 1073
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-006.webp",
+      "caption": "Figure 2: (A) VLM-as-a-Judge input: A VQA question (query + image) is given to two different response models, producing candidate answers A and B. The question asks for the park’s name. Answer B looks more informative by giving a name and claiming it is inscribed on the bench, while Answer A is correct since the name is not visible in the image. (B) Human preference: Human annotators, given the query, image, answers, and judging rubrics, choose Answer A as the preference label. (C) VLM-as-a-Judge decision: The judge receives the same input and is prompted with the same judging rubrics as the humans. It is misled by Answer B’s greater informativeness, mistakenly selecting it because it provides a specific (but wrong) name, while Answer A does not—misaligning with human judgment. (D) Direct model response: When asked to answer the question directly, the same VLM correctly sees that the name cannot be determined from the image. Here, (A) and (B) are covered by existing benchmarks. (C) and (D) highlight a gap between VLM-as-a-Judge’s actual recognition ability and its judging behavior, caused by being misled by informativeness. This paper aims to close that gap for more reliable judgment.",
+      "page": 2,
+      "index": 6,
+      "width": 948,
+      "height": 463
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-007.webp",
+      "caption": "Figure 27: In this example, Standard Ref rejects the better Answer B, reasoning that electric or hybrid vehicles cannot be inferred from the image (even though the charging cable and plug suggest this) because the reference answer does not mention it. This shows how it over-penalizes informativeness. In contrast, BIRCH includes the likelihood of the car being electric or hybrid in the generated anchor, allowing it to correctly verify Answer B and achieve a better balance between informativeness and correctness.",
+      "page": 29,
+      "index": 7,
+      "width": 950,
+      "height": 1208
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-008.webp",
+      "caption": "Figure 20: Prompt for generating an anchor in BIRCH.",
+      "page": 22,
+      "index": 8,
+      "width": 950,
+      "height": 939
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-009.webp",
+      "caption": "Figure 14: Example showing a human labeling error in VL-RewardBench. The white food (rice) is clearly to the left of the meat on the right side, but humans incorrectly chose B.",
+      "page": 18,
+      "index": 9,
+      "width": 950,
+      "height": 531
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-010.webp",
+      "caption": "Figure 13: Illustration of the Image Caption baseline and why it performs poorly. First, the same VLM later used as the judge is asked to generate a caption for the image. Then, the judge takes the query, image, two candidate answers, and the caption as input, and decides which answer better addresses the query. However, the caption does not mention whether the park name is visible, so the judge still accepts the unsupported park name in Answer B as correct. This highlights the need for BIRCH, which ensures that every detail in the candidate answers is also represented in the reference.",
+      "page": 18,
+      "index": 10,
+      "width": 950,
+      "height": 510
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-011.webp",
+      "caption": "Figure 21: Prompt for judging with reference answer in BIRCH.",
+      "page": 23,
+      "index": 11,
+      "width": 950,
+      "height": 1008
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-012.webp",
+      "caption": "Figure 26: In this example, Standard Ref rejects the better Answer A, assuming Australia is not the highlighted country because the reference answer does not mention it. This shows how it over-penalizes informativeness. In contrast, BIRCH includes the valid mention of Australia in the generated anchor, allowing it to correctly verify Answer A and achieve a better balance between informativeness and correctness.",
+      "page": 28,
+      "index": 12,
+      "width": 950,
+      "height": 1335
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-013.webp",
+      "caption": "Table 3: Accuracy of VLM-as-a-Judge. Our proposed BIRCH significantly improves the performance of both open-source and proprietary models across different benchmarks.",
+      "page": 8,
+      "index": 13,
+      "width": 941,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-014.webp",
+      "caption": "Figure 7: Illustration of the proposed BIRCH. Step 1: Each candidate answer is checked and corrected based on the image. In Answer B, the unsupported detail \"Boeing 747\" is replaced with \"a commercial airliner\" and clarified as \"the exact model cannot be confirmed\". Step 2: The corrected answers are merged into an anchor that is both truthful and informative (all details from the candidates are either corrected or preserved). Step 3: Candidates are compared with the anchor. This forces the judge to focus on the image content encoded in the anchor, balance informativeness with correctness, and avoid both over-prioritizing and over-penalizing informativeness.",
+      "page": 8,
+      "index": 14,
+      "width": 948,
+      "height": 377
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-015.webp",
+      "caption": "Figure 15: Example showing a human labeling error in VL-RewardBench. Answer B incorrectly states that the American flag is to the left of the red car, yet it was still chosen by humans.",
+      "page": 19,
+      "index": 15,
+      "width": 950,
+      "height": 633
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-016.webp",
+      "caption": "Figure 12: Successful and failed cases with the Standard Ref pipeline, where the judge first generates its own answer as a reference and then compares Answer A and B against it to decide which is better. (A) Successful case: Using the judge’s answer \"it does not include any signs that would indicate the name of the park\" as reference, the judge correctly identifies an error in Answer B, which claims the park name is inscribed on the bench when it is not. This helps the judge overcome informativeness bias and make the right decision. (B) Failed case: Standard Ref can over-prioritize correctness and unfairly penalize valid details missing from the reference. Here, Answer A is rejected simply for mentioning the position (marked in green) of the \"No Stop\" sign, information that is valid but absent from the reference, leading it to be mistakenly judged as \"unsupported by the image\".",
+      "page": 17,
+      "index": 16,
+      "width": 948,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-017.webp",
+      "caption": "Figure 11: Per-domain comparison of GPT-4o (left), Llama-3.2-Vision-90B (middle), and Gemini-2.5-Flash (right), with and without image input, on the MLLM-as-a-Judge benchmark. Each scatter point represents a domain, with its size indicating the number of samples. The x-axis shows accuracy with image input; the y-axis shows accuracy without. Points in the green area indicate that the image improves accuracy, while points in the red area indicate that the image reduces accuracy. The farther a point is from the diagonal, the greater the impact (positive or negative) of the image. For all models, most domains cluster near the diagonal, showing that images provide little additional benefit.",
+      "page": 17,
+      "index": 17,
+      "width": 929,
+      "height": 303
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-018.webp",
+      "caption": "Figure 30: Failure case study. BIRCH generates a reliable anchor stating that the balloon held by the boy is filled with a light gas, likely helium. However, the judge still incorrectly selects the more informative Answer B, which does not specify what the balloon is filled with.",
+      "page": 32,
+      "index": 18,
+      "width": 950,
+      "height": 937
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-019.webp",
+      "caption": "Figure 25: In this example, Standard Ref rejects the better Answer B, judging its placement of the sign as speculative since this detail is not in the reference. This shows how it over-penalizes informativeness. In contrast, BIRCH ensures such placement details are included in the generated anchor, allowing it to correctly verify Answer B and achieve a better balance between informativeness and correctness.",
+      "page": 27,
+      "index": 19,
+      "width": 950,
+      "height": 1221
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-020.webp",
+      "caption": "Figure 22: In this example, VLM-as-a-Judge prefers Answer B, which gives more details about the book but makes two mistakes: it treats the figure caption as text on the top of the left page, and it misplaces the actual text from the top of the left page onto the right page. The model does recognize the correct text on the top of the left page, yet still judges Answer B as correct. Using the model’s own generated answer as a reference helps mitigate this issue.",
+      "page": 24,
+      "index": 20,
+      "width": 950,
+      "height": 1346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-021.webp",
+      "caption": "Figure 29: Failure case study. BIRCH generates an anchor with incorrect visual reasoning or is misled by the wrong Answer B, using 5.2 million as the like count instead of the correct 5,200 million. Based on this anchor, the judge incorrectly prefers Answer A.",
+      "page": 31,
+      "index": 21,
+      "width": 950,
+      "height": 967
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-022.webp",
+      "caption": "Figure 16: Example showing a human labeling error in VL-RewardBench. Although precisely counting the flags here is very difficult, the number is clearly much higher than the 27 claimed in Answer B. Answer A, while not giving an exact count, is better since it avoids misleading information. However, the human still chose Answer A.",
+      "page": 20,
+      "index": 22,
+      "width": 950,
+      "height": 707
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17768v1/fig-023.webp",
+      "caption": "Figure 17: Example showing a human labeling error in VL-RewardBench. The image clearly shows multiple tracks on the snow ground, matching Answer A, but humans incorrectly chose B.",
+      "page": 20,
+      "index": 23,
+      "width": 950,
+      "height": 531
+    }
+  ]
+}

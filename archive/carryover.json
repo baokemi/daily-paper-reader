@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-04-28T03:25:16.514166+00:00",
-  "updated_date": "20260419-20260428",
+  "generated_at": "2026-04-28T20:32:01.092220+00:00",
+  "updated_date": "20260428",
   "carryover_days": 9,
   "tag_states": {
     "VisFed": {
-      "updated_date": "20260419-20260428",
+      "updated_date": "20260428",
       "carryover_days": 9,
       "items": []
     },
     "FLRLVLDM": {
-      "updated_date": "20260416",
+      "updated_date": "20260428",
       "carryover_days": 9,
       "items": []
     },
@@ -19,12 +19,12 @@
       "items": []
     },
     "联邦激励": {
-      "updated_date": "20260419-20260428",
+      "updated_date": "20260428",
       "carryover_days": 9,
       "items": []
     },
     "VLM CLIP": {
-      "updated_date": "20260416",
+      "updated_date": "20260428",
       "carryover_days": 9,
       "items": []
     }

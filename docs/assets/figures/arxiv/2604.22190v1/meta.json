@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-001.webp",
+      "caption": "Figure 3: Robustness under controlled occlusion on Market-1501. Left: mAP and Rank-1 under five occlusion types at increasing coverage. Right: SAGA-Refined advantage over [CLS] (pp). The advantage peaks at 60-70% coverage, reaching +30 Rank-1 pp and +15 mAP pp under lower-half occlusion, and is consistent across all three occlusion geometries.",
+      "page": 6,
+      "index": 1,
+      "width": 826,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-002.webp",
+      "caption": "Table 3: Ablation study on Occluded-Market. We compare free vs structure anchors and progressively add domain anchors and feature fusion.",
+      "page": 11,
+      "index": 2,
+      "width": 610,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-003.webp",
+      "caption": "Figure 4: Robustness under human distractor occlusion on Market-1501. A segmented person from a disjoint dataset is composited into query images at increasing coverage levels; gallery images remain clean. (left) Absolute mAP and Rank-1. (right) SAGA advantage over global [CLS], peaking at +10.1 Rank-1 pp mean and +6.8 mAP pp mean for SAGA-Fusion near 60% coverage. Shaded bands show ±1 SD across distractor identities and entry angles.",
+      "page": 7,
+      "index": 3,
+      "width": 826,
+      "height": 204
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-004.webp",
+      "caption": "Figure 5: Attention comparison on Occluded-DukeMTMC. Top: global CLS attention. Bottom: max structured-anchor attention. Structured-anchor attention remains person-centric under occlusion; CLS attention spreads across occluding objects.",
+      "page": 10,
+      "index": 4,
+      "width": 826,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-005.webp",
+      "caption": "Figure 6: Per-anchor attention maps for representative regular (top) and occluded (bottom) queries, showing the 8 maximally distinct anchors from the full set of 24. Anchors partition into distinct spatial behaviors rather than collapsing to a single pooling strategy. Anchors 03 and 19 show stronger lower-body activation in the regular case, becoming diffuse when occluded.",
+      "page": 10,
+      "index": 5,
+      "width": 829,
+      "height": 364
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-006.webp",
+      "caption": "Table 1: Comparison with state-of-the-art methods on standard and occluded ReID benchmarks. Methods are grouped by input modality and supervision setting. †Results reproduced using authors’ released code and configurations; reproduced Market-1501 R1 differs from reported by 0.6%, consistent with environment and random seed variance. ‡No public implementation available; results are from the original paper and could not be reproduced under a consistent experimental protocol.",
+      "page": 8,
+      "index": 6,
+      "width": 822,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-007.webp",
+      "caption": "Figure 2: SAGA-ReID architecture overview",
+      "page": 4,
+      "index": 7,
+      "width": 829,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22190v1/fig-008.webp",
+      "caption": "Figure 7: Effect of fusion weight ratio wr/wi on retrieval performance. mAP (left axis, blue) and Rank-1 (right axis, red dashed) as a function of wr/wi with wr + wi = 1. Circle marks best mAP; diamond marks our fixed 10× configuration.",
+      "page": 12,
+      "index": 8,
+      "width": 912,
+      "height": 239
+    }
+  ]
+}

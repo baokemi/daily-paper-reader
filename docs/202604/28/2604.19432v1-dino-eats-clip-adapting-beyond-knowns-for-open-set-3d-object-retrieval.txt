@@ -1,0 +1,597 @@
+Title: DINO Eats CLIP: Adapting Beyond Knowns for Open-set 3D Object Retrieval
+
+URL Source: https://arxiv.org/pdf/2604.19432v1
+
+Published Time: Wed, 22 Apr 2026 01:04:28 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# DINO Eats CLIP: Adapting Beyond Knowns for Open-set 3D Object Retrieval 
+
+## Xinwei He 1 Yansong Zheng 1 Qianru Han 1 Zhichuan Wang 1 Yuxuan Cai 2 Yang Zhou 3
+
+## Jingbo Xia 1 Yulong Wang 1 Jinhai Xiang 1 Xiang Bai 2*
+
+> 1
+
+## Huazhong Agricultural University 2Huazhong University of Science and Technology 
+
+> 3
+
+## Shenzhen University  
+
+> xwhe@mail.hzau.edu.cn ,xbai@hust.edu.cn
+
+## Abstract 
+
+Vision foundation models have shown great promise for open-set 3D object retrieval (3DOR) through efficient adap-tation to multi-view images. Leveraging semantically aligned latent space, previous work typically adapts the CLIP encoder to build view-based 3D descriptors. De-spite CLIP’s strong generalization ability, its lack of fine-grainedness prompted us to explore the potential of a more recent self-supervised encoder—DINO. To address this, we propose DINO Eats CLIP (DEC), a novel framework for dynamic multi-view integration that is regularized by syn-thesizing data for unseen classes. We first find that sim-ply mean-pooling over view features from a frozen DINO backbone gives decent performance. Yet, further adaptation causes severe overfitting on average view patterns of known classes. To combat it, we then design a module named Chunking and Adapting Module (CAM). It segments multi-view images into chunks and dynamically integrates local view relations, yielding more robust features than the stan-dard pooling strategy. Finally, we propose Virtual Feature Synthesis (VFS) module to mitigate bias towards known cat-egories explicitly. Under the hood, VFS leverages CLIP’s broad, pre-aligned vision-language space to synthesize vir-tual features for unseen classes. By exposing DEC to these virtual features, we greatly enhance its open-set discrimina-tion capacity. Extensive experiments on standard open-set 3DOR benchmarks demonstrate its superior efficacy. 
+
+## 1. Introduction 
+
+3D object retrieval (3DOR) has been extensively studied for many years [1, 8, 17, 21, 26, 29, 36, 46, 47]. Traditional methods generally assume a closed-set setting, where train-ing and testing sets share the same label space. However, real-world applications demand generalized representations for unseen categories. It has spurred a lately shift towards           
+
+> *Correspondence to Xiang Bai <xbai@hust.edu.cn >.Multi -view
+> Images
+> Multi -modal
+> Representation
+> Single -modal
+> Representation
+> (a) Existing methods
+> (b)Our DEC
+> MLLM
+> CLIP
+> Text Descriptions
+> Multi -view
+> Images
+> CLIP
+> DINO Chunking and
+> Adapting
+> …Virtual
+> Features
+> 𝟓𝟓 .𝟎
+> 𝟕𝟓 .𝟎
+> 𝟔𝟓 .𝟎
+> 𝟔𝟎 .𝟎
+> 𝟕𝟎 .𝟎
+> (c)Performance comparison (%)
+> 𝐃𝐀𝐂 𝐃𝐈𝐍𝐎
+> 𝐎𝐮𝐫 𝐃𝐄𝐂
+> 𝐇𝐆 𝐌 𝟐 𝐑
+> Training only
+> Virtual Feature
+> Synthesis
+> CLIP -AdaM
+
+Figure 1. (a) Prior CLIP-based methods rely on multi-modal image-text representations at inference time while our DEC (b) uses only single-modal visual features, making it more efficient for open-set 3DOR task. (c) Our DEC significantly outperforms existing methods on open-set 3D object retrieval. 
+
+open-set learning, also known as open-set 3DOR [9], which learns from a collection of 3D objects solely from seen cat-egories but must generalize well to unseen categories. Open-set 3DOR is a challenging task. Limited 3D data from a few categories often leads to severe overfit-ting on seen classes and poor generalization to unseen ones. The seminal work HGM 2R [10] integrates multi-modalities (point clouds, voxels, view images) of 3D objects to enrich the data, yet it requires a complex framework of modality-specific backbones, limiting its scalability and efficiency. Recent studies [18, 44] have demonstrated the efficacy of adapting pretrained vision foundation models like CLIP to multi-view images for this task (Figure 1(a)). Although the text-aligned view embedding from CLIP provides strong generalization capabilities, the limitations in fine granu-larity restrict its upper bound, prompting us to turn to a more recent self-supervised encoder—DINO. We argue that DINO’s inherent capacity to capture both local details and 
+
+> arXiv:2604.19432v1 [cs.CV] 21 Apr 2026
+
+global structures in view images makes it a powerful source of robust and generalized view features for adaptation. We first establish a simple multi-view DINO baseline. By simply mean-pooling across view embeddings, it pro-vides a stronger zero-shot baseline than CLIP-based ones, as shown in Table 1. However, further adaptation leads to severe overfitting to seen-class view features. To mitigate it, we propose DINO Eats CLIP (DEC) (Figure 1(b)), a novel framework that dynamically adapts a pretrained DINO en-coder to multi-view images and uses CLIP as a bridge to achieve generalization to unseen classes. In contrast to view-pooling strategies that risk overfitting to pronounced view features, we introduce a Chunking and Adapting Mod-ule (CAM). This module avoids direct pooling of multi-view features. Instead, it first chunks multi-view embed-dings into small groups and then aggregates each group into chunk features, capturing local inter-view patterns. Next, it combines cross-chunk features to capture longer-range inter-view relations. In this divide-and-conquer way, CAM gradually mines rich, multi-granular view patterns to pro-duce a compact and generalized view-based 3D embedding. Without exposure to unseen-class data, however, CAM still faces the risk of overfitting of known categories. One straightforward strategy is to synthesize virtual features of unseen classes for regularization, but this approach is hin-dered by the fundamental difficulty of learning from lim-ited data. Being contrastively trained on substantially broad concepts and images, CLIP [34] provides a potential link between vision data of seen and unseen classes. We the-oretically demonstrate that the semantic relations between classes are reflected in the structure of their visual spaces. Motivated by this theoretical insight, we further introduce a virtual feature synthesizer that transfers seen-unseen se-mantic relations in the text embedding space to the visual embedding space. By treating visual features of seen classes as anchors, we synthesize virtual visual features based on transferred semantic differences. We finally train our CAM adapter to distinguish these virtual visual features of dis-tinct unseen classes through an end-to-end metric learning loss, which effectively regularize CAM and further enhance open-set 3D object discrimination greatly. In summary, we make the following contributions: • To our best knowledge, DEC is the first effort to adapt pretrained DINO for open-set 3D object retrieval. Equip-ping it with robust generalization to unseen categories from CLIP, we thereby fully leverage the strengths of this powerful self-supervised model to provide a concise yet effective solution. • We introduce a lightweight Chunking and Adapting Mod-ule (CAM) that progressively aggregates multi-view fea-tures in a divide-and-conquer manner, capturing rich inter-view relations at different granularities for a gener-alized and compact 3D embedding. • We develop a CLIP-based virtual feature synthesizer for regularization. Grounded by our theoretical insight that semantic relations are reflected in visual embed-ding space, it generates virtual unseen-class features by transferring textual semantic relations, enabling effective model regularization. 
+
+## 2. Related Work 
+
+3D Object Retrieval. 3D Object Retrieval (3DOR) aims to learn discriminative representations from 3D objects. Existing approaches can be broadly divided into two cat-egories: methods [27, 28, 32, 33, 40, 42, 48, 53] that learn directly from raw 3D data and methods [4, 7, 8, 14– 16, 23, 24, 38] that learn from 2D projections or views. Although 3DOR has achieved remarkable progress, most existing methods assume that all test categories are seen during training, which limits their generalization to real-world applications. To address this limitation, open-set 3DOR [9, 10] has drawn increasing attention, where test 3D objects belong to unseen categories. This new setting evaluates the model’s ability to generalize beyond the train-ing distribution, making it more suitable for practical de-ployment. Recent studies [18, 37, 44, 45, 49, 50, 56] have also explored this problem by using large-scale point cloud models or vision-language frameworks such as CLIP [34], aiming to learn generalized 3D representations through se-mantic alignment. While most existing methods are built upon CLIP, its global image-text alignment strategy limits the ability to capture fine-grained visual differences. In contrast, the recent self-supervised model DINO [3, 31, 35] exhibits strong fine-grained representation extraction capacity and has demonstrated superior transfer ability in a variety of computer vision tasks, such as segmentation [2, 22], 3D reconstruction [39], and industrial anomaly detection [13]. Yet, research on adapting it for 3D representation learning is underexplored. Therefore, in this paper, we explore the potential of DINO for open-set 3DOR. Instead of utilizing simple multi-view feature pooling [18, 44] which ignores inter-view relations, we propose a Chunking and Adapting Module (CAM) to integrate rich local inter-view patterns for discriminative and generalized view-based descriptors. 
+
+Virtual Feature Exposure. Our work is also relevant to Out-of-distribution (OOD) detection [51]. To mitigate lack of knowledge from unknowns, one effective strategy [6] is to synthesize virtual features for regularization , which helps to learn a compact decision boundary for OOD de-tection. However, they generally treats all conflate all un-seen classes into a monolithic “unknown” one, which is in-feasible for Open-set 3DOR, which requires explicit asso-ciations between samples and their semantic categories to improve open-set discriminative learning. Recently, some works, e.g., APLGOS [52] and SHIP [43], use a pretrained CLIP text encoder to synthesize virtual prompts by train-ing a generative model ( e.g. , variational autoencoder) to en-hance downstream 2D vision tasks. Yet, it is difficult for 3D domain due to data scarcity. In contrast, we directly lever-age the text-vision alignment of vision-language models (CLIP) to connect unseen and seen categories for regular-ization. To this end, we synthesize semantically grounded unseen features to effectively enhance open-set 3DOR. 
+
+## 3. Method 
+
+3.1. Problem Statement and Overview 
+
+Problem statement . Open-set 3DOR aims to learn an em-bedding network fΘ(·) that induces a metric space where 3D objects of distinct unseen categories form compact, well-separated clusters. Formally, we are given a collec-tion O of 3D objects and a training set with Ntra samples from a closed label set Yseen to train fΘ(·), i.e. , Dtra =
+
+{(oi, y i)}Ntra  
+
+> i=1
+
+, where oi ∈ O denotes the i-th 3D object and yi ∈ Y seen represents its label. At test time, we will ap-ply fΘ(·) to embed a retrieval set with Nret samples from unseen category space Yunseen , i.e. , Dret = {(oj , y j )}Nret  
+
+> j=1
+
+,where oj ∈ O and yj ∈ Y unseen . Note that Yseen and Yunseen 
+
+are non-overlapping label spaces indicating Yseen ∩Y unseen =
+
+∅. Dret is further divided into query set Dq and target set Dt.Each 3D object oj from Dq serves as the query to retrieve from Dt to evaluate the generalizalibity of fΘ(·).
+
+Overview . Figure 2 presents an overview of our frame-work. In essence, it encodes multi-view images with frozen, pretrained models (denoted by F❄ (·)), and then adapts to these multi-view embeddings with a learnable adapter (de-noted by ϕ(·)), i.e. , fΘ(·) = ( ϕ◦F ❄ )( ·). The adapter divides the multi-view images into small chunks and learn to inte-grate rich local patterns across views, producing discrimi-native and generalized representations. To avoid overfitting on known categories, we further build upon the CLIP model and design a novel virtual feature synthesis (VFS) module to synthesize virtual visual features to regularize the train-ing process. By design, it simply integrates three feature sources (the DINO embedding space VD , the CLIP visual embedding space VC and text embedding space VT ) and learn to synthesize unseen visual features in VD for regu-larization. We present the details in the following sections. 
+
+3.2. View Feature Extraction 
+
+We follow the popular multi-view paradigm in 3D object re-trieval [38]. For each 3D object in O , we first project it into a sequence of M view images [I1, I2, ..., IM ] = o, from different viewpoints folowing [10], where each view image 
+
+Im ∈ RH×W . Next, we feed multi-view images into a pre-trained DINO [3, 31, 35] and take out the d-dimensional 
+
+[CLS ] tokens as the global view features. The feature extrac-tion for the multi-view set is defined as [f1, f2, . . . , fM ] = 
+
+F❄ (o), where for each individual view: 
+
+fm = F❄ (Im), fm ∈ V D . (1) While any modern pretrained 2D model, especially vision foundation ones ( e.g. , CLIP [34]), can be used as the vi-sion encoder F❄ (·) for high-quality, transferable view fea-tures, here we diverge from recent CLIP-based works [18, 44, 45] based on two considerations: 1) DINO is pretrained with self-supervised learning and provides robust category-agnostic features capturing global and local cues, which are crucial for generalization to new classes. 2) Our preliminary experiments show that it gives stronger empirical zero-shot 
+
+3DOR performance than CLIP counterparts. 
+
+3.3. Chunking and Adapting Module 
+
+While mean-pooling across view features provides a decent zero-shot baseline, we consider enhancing it by adapting to a limited set of seen-class 3D objects, mitigating the dis-tribution gap. To this end, we design a simple but effec-tive Chunking and Adapting Module ( CAM ) for adapta-tion (Figure 3), which gradually integrates rich local view relations into compact and discriminative 3D embeddings. Specifically, the whole process is divided into three stages: 
+
+Local chunk aggregation . We first divide the view feature sequence [f1, f2, ..., fM ] into K non-overlapping chunks. Each chunk comprises kw = ⌈M/K ⌉ consecutive views, with padding applied to the final chunk if M is not divisi-ble by K. Next, we apply a shared linear layer to aggregate each chunk in parallel. The above process could be eas-ily instantiated with a 1D convolution by setting kernel and stride sizes to kw. In particular, we use CBR block (denoted by CBR (·)) to process the whole sequence, with each one consisting of 1D convolutional layer, followed by a batch normalization and a ReLU layer: 
+
+[g1, g2, ..., gK ] = CBR ([ f1, f2, ..., fM ]) , (2) where each gi ∈ Rd is the i-th chunk embeddings derived from i-th chunk. In this way, we capture local correlations and compositional patterns within a chunk’s context. 
+
+Cross-chunk integration . To integrate cross-chunk fea-tures, we apply a non-parametric 1D pooling operation over the chunk embeddings with a predefined pooling win-dow/kernel size, which efficiently captures longer-range de-pendencies among views: 
+
+[g′
+
+> 1
+
+, . . . , g′ 
+
+> K′
+
+] = Pool ([ g1, g2, . . . , gK ]) , (3) where g′ 
+
+> k′
+
+∈ Rd is the k′-th pooled feature and K′ is the feature number. By stacking multiple CBR (·) and Pool (·)
+
+blocks, we progressively extend spatial contexts, ultimately yielding one compact global representation gadpt ∈ Rd.
+
+Weighted residual fusion . To better preserve the pre-trained knowledge and the newly adapted one, we combine DINO  CAM 
+
+Adapter 
+
+Image 
+
+Encoder 
+
+Text 
+
+Encoder 
+
+a photo of 
+
+a [ class ]dog 
+
+> …
+> …
+> …
+> …
+
+VFS 
+
+Module 
+
+Loss  
+
+> …
+> …
+> f1f2
+
+Train -stage Only 
+
+cat sink table 
+
+> …
+> …
+> …
+> View Features
+
+𝓨 seen  𝓨 un seen 
+
+> View Features
+> Class Features
+
+Push 
+
+> Class A
+> Class B
+> Class C
+
+Pull 
+
+Input/Output   
+
+> fM
+> f1f2fM
+> ҧ
+> f1
+
+…
+
+…  
+
+> 3D Objects of Seen Class
+> … …v1
+> v1
+> v2vM
+> v2vM
+> …
+> …
+> Virtual Features
+
+Real /virtual              
+
+> തy1തy𝑆 തy1
+> uതy𝑍
+> u
+> ҧ
+> f2ҧfM
+> ҧ
+> f1ҧf2ҧfM
+> 𝒱 𝒟
+> 𝒱 𝒞
+> 𝒱 𝒯
+> 𝒱 𝒞 ×𝒱 𝒯 →𝒱 𝒟
+
+ℱ 𝜙 Figure 2. Overview of our framework . During training, it processes known-category images by frozen DINO and CLIP image encoders, while encoding known and unseen ( e.g ., ImageNet) class labels via CLIP’s text encoder using the prompt ”a photo of [class]”. Based on them, we synthesize virtual features to train our chunking and adapting (CAM) adapter jointly with an end-to-end metric learning loss, encouraging it to produce generalized view-based 3D descriptors to unseen categories. 𝑘 𝑤 × 𝐷   
+
+> 1×𝐷
+
+λ
+
+1-λ    
+
+> Split into
+> view chunks
+> 𝑀 ×𝐷
+> …
+> …
+> …
+> 1×𝐷
+> …
+
+× 𝐿  times                 
+
+> 𝑘 𝑤 ×𝐷
+> 𝑘 𝑤 ×𝐷
+> 1×𝐷
+> 1×𝐷
+> 1×𝐷
+> 1×𝐷
+> 𝑘 𝑤 ×𝐷
+> 1×𝐷
+
+…
+
+> intra -chunk
+> cross -chunk
+
+CBR 
+
+GAP 
+
+Pool 
+
+Figure 3. Illustration of our chunking and adapting module .
+
+them through a weighted residual connection: 
+
+gfinal = λ · fgap + (1 − λ) · gadpt , (4) where fgap = GAP ([ f1, f2, ..., fM ]) denotes the global pre-trained feature by global average pooling, λ ∈ [0 , 1] is a hyperparamter that balances conserved pre-trained knowl-edge and the one learned by CAM, for enhancement. 
+
+3.4. Virtual Feature Synthesis 
+
+To prevent overfitting to “seen” classes, we design a mod-ule named Virtual Feature Synthesis (VFS) to regularize training (Figure 4). Our key insight is that CLIP’s aligned embedding spaces and the semantic relationships between text correlate in the visual space. Inspire by it, we propose to synthesize a continuum of virtual visual features for “un-seen” categories by transferring semantic relationships from text modality, thereby encouraging open-set discrimination. 
+
+Label space enrichment . Our VFS is guided by an ex-tended label space, constructed from a predefined lexicon (e.g. , 1k categories from ImageNet). We filter out overlap-ping labels with Yseen . Meanwhile, to ensure training effi-ciency, we sub-sample a tractable set of E concepts Ynew .LN            
+
+> CLIP Embedding Space DINO Embedding Space 𝒱 𝒟
+> MLP ++
+> ത𝐲 𝒖
+> ത𝐲 𝒊 ҧ𝐟 𝐦
+> 𝐢
+> Seen Class Embedding Seen View Embedding Unseen Class Embedding
+> Virtual View Embedding
+> Same View
+> Same Virtual View
+> Input/Output Data Correspondence
+> 𝐟 𝐦
+> 𝐢
+> 𝐯 𝒎
+> 𝒖
+> 𝒱 𝒞 ×𝒱 𝒯
+
+Figure 4. Illustration of our virtual feature synthesis module .
+
+The final, enriched concept space is defined as the union of the original and new labels: Y = Yseen ∪ Y new , which provides a scalable foundation for incorporating a much broader universe of semantic concepts. 
+
+Aligned embeddings extraction . For each view image Iim
+
+of a 3D training object oi, we utilize the CLIP visual en-coder to map into aligned visual space VC , yielding f im. For each category y, we use the CLIP text encoder to embed the prompt “a photo of y” into text embedding y ∈ V T . Let 
+
+yi ∈ V T denote the corresponding label embedding for la-bel yi ∈ Y seen , and yu ∈ V T for yu ∈ Y new . We aim to generate a virtual visual embedding vum ∈ V D for yu.
+
+Virtual feature synthesis . With aligned space, we pro-pose to transfer relations between seen and unseen cate-gories—from the textual to the visual modality in CLIP em-bedding space. Specifically, a virtual visual embedding in the CLIP visual space VC is synthesized by shifting a seen-class feature along the semantic direction towards an unseen class. It is then projected into the DINO embedding space (VD ) via a lightweight Multi-Layer Perceptron (MLP) ψ(·),which results in the virtual embedding vum:
+
+vu 
+
+> m
+
+= ψ[f im + ϵ · LN (yu − yi)] , (5) where ϵ denotes a learnable scaling weight, LN (·) denotes Layer Normalization, and yu − yi captures the semantic direction towards the unseen category in Ynew . This op-eration assumes that semantic relations are approximately preserved between VC and VT (see sec. 3.5). To stabilize training, we further use a weighted residual fusion, producing final output of VFS is a virtual unseen-class feature vum ∈ V D :
+
+vum = α · vum + β · f im. (6) Here, α and β are learnable parameters that balance the con-tribution between the unseen synthesized features vu and the original DINO features f i of the seen-class view images. These virtual features of unseen classes serve as regular-izers. By compelling CAM to discriminate virtual features of unseen classes, we circumvent over-reliance on known class patterns and bolster generalization. Notably, VFS is only used in training, incurring no extra inference cost. 
+
+3.5. Theoretical Analysis of the VFS module 
+
+Our VFS module employs a common residual connection to merge real features with synthesized ones ( Eq. (6)), produc-ing virtual features. Its core novelty lies in Eq. (5), which utilizes text-visual alignment from CLIP and approximates the expectation of unseen features, E[fm|yu], through gen-eralized sampling. Below we give detailed analysis. 
+
+CLIP’s semantic alignment . Being contrastively trained on web-scale text-image pairs, CLIP visual embedding space VC and textual embedding space VT are well-aligned for broad concepts and visual counterparts. For a seen cat-egory instance, we assume the visual embedding is f im ≈
+
+yi +η, where η represents bounded intra-class noise, which is modeled as a Gaussian distribution η ∼ N (0, σ 2I). For an unseen category, assuming access to hypothetical visual embeddings f um ≈ yu + η′ (with similar noise η′), the vi-sual difference is defined as f um − f im. Under CLIP’s con-trastive alignment, the dot product of semantic and visual differences between seen and unseen classes: 
+
+(yu − yi)T(f um − f im) =[( yu)Tf um + ( yi)Tf im]pos 
+
+− [( yu)Tf im + ( yi)Tf um]neg ,
+
+(7) where [·]pos/neg wraps calculations from positive/negative pairs, respectively. It can be easily observed that seman-tic relations in VT are preserved isometrically in VC .This provides a principled bedrock for generalized sampling of virtual unseen class features to regularize the model. 
+
+Generalized sampling . Assuming there exists a Lipschitz mapping ζ : VC × V T → V D , with Lipschitz constant L,to transform from the CLIP embedding space VC × V T to the DINO embedding space VD . We regard f m as a random variable in VC , and E[f m|yu] denote the expectation of f m
+
+for the u-th unseen class. To facilitate generalized sampling, we employ : f im +ϵ·LN (yu −yi) ∼ E [f m|yu]. The learnable parameter ϵ endows the model with a certain degree of gen-eralization capability. Theoretically, the mapping ζ exists. In practice, we instantiate it using an MLP ( ψ(·)). Through optimization, ψ(·) is driven towards a reliable approxima-tion. Based on Equation (5) and the Lipschitz property, we have the following proof: 
+
+∥vu 
+
+> m
+
+− ψ(E[f m|yu]) ∥
+
+= ∥ψ[f im + ϵ · LN (yu − yi)] − ψ(E[f m|yu]) ∥ ≤ L · σ2,
+
+(8) where L is the Lipschitz constant, σ2 denotes the variance of the noise η. The result indicates vu 
+
+> m
+
+is bounded close to ψ(E[f m|yu]) . Such a property enables a trainable vu 
+
+> m
+
+to regularize for better generalization to unknown classes. 
+
+3.6. Training and Inference 
+
+To train, we use multi-similarity loss [41], pulling positives together and pushing negatives apart for compact and well-separated classes for both seen and unseen ones.During in-ference, we use CAM outputs as 3D descriptors for 3DOR. 
+
+## 4. Experiments 
+
+4.1. Experimental Setup 
+
+Datasets and evaluation metrics . We evaluate on four standard open-set 3DOR datasets [10], including OS-ESB-core, OS-NTU-core, OS-MN40-core, and OS-ABO-core. Following common practice [10, 44], we use mean Aver-age Precision (mAP), Normalized Discounted Cumulative Gain (NDCG) and Average Normalized Modified Retrieval Rank (ANMRR) as evaluation metrics. 
+
+Implementation details . For a fair comparison, we adopt the same projection scheme as HGM2R [10, 18, 44], ob-taining 24-view images at 256 × 256 resolution for each 3D object. The CBR block CBR (·) adopts a 3 kernel with stride 3, and Pool1D (·) a kernel 3. We extensively bench-mark with four pre-trained DINO models, DINOv2 ViT-B/14, DINOv2 ViT-L/14, DINOv3 ViT-B/16, and DINOv3 ViT-L/16. In addition, the Virtual Feature Synthesis (VFS) module uses the pretrained CLIP ViT-B/16 model. We use SGD with momentum 0.9 and weight decay 5 × 10 −4 for optimization. The adapter is trained with a learning rate of 1×10 −3, while VFS is initialized at 1×10 −4. Each mini-batch contains 8 samples from 2 categories, with 4 instances per category. We train for 70 epochs and decay the learn-ing rate by a factor of 0.1 at the 20th and 40th epochs. We use the ImageNet label set as our lexicon for unseen classes. All experiments are conducted on a single RTX 4090 GPU. Please refer to Appendix for detailed model settings. Method Modality OS-ESB-core OS-NTU-core OS-MN40-core OS-ABO-core            
+
+> mAP ↑NDCG ↑ANMRR ↓mAP ↑NDCG ↑ANMRR ↓mAP ↑NDCG ↑ANMRR ↓mAP ↑NDCG ↑ANMRR ↓
+
+Zero-shot baseline 
+
+OpenShape ( PB-CLIP B/32) [25] P. 37.64 18.38 65.57 25.53 15.41 74.51 30.31 46.34 67.01 40.29 46.09 59.42 OpenShape ( PB-CLIP L/14) [25] P. 38.58 18.81 65.10 24.71 15.02 75.18 29.64 44.79 67.64 38.65 45.56 60.90 ULIP-2 ( PB-CLIP G/14) [50] P. 45.14 21.00 59.15 31.50 17.89 68.99 32.76 48.92 65.22 44.26 49.04 55.64 Uni3D ( Uni3D-Giant) [56] P. 44.42 20.92 59.96 32.02 18.04 68.49 33.21 50.51 65.11 45.92 49.79 53.96 CLIP-AdaM ( ViT-B/32) [18] I., T. 53.93 23.00 49.66 49.35 23.70 53.03 49.60 65.73 50.89 47.73 51.76 52.48 CLIP-AdaM ( ViT-L/14) [18] I., T. 54.69 23.40 48.68 57.28 26.24 45.47 55.01 70.56 45.72 57.29 56.13 44.51 Our baseline (DINOv2 ViT-B/14) I. 59.19 24.13 44.31 59.77 26.77 43.25 62.77 74.76 39.42 62.17 57.93 40.23 Our baseline (DINOv2 ViT-L/14) I. 58.25 24.24 46.00 63.24 27.73 39.73 65.42 77.06 36.72 64.92 58.85 37.70 Our baseline (DINOv3 ViT-B/16) I. 57.93 23.86 45.85 59.33 26.49 43.95 62.25 75.71 39.76 61.84 57.55 40.39 Our baseline (DINOv3 ViT-L/16) I. 61.44 24.88 42.63 66.34 28.45 36.79 68.18 79.25 34.31 67.02 60.00 35.34 Open-set 3DOR 
+
+TCL [15] P., I., V. 49.31 21.89 52.68 39.37 21.23 61.00 48.11 63.83 52.30 49.33 53.86 51.05 SDML [19] P., I., V. 49.59 21.75 52.36 40.16 21.52 60.49 50.75 65.70 50.22 47.44 52.79 52.42 CMCL [21] P., I., V. 50.01 21.97 53.06 41.08 21.72 59.43 51.38 65.98 49.75 49.83 50.89 50.24 MMSAE [47] P., I., V. 49.88 22.06 53.69 40.85 21.70 59.99 52.08 66.57 49.00 50.51 53.80 50.49 MCWSA [54] P., I., V. 49.48 21.34 53.75 39.22 20.69 62.14 48.78 63.85 51.95 45.61 51.05 54.70 PROSER [55] P., I., V. 48.69 21.13 53.95 39.47 21.24 60.96 49.00 64.54 51.66 50.33 53.27 50.34 InfoNCE [30] P., I., V. 50.26 21.91 52.63 40.03 21.19 61.09 47.37 63.31 53.02 46.83 52.14 53.50 HGM 2R [10] P., I., V. 51.74 22.73 51.28 44.88 22.81 56.67 64.20 72.91 38.27 63.39 57.96 37.96 CLIP-AdaM( ViT-B/32) [18] I., T. 57.23 24.05 47.73 52.47 24.77 50.97 57.09 70.13 44.70 57.65 57.52 43.37 CLIP-AdaM( ViT-L/14) [18] I., T. 59.90 24.69 44.80 61.52 27.65 41.72 63.54 74.21 38.76 64.77 58.75 37.25 DAC( CLIP ViT-B/32) [44] I., T. 58.70 24.27 45.67 59.21 27.06 44.58 62.40 72.63 39.82 66.10 59.01 36.12 DAC( CLIP ViT-L/14) [44] I., T. 57.80 24.36 47.44 65.83 28.78 37.46 68.98 77.59 33.87 70.74 60.87 32.14 Ours(DINOv2 ViT-B/14) I. 61.82 24.55 42.74 61.56 27.27 41.62 67.62 77.67 34.95 65.04 59.34 37.32 Ours(DINOv2 ViT-L/14) I. 60.48 24.47 43.25 65.15 28.24 37.80 69.69 79.11 33.23 67.91 60.73 34.74 Ours(DINOv3 ViT-B/16) I. 59.06 24.08 44.77 60.01 26.91 43.21 65.44 77.75 36.96 63.66 58.74 38.94 Ours(DINOv3 ViT-L/16) I. 62.75 25.29 42.33 67.75 28.92 35.26 72.15 81.18 30.71 70.96 61.69 31.53 
+
+Table 1. Performance comparisons (%) on open-set 3DOR benchmarks . Bold and underline indicate the best and second best results, respectively. PB-CLIP refers to PointBERT-CLIP. P., I., V., and T. stand for Point Cloud, Multi-view Images,Voxel and Text, respectively. 
+
+4.2. Comparison with state-of-the-arts 
+
+Comparison methods. We compare DEC extensively against state-of-the-art methods, which we categorize as follows: (1) Traditional 3DOR methods, including TCL [15], SDML [19], CMCL [21], MMSAE [47], MCWSA [54], InfoNCE [30]. These works utilize multi-modalities for generalized 3D descriptors. (2) Large-scale zero-shot models, including some recent models pre-trained on large-scale point cloud datasets, such as Open-Shape [25], ULIP-2 [50], and Uni3D [56]. (3) Hypergraph-based method HGM 2R that model train-test data rela-tions using multi-modalities. (4) Recent CLIP-based meth-ods, CLIP-AdaM [18] and DAC [44]. CLIP-AdaM care-fully designs an adapter after CLIP, and DAC synergizes MLLM-inferred text with multi-view images in a CLIP-based framework. In contrast, our DEC operates solely on multi-view images, making it more scalable and efficient. 
+
+Result analysis. Table 1 summarizes results under both zero-shot and open-set settings. Under the zero-shot setup, we establish a simple multi-view DINO baseline by mean-pooling the multi-view features for retrieval. No-tably, this simple baseline substantially outperforms all the compared methods, covering CLIP-based and point-cloud-based methods, across multiple pretrained DINO variants. For instance, with the DINOv3 ViT-L/14 backbone, it achieves over 10% mAP improvement on OS-MN40-core surpassing the best CLIP-based baseline by a large margin. Notably, on OS-ESB-core, which comprises high-genus ob-jects like mechanical parts [20] and requires discerning sub-tle structural nuances, our established baseline surpasses all specifically designed open-set methods, even those that re-quire training ( e.g. , DAC [44]). It demonstrates that DINO’s inherent ability to capture fine-grained local details yields more robust and generalizable features, thereby benefiting further adaptation in open-set 3DOR. In the open-set setting, with only a limited number of 3D objects from seen categories available, DEC fur-ther enhances generalization through adaptation, advancing state-of-the-art greatly across all benchmarks. For exam-ple, compared with DAC [44], the current SOTA in open-set 3DOR, although we only utilize multi-view images, our method (DINOv2 ViT-B/14) improves mAP over DAC (CLIP ViT-B/32) by +3.12% (on OS-ESB-core), +2.35% (on OS-NTU-core), and +5.22% (on OS-MN40-core), three of the four standard benchmarks, respectively. More im-Backbone CAM VFS mAP ↑ NDCG ↑ ANMRR ↓                         
+
+> ViT-B/14
+> ✗✗63.49 75.02 38.86
+> ✓✗66.43 76.80 37.95
+> ✓✓67.62 77.67 34.95
+> ViT-L/14
+> ✗✗65.89 77.29 36.55
+> ✓✗68.43 78.50 34.56
+> ✓✓69.69 79.11 33.23
+> Table 2. Ablations of components on OS-MN40-core.
+
+portantly, when equipped with stronger backbones, further performance gain can be acquired for our method. For ex-ample, compared with DAC (CLIP ViT-L/14), our method (DINOv3 ViT-L/16) improves mAP by +0.22%, NDCG by up to +0.88%, and reduces ANMRR by -0.61% on OS-ABO-core. The consistent improvements provide strong ev-idence for the efficacy of DEC across a spectrum of bench-marks—from fine-grained mechanical parts (OS-ESB-core) to large-scale common objects (OS-MN40-core and OS-NTU-core), and real-world products (OS-ABO-core). 
+
+4.3. Component Analysis 
+
+All ablations are conducted on OS-MN40-core. For more analysis, please refer to Appendix .
+
+Effectiveness of components. We conduct a step-wise ab-lation with two DINOv2 variants on the core components (CAM and VFS) of our framework. As shown in Table 2, our baseline that uses a three-layer MLP adapter over the mean-pooled DINO view features, yields limited perfor-mance. Specifically, with the ViT-B/14 backbone, it only reaches 63.49%, 75.02%, 38.86% in mAP, NDCG, AN-MRR, respectively. Replacing it with CAM greatly in-creases mAP and NDCG by +2.94% and +1.78%, while reducing ANMRR by -0.91%. This indicates that by inte-grating local view relations gradually, CAM effectively pro-duces more discriminative and generalized features. When combined with VFS, further notable gains are observed. For example, with DINOv2 ViT-B/14, mAP goes from 66.43% to 67.62%, demonstrating the complementary enhancement of virtual features in open-set generalization. 
+
+The influence of E under different selection schemes. 
+
+To further examine the influence of the sub-sampling strategy in our Virtual Feature Synthesis (VFS) module (Sec. 3.4), we compare two concept selection schemes: 1) RANDOM E, which uniformly samples E unseen concepts from the category set Ynew , introducing stochastic seman-tic variations; and 2) TOP E, which measures the cosine similarity between the CLIP image feature and all unseen textual embeddings, selecting the top E closest ones to en-sure semantic coherence between visual and textual spaces. The experiments are performed on OS-MN40-core using DINOv2 ViT-B/14 as the backbone. As shown in the left              
+
+> Method mAP ↑NDCG ↑ANMRR ↓
+> CLIP-Adaptor [12] 64.35 75.56 37.95 CLIP-AdaM [18] 64.46 75.64 38.13 Ours 66.43 76.80 36.25
+> Table 3. Performance of different adapters on OS-MN40-core.
+
+panel of Figure 5, and show that the RANDOM E selec-tion scheme gradually increases with E, and then saturat-ing at 40 . TOP E performs better than the random scheme for smaller E, but it rapidly introduces redundant, semanti-cally similar concepts, which hinders further learning. Con-versely, RANDOM E benefits from stochastic semantic di-versity to explore broader unseen space, which acts as a reg-ularization and promotes generalization. 
+
+Comparative analysis of adapters. We further com-pare our adapter with other counterparts, including CLIP-Adapter [12] and CLIP-AdaM [18]. As shown in Table 3, compared with CLIP-Adaptor [12] and CLIP-AdaM [18], our CAM achieves additional gains. This advantage arises from CAM’s localized chunk aggregation, which captures inter-view structural dependencies that are often overlooked by global pooling approaches. By promoting coherent yet compact representations, CAM produces embeddings that generalize more effectively across unseen categories and exhibit improved stability under open-set setting. 
+
+Impact of fusion weight λ. We investigate how the fu-sion weight λ affects the balance between frozen DINO rep-resentations and adapted features. As shown in the right panel of Figure 5, both ViT-B/14 and ViT-L/14 backbones exhibit a similar trend. When λ increases from 0.0 to 0.4, performance improves steadily, with mAP reaching its peak at around λ = 0 .4. This suggests that a moderate fusion allows the adapter to enhance DINO features while pre-serving the pretrained priors. Beyond this point, further increasing λ causes a gradual decline in performance, as the model begins to overfit to the adapted space and loses the robust geometric priors encoded in DINO. Moreover, the larger ViT-L/14 backbone achieves consistently higher mAP and exhibits a smoother performance curve, indicat-ing that a stronger pretrained backbone not only yields more discriminative and robust features but also provides greater tolerance to feature adaptation. In conclusion, these results highlight that λ controls the balance between representation stability and adaptation flexibility, and the best performance appears when the fusion allows the adapter to complement, rather than override, the pretrained DINO representations. 
+
+Analysis of the CBR block. We conduct comprehensive experiments to evaluate the impact of kernel size in the CBR block (Sec. 3). As shown in Table 4, the chunk size of 3 achieves the best results across all metrics. We argue that this is due to a more suitable receptive field, and too large chunks also weaken discriminative local patterns. Figure 5. Performance comparison on OS-MN40-core. Left: Selection schemes with different E value. Right: Impact of fusion weight λ.
+
+Figure 6. Impact of training sample numbers per class on OS-MN40-core. 
+
+chunk size mAP ↑ NDCG ↑ ANMRR ↓
+
+1 63.62 75.38 38.77 3 67.62 77.67 34.95 
+
+5 64.91 75.68 37.08 7 65.72 76.42 36.87 
+
+Table 4. Impact of different chunk sizes on OS-MN40-core. 
+
+4.4. Extending to More Challenging Scenarios 
+
+Cross-dataset open-set 3DOR. To evaluate the cross-dataset generalization, we train DEC on OS-MN40-core and evaluate on OS-ABO-core. As shown in Table 5, DEC with ViT-B/14 already achieves competitive perfor-mance, surpassing several multi-modal baselines that uti-lize point cloud, multi-view images, and voxel modalities. With the stronger ViT-L/16 backbone, DEC achieves an mAP of 69.12% and an NDCG of 60.44%, demonstrating strong cross-dataset retrieval capabilities. Although DAC (ViT-L/14) slightly outperforms DEC in mAP (69.86%), it leverages Multi-Modal Large Language Models (MLLM) to generate textual embeddings, providing additional se-mantic guidance for unseen categories. In contrast, DEC relies solely on visual features, yet still maintains compara-ble performance, highlighting the robustness and generaliz-ability of the representations learned by our framework.                                               
+
+> Method Modality OS-MN40-core →OS-ABO-core mAP ↑NDCG ↑ANMRR ↓
+> CMCL [21] P., I., V. 53.90 53.79 47.28 MMSAE [47] P., I., V. 52.83 52.80 48.02 MCWSA [54] P., I., V. 49.20 50.99 51.11 PROSER [55] P., I., V. 50.80 52.37 49.73 InfoNCE [30] P., I., V. 51.63 52.75 49.16 HGM 2R [10] P., I., V. 57.55 54.14 45.35 DAC (ViT-B/32) I., T. 63.45 57.34 38.48 DAC (ViT-L/14) I., T. 69.86 60.13 32.42
+> Ours (ViT-B/14) I. 63.49 57.39 38.73 Ours (ViT-L/16) I. 69.12 60.44 32.50
+
+Table 5. Comparisons (%) on cross-dataset retrieval .
+
+Few-shot open-set 3DOR. To further evaluate the robust-ness of DEC under limited supervision, we conduct few-shot experiments on OS-MN40-core, varying the number of labeled samples per class from 1 to 64. As shown in Figure 6, DEC consistently outperforms previous arts CMCL [21], CLIP-Adapter [12], and CLIP-AdaM [18] across all shot settings. The performance gap is most ev-ident in the very low-shot regime (1–4 shots), where all methods perform relatively poorly, but DEC maintains a clearly higher mAP. As sample number increases, DEC still performs the best, indicating that it effectively leverages limited data to build a stable and transferable feature space. 
+
+4.5. Visualization and Limitations 
+
+Despite its SOTA performance, our method has limitations. As shown in Figure 7 for more qualitative examples, while it captures fine-grained details effectively (e.g., for small objects like a radio), it is sometimes confused by symmetric objects like cup and vase. This suggests a need for more careful balancing between global shape and local detail. See 
+
+Appendix for more qualitative samples. Query Retrieved 3D Objects （Top 10 ）                                
+
+> radio
+> radio
+> radio
+> bench tv_stand curtain radio radio radio
+> curta in curtain curtain bookshelf
+> CLIP-
+> AdaM
+> tv_stand tv_stand tv_stand curtain
+> DAC
+> Ours
+> curtain curtain tv_stand radio radio radio
+> radio radio radio radio radio radio radio radio radio radio
+> Ours’
+> cup cup cup cup vase vase vase cup vase vase cup
+> NO. 10 NO. 9 NO. 8 NO. 7 NO. 6 NO. 5 NO. 4 NO. 3 NO. 2 NO. 1
+
+Figure 7. Retrieval example comparisons with other methods on OS-MN40-core. Incorrect matches are in red boxes. 
+
+## 5. Conclusions 
+
+In this paper, we presented a new framework, DINO Eats CLIP (DEC), to adapt multi-view images for open-set 3DOR. Building upon the robust self-supervised view rep-resentations, we designed a novel chunking and adapting module to effectively integrates rich local relations across views into compact and generalized features. To mitigate overfitting to seen classes, we further introduced a CLIP-based virtual feature synthesizer to regularize the training. Through extensive experiments, we validated its superiority on open-set 3DOR. We hope DEC can inspire research in generalized representation learning beyond 3D domain. Acknowledgments 
+
+This work was supported by the National Natural Science Foundation of China (No. 62302188, 62225603). 
+
+## References 
+
+[1] Panos Achlioptas, Olga Diamanti, Ioannis Mitliagkas, and Leonidas Guibas. Learning representations and generative models for 3d point clouds. In ICML , pages 40–49, 2018. 1 [2] Luca Barsellotti, Lorenzo Bianchi, Nicola Messina, Fabio Carrara, Marcella Cornia, Lorenzo Baraldi, Fabrizio Falchi, and Rita Cucchiara. Talking to dino: Bridging self-supervised vision backbones with language for open-vocabulary segmentation. In ICCV , pages 22025–22035, 2025. 2 [3] Mathilde Caron, Hugo Touvron, Ishan Misra, Herv´ e J´ egou, Julien Mairal, Piotr Bojanowski, and Armand Joulin. Emerg-ing properties in self-supervised vision transformers. In 
+
+ICCV , pages 9650–9660, 2021. 2, 3 [4] Guoxian Dai, Jin Xie, Yi Fang, et al. Siamese cnn-bilstm architecture for 3d shape representation learning. In IJCAI ,pages 670–676, 2018. 2 [5] Matt Deitke, Dustin Schwenk, Jordi Salvador, Luca Weihs, Oscar Michel, Eli VanderBilt, Ludwig Schmidt, Kiana Ehsani, Aniruddha Kembhavi, and Ali Farhadi. Objaverse: A universe of annotated 3d objects. In CVPR , pages 13142– 13153, 2023. 2 [6] Xuefeng Du, Zhaoning Wang, Mu Cai, and Yixuan Li. Vos: Learning what you don’t know by virtual outlier synthesis. In ICLR , 2022. 2 [7] Carlos Esteves, Yinshuang Xu, Christine Allen-Blanchette, and Kostas Daniilidis. Equivariant multi-view networks. In 
+
+ICCV , pages 1568–1577, 2019. 2 [8] Yifan Feng, Zizhao Zhang, Xibin Zhao, Rongrong Ji, and Yue Gao. Gvcnn: Group-view convolutional neural networks for 3d shape recognition. In CVPR , pages 264–272, 2018. 1, 2[9] Yifan Feng, Yue Gao, Xibin Zhao, Yandong Guo, Nihar Bagewadi, Nhat-Tan Bui, Hieu Dao, Shankar Gangisetty, Ripeng Guan, Xie Han, et al. Shrec’22 track: Open-set 3d object retrieval. Computers & Graphics , pages 231–240, 2022. 1, 2 [10] Yifan Feng, Shuyi Ji, Yu-Shen Liu, Shaoyi Du, Qionghai Dai, and Yue Gao. Hypergraph-based multi-modal represen-tation for open-set 3d object retrieval. IEEE TPAMI , 2023. 1, 2, 3, 5, 6, 8 [11] Huan Fu, Rongfei Jia, Lin Gao, Mingming Gong, Binqiang Zhao, Steve Maybank, and Dacheng Tao. 3d-future: 3d fur-niture shape with texture. IJCV , 129(12):3313–3337, 2021. 3[12] Peng Gao, Shijie Geng, Renrui Zhang, Teli Ma, Rongyao Fang, Yongfeng Zhang, Hongsheng Li, and Yu Qiao. Clip-adapter: Better vision-language models with feature adapters. IJCV , 132(2):581–595, 2024. 7, 8 [13] Jia Guo, Shuai Lu, Weihang Zhang, Fang Chen, Huiqi Li, and Hongen Liao. Dinomaly: The less is more philosophy in multi-class unsupervised anomaly detection. In CVPR , pages 20405–20415, 2025. 2 [14] Zhizhong Han, Honglei Lu, Zhenbao Liu, Chi-Man Vong, Yu-Shen Liu, Matthias Zwicker, Junwei Han, and CL Philip Chen. 3d2seqviews: Aggregating sequential views for 3d global feature learning by cnn with hierarchical attention ag-gregation. IEEE TIP , 28(8):3986–3999, 2019. 2 [15] Xinwei He, Yang Zhou, Zhichao Zhou, Song Bai, and Xiang Bai. Triplet-center loss for multi-view 3d object retrieval. In 
+
+CVPR , pages 1945–1954, 2018. 6, 2 [16] Xinwei He, Tengteng Huang, Song Bai, and Xiang Bai. View n-gram network for 3d object retrieval. In ICCV , pages 7515–7524, 2019. 2 [17] Xinwei He, Silin Cheng, Dingkang Liang, Song Bai, Xi Wang, and Yingying Zhu. Latformer: Locality-aware point-view fusion transformer for 3d shape recognition. PR , page 110413, 2024. 1 [18] Xinwei He, Liang Ma, Yuxuan Cheng, Zhichuan Wang, Yu-long Wang, Yang Zhou, and Xiang Bai. Clip-adam: Adapt-ing multi-view clip for open-set 3d object retrieval. In SIGIR ,pages 1022–1032, 2025. 1, 2, 3, 5, 6, 7, 8 [19] Peng Hu, Liangli Zhen, Dezhong Peng, and Pei Liu. Scal-able deep multimodal learning for cross-modal retrieval. In 
+
+SIGIR , pages 635–644, 2019. 6, 2 [20] Subramaniam Jayanti, Yagnanarayanan Kalyanaraman, Na-traj Iyer, and Karthik Ramani. Developing an engineering shape benchmark for cad models. Computer-Aided Design ,38(9):939–953, 2006. 6 [21] Longlong Jing, Elahe Vahdani, Jiaxing Tan, and Yingli Tian. Cross-modal center loss for 3d cross-modal retrieval. In 
+
+CVPR , pages 3142–3151, 2021. 1, 6, 8, 2 [22] Cijo Jose, Th´ eo Moutakanni, Dahyun Kang, Federico Baldassarre, Timoth´ ee Darcet, Hu Xu, Daniel Li, Marc Szafraniec, Micha¨ el Ramamonjisoa, Maxime Oquab, et al. Dinov2 meets text: A unified framework for image-and pixel-level vision-language alignment. In CVPR , pages 24905–24916, 2025. 2 [23] Asako Kanezaki, Yasuyuki Matsushita, and Yoshifumi Nishida. Rotationnet: Joint object categorization and pose estimation using multiviews from unsupervised viewpoints. In CVPR , pages 5010–5019, 2018. 2 [24] Zhaoqun Li, Cheng Xu, and Biao Leng. Angular triplet-center loss for multi-view 3d shape retrieval. In AAAI , pages 8682–8689, 2019. 2 [25] Minghua Liu, Ruoxi Shi, Kaiming Kuang, Yinhao Zhu, Xu-anlin Li, Shizhong Han, Hong Cai, Fatih Porikli, and Hao Su. Openshape: Scaling up 3d shape representation towards open-world understanding. NeurIPS , 36, 2023. 6 [26] Xinhai Liu, Zhizhong Han, Yu-Shen Liu, and Matthias Zwicker. Point2sequence: Learning the shape representa-tion of 3d point clouds with an attention-based sequence to sequence network. In AAAI , pages 8778–8785, 2019. 1 [27] Yongcheng Liu, Bin Fan, Shiming Xiang, and Chunhong Pan. Relation-shape convolutional neural network for point cloud analysis. In CVPR , pages 8895–8904, 2019. 2 [28] Daniel Maturana and Sebastian Scherer. Voxnet: A 3d con-volutional neural network for real-time object recognition. In 
+
+IROS , pages 922–928, 2015. 2 [29] Weizhi Nie, Qi Liang, An-An Liu, Zhendong Mao, and Yangyang Li. Mmjn: Multi-modal joint networks for 3d shape recognition. In ACM MM , pages 908–916, 2019. 1, 2[30] Aaron van den Oord, Yazhe Li, and Oriol Vinyals. Repre-sentation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748 , 2018. 6, 8, 2 [31] Maxime Oquab, Timoth´ ee Darcet, Th´ eo Moutakanni, Huy Vo, Marc Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa, Alaaeldin El-Nouby, et al. Dinov2: Learning robust visual features without supervision. 
+
+TMLR , 2024. 2, 3 [32] Charles R Qi, Hao Su, Kaichun Mo, and Leonidas J Guibas. Pointnet: Deep learning on point sets for 3d classification and segmentation. In CVPR , pages 652–660, 2017. 2 [33] Charles Ruizhongtai Qi, Li Yi, Hao Su, and Leonidas J Guibas. Pointnet++: Deep hierarchical feature learning on point sets in a metric space. NeurIPS , 30, 2017. 2, 3 [34] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learn-ing transferable visual models from natural language super-vision. In ICML , pages 8748–8763, 2021. 2, 3 [35] Oriane Sim´ eoni, Huy V Vo, Maximilian Seitzer, Federico Baldassarre, Maxime Oquab, Cijo Jose, Vasil Khalidov, Marc Szafraniec, Seungeun Yi, Micha¨ el Ramamonjisoa, et al. Dinov3. arXiv preprint arXiv:2508.10104 , 2025. 2, 3[36] Vincent Sitzmann, Justus Thies, Felix Heide, Matthias Nießner, Gordon Wetzstein, and Michael Zollhofer. Deep-voxels: Learning persistent 3d feature embeddings. In 
+
+CVPR , pages 2437–2446, 2019. 1 [37] Dan Song, Xinwei Fu, Weizhi Nie, Wenhui Li, and Anan Liu. Mv-clip: Multi-view clip for zero-shot 3d shape recog-nition. arXiv preprint arXiv:2311.18402 , 2023. 2 [38] Hang Su, Subhransu Maji, Evangelos Kalogerakis, and Erik Learned-Miller. Multi-view convolutional neural networks for 3d shape recognition. In ICCV , pages 945–953, 2015. 2, 3[39] Jianyuan Wang, Minghao Chen, Nikita Karaev, Andrea Vedaldi, Christian Rupprecht, and David Novotny. Vggt: Vi-sual geometry grounded transformer. In CVPR , pages 5294– 5306, 2025. 2 [40] Peng-Shuai Wang, Yang Liu, Yu-Xiao Guo, Chun-Yu Sun, and Xin Tong. O-cnn: Octree-based convolutional neural networks for 3d shape analysis. ACM TOG , 36(4):1–11, 2017. 2 [41] Xun Wang, Xintong Han, Weilin Huang, Dengke Dong, and Matthew R Scott. Multi-similarity loss with general pair weighting for deep metric learning. In CVPR , pages 5022– 5030, 2019. 5 [42] Yue Wang, Yongbin Sun, Ziwei Liu, Sanjay E Sarma, Michael M Bronstein, and Justin M Solomon. Dynamic graph cnn for learning on point clouds. ACM TOG , 38(5): 1–12, 2019. 2 [43] Zhengbo Wang, Jian Liang, Ran He, Nan Xu, Zilei Wang, and Tieniu Tan. Improving zero-shot generalization for clip with synthesized prompts. ICCV , 2023. 2 [44] Zhichuan Wang, Yang Zhou, Zhe Liu, Rui Yu, Song Bai, Yu-long Wang, Xinwei He, and Xiang Bai. Describe, adapt and combine: Empowering clip encoders for open-set 3d object retrieval. In ICCV , pages 21026–21036, 2025. 1, 2, 3, 5, 6 [45] Zhichuan Wang, Yang Zhou, Jinhai Xiang, Yulong Wang, and Xinwei He. Teda: Boosting vision-lanuage models for zero-shot 3d object retrieval via testing-time distribution alignment. In ICMR , pages 1442–1451, 2025. 2, 3 [46] Xin Wei, Ruixuan Yu, and Jian Sun. View-gcn: View-based graph convolutional network for 3d shape analysis. In CVPR ,pages 1850–1859, 2020. 1 [47] Yiling Wu, Shuhui Wang, and Qingming Huang. Multi-modal semantic autoencoder for cross-modal retrieval. Neu-rocomputing , pages 165–175, 2019. 1, 6, 8, 2 [48] Zhirong Wu, Shuran Song, Aditya Khosla, Fisher Yu, Lin-guang Zhang, Xiaoou Tang, and Jianxiong Xiao. 3d shapenets: A deep representation for volumetric shapes. In 
+
+CVPR , pages 1912–1920, 2015. 2 [49] Le Xue, Mingfei Gao, Chen Xing, Roberto Mart´ ın-Mart´ ın, Jiajun Wu, Caiming Xiong, Ran Xu, Juan Carlos Niebles, and Silvio Savarese. Ulip: Learning a unified representation of language, images, and point clouds for 3d understanding. In CVPR , pages 1179–1189, 2023. 2 [50] Le Xue, Ning Yu, Shu Zhang, Artemis Panagopoulou, Jun-nan Li, Roberto Mart´ ın-Mart´ ın, Jiajun Wu, Caiming Xiong, Ran Xu, Juan Carlos Niebles, et al. Ulip-2: Towards scal-able multimodal pre-training for 3d understanding. In CVPR ,pages 27091–27101, 2024. 2, 6 [51] Jingkang Yang, Kaiyang Zhou, Yixuan Li, and Ziwei Liu. Generalized out-of-distribution detection: A survey. IJCV ,pages 5635–5662, 2024. 2 [52] Yongkang Zhang, Dongyu She, and Zhong Zhou. Adap-tive prompt learning via gaussian outlier synthesis for out-of-distribution detection. In ICCV , pages 3235–3244, 2025. 2[53] Hengshuang Zhao, Li Jiang, Chi-Wing Fu, and Jiaya Jia. Pointweb: Enhancing local neighborhood features for point cloud processing. In CVPR , pages 5565–5573, 2019. 2 [54] Jiahao Zheng, Sen Zhang, Zilu Wang, Xiaoping Wang, and Zhigang Zeng. Multi-channel weight-sharing autoencoder based on cascade multi-head attention for multimodal emo-tion recognition. IEEE TMM , 2022. 6, 8, 2 [55] Da-Wei Zhou, Han-Jia Ye, and De-Chuan Zhan. Learn-ing placeholders for open-set recognition. In CVPR , pages 4401–4410, 2021. 6, 8, 2 [56] Junsheng Zhou, Jinsheng Wang, Baorui Ma, Yu-Shen Liu, Tiejun Huang, and Xinlong Wang. Uni3d: Exploring unified 3d representation at scale. In ICLR , 2024. 2, 6 [57] Xiangyang Zhu, Renrui Zhang, Bowei He, Ziyu Guo, Ziyao Zeng, Zipeng Qin, Shanghang Zhang, and Peng Gao. Point-clip v2: Prompting clip and gpt for powerful 3d open-world learning. In ICCV , pages 2639–2650, 2023. 3 DINO Eats CLIP: Adapting Beyond Knowns for Open-set 3D Object Retrieval 
+
+# Supplementary Material 
+
+In the supplementary material, we first provide more implementation details. Next, we conduct more analysis experiments. Then, we provide more qualitative results. Lastly, we evaluate DEC on more challenging and realis-tic scenarios. 
+
+## A. More Implementation Details 
+
+We set the chunk size to 3, efficiently reducing the number of views by a factor of 6 with each CBR block and pooling layer. Thus, by design, CAM is highly light-weight that comprises only maximum of two CBR blocks to process an initial set of 24 views. Empirically, a single block is optimal for smaller datasets (OS-ESB-core, OS-NTU-core), while two blocks yield stronger performance on larger ones (OS-MN40-core, OS-ABO-core). When only one block is used, we simply aggregate the view features into a compact representation using adaptive average pooling. We also implement a three-layer MLP as our plain adapter for our baseline, which follows an encoder-decoder architecture: the first layer projects the input dimension D
+
+down to a bottleneck dimension D/ 4, the second layer op-erates within this bottleneck, and the third layer projects the features back to the original dimension D (D = 768 ). 
+
+## B. More Analyses 
+
+Impact of View Number. We analyze the impact of view number on OS-MN40-core. As shown in Figure 8, per-formance remains relatively stable when using only 2 to 4 views, then increases markedly between 4 and 8 views, and continues to improve slightly up to 24 views. This trend indicates that our method can effectively use a moderate number of views for decent performance. Yet we observe diminishing returns once most geometric view information has been observed. 
+
+Impact of fusion weight λ. Table 6 summarizes opti-mal λ across benchmarks and backbones. For OS-ESB-core and OS-NTU-core, the optimal λ remains consis-tently small (0.11) for both ViT-B/14 and ViT-L/14, sug-gesting that the pretrained DINO embeddings already en-code sufficiently discriminative geometric information for these datasets. Consequently, only a minimal contribu-tion from the adapted feature branch is required to attain peak performance, and excessive adaptation may perturb the pretrained feature structure. Conversely, OS-MN40-core and OS-ABO-core exhibit substantially higher optimal fusion weights, ranging from 0.2 to 0.4. These datasets involve greater intra-class variability and more heteroge-neous shape distributions, thereby increasing the necessity 2 3 4 6 8 12 24 
+
+> Number of views(N)
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> mAP
+> NDGG
+> ANMRR
+
+Figure 8. Effect of view numbers (N) on OS-MN40-core. 
+
+for task-specific feature adjustment. In such settings, the adapter contributes more complementary information, and the model benefits from assigning a larger relative weight to the adapted features. Dataset Backbone λ mAP ↑ NDCG ↑ ANMRR ↓                                            
+
+> OS-ESB-core ViT-B/14 λ= 0 .11 61.82 24.55 42.74 ViT-L/14 λ= 0 .11 60.59 24.46 43.30 OS-NTU-core ViT-B/14 λ= 0 .11 61.56 27.26 41.62 ViT-L/14 λ= 0 .11 65.15 28.24 37.80 OS-MN40-core ViT-B/14 λ= 0 .367.62 77.67 34.99 ViT-L/14 λ= 0 .469.69 79.11 33.23 OS-ABO-core ViT-B/14 λ= 0 .365.04 59.34 37.32 ViT-L/14 λ= 0 .267.91 60.73 34.74
+
+Table 6. Optimal λ across different datasets and backbones. 
+
+Overlapping vs. Non-overlapping Chunking. Ta-ble 7 studies the impact of stride size in CBR. The non-overlapping configuration (stride = 3) yields the highest per-formance across mAP, NDCG, and ANMRR. It indicates that non-overlapping chunking is not only sufficient but also works better: it successfully captures diverse local contexts while avoiding the computational redundancy and potential feature dilution associated with overlapping strides. Hence, DEC’s non-overlapping chunking strategy achieves a much better balance between effectiveness and efficiency. 
+
+Combining DINO and CLIP Features To study whether directly combining CLIP and DINO features derives more effective representations, we train an MLP on added DINOv2-ViT/B14 (mapped to the same dim. as CLIP) and CLIP ViT/B16 features with the standard cross-entropy loss. Yet it is worse than the DINOv2 baseline (Table 8) on 3/4 datasets in mAP. It suggests that naive fusion strug-stride size mAP ↑ NDCG ↑ ANMRR ↓
+
+1 64.64 76.31 37.34 2 65.52 76.62 36.74 3 67.62 77.67 34.95 
+
+Table 7. Impact of different stride sizes on OS-MN40-core. 
+
+gles to reconcile the two divergent feature spaces, whereas ours uses CLIP to provide semantic, generalized priors that regularize and guide DINO’s training, resulting in a more effective synergy.                  
+
+> Methods OS-ESB OS-NTU OS-MN40 OS-ABO DINOv2 59.19 59.77 62.77 62.17
+> Base. (DINOv2+CLIP) 59.40 59.28 61.35 60.69 Ours 61.82 61.56 67.62 65.04
+
+Table 8. Base. fuses DINO and CLIP, while we use DINO only. 
+
+## C. More Qualitative Results 
+
+Figure 9 presents more retrieval examples on OS-MN40-Core. As shown, DEC faithfully retrieves relevant 3D ob-jects for 3D query objects of common classes such as bath-tub, door, and bed. However, certain challenge cases (row 4-6) exist for classes such as stool, bowl, and bottle, lead-ing to failures. For instance, in row 5, a bowl query is in-correctly matched with instances from the vase, despite the subtle differences in their geometric profiles ( e.g. , aperture width and base structure). Notably, the top-ranked false positives typically share strong overall geometric similar-ities with the 3D query objects, which indicates that our model successfully learns high-level shape features but can be confounded by nuanced inter-class variations. One po-tential direction for improvement is to enhance fine-grained class discrimination by modeling these fine-grained geo-metric variations. Query                                                   
+
+> bathtub
+> door
+> bed
+> Failure
+> Cases
+> stool
+> NO. 10 NO. 9 NO. 8 NO. 7 NO. 6 NO. 5 NO. 4 NO. 3 NO. 2 NO. 1
+> Success
+> Cases
+> bathtub bathtub bathtub bathtub bathtub bathtub bathtub bathtub bathtub bathtub
+> door door door door door door door door door door
+> bed bed bed bed bed bed bed bed bed bed
+> stool stool stool stool stool stool stool stool chair lamp
+> bowl vase bowl vase vase lamp vase vase tent bowl vase
+> bottle vase vase vase vase vase vase vase vase vase vase
+
+Figure 9. More retrieval examples of our method on OS-MN40-core. Incorrect matches are in red boxes. 
+
+## D. Retrieval on Seen and Unseen Categories 
+
+We further evaluate the performance of our method on both seen and unseen categories. Following HGM 2R [10], we split the ModelNet40 dataset into two subsets: one for seen categories and one for unseen categories. Each subset con-tains 20 categories, with 80% of the data used for train-ing (training on seen categories and unseen categories sep-arately) and 20% reserved for retrieval evaluation (evalua-tion on seen and unseen categories). The models are trained on the seen categories and evaluated separately on both the seen and unseen category sets. As shown in Table 9, for seen categories, our method demonstrates competitive per-formance on seen categories, relying solely on multi-view images. It achieves a mAP of 94.09 and Recall@100 of 82.63, surpassing other methods in Recall@100. While the mAP is slightly below HGM 2R (94.10), which requires multi-modalities and test data for training, our method only relies on visual input alone and does not involve test data for training, highlighting our advantages in 3DOR. For unseen categories, our method outperforms all methods, achieving 86.47 in mAP and 82.00 in Recall@100. These results con-firm the model’s strong generalization ability, crucial for real-world applications with unseen categories. 
+
+Method On Seen Categories On Unseen Categories mAP ↑ Recall@100 ↑ mAP ↑ Recall@100 ↑
+
+TCL [15] 93.50 82.14 73.92 71.76 MMJM [29] 91.99 80.78 73.07 71.38 SDML [19] 88.50 78.50 74.69 72.39 CMCL [21] 90.99 79.60 75.21 72.49 MMSAE [47] 88.72 78.61 76.03 72.94 MCWSA [54] 85.70 76.83 72.89 70.56 PROSER [55] 87.71 77.78 74.93 72.56 InfoNCE [30] 93.65 82.19 73.92 71.64 HGM 2R [10] 94.10 82.47 82.23 78.21 DAC [44] 91.12 80.46 86.27 81.76 Our Method 94.09 82.63 86.47 82.00 
+
+Table 9. Separate retrieval results on seen and unseen classes. 
+
+## E. Results on More Realistic Datasets 
+
+OS-Objaverse-core. To validate DEC on real-world sce-narios, we curate OS-Objaverse-core, a new large-scale open-set 3DOR dataset based on Objaverse-LVIS of Ob-javerse [5]. Objaverse-LVIS has 1,142 categories in to-tal. We filter out categories with fewer than 20 objects, resulting in 607 categories. We split them into training, query, and target subsets, which have 10,092, 1,458, and 15,274 objects, respectively. The training set comprises 121 seen classes for training, while the query and target con-tain 486 unseen classes for evaluation. Table 10 compares the performance of DEC with state-of-the-art methods on Method mAP ↑ NDCG ↑ ANMRR ↓                          
+
+> CLIP-AdaM [18] 16.97 13.71 80.39 DAC [44] 21.89 16.42 75.86 DINOv3 [35] 32.23 21.34 66.31 Ours 35.53 23.02 63.71
+> Table 10. Performance comparison on OS-Objaverse-core.
+> Method mAP ↑NDCG ↑ANMRR ↓
+> DAC [44] 29.40 43.06 68.40 DINOv3 [35] 31.02 45.30 66.54
+> Ours 35.70 47.29 62.96
+> Table 11. Performance comparison on 3DFuture.
+
+OS-Objaverse-core. We also include a zero-shot baseline based on DINOv3 [35] which mean-pools the view features of ViT-L. As shown, DEC significantly surpasses this zero-shot baseline, increasing the mAP by +3.30%, demonstrat-ing the effectiveness of DEC for adaptation in this challeng-ing large-scale dataset with highly diverse categories. When compared with recent competitors such as CLIP-AdaM [18] and DAC [44], our method consistently achieves remark-able performance gains across all metrics. Specifically, we achieve a notable gain of +13.64% in mAP, +6.60% in NDCG, and +15.15% in ANMRR over DAC. 
+
+3DFuture. To further validate DEC’s effectiveness on real-world data, we evaluate it on 3DFuture [11], a large-scale 3D object retrieval benchmark comprising 49 object cate-gories. We split them into training, query, and target sub-sets, which have 3373, 205, and 11234 objects, respectively. Ten classes are designated as seen and used for training, and the remaining 39 classes are reserved for evaluation. As shown in Table 11, our method significantly outperforms the strong baselines, achieving substantial improvements across all evaluation metrics. Compared to DAC [44], we observe a remarkable gain of +6.30% in mAP, +4.23% in NDCG, and a -5.44% reduction in ANMRR, confirming the efficacy of our design in handling the high category di-versity and scale of the 3DFuture dataset. Compared with recent DINOv3 [35], we yield gains of +4.68% in mAP, +1.99% in NDCG, and -3.58% in ANMRR. These results demonstrate that our method offers a scalable and effec-tive solution for real-world 3D object retrieval scenarios in open-set conditions. 
+
+ScanObjectNN. Our DEC is also compatible with point clouds by projecting it online into depth maps. For the ex-periment, 10 depth maps are projected for each point cloud online following [57]. We experiment on noisy real-world ScanObjectNN. We achieve 30.34% mAP, outperforming recent CLIP-Adam [18] greatly. The zero-shot baseline at-tains only 23.77% mAP.            
+
+> Method mAP
+> Base. 23.77 CLIP-Adam [18] 24.18
+> Ours 30.34
+> Table 12. Performance comparison on ScanObjectNN.
+> Method Top-1 Accuracy PointCLIP V2 [57] 89.55 PointNet++ [33] 90.7
+> Ours 91.49
+> Table 13. Few-shot learning results on ModelNet40. We report the 16 shot classification accuracy (%).
+
+## F. Extending to Few-shot Classification 
+
+3D classification. Beyond open-set 3D object retrieval, we further evaluate DEC on diverse downstream tasks to as-sess its general-purpose representation capability. We con-duct a 16-shot 3D classification on ModelNet40. As shown in Table 13, we surpass PointCLIP V2 [57] greatly on Top-1 accuracy, even surpassing the fully supervised Point-Net++ [33] without normal .

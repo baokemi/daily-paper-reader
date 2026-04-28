@@ -1,0 +1,2129 @@
+Title: Compliance Moral Hazard and the Backfiring Mandate
+
+URL Source: https://arxiv.org/pdf/2604.21789v2
+
+Published Time: Tue, 28 Apr 2026 01:38:57 GMT
+
+Number of Pages: 60
+
+Markdown Content:
+# Compliance Moral Hazard and the Backfiring Mandate 
+
+## Jian Ni, Lecheng Zheng, John R Birge ∗
+
+Abstract 
+
+Competing firms that serve shared customer populations face a fundamental infor-mation aggregation problem: each firm holds fragmented signals about risky customers, but individual incentives impede efficient collective detection. We develop a mechanism design framework for decentralized risk analytics, grounded in anti-money laundering in banking networks. Three strategic frictions distinguish our setting: compliance moral hazard, adversarial adaptation, and information destruction through intervention. A
+
+temporal value assignment (TVA) mechanism, which credits institutions using a strictly proper scoring rule on discounted verified outcomes, implements truthful reporting as a Bayes–Nash equilibrium (uniquely optimal at each edge) in large federations. Em-bedding TVA in a banking competition model, we show competitive pressure ampli-fies compliance moral hazard and poorly designed mandates can reduce welfare below autarky, a “backfiring” result with direct policy implications. In simulation using a synthetic AML benchmark, TVA achieves substantially higher welfare than autarky or mandated sharing without incentive design. 
+
+Keywords: Mechanism design, Compliance moral hazard, Network Shapley value, Feder-ated learning 
+
+JEL Classification: D82, D83, G21, G28 
+
+> ∗
+
+Jian Ni: Pamplin College of Business, Virginia Tech, Email: jiann@vt.edu; Lecheng Zheng: Pam-plin College of Business, Virginia Tech, Email: lecheng@vt.edu; John R Birge: Booth School of Business, University of Chicago, Email: John.Birge@chicagobooth.edu 
+
+> arXiv:2604.21789v2 [cs.GT] 26 Apr 2026
+
+# 1 Introduction 
+
+Firms that serve shared customer populations routinely face a decentralized risk analytics problem in which each firm observes partial signals about customer behavior (transaction patterns, account activity, behavioral anomalies), while the full risk picture emerges only when signals are aggregated across firms. This fragmentation creates a market failure rem-iniscent of classic settings in mechanism design and information economics: decentralized agents hold private information whose aggregation would generate social surplus, but in-dividual incentives impede efficient revelation (Myerson, 1981; Myerson and Satterthwaite, 1983). This paper studies the mechanism design challenge of inducing truthful information sharing among competing firms and characterizes the welfare consequences of alternative regulatory regimes. 1
+
+The problem arises broadly wherever competing firms serve a shared risky customer population: payment platforms detecting fraud across merchants, fintech lenders assessing credit risk across origination channels, firms exchanging cybersecurity threat intelligence, or digital platforms identifying abusive accounts across services. We ground the analysis in the empirically important case of anti-money laundering (AML) in banking networks, where the information fragmentation problem is acute and well-documented: a single illicit network may conduct transactions across dozens of institutions and jurisdictions, but each institution observes only local fragments of the broader pattern. Recent estimates suggest that $800 billion to $2 trillion is laundered annually through legitimate financial channels, yet less than 1% is ever recovered (United Nations Office on Drugs and Crime, 2025). Three inter-related strategic frictions distinguish our setting from standard mechanism design problems with decentralized information (Myerson and Satterthwaite, 1983; Bergemann and Välimäki, 2010). 
+
+Compliance Moral Hazard. Firms that share risk signals may trigger costly investiga-tions or reveal detection capabilities to competitors, creating free-riding incentives (Begley et al., 2017). When detection benefits are shared through federation but compliance costs are borne locally, firms face incentives to underreport. Competitive pressure intensifies this moral hazard by raising the opportunity cost of flagging risky accounts: a channel analogous 
+
+> 1The applied implementation of the detection framework developed here (including the federated GNN architecture, dynamic targeting, and large-scale cross-market validation) is developed in a companion paper available separately. The present paper provides the game-theoretic foundations: incentive design, welfare analysis, and network Shapley characterization. Architecture details are in Appendix C.
+
+2to the competition–deposit insurance interaction documented in Bao and Ni (2017). 
+
+Adversarial Adaptation. Sophisticated bad actors observe intervention patterns and re-structure their behavior in response, requiring detection policies robust to strategic manip-ulation. This connects to the literature on strategic classification (Hardt et al., 2016; Dong et al., 2018), with the additional complication that the adversary’s adaptation is endogenous to the entire system of firms’ reporting and the regulator’s intervention. 
+
+Information Destruction Through Intervention. Acting on detected risk perma-nently removes nodes and edges from the observation network, creating an exploration– exploitation tradeoff where aggressive intervention improves immediate security but degrades future learning. This echoes optimal stopping problems in the bandit literature (Gittins, 1979; Whittle, 1988). We develop a formal framework in which heterogeneous institutions hold fragmented sig-nals and participate in a federated learning protocol that aggregates local models without sharing raw transaction records. The strategic question is whether parameter reports faith-fully reflect local risk assessments or are distorted to minimize compliance costs. We use graph neural networks to represent each institution’s local transaction network, and evaluate the framework in simulation using the IBM AML synthetic benchmark (Altman et al., 2023), comprising millions of transactions across seven markets. The paper’s core contribution is the mechanism design analysis and the welfare comparison across regulatory regimes; the network Shapley characterization and the intervention policy are extensions that enrich the framework under additional structure. Three main results organize the analysis. The first and central result is a welfare analysis showing that information-sharing man-dates can backfire . Embedding the detection game in a model of banking competition in the tradition of Keeley (1990) and Hellmann et al. (2000), we show that competitive pressure raises the private cost of truthful reporting and requires a calibrated TVA mechanism to sus-tain incentive compatibility. The Backfiring Mandate Proposition (Proposition 4) establishes that voluntary federation without incentive design can reduce welfare below autarky when competition is sufficiently intense, because strategic underreporting produces biased global models worse than honest local models while still imposing compliance costs. In calibrated simulations, mandatory sharing without TVA reaches only 56% of first-best welfare, barely above autarky (54%), while TVA achieves 87%. This “good intentions backfiring” result is the paper’s main policy contribution. 3The second result is the incentive design solution that achieves this welfare improvement .We introduce TVA, which credits institutions for the discounted future value of their early warnings, creating a first-mover advantage that aligns private and social incentives without requiring data sharing. Under the model’s assumptions, TVA characterizes truthful reporting as a Bayes–Nash equilibrium (Theorem 1) and achieves sublinear regret against adaptive adversaries with bounded memory when γ is sufficiently close to 1 (Proposition 1). Two extensions enrich the core analysis. A network theory of information value (Sec-tion 3.1) characterizes which institutions contribute most to collective detection using a Shapley value decomposition over the inter-institutional network (Myerson, 1977): under the edge-additive coalition value, each institution’s Shapley share is proportional to its weighted cross-border degree, so coalition design should prioritize institutions with high inter-institutional transaction volume. A path-based extension connecting to Bonacich cen-trality is outlined in Appendix B. An operational intervention analysis (Section 5) shows that freezing accounts creates a restless bandit problem (Whittle, 1988); we propose a network-adjusted index-based heuristic and show that a tractable risk memory approximation per-forms close to the oracle benchmark in simulation (Proposition 5). 
+
+## Related Literature 
+
+Our mechanism connects to dynamic mechanism design with marginal-contribution transfers (Bergemann and Välimäki, 2010; Pavan et al., 2014): TVA (4) is a delayed contribution-based transfer, structurally related to dynamic pivot and VCG-type mechanisms (Groves, 1973; Clarke, 1971; Vickrey, 1961) but adapted to a non-stationary environment where intervention alters the state space. The truthful elicitation of probabilistic beliefs draws on strictly proper scoring rules (Gneiting and Raftery, 2007); embedding such a rule in the dynamic transfer yields truthful reporting as a BNE uniquely optimal at each edge in large federations (Theorem 1). On strategic disclosure, our setting parallels the finance literature on underreporting of regulatory exposure (Begley et al., 2017; Admati and Pfleiderer, 2000) and information design in competitive markets (Kamenica and Gentzkow, 2011; Gentzkow and Kamenica, 2016), though institutions here jointly construct the information structure rather than a single designer choosing it. The competition channel builds on banking theory showing competitive pressure erodes prudential incentives (Keeley, 1990; Hellmann et al., 2000). The welfare analysis relates to the literature on information sharing among competitors (Vives, 1990; Gal-Or, 1985) and on voluntary disclosure (Admati and Pfleiderer, 2000). 4The competition–moral hazard interaction connects to the theoretical banking literature on how competitive pressure erodes prudential incentives (Keeley, 1990; Hellmann et al., 2000; Morrison and White, 2005). Our Backfiring Mandate Proposition echoes the finding of Bao and Ni (2017) that well-intentioned regulatory interventions can intensify rather than mitigate moral hazard when competitive pressure is strong: in our setting, mandating federation without incentive design encourages free-riding on others’ detection effort in the same way that deposit insurance can reduce banks’ incentive for prudent risk management (Keeley, 1990; Hellmann et al., 2000). What is novel is the explicit welfare ordering across four regulatory regimes and the identification of network centrality, rather than institution size, as the key determinant of coalition efficiency. The network Shapley value builds on the foundational work of Myerson (1977) on cooper-ative games in graph structures and the network economics literature (Jackson and Wolinsky, 1996; Jackson, 2008). A path-based extension of our Shapley characterization (Appendix B) connects to the key-player result of Ballester et al. (2006), who show that the agent whose removal most reduces aggregate Nash equilibrium activity is the one with the highest in-tercentrality. Our core Proposition 2 uses the weighted-degree structure that follows from the edge-additive coalition value, while the path-based extension relates to Bonacich central-ity. Further foundations are in Galeotti et al. (2010), Bramoullé et al. (2014), and Jackson (2005). On the machine learning side, the strategic reporting frictions we study connect to the strategic classification literature (Hardt et al., 2016; Dong et al., 2018) and to federated learning (McMahan et al., 2017; Li et al., 2020). The graph neural network architecture underlying the detection model builds on foundational GNN work (Kipf and Welling, 2016; Veličković et al., 2018). The applied graph-based AML detection literature (Weber et al., 2019; Weber et al., 2018; Zheng et al., 2025a; Zheng et al., 2024) treats detection as a pure prediction problem; our contribution is providing game-theoretic foundations in which net-work position is a first-class strategic variable: institutions choose how much to contribute to the graph-based detection system, and their network centrality determines both their incentive constraints and their coalition value. The remainder of this paper is organized as follows. Section 2.1 introduces the TVA mechanism, the incentive analysis (including a quantitative illustration on the IBM AML synthetic benchmark), and adversarial robustness. Section 3 characterizes coalition forma-tion and the network theory of information value. Section 4 embeds the detection game in banking competition and establishes the welfare ordering across regulatory regimes. Sec-tion 5 develops the operational intervention extension under additional dynamic assumptions, 5including simulation evidence. Section 6 concludes. All proofs are in the Appendix. 
+
+# 2 Model and Mechanism Design 
+
+## 2.1 Federated Detection Framework 
+
+The financial system consists of m institutions indexed by i ∈ { 1, . . . , m } operating over discrete time periods t ∈ { 1, . . . , T }. Each institution i observes a local transaction network 
+
+Gi,t = ( V i,t , E i,t , X i,t V , X i,t E ), where V i,t is the set of accounts active at institution i in period 
+
+t, Ei,t ⊆ V i,t × V i,t is the set of fund transfers (edges), Xi,t V ∈ R|V i,t |× dV is the matrix of node (account) features, and Xi,t E ∈ R|Ei,t |× dE is the matrix of edge (transaction) features. Cross-institution transactions create edges between institutions: if account u ∈ V i,t sends funds to v ∈ V j,t with i̸ = j, the edge (u, v ) appears in both Ei,t and Ej,t . Each edge e ∈ Ei,t 
+
+carries a binary label ye ∈ { 0, 1} indicating whether it is illicit. Labels are confirmed with delay: the true label for an edge observed at time t may not be determined until t + τ for some τ ≥ 0, reflecting the time required for regulatory investigation, court proceedings, or account seizure to establish that a transaction was illicit. 2 The class distribution is severely imbalanced: P(ye = 1) < 0.01 in typical financial data. Each institution i maintains a graph-based detection model f iθ : Gi,t → [0 , 1] |Ei,t | that maps the transaction network to risk scores byi,t e for each edge. We implement f iθ using graph neural networks (GNNs) (Kipf and Welling, 2016; Xu et al., 2019), which aggregate information from local transaction neighborhoods through learned message-passing, followed by temporal attention across time windows to capture evolving laundering patterns, and an edge-level multi-layer perceptron for illicit transaction classification. To address class imbalance, we adopt focal loss (Lin et al., 2017), which dynamically reweights training samples toward hard-to-classify minority cases. Full architectural details are provided in Appendix C. The key feature of the protocol is privacy preservation: each institution i trains its local model f iθ on Gi,t for a fixed number of local epochs, then transmits model parameters θi
+
+(not raw data) to a central coordinator that aggregates via weighted averaging, θglobal =
+
+Pmi=1 wiθi, and distributes the updated global model back to all institutions (McMahan et al., 2017). This process repeats for R communication rounds. Training is supervised: institution i uses the local graph Gi,t together with all confirmed labels {ye : e ∈ Ei,t ′
+
+, t ′ ≤ t}  
+
+> 2In AML practice, label confirmation follows the Suspicious Activity Report (SAR) investigation process in which the institution flags the activity, FinCEN or a national financial intelligence unit reviews it, and a determination is made, typically over weeks to months. The delay τcaptures this institutional timeline.
+
+6available up to period t. Crucially, institutions never share raw transaction data (Gi,t , y i,t ):only model parameters. The central question is: what information does each institution reveal through its parameter updates, and what are the strategic incentives for truthful versus distorted reporting? 
+
+## 2.2 Strategic Environment and Incentive Alignment 
+
+To answer this question, we model a repeated strategic interaction among three types of players: financial institutions (information senders), adaptive adversaries (money launder-ers), and a regulator (decision maker). The interaction unfolds over discrete time periods 
+
+t = 1 , . . . , T , with decentralized information, delayed feedback, and endogenous adaptation. 
+
+Institutions (Information Senders). Each institution i observes its local transaction network Gi,t and submits a report consisting of model parameters ϑi ∈ Θ to a central coor-dinator. A reporting strategy ρi : Gi,t → Θ maps local observations to reported parameters. The submitted parameters induce edge-level posterior probabilities byi,t e ≡ fϑi (e; Gi,t ) ∈ [0 , 1] 
+
+on each edge e ∈ Ei,t , which are the mechanism-relevant quantities entering the TVA credit rule (4). The truthful benchmark strategy is 
+
+ρ∗ 
+
+> i
+
+(Gi,t ) = θi, where θi = arg min  
+
+> θ
+
+L(fθ, G i,t ),
+
+for a suitable loss function L (e.g., focal loss). Under truthful reporting, the induced poste-riors byi,t e = fθi (e; Gi,t ) are the institution’s best Bayesian estimates of the illicit probability 
+
+Pr( ye = 1 | Gi,t , θ i): that is, institutions report calibrated beliefs. Strategic deviations, such as reporting ϑi̸ = θi, manifest as distorted posteriors at the edge level, and the mechanism analysis therefore operates equivalently on parameters ϑi or on the induced posteriors byi,t .Institutions may deviate by underreporting risk (scaling posteriors below their calibrated values) to free-ride on others’ detection efforts, injecting parameter noise (which translates to noise in posteriors), or withholding participation. 3
+
+Adversaries (Money Launderers). Adversaries observe the history of regulatory inter-ventions {a1, . . . , a t}, where as indicates which transaction edges were frozen at time s. Using this feedback, sophisticated launderers infer the detection policy and adapt through transac-tion splitting, temporal manipulation, route switching, and account replacement. Formally,       
+
+> 3That model parameters can expose local training data is well-established in the federated learning literature; see Zhu et al. (2019) and Melis et al. (2019) on gradient inversion and membership inference attacks. The mutual information term κi·I(θi;Gi,t )in equation (3) provides a formal measure of this leakage.
+
+7the adversary chooses the next-period transaction graph Gt+1 to solve 
+
+max  
+
+> Gt+1
+
+E[laundered value ] − P(detected | policy history ) · C, (1) where C denotes the cost of detection, including account freezing and asset seizure. 
+
+Regulator (Decision Maker). The regulator observes aggregated risk scores {byte} pro-duced by the global model and selects intervention actions ae ∈ { monitor , freeze } for suspi-cious transaction edges. Freezing prevents immediate illicit losses but removes edges from future transaction graphs, degrading subsequent learning. Within each period t, the interaction proceeds as follows: (1) institutions observe local transaction graphs and submit (possibly distorted) reports; (2) the coordinator aggregates reports and updates the global model, and the regulator computes risk scores and selects interventions; (3) adversaries observe interventions and adapt for period t + 1 ; (4) true labels are revealed with delay. 
+
+Social Planner Benchmark. Consider a social planner with access to all local transaction graphs {Gi,t }mi=1 . The planner jointly optimizes detection and intervention to maximize discounted social welfare: 
+
+max  
+
+> θ, {ate}
+
+E
+
+
+
+> T
+
+X
+
+> t=1
+
+γt
+
+ X
+
+> e:ate=freeze
+
+Ceye − α1
+
+X
+
+> e:ate=freeze
+
+(1 − ye) − α2
+
+X
+
+> e:ate=monitor
+
+ye
+
+ Ft
+
+ , (2) where θ denotes the global detection model parameters (which determine the risk scores byte
+
+used in intervention decisions), ate ∈ { monitor , freeze } is the intervention action for edge e
+
+at time t, Ft is the information available at time t (all observed graphs and confirmed labels up to t), Ce is the prevented illicit value from freezing edge e, and α1, α2 are Type I and Type II error costs. In practice, however, all local transaction graphs are not shared across institutions due to privacy and competitive concerns. Each institution i instead maximizes a private utility function: 
+
+ui(ρi, ρ −i) = E[detection quality ] − βi · E[local compliance costs ] − κi · I(θi; Gi,t ), (3) where I(θi; Gi,t ) denotes the mutual information between reported parameters and local data, capturing information leakage costs. This divergence between institutions and the social planner creates incentives for underreporting, delayed signaling, and strategic noise 8injection, leading to systematically suboptimal collective detection. Truthful reporting imposes two costs on institution i: (i) a direct compliance cost , since strong suspicion signals trigger more local freezing decisions and the associated investigations; and (ii) an information leakage cost , since reporting θi reveals local transaction patterns to competitors and potentially to adversaries. Meanwhile, detection benefits are dispersed across all institutions through reduced systemic risk and regulatory penalties. This creates incentives for strategic underreporting. 
+
+Example 1 (Strategic Underreporting) . Consider institution A in a federation of m banks, with three edges having true posteriors qe ∈ { 0.6, 0.7, 0.8}. Under the Brier score, truthful reporting yields expected credit 2.39 C; unilateral underreporting to [0 .48 , 0.56 , 0.64] reduces this to 2.357 C by strict propriety. Under Assumptions 3 and 5, underreporting reduces global detection sensitivity on A’s edges, lowering expected investigations and hence compliance cost; however, because A’s unilateral deviation shifts the aggregated signal by only O(1 /m ),this induced compliance saving is itself O(cA/m ) and vanishes in large federations. For moderately large m, the first-order credit loss 0.033 C dominates the O(1 /m ) compliance saving. Coordinated underreporting by all institutions would collapse aggregate detection quality, a collective-action failure that TVA prevents by making individual truthfulness a strict best response at each edge. 
+
+This example shows that decentralized institutions face a misalignment between marginal social benefits and marginal private costs, yielding strategic underreporting as a rational equi-librium. The key question is: can we design a mechanism that aligns institutional incentives with the social objective? 
+
+Temporal Value Assignment. We introduce a Temporal Value Assignment (TVA) mech-anism (Sutton, 1984) that explicitly rewards institutions for early and accurate warnings. The coordinator maintains a dynamic credit account πit for each institution i. When a trans-action edge e is confirmed illicit at time tconfirm , institution i receives credit based on its historical predictions: 
+
+πitconfirm = πitconfirm −1 + X
+
+> t<t confirm
+
+γtconfirm −t · Ce · S byi,t e , y e
+
+ , (4) where γ ∈ (0 , 1) discounts delayed signals, ye ∈ { 0, 1} is the confirmed label, and S :[0 , 1] × { 0, 1} → R is a strictly proper scoring rule (Gneiting and Raftery, 2007). Our baseline specification is the (negative) Brier score S(by, y ) = 1 − (by − y)2, which is strictly 9proper, bounded in [0 , 1] , and has intuitive economic interpretation as accuracy rent. The log score S(by, y ) = y log by + (1 − y) log(1 − by) is an equivalent alternative. The defining property of a strictly proper scoring rule is that, for any distribution q ∈ [0 , 1] 
+
+over the outcome y,
+
+q = arg max  
+
+> by∈[0 ,1]
+
+Ey∼Ber( q)[S(by, y )] , (5) with the maximum uniquely attained at by = q. Applied edge-by-edge, this means an institu-tion’s expected credit on edge e is strictly maximized by reporting byi,t e = Pr( ye = 1 | Gi,t , θ i):the true posterior probability of illicit activity given the institution’s information. Institu-tions with higher accumulated credit receive tangible benefits: reduced regulatory penalties, preferential access to global model updates, and advantages in future coordination games. By explicitly pricing the temporal value of information, TVA creates a first-mover ad-vantage for early detection. Institutions internalize the social benefit of timely warnings, making truthful and prompt reporting a best response. As a result, the mechanism makes truthful reporting robust to the main classes of strategic misreporting, as formalized below. To ground TVA as an economic primitive: the coordinator (regulator or industry consor-tium) can observe confirmed illicit transactions and each institution’s historical risk scores. The credit account πit is contractible: it enters directly into the institution’s regulatory penalty schedule or access to shared intelligence, as specified in equation (20). The commit-ment assumption is that the coordinator pre-commits to the credit rule (4) before institutions choose their reporting strategies; this is analogous to a regulatory commitment to reward early suspicious activity reports, which is feasible under existing AML frameworks such as FinCEN’s Suspicious Activity Report (SAR) programme. TVA is therefore not a literal cash transfer but a penalty rebate or regulatory credit whose present discounted value creates the incentive alignment. 
+
+## 2.3 Theoretical Analysis 
+
+We prove that temporal value assignment implements truthful reporting as a Bayes–Nash equilibrium under regularity conditions. 
+
+Assumption 1 (Label Revelation Independent of Own Report) . The probability that edge 
+
+e’s true label ye is eventually revealed does not depend on institution i’s own report byi,t e . Labels may be revealed through external audits, law enforcement subpoenas, downstream defaults, or investigations initiated outside the consortium; revelation need not occur for every edge, only that the revelation mechanism is not selective on institution i’s reports. This ensures the 
+
+10 scoring rule in (4) is evaluated on a sample unbiased with respect to i’s reporting strategy, preserving strict propriety. 
+
+Assumption 2 (Detection Value) . The marginal value of detecting an illicit transaction at time t is V (t) = V0γt, where V0 > 0 is the initial value and γ ∈ (0 , 1) captures depreciation (cumulative losses before detection). 
+
+Assumption 3 (Compliance Cost Structure) . Compliance costs arise from investigations triggered by the aggregated global detection decision, not directly from institution i’s own reports. Let ninv  
+
+> i
+
+(S, ¯ρ) ∈ Z≥0 denote the number of edges in institution i’s local transaction network that are investigated in the current period, where S is the participating coalition and ¯ρ is the aggregated reporting profile that feeds into the global detection system. The compliance cost is 
+
+Ccomp  
+
+> i
+
+= ci · E[ninv  
+
+> i
+
+(S, ¯ρ)] ,
+
+with ci > 0. This reflects how anti-money laundering investigations work in practice: an institution bears investigation costs on edges flagged by the regulatory or industry detection pipeline, which aggregates many institutions’ signals. Because ninv  
+
+> i
+
+depends on the aggregated reporting profile ¯ρ, the marginal effect of institution i’s individual report on its own compli-ance cost is of order 1/m in a coalition of size m, vanishing in large federations. Under this structure, the report-dependent component of institution i’s payoff is, to first order, only the TVA credit and the leakage cost. A small fixed filing cost directly proportional to own reports can be accommodated without affecting Theorem 1, provided this direct component is of order 
+
+O(1 /m ) relative to the scoring-rule accuracy rent; the theorem’s ϵ-BNE bound absorbs such first-order direct costs into the ϵ-shading. 
+
+Assumption 4 (Information Leakage) . The cost to institution i of revealing information through parameter reporting is κi · I(θi; Gi,t ), where I(·; ·) is mutual information and κi ≥ 0.
+
+Assumption 5 (No Dominant Player and Lipschitz Aggregation) . (i) No institution has more than O(1 /m ) weight in the aggregated profile: max i wagg  
+
+> i
+
+= O(1 /m ). (ii) The mapping from ¯ρ to expected investigations E[ninv  
+
+> i
+
+] is Lipschitz continuous. 
+
+In typical AML consortia no bank exceeds a few percent of aggregate weight; the Lipschitz condition ensures the O(1 /m ) argument in Theorem 1 carries through to compliance costs. The O(1 /m ) form can be weakened: Theorem 1 extends to any bounded-share structure 
+
+max i wagg  
+
+> i
+
+≤ ¯w < 1, with the ϵ-BNE shading bound scaled by ¯w/ (1 − ¯w) rather than by 1/m .11 Theorem 1 (Bayes–Nash Implementation of Truthful Reporting) . Consider the federated reporting game in which each institution i chooses a reporting strategy ρi : Gi,t 7 → byi,t and receives payoff 
+
+Ui(ρi, ρ −i) = Eπi
+
+> ∞
+
+ − ci · E[ninv  
+
+> i
+
+(S, ¯ρ)] − κi · I(θi; Gi,t ), (6) 
+
+where TVA credit πi 
+
+> ∞
+
+is accumulated according to (4) with a strictly proper scoring rule S.Under Assumptions 2–4, the truthful reporting profile ρ∗ 
+
+> i
+
+(Gi,t )e = Pr( ye = 1 | Gi,t , θ i) is a Bayes–Nash equilibrium provided: 
+
+V0
+
+1 − γ · Pr( illicit ) > c i + κi · I(θi; Gi,t ) for all i. (7) 
+
+Truthful reporting is a strict pointwise best response at each edge. For finite m, it is an 
+
+ϵ-BNE with optimal unilateral shading ϵ∗ = O(ci/(Cem)) (vanishing as m → ∞ ); exact BNE obtains in the large-federation limit, or under a discrete reporting grid with step size exceeding ϵ∗.
+
+See proof in Appendix A.1. The strict propriety of S delivers the result pointwise: each edge’s expected credit is strictly maximized at the true posterior. Condition (7) ensures the temporal accuracy rent from truthful reporting outweighs the compliance and information-leakage costs, with the discount factor γ as the policy lever: higher γ broadens the parameter range in which truthful reporting is individually rational. Unlike static VCG transfers, TVA self-finances through endogenous credit accumulation on verified outcomes. Strict propriety of S rules out pooling and constant-report deviations directly: any con-stant by = k earns credit strictly below truthful reporting on each edge with qe̸ = k, with margin scaling as (qe − k)2. Condition (7) ensures the scoring-rule accuracy premium out-weighs the leakage cost κiI(θi; Gi,t ), which is specific to truthful reporting ( I = 0 for constant strategies). Appendix A.1 formalizes the full argument. The factor (1 − γ)−1 makes the discount rate pivotal: a higher γ (slower depreciation of detection value) raises the left side, broadening the parameter range over which truthful reporting is individually rational. When competitive pressure is strong (Section 4), the right side of (7) acquires an additional competitive cost term, requiring a higher γ∗ to maintain incentive compatibility. Next, we characterize the efficiency loss from decentralization. Let θ∗ denote the param-12 eters of the centralized benchmark (social planner with access to all local graphs), and let 
+
+θfed denote the federated learning solution under truthful reporting. Standard federated learning convergence results (Li et al., 2020) further imply that un-der truthful reporting the federated solution satisfies L(θfed ) ≤ (1 + ϵ)L(θ∗) + O(mLd/N ),where ϵ decays exponentially in the number of communication rounds and N = P 
+
+> i
+
+ni. The efficiency loss is thus small when the federation is large relative to model complexity: the institutional scale of AML networks (dozens to hundreds of banks) favors this regime. The communication–performance tradeoff is illustrated empirically in Appendix D.9. 
+
+## 2.4 Quantitative Illustration 
+
+We illustrate the model’s predictions using the IBM AML synthetic benchmark (Altman et al., 2023), which contains over 1.4 million transactions across seven markets (United States, Germany, France, Italy, Spain, China, Rest of World) over 10 days, with illicit transactions representing less than 1% of volume. 4 Data are split temporally: days 1–8 for training and validation, days 9–10 for testing, with seven federated clients corresponding to the seven markets. We implement three reporting strategies: Truthful (banks report true local parameters 
+
+θi), Underreporting (banks scale parameters by 0.8 to reduce sensitivity), and Independent 
+
+(banks train only on local data without federation). Given severe class imbalance we focus on AUPRC (Area Under Precision-Recall Curve) and Type II error (false negative rate). Table 1: Detection Performance Under Different Reporting Strategies 
+
+Strategy AUPRC AUCROC Type I Error Type II Error 
+
+Independent (No Federation) 0.432 0.978 0.028 0.219 Underreporting ( ×0.8) 0.452 0.979 0.041 0.198 Truthful Reporting (TVA) 0.471 0.984 0.057 0.104 
+
+Notes : Simulation on the IBM AML synthetic benchmark. AUPRC is the primary metric given severe class imbalance ( < 1% illicit). 
+
+Table 1 shows that truthful reporting outperforms independent learning by 3.9 percentage points in AUPRC and underreporting by 2.1 percentage points, with Type II error reduced by 52.5% and 47% respectively. The ordering is consistent with the model’s predictions under   
+
+> 4Dataset available at https://www.kaggle.com/datasets/ealtman2019/ibm-transactions-for-a nti-money-laundering-aml .Full dataset statistics, architecture details, parameter calibration, welfare simulations across regulatory regimes, per-market heterogeneity, and comparison to prior AML detection methods are in Appendix D. The federated GNN architecture and complete simulation pipeline that produce the empirical results reported below are developed in a companion paper, Zheng et al. (2025b).
+
+13 Theorem 1, though we emphasize that this is an illustration of comparative performance under exogenously imposed distortions, not a derivation of equilibrium reporting under TVA: underreporting is imposed as a scalar distortion ( ×0.8) rather than derived as an equilibrium best response. A decomposition in Appendix D attributes 22–34% of the total improvement across markets to the incentive-alignment channel, with the remainder from data-pooling. 
+
+## 2.5 Adversarial Robustness 
+
+The previous section established that temporal value assignment implements truthful report-ing as a Bayes–Nash equilibrium. We now analyze robustness when adversaries adapt their strategies in response to observed interventions. 
+
+Adversarial learning model 
+
+Sophisticated adversaries are not passive: they observe the history of enforcement actions and adjust transaction patterns to evade detection. We model this as a repeated game between the regulator and adversary. At time t, the adversary observes the history of frozen accounts Ht = {e : ase = freeze , s < t}, implied detection threshold , i.e., bτt = min {bye : e ∈ H t}, and the regulator’s behavioral patterns including intervention timing and targeting priorities. Based on this history, the adversary can adapt through transaction splitting (breaking large transfers into small ones to fall below detection thresholds), temporal manipulation 
+
+(adjusting transaction timing to avoid detection windows), route switching (using different intermediary accounts), and account replacement (abandoning compromised accounts for new ones). Each adaptation has a cost c(·) that increases with the degree of deviation from the adversary’s preferred strategy. Formally, at time t the adversary solves: 
+
+max  
+
+> Gt+1
+
+E[Vlaunder (Gt+1 )] − P(detected | Gt+1 , Ht) · Cpenalty − c(Gt+1 , G t) (8) where Vlaunder (·) is the value of successfully laundered funds and c(Gt+1 , G t) measures the cost of adaptation. 
+
+Regret and equilibrium analysis 
+
+We analyze the regulator’s performance using the standard regret framework from online learning. Let π denote the regulator’s policy (mapping risk scores to interventions) and let 14 π∗ denote the best fixed policy in hindsight. The regret after T periods is: Regret (T ) = 
+
+> T
+
+X
+
+> t=1
+
+L(π, G t) − min 
+
+> π′∈Π
+> T
+
+X
+
+> t=1
+
+L(π′, G t), (9) where L(π, G t) is the loss (missed detections + false alarms) under policy π at time t.Standard regret bounds assume the sequence {Gt} is fixed or generated by an oblivious adversary. But in our setting, the adversary is adaptive : Gt+1 depends on the regulator’s past actions through Ht. This makes the problem significantly harder. Here, we formalize the regret bound for the temporal value assignment as follows. 
+
+Proposition 1 (Regret Bound) . Suppose the adversary adapts with delay δ ≥ 1 (observes interventions at time t and responds at t + δ). Let A denote the set of adversarial adaptation strategies. Then temporal value assignment with discount factor γ achieves regret: Regret (T ) = O
+
+p T |A| log |A| + δT (1 − γ)2
+
+
+
+(10) 
+
+In contrast, fixed-threshold policies achieve regret Ω( T ).
+
+See proof in Appendix A.2. The regret bound decomposes into two economically distinct channels. The O(pT |A| log |A| )
+
+term reflects standard online learning: the cost of not knowing in advance which detection strategy is best against a fixed adversary. The δT (1 −γ)2 term captures the additional cost of adversarial adaptation: it is linear in time but shrinks as γ → 1, because aggressive temporal discounting functions as a commitment device. When the regulator heavily weights early signals, the adversary’s best response is to avoid generating any early signals at all: which is effectively not laundering. Fixed-threshold policies lack this commitment, so adversaries can profitably learn to evade them throughout the horizon, producing Ω( T ) regret. When adaptation costs are strictly convex and increasing in the degree of deviation, a stronger result follows directly from Proposition 1: there exists a threshold ¯γ ∈ (0 , 1) such that for γ > ¯γ, the regulator playing TVA and the adversary not adapting constitutes a subgame-perfect equilibrium (proof in Appendix A.3). The intuition is a deterrence argu-ment. A regulator committed to high γ acts on early signals before the adversary has time to respond, making adaptation futile. Rational adversaries, anticipating that any restruc-turing of transaction flows will be caught early regardless, find it cheaper not to adapt at all. The mechanism is self-enforcing: the regulator never needs to carry out its most aggressive 15 interventions in equilibrium because the commitment itself deters the behavior that would trigger them (Fudenberg and Tirole, 1991). 
+
+Empirical evidence 
+
+We illustrate Proposition 1 and the deterrence result using simulations where an adversary best-responds to observed intervention patterns. We train detection models on days 1–8 and simulate adversarial adaptation in the test period (days 9–10). The adversary: (1) Regulator deploys detection policy π and freezes accounts with bye ≥ τ . (2) Adversary observes frozen accounts and infers threshold bτ . (3) Adversary adapts by: (a) splitting large transactions by factor 1/α , where α ≥ 1, (b) reducing transaction frequency by factor β ∈ [0 , 1] . (4) Adversary incurs adaptation cost c(α, β ) = (α − 1) 2 + (1 − β)2. (5) Process repeats with adapted graph Gt+1 . We compare three policies: (1) Temporal Value ( γ = 0 .9): Our mechanism with strong early detection incentives; (2) 
+
+Temporal Value ( γ = 0 .5): Moderate discounting; (3) Fixed Threshold: Constant τ = 0 .5
+
+without temporal weighting. Table 2: Detection Performance Under Adversarial Adaptation 
+
+Policy Period 9 Period 10 Degradation AUPRC AUPRC (%) 
+
+No Adaptation (Baseline) 
+
+All Policies 0.474 0.469 0.0% 
+
+With Adaptive Adversary 
+
+Fixed Threshold 0.413 0.401 13.7% Temporal Value ( γ = 0 .5) 0.457 0.449 3.9% Temporal Value ( γ = 0 .9) 0.468 0.464 1.2% Table 2 shows that temporal value assignment with high γ maintains stable performance (only 1.2% degradation) under adversarial adaptation, while fixed-threshold policies degrade substantially (13.6%). The moderate discounting ( γ = 0 .5) provides intermediate robustness. Table 3 shows that when facing temporal value assignment with high γ, adversaries choose minimal adaptation ( α ≈ 1, β ≈ 1) because the cost exceeds the benefit, consistent with the deterrence result above. Against fixed thresholds, adversaries aggressively split transactions (α = 2 .3) and reduce frequency ( β = 0 .65 ). 16 Table 3: Adversary’s Adaptation Strategies                 
+
+> Regulator Policy Transaction Splitting Frequency Reduction Adaptation Cost
+> αβc(α, β )
+> Fixed Threshold 2.3 0.65 1.81 Temporal Value ( γ= 0 .5)1.7 0.78 0.54 Temporal Value ( γ= 0 .9)1.2 0.91 0.05
+
+# 3 Coalition Formation and Network Theory of Informa-tion Value 
+
+In this section, we model federated participation among heterogeneous institutions as a two-stage Bayesian game in which institutions differ in size, compliance cost, signal quality, and competitive sensitivity. Participation generates positive network effects in detection perfor-mance but entails compliance and leakage costs, creating endogenous coalition formation. The model characterizes the minimum viable coalition, highlights strategic complementarities in participation, and shows that without TVA the federation may unravel due to adverse selection. By internalizing marginal contributions to system-wide detection quality, TVA sustains participation of high-value institutions and stabilizes the cooperative equilibrium. 
+
+Two-stage participation game 
+
+Consider a finite set of institutions M = {1, . . . , m }. Each institution i is characterized by type θi = ( si, c i, q i, κ i) ∼ F on R4+, where si denotes size (data scale), ci denotes compliance cost, qi denotes signal quality, and κi denotes competitive sensitivity (leakage concern). Types are private information. We assume si and qi are positively correlated, reflecting that larger institutions invest more in compliance and data infrastructure. In the first stage (participation decision), Institutions simultaneously choose di ∈ { 0, 1},where di = 1 indicates participation in the federated learning mechanism and di = 0 indicates non-participation. Let S = {i ∈ M : di = 1 } denote the participating coalition. The participation stage is a static Bayesian game under incomplete information about other institutions’ types. In the second stage (reporting game), c Conditional on S, participating institutions jointly train a federated model with TVA-based credit allocation, while non-participating institutions train independently using only their local data. Let Bi(S) denote the detection benefit that institution i derives when the participating coalition is S.17 Institution i’s participation payoff is 
+
+Ui(di = 1 | S ) = Bi(S)
+
+| {z } 
+
+> detection benefit
+
+− ci · ∆ni(S)
+
+| {z }
+
+> compliance cost
+
+− κi · Ii(S)
+
+| {z }
+
+> leakage cost
+
++ πi(S)
+
+| {z } 
+
+> TVA credit
+
+. (11) If di = 0 , institution i receives its outside option 
+
+Ui(di = 0) = Bi({i}),
+
+which corresponds to training independently. The net gain from participation is therefore 
+
+∆Ui(S) = Bi(S) − Bi({i}) − ci∆ni(S) − κiIi(S) + πi(S).
+
+Institution i participates if and only if ∆Ui(S) ≥ 0.
+
+Assumption 6 (Positive Network Effects) . For any coalition S ⊆ N and any institution 
+
+j / ∈ S ,
+
+Bi(S ∪ { j}) − Bi(S) > 0,
+
+and the marginal benefit is diminishing in coalition size: 
+
+∂2Bi
+
+∂|S| 2 < 0.
+
+That is, adding an additional participating institution j strictly increases i’s detection benefit, but at a decreasing rate as the coalition grows. 
+
+Assumption 7 (Heterogeneous Outside Options) . The standalone benefit Bi({i}) is increas-ing in si and qi. Hence, institutions with larger size or higher signal quality have stronger outside options and require larger coalition gains to participate. 
+
+Minimum viable coalition and adverse selection Definition 1 (Minimum Viable Coalition) . S∗ is a minimum viable coalition if (i) Ui(1 |S∗) ≥ Ui(0) for all i ∈ S ∗, and (ii) no proper subset satisfies (i). 
+
+The following properties of the minimum viable coalition follow from supermodularity of the detection benefit function (proof in Appendix A.4). First, it exceeds a size threshold: 
+
+|S ∗| ≥ m, where m is determined by the condition P 
+
+> i∈S
+
+siqi ≥ max i{ci + κiIi}/[Pr( illicit ) ·
+
+18 V0/(1 − γ)] . Second, institutions with high cross-border exposure and low compliance costs join first: a selection pattern consistent with the empirical observation that large interna-tionally active banks tend to be early participants in AML information-sharing programmes. Third, the coalition exhibits strategic complementarity: adding one institution increases the marginal benefit for all remaining members, supporting a thick-market equilibrium. Fourth, without TVA the federation unravels: if max i[Bi({i}) − Bi({1, . . . , m }) + ci∆ni + κiIi] > 0,the marginal institution exits, reducing detection quality for remaining members and trigger-ing cascading departures in a dynamic analogous to adverse selection in insurance markets (Akerlof, 1970). 
+
+## 3.1 Network Structure and Information Value 
+
+The analysis in Section 3 treats each institution’s contribution as depending on its type 
+
+(si, c i, q i, κ i) but not on its position in the inter-institutional transaction network. In practice, an institution that bridges two otherwise disconnected clusters of markets contributes far more to detection than an equally sized institution embedded within a single cluster. This section formalizes the network determinants of information value. 
+
+The Inter-Institutional Network 
+
+Define the inter-institutional network G = ( N , E, W ), where N = {1, . . . , m } is the set of institutions, E ⊆ N × N contains an edge (i, j ) whenever institutions i and j share cross-border transactions, and W : E → R+ assigns weights wij equal to the volume of cross-border transactions between i and j. Let A denote the weighted adjacency matrix with Aij = wij .The inter-institutional network G is distinct from the individual transaction graphs Gi,t :the former captures which institutions share information boundaries , while the latter cap-tures within-institution transaction patterns. Detection of cross-border illicit flows requires information from both endpoints of an inter-institutional edge: and thus from both institu-tions. 
+
+Definition 2 (Cross-Border Detection Function) . For edge (i, j ) ∈ E , the cross-border de-tection probability is: 
+
+pij (S) = 
+
+
+
+pHij if i ∈ S and j ∈ S ,pLij if i ∈ S or j ∈ S (but not both) ,p0 
+
+> ij
+
+if i / ∈ S and j / ∈ S ,
+
+(12) 
+
+where pHij > p Lij > p 0 
+
+> ij
+
+and S is the participating coalition. 
+
+19 The key feature is the complementarity between endpoints: having both institutions in the federation ( pH ) yields strictly higher detection than having only one ( pL), which in turn dominates having neither ( p0). This complementarity is the network foundation for the supermodularity of the participation game. 
+
+Network Shapley Value 
+
+We define the detection value function over coalitions as: 
+
+V (S) = X
+
+> (i,j )∈E
+
+wij · pij (S) · Cij , (13) where Cij is the expected cost of undetected illicit flow on edge (i, j ). Following Myerson (1977), the network Shapley value of institution i is: 
+
+ϕnet  
+
+> i
+
+= X
+
+> S⊆N \{ i}
+
+|S| ! ( m − |S| − 1)! 
+
+m!
+
+V (S ∪ { i}) − V (S). (14) 
+
+Proposition 2 (Network Shapley Characterization) . Under the edge-additive coalition value (13) ,the network Shapley value of institution i is: 
+
+ϕnet  
+
+> i
+
+= 12
+
+X
+
+> j:( i,j )∈E
+
+(pHij − p0 
+
+> ij
+
+) · wij · Cij . (15) 
+
+That is, institution i’s Shapley value is a weighted-degree measure: it is proportional to the sum, across edges incident to i, of the expected detection gain (pHij − p0 
+
+> ij
+
+) weighted by edge volume wij and edge cost Cij . Institutions with more incident cross-border volume or higher per-edge detection complementarity earn a larger Shapley share. 
+
+See proof in Appendix A.5. The Shapley value (15) is a weighted-degree measure under the edge-additive coalition value (13). While the mathematical reduction to weighted degree follows directly from edge-additivity, the economic contribution is providing an axiomatic justification for prioritizing inter-institutional transaction volume over total asset size in coalition design. Institutions with larger incident cross-border volume or higher per-edge detection complementarity con-tribute more to collective detection and therefore deserve a proportionally larger share of federation-generated surplus. Richer centrality notions (betweenness, cut-vertex bridge pre-mia, Bonacich) emerge when the coalition value is extended to reward path-based or flow-based detection, where institution i’s contribution depends on paths through i rather than 20 only on edges incident to i; we outline this extension in Appendix B. For the core analysis, the weighted-degree characterization is sufficient for the coalition-design results that follow. 
+
+Efficient Coalition Design 
+
+The network Shapley value enables an efficient coalition design that improves on the type-based analysis in Section 3. Proposition 2 immediately pins down the welfare-maximizing coalition: rank institutions by net network value ϕnet  
+
+> i
+
+− ci − κiIi and include institutions until the marginal net value turns negative. Since ϕnet  
+
+> i
+
+depends on weighted cross-border degree, the practical implica-tion is that regulators should prioritize institutions with high inter-institutional transaction volume, rather than simply recruiting the largest banks by total assets. This provides a tractable, data-based criterion for coalition expansion that is absent from existing AML policy guidance. 
+
+TVA with Network-Adjusted Credit 
+
+The network Shapley value motivates a refinement of TVA in which scoring-rule credit rates are scaled by institution-specific weights reflecting network position: 
+
+πitconfirm = πitconfirm −1 + ωi
+
+X
+
+> t<t confirm
+
+γtconfirm −t · Ce · S(byi,t e , y e), (16) where ωi = ϕnet  
+
+> i
+
+/ ¯ϕ is a network position multiplier and S remains a strictly proper scoring rule. Because ωi scales the scoring-rule transfer uniformly across reports, strict propriety is preserved at the per-edge level (pointwise strict propriety is invariant to positive affine scaling of S). Institutions with higher network contribution receive proportionally more credit per accurate report. Under network-adjusted TVA with weights ωi, truthful reporting remains a Bayes–Nash equilibrium, uniquely optimal at each edge in the large-federation limit, if 
+
+ωi · V0
+
+1 − γ · Pr( illicit ) > κ i · I(θi; Gi,t ) ∀ i, (17) with the compliance term vanishing in the large-federation limit as in Theorem 1. The multiplier ωi relaxes the IC constraint for high-contribution institutions and tightens it for low-contribution ones, matching marginal incentive to marginal social contribution. A uni-form credit rate would over-reward peripheral institutions relative to their contribution and under-reward bridges, creating an adverse selection pressure that risks losing the most in-21 formationally valuable participants. 
+
+Adversarial Exploitation of Network Structure 
+
+A sophisticated adversary can exploit the inter-institutional network structure by routing illicit flows through structural holes : pairs of institutions that do not share a federation link. 
+
+Definition 3 (Structural Hole) . A structural hole is a pair (i, j ) such that (i, j ) /∈ E but there exist accounts u ∈ V i, v ∈ V j with a transaction path u → w1 → · · · → wk → v
+
+passing through intermediaries outside the federation. 
+
+(a) In equilibrium, the adversary routes a fraction λ∗ of illicit flows through structural holes, where: 
+
+λ∗ = pH − p0
+
+pH − p0 + croute 
+
+, (18) and croute is the additional transaction cost. The adversary’s equilibrium exploit is increasing in the number of structural holes and decreasing in federation coverage. (b) Closing a structural hole, which means adding institution k such that (i, k ) ∈ E and 
+
+(k, j ) ∈ E , reduces adversarial exploit by ∆λ∗ ≈ (pH − p0)( pH − pL)/(pH − p0 + croute )2,providing a principled criterion for federation expansion. 
+
+Proof Sketch. Part (a): The adversary maximizes expected laundered value net of routing cost. The FOC pH − p0 = croute · λ/ (1 − λ) yields the result. Part (b): Differentiation with respect to the number of structural holes. 
+
+# 4 Competition, Welfare, and the Backfiring Mandate 
+
+We now analyze how competitive pressure among banks interacts with detection incentives, following the approach of Bao and Ni (2017) in modeling how competition shapes banks’ compliance behavior. The key insight is that detection investment imposes customer-facing costs (monitoring delays, false-positive freezes, privacy concerns) that can disadvantage a bank relative to less vigilant competitors, creating incentives to underinvest in compliance. Consider m banks competing for depositors. Depositor j’s utility from bank i is: 
+
+uji = δi + αr · ri − αϕ · ϕi + ξi + ϵji , (19) where δi captures non-price characteristics, ri is the deposit rate, αr > 0 is rate sensitivity, 
+
+αϕ ≥ 0 is the detection externality : the disutility from heightened monitoring (delays, false-22 positive freezes, privacy loss), ξi is unobserved quality, and ϵji is i.i.d. Type I extreme value. 5
+
+The parameter αϕ captures the competitive cost of detection: when αϕ > 0, firms that invest more in detection bear customer-facing costs that erode their market position. The parameter αϕ captures a competitive externality distinct from the information-sharing frictions above: even if a bank reports truthfully, it bears the customer-facing costs of its detection investment while rivals free-ride on the systemic risk reduction. Each bank’s private return on compliance falls short of the social return. Bank i jointly chooses deposit rate ri, detection investment ϕi, and reporting strategy ρi:
+
+max 
+
+> ri,ϕ i,ρ i
+
+Di(ri, ϕ i) · (rL − ri)
+
+| {z }
+
+> intermediation margin
+
+− ci · ϕi · Di
+
+| {z }
+
+> compliance cost
+
++ πi(ρi, ρ −i)
+
+| {z }
+
+> TVA credit
+
+− Pi(ϕi)
+
+| {z } 
+
+> regulatory penalty
+
+, (20) where Di is deposit demand, rL is the lending rate, and Pi(ϕi) = p0(1 − ϕi)2 is a convex regulatory penalty. 
+
+Proposition 3 (Competition and Compliance Moral Hazard) . Suppose depositor utility is given by (19) with i.i.d. Type I extreme value errors, so market shares Di(ri, ϕ i) follow the multinomial logit form. Then under competitive pressure with detection externality αϕ > 0:(a) Underinvestment. Without TVA, the equilibrium detection intensity ϕ∗ 
+
+> i
+
+is strictly decreasing in αϕ: ∂ϕ ∗ 
+
+> i
+
+/∂α ϕ < 0. In the limit αϕ → ∞ , ϕ∗ 
+
+> i
+
+converges to a minimal level strictly below the socially optimal ϕsoc .(b) IC correction. Truthful reporting is implemented as a Bayes–Nash equilibrium under competition if: 
+
+V0
+
+1 − γ · Pr( illicit ) > c iϕ∗ 
+
+> i
+
++ κiI(θi; Gi,t ) + αϕ ∂D i 
+
+> ∂ϕ i
+
+(rL − ri)
+
+| {z }
+
+> competitive cost of detection
+
+. (21) 
+
+The required γ∗ is higher in more competitive markets. Proof Sketch. See detailed proof in Appendix A.6. Under the logit demand (19), ∂D i/∂ϕ i =
+
+−αϕDi(1 − Di) < 0: more detection reduces own deposit market share. The bank’s FOC for 
+
+ϕi from (20) is P ′ 
+
+> i
+
+(ϕi) = ∂D i/∂ϕ i · (rL − ri) − ciDi − ciϕi∂D i/∂ϕ i. Substituting ∂D i/∂ϕ i < 0
+
+and applying the implicit function theorem yields ∂ϕ ∗ 
+
+> i
+
+/∂α ϕ < 0. Part (b) follows from  
+
+> 5αϕcaptures customer friction from KYC/AML procedures (delayed onboarding, false-positive freezes, settlement delays), a first-order determinant of deposit mobility in recent fintech evidence (Kadamathikuttiyil Karthikeyan and Bhowmik, 2025; Amoako et al., 2025). This liability-side channel complements the asset-side charter-value mechanism in Keeley (1990).
+
+23 Theorem 1 with the competitive cost enters the right-hand side of the IC condition as an additional private cost of detection that TVA credit must offset. Competition induces firms to underinvest in socially valuable detection when the asso-ciated costs are partly borne by customers, a compliance analog of the competition–moral hazard channel (Bao and Ni, 2017). Mandating federation without calibrating incentives to offset competitive costs leads firms to comply in form but not substance. 
+
+## 4.1 Welfare Analysis Across Regulatory Regimes 
+
+We introduce and compare four regulatory regimes: autarky, mandated full sharing, volun-tary federation without incentives, and incentive-compatible federation with TVA. While full sharing maximizes detection externalities, it may impose excessive leakage and compliance costs; voluntary federation without incentives can suffer from strategic underreporting and even underperform autarky. TVA restores alignment by compensating marginal contribu-tions, improving participation and welfare. Optimal mechanism design balances detection gains against compliance, competitive, and adversarial pressures. 
+
+Four regulatory regimes 
+
+We compare four institutional arrangements governing information sharing and model train-ing. The welfare comparison requires one additional assumption about the structure of detection benefits. 
+
+Assumption 8 (Reporting Spillovers) . The aggregate detection benefit is supermodular in institutions’ reporting intensities: for any institution i and any reporting profile m−i,
+
+∂2 P 
+
+> j
+
+Bj
+
+∂m i∂m −i
+
+> 0.
+
+That is, more informative reporting by one institution raises the marginal social value of informative reporting by others. Furthermore, equilibrium reporting intensity under Regime C satisfies mCi (αϕ) → 0 as αϕ → ∞ for all i: under sufficiently intense competition, the competitive cost of accurate detection drives reporting toward uninformative levels. 
+
+Assumption 9 (Detection Quality Monotonicity) . The detection benefit Bi(S) evaluated at distorted reports {mCj }j∈S is strictly decreasing in the degree of distortion: if mCj < m Aj
+
+for all j, then BCi < B Ai , where Bri denotes the detection benefit in regime r at equilibrium reporting intensities. 
+
+24 Regime A: Autarky. Each institution operates independently and trains its own local detection model using only its proprietary data. There is no parameter sharing, no cross-institutional signal aggregation, and no information leakage through reporting. Formally, for each i, S = {i} and welfare is 
+
+W A = X
+
+> i
+
+
+
+Bi({i}) − ci E[nAi ]
+
+
+
+,
+
+with IAi = 0 and ΦAi = 0 .
+
+Regime B: Mandated Full Sharing. All institutions are required to share information and participate in centralized model training. Reporting is fully informative and participa-tion is compulsory. Incentive, privacy, and competitive constraints are ignored. The coalition is S = N , and reporting maximizes aggregate detection performance: 
+
+W B = max 
+
+> reports
+
+X
+
+> i
+
+
+
+Bi(N ) − ci E[nBi ] − κiIBi − αϕΦBi
+
+
+
+.
+
+This regime internalizes detection externalities but may impose high leakage and competition costs. 
+
+Regime C: Voluntary Federation Without Incentives. Institutions may voluntar-ily join a federated learning coalition and report model updates. However, no transfer or contribution-based compensation (TVA) is provided. Reporting choices are strategic and privately chosen to maximize individual payoffs: 
+
+ΠCi = Bi(S) − ci E[nCi ] − κiICi − αϕΦCi .
+
+Equilibrium may feature underreporting or partial participation due to privacy and compet-itive concerns. 
+
+Regime D: Incentive-Compatible Federation (TVA). Institutions participate in fed-erated learning with a transfer mechanism that allocates credit based on marginal contribu-tion. The TVA mechanism aligns private incentives with social detection value: 
+
+ΠDi = Bi(S) − ci E[nDi ] − κiIDi − αϕΦDi + TVA i.
+
+25 Transfers are designed so that truthful or higher-quality reporting is privately optimal. This regime mitigates underreporting distortions while preserving decentralized participation. 
+
+Welfare ordering 
+
+The central result of this section is our welfare ordering theorem, which we name the Back-firing Mandate Proposition to highlight its principal policy implication: information-sharing mandates that ignore strategic incentives can reduce welfare below the autarky benchmark. 
+
+Proposition 4 (Backfiring Mandate) . Suppose Assumptions 2–7, 8, and 9 hold. The welfare ordering across regulatory regimes satisfies: (a) If αϕ = 0 : W A ≤ W C ≤ W D ≤ W B . Incentive-compatible federation (TVA) weakly dominates voluntary federation without incentives. (b) If αϕ > 0 and competition is sufficiently intense: W C < W A < W D ≤ W B . Voluntary federation without incentive alignment is strictly worse than autarky. (c) There exists ¯αϕ > 0 above which W B < W D: mandated full sharing can reduce welfare relative to incentive-compatible federation when competitive and leakage costs over-whelm detection gains. 
+
+Assumptions 8 and 9 are presented as maintained conditions rather than derived from prim-itives because the full microfoundation in the GNN setting is intractable. A Gaussian ag-gregation toy model in Appendix E shows that both assumptions hold structurally under standard information aggregation with linear competitive costs, so this proposition is not tautological. 
+
+Proof Sketch. Part (a) follows from revealed preference and the fact that TVA eliminates leakage-minimizing distortions. Part (b) combines Assumption 8 (reporting becomes unin-formative under high competition) with Assumption 9 (distorted reports reduce detection below autarky): together these imply W C < W A when αϕ is large enough. Part (c) follows because detection gains are bounded while competitive costs grow linearly in αϕ. Full proof in Appendix A.7. The welfare ranking W C < W A does not arise because federation is harmful, but because federation without incentive design is worse than no federation. When banks federate with-out TVA under competitive pressure, the competitive cost of flagging customers motivates systematic underreporting; the aggregated global model is built on distorted inputs and de-livers detection quality below each bank’s honest local model, while still imposing compliance 26 burdens, a strict welfare loss relative to autarky. Part (c) extends this finding: mandatory sharing eventually backfires when competitive and leakage costs dominate detection gains. The policy implication, that how sharing is organized matters as much as whether it occurs, is directly actionable for regulators designing AML information-sharing frameworks. 
+
+Optimal mechanism design 
+
+The regulator chooses γ to maximize welfare: 
+
+γ∗ = argmax γ∈(0 ,1) W D(γ) = argmax γ
+
+X
+
+> i∈S ∗(γ)
+
+Bi(S∗(γ)) − Total Costs (γ). (22) Comparative statics yield natural properties: γ∗ is decreasing in the base illicit rate Pr( illicit )
+
+(higher base rates require less aggressive temporal discounting), increasing in competitive intensity αϕ (more competition demands stronger incentives), and increasing in adversarial speed 1/δ (faster adversaries require sharper temporal credit). 
+
+# 5 Intervention Under Information Loss: An Index-Based Heuristic 
+
+The previous sections established the paper’s main welfare results. This section devel-ops an operational extension: under additional dynamic assumptions about how freez-ing accounts destroys network information, the regulator faces a non-trivial exploration– exploitation tradeoff that the welfare analysis of Section 4.1 abstracted away. This extension is self-contained and not required for the backfiring mandate result; readers primarily inter-ested in the welfare analysis may proceed directly to Section 6. The intervention decision is which suspicious accounts to freeze immediately versus mon-itor for additional learning. The problem is subtle because freezing accounts permanently removes edges from the transaction network , destroying information about future illicit flows and creating a tradeoff where aggressive intervention improves immediate security but de-grades future detection. 
+
+## 5.1 Link Removal and Information Loss 
+
+Formally, let Gt = ( V t, E t) denote the observable transaction network at time t. When the regulator freezes account u ∈ V t, the following period’s network becomes: 
+
+Gt+1 = ( V t \ { u}, E t \ { (u, v ) : v ∈ V t})
+
+27 All edges incident to u are removed. This has two effects: (1) Direct Information Loss: 
+
+The regulator no longer observes transactions involving u, preventing detection of illicit flows through that account. (2) Network Information Loss: Removing u affects the GNN’s ability to learn about neighbors N (u). GNN aggregation computes node v’s embedding at layer ℓ + 1 as a function of its neighbors’ embeddings at layer ℓ (see Appendix C for the full equation). When u is removed from N (v), the aggregation for neighbor v changes, degrading embeddings for the entire neighborhood. Consider a star network as an illustration:, where a hub account h connects to 10 peripheral accounts {p1, . . . , p 10 }. Freezing h on early suspicion yields: 
+
+• Benefit: Prevents immediate illicit flows through h.
+
+• Cost: Loses ability to observe whether peripheral accounts {pi} are also involved; the GNN cannot aggregate information from h to update suspicion scores for {pi}.However, this example also reveals that if h turns out to be legitimate (false positive), the information loss is permanent and unrecoverable. We formulate the intervention decision as a restless bandit problem (Whittle, 1988). Each edge e ∈ Et is an "arm" with evolving state: 
+
+ste ∈ { unknown , suspicious , confirmed-illicit , confirmed-legitimate }
+
+The regulator chooses action ate ∈ { monitor , freeze } for each edge. The state transitions are: 
+
+P(st+1  
+
+> e
+
+= confirmed-illicit | ste = suspicious , a te = monitor ) = pe
+
+P(st+1  
+
+> e
+
+= confirmed-legitimate | ste = suspicious , a te = monitor ) = 1 − pe (23) 
+
+P(st+1  
+
+> e
+
+= removed | ate = freeze ) = 1 
+
+where pe = P(illicit | features Xe, embedding He) is the learned risk probability. The regu-lator’s reward depends on the action taken and the true state of the edge: 
+
+R(ae = freeze , s e = confirmed-illicit ) = Ce, (prevented loss) 
+
+R(ae = freeze , s e = confirmed-legitimate ) = −α1, (false positive cost) 
+
+R(ae = monitor , s e = confirmed-illicit ) = −α2, (false negative cost) 
+
+R(ae = monitor , s e = unknown ) = λ · Ie, (information value) where Ie is the information value of edge e, defined as the reduction in uncertainty about neighboring edges. Ce, α1 and α2 are defined in Equation (2). The regulator maximizes 28 expected discounted cumulative reward: 
+
+max  
+
+> {ate}
+
+E
+
+" TX
+
+> t=1
+
+γt X
+
+> e∈Et
+
+R(ate, s te)
+
+#
+
+(24) 
+
+## 5.2 Risk Memory as Index Approximation 
+
+For standard multi-armed bandits, the optimal policy is characterized by the Gittins index 
+
+(Gittins, 1979): a scalar priority score for each arm that trades off immediate reward against information value. We extend this to the restless bandit setting with network effects. 
+
+Definition 4 (Network-Adjusted Gittins Index) . For edge e in state ste with embedding Hte,define the index: 
+
+νe(ste, H te) = E[P∞ 
+
+> k=0
+
+γkR(at+ke , s t+ke ) | ate = monitor ]1 − γP(e remains active ) (25) 
+
+This represents the opportunity cost of freezing: the discounted future value if the edge were monitored, normalized by the probability it remains observable. 
+
+Proposition 5 (Index-Based Intervention Heuristic) . The restless-bandit intervention prob-lem does not in general admit a Gittins-optimal policy. We propose an index-based heuristic in the spirit of Whittle (1988): freeze edge e if the network-adjusted index νe(ste, H te) < ¯νt
+
+and monitor otherwise, where νe balances immediate detection reward against the long-run information value of continued monitoring. When the objective F (E) = P 
+
+> e∈E
+
+peCe + λI (E)
+
+is monotone submodular in the set of monitored edges E and the decision is recast as greedy cardinality-constrained maximization, the risk memory mechanism with K = Θ(log |V |)
+
+achieves a (1 − 1/e ) approximation to the greedy optimum at complexity O(|V | · K), by the classical result of Nemhauser et al. (1978). We do not claim optimality against the full restless-bandit benchmark (proofs in Appendix A.8). 
+
+Computing the exact Gittins index in Equation (25) requires solving a dynamic program over the entire state space, which is intractable for large networks. We show that the risk memory mechanism proposed in our system provides a computationally efficient approxi-mation. For each node u, maintain a priority queue of the top-K most suspicious historical interactions: 
+
+Mu = top-K{(byte, e, t ) : e = ( u, v ) or e = ( v, u ), t ≤ tcurrent } (26) 29 where entries are sorted by risk score byte and K is a hyperparameter (typically K ∈ [5 , 20] ). The node-level risk score aggregates memory: 
+
+byu = max 
+
+> (bye,e,t )∈M u
+
+γtcurrent −t · bye (27) The regulator freezes node u if byu ≥ τ .
+
+## 5.3 Centrality-Weighted Optimal Intervention 
+
+We extend the Gittins index formulation (5) to account for network externalities from inter-vention. Freezing a high-centrality account destroys more network information than freezing a peripheral one. 
+
+Definition 5 (Centrality-Weighted Gittins Index) . For account u with neighborhood N (u):
+
+νnet  
+
+> u
+
+= νu − λnet · X 
+
+> v∈N (u)
+
+γτv byv · dv
+
+dv − 1
+
+| {z }
+
+> network information loss
+
+, (28) 
+
+where νu is the standard Gittins index, dv is the degree of neighbor v, and λnet > 0 is the network information weight. The correction term captures the fact that freezing u removes information about all of u’s neighbors, weighted by each neighbor’s risk score, temporal dis-count, and vulnerability to isolation ( dv/(dv − 1) diverges as v approaches degree 1). 
+
+When the Gittins index is adjusted for network externalities via Definition 5, two eco-nomically meaningful properties emerge. First, hub protection : highly connected accounts are frozen later than equally suspicious peripheral accounts, because their removal would deprive the regulator of information about an entire neighborhood. This is costly precisely when the hub is legitimate: a false positive on a hub account severs the learning links that would have identified genuinely illicit peripheral accounts. Second, cascade avoidance : suc-cessive freezes within a cluster progressively increase the marginal information loss of further freezes, so the policy endogenously spaces out interventions. Both properties are consistent with practical AML guidance on preserving monitoring channels, and the (1 − 1/e ) approx-imation guarantee (proof in Appendix A.9) ensures that the computationally tractable risk memory implementation captures nearly all of this benefit. The hub protection property creates a strategic tension: since central accounts are frozen later, a rational adversary has an incentive to route illicit flows precisely through well-connected hubs. The regulator can respond by raising λnet selectively for accounts with 30 unusual hub-concentration of flagged flows. This cat-and-mouse dynamic over hub interven-tion timing converges to a mixed-strategy equilibrium, and calibrating λnet from observed routing patterns is therefore an important input to the regulator’s policy design. 
+
+## 5.4 Simulation Evidence on Intervention Policies 
+
+We compare three intervention policies on the transaction network data. 6 (1) Greedy Im-mediate Freezing: Freeze all edges with bye ≥ τ immediately; (2) Risk Memory: Use risk memory mechanism (Equation (26)) with K = 10 ; (3) Oracle: Gittins index computed via dynamic programming (intractable for full dataset, evaluated on subsampled graphs). We measure performance using three metrics: (1) prevented loss ratio: fraction of to-tal illicit transaction value prevented by freezing; (2) Network connectivity: average graph diameter before and after interventions (measures information loss); (3) Detection latency: 
+
+average time between first suspicious signal and final detection. Table 4: Intervention Policy Comparison 
+
+Policy Prevented Loss Network Diameter Detection Latency Ratio (after intervention) (days) 
+
+Greedy Immediate 49.4% 8.2 1.2 Risk Memory ( K = 10 ) 79.3% 4.6 2.1 Oracle (subsampled) 82.1% 4.1 2.3 Table 4 shows that risk memory substantially outperforms greedy freezing (79.3% vs. 49.4% prevented loss) while maintaining better network connectivity (diameter 4.6 vs. 8.2). The performance is close to the oracle policy (82.1%), consistent with Proposition 5. Greedy freezing creates information loss by prematurely removing suspicious nodes. Risk memory defers intervention on high-information-value nodes (those with many connections, central positions), allowing the GNN to continue learning about their neighborhoods. Figure 1 illustrates the efficiency trade-off for risk memory size K. Performance improves rapidly from K = 1 to K = 10 and then plateaus, consistent with Proposition 5’s prediction that K = Θ(log |V |) ≈ 11 suffices for near-optimal approximation. Additional simulation evidence (adversarial robustness, parameter calibration, TVA gain decomposition, welfare across regulatory regimes, per-market heterogeneity, and comparison 
+
+> 6A practical hierarchical reinforcement learning implementation of the index-based heuristic, with exten-sive ablation studies and per-market calibration, is developed in the companion paper Zheng et al. (2025b). The simulation reported here uses the simpler risk-memory approximation, which is sufficient to illustrate the comparative properties.
+
+31 Figure 1: Performance-efficiency trade-off of risk memory size K (AUPRC and Type II error vs. K, with time per epoch). Performance saturates around K = 10 , consistent with 
+
+K = Θ(log |V |).to prior AML methods) is collected in Appendix D. 
+
+# 6 Conclusion 
+
+This paper develops a mechanism design framework for decentralized risk analytics in which competing firms hold fragmented signals about risky customers and must be induced to share them truthfully. The core contribution is a welfare analysis showing that information-sharing mandates can backfire when they ignore competitive incentives, paired with a TVA mechanism that corrects this failure. Three main results organize the analysis. First, the Backfiring Mandate Proposition es-tablishes that voluntary federation without incentive design can reduce welfare below autarky when competitive pressure is strong, because strategic underreporting produces biased global models worse than honest local models while still imposing compliance costs. Simulation-based welfare comparisons in Appendix D show that mandatory sharing without TVA barely exceeds autarky in welfare, while TVA substantially closes the gap to the first-best: illus-trating the quantitative importance of incentive alignment. Second, the TVA mechanism with a strictly proper scoring rule transfer implements truthful reporting as a Bayes–Nash equilibrium (uniquely optimal at each edge) in large federations; temporal discounting deters adversarial adaptation, yielding sublinear regret against adaptive adversaries with bounded memory when γ is close to 1. Third, a network Shapley characterization shows that each institution’s marginal contribution to collective detection is proportional to its weighted cross-border degree, so coalition design should prioritize high inter-institutional transaction volume rather than total assets: with direct implications for how regulators design AML information-sharing programmes. 32 For practice, regulators should pair information-sharing mandates with incentive mech-anisms; mandatory sharing without TVA performs barely better than autarky. Coalition design should prioritize network centrality over institution size: the network Shapley value is more predictive of an institution’s marginal contribution to collective detection than transac-tion volume alone. Intervention policies should account for network information externalities, protecting high-centrality accounts to preserve detection capability. The principles developed here, namely temporal value assignment, network Shapley value, centrality-weighted intervention, and competition-aware mechanism design, extend beyond financial crime to any setting where competing firms must share signals for collective risk detection, including cybersecurity threat intelligence, supply chain risk management, multi-platform fraud prevention, and collaborative marketing analytics. Our analysis uses synthetic data; validation on proprietary transaction data is an im-portant next step. The network Shapley value computation is exponential in m; developing polynomial-time approximations for large federations is a natural algorithmic direction. Ex-tensions to endogenous network formation (where institutions choose which bilateral links to maintain), and to dynamic network evolution would further enrich the theory. The po-litical economy of international cooperation and asymmetric regulatory environments are promising policy-relevant directions. 
+
+# References 
+
+Admati, Anat R and Paul Pfleiderer (2000). “Forcing firms to talk: Financial disclosure regulation and externalities”. In: The Review of financial studies 13.3, pp. 479–519. Akerlof, George A. (1970). “The Market for “Lemons”: Quality Uncertainty and the Market Mechanism”. In: Quarterly Journal of Economics 84.3, pp. 488–500. Altman, Erik, Jovan Blanuša, Luc Von Niederhäusern, Béni Egressy, Andreea Anghel, and Kubilay Atasu (2023). “Realistic synthetic financial transactions for anti-money launder-ing models”. In: vol. 36, pp. 29851–29874. Amoako, Elizabeth Kuukua Woode, Victor Boateng, Ola Ajay, Tobias Kwame Adukpo, and Nicholas Mensah (2025). “Exploring the role of machine learning and deep learning in anti-money laundering (AML) strategies within US financial industry: A systematic re-view of implementation, effectiveness, and challenges”. In: Finance & Accounting Research Journal 7.1, pp. 22–36. Arora, Raman, Ofer Dekel, and Ambuj Tewari (2012). “Online bandit learning against an adaptive adversary: from regret to policy regret”. In: arXiv preprint arXiv:1206.6400 .33 Ballester, Coralio, Antoni Calvó-Armengol, and Yves Zenou (2006). “Who’s who in networks. Wanted: The key player”. In: Econometrica 74.5, pp. 1403–1417. Bao, Weining and Jian Ni (2017). “Could good intentions backfire? An empirical analysis of the bank deposit insurance”. In: Marketing Science 36.2, pp. 301–319. Begley, Taylor A, Amiyatosh Purnanandam, and Kuncheng Zheng (2017). “The strategic underreporting of bank risk”. In: The Review of Financial Studies 30.10, pp. 3376–3415. Bergemann, Dirk and Juuso Välimäki (2010). “The dynamic pivot mechanism”. In: Econo-metrica 78.2, pp. 771–789. Bramoullé, Yann, Rachel Kranton, and Martin D’amours (2014). “Strategic interaction and networks”. In: American Economic Review 104.3, pp. 898–930. Clarke, Edward H (1971). “Multipart pricing of public goods”. In: Public choice , pp. 17–33. Dong, Jinshuo, Aaron Roth, Zachary Schutzman, Bo Waggoner, and Zhiwei Steven Wu (2018). “Strategic classification from revealed preferences”. In: Proceedings of the 2018 ACM Conference on Economics and Computation , pp. 55–70. Fudenberg, Drew and Jean Tirole (1991). Game Theory . Cambridge, MA: MIT Press. Gal-Or, Esther (1985). “Information sharing in oligopoly”. In: Econometrica: Journal of the Econometric Society , pp. 329–343. Galeotti, Andrea, Sanjeev Goyal, Matthew O Jackson, Fernando Vega-Redondo, and Leeat Yariv (2010). “Network games”. In: The review of economic studies 77.1, pp. 218–244. Gentzkow, Matthew and Emir Kamenica (2016). “Competition in persuasion”. In: The Review of Economic Studies 84.1, pp. 300–322. Gittins, John C (1979). “Bandit processes and dynamic allocation indices”. In: Journal of the Royal Statistical Society Series B: Statistical Methodology 41.2, pp. 148–164. Gneiting, Tilmann and Adrian E Raftery (2007). “Strictly proper scoring rules, prediction, and estimation”. In: Journal of the American statistical Association 102.477, pp. 359–378. Groves, Theodore (1973). “Incentives in teams”. In: Econometrica: Journal of the Economet-ric Society , pp. 617–631. Hardt, Moritz, Nimrod Megiddo, Christos Papadimitriou, and Mary Wootters (2016). “Strate-gic classification”. In: Proceedings of the 2016 ACM conference on innovations in theo-retical computer science , pp. 111–122. Hellmann, Thomas F., Kevin C. Murdock, and Joseph E. Stiglitz (2000). “Liberalization, Moral Hazard in Banking, and Prudential Regulation: Are Capital Requirements Enough?” In: American Economic Review 90.1, pp. 147–165. 34 Jackson, Matthew O (2008). Social and economic networks . Vol. 3. Princeton university press Princeton. Jackson, Matthew O and Asher Wolinsky (1996). “A strategic model of social and economic networks”. In: Journal of economic theory 71.1, pp. 44–74. Jackson, Matthew O. (2005). “Allocation rules for network games”. In: Games and Economic Behavior 51.1, pp. 128–154. Joulani, Pooria, Andras Gyorgy, and Csaba Szepesvári (2013). “Online learning under de-layed feedback”. In: pp. 1453–1461. Kadamathikuttiyil Karthikeyan, Girish and Biswajit Bhowmik (2025). “Enhancing Money Laundering Detection in Bank Transactions using GAGAN: A Graph-Adapted Genera-tive Adversarial Network Approach: KK Girish, B. Bhowmik”. In: International Journal of Data Science and Analytics , pp. 1–31. Kamenica, Emir and Matthew Gentzkow (2011). “Bayesian persuasion”. In: American Eco-nomic Review 101.6, pp. 2590–2615. Keeley, Michael C. (1990). “Monopoly, Risk, and the Government Net in Banking”. In: Amer-ican Economic Review 80.5, pp. 1183–1200. Kipf, Thomas N and Max Welling (2016). “Semi-supervised classification with graph convo-lutional networks”. In: International Conference on Learning Representations .Li, Tian, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, and Virginia Smith (2020). “Federated optimization in heterogeneous networks”. In: Proceedings of Machine learning and systems 2, pp. 429–450. Lin, Tsung-Yi, Priya Goyal, Ross Girshick, Kaiming He, and Piotr Dollár (2017). “Focal loss for dense object detection”. In: Proceedings of the IEEE international conference on computer vision , pp. 2980–2988. McMahan, Brendan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Ar-cas (2017). “Communication-efficient learning of deep networks from decentralized data”. In: pp. 1273–1282. Melis, Luca, Congzheng Song, Emiliano De Cristofaro, and Vitaly Shmatikov (2019). “Ex-ploiting Unintended Feature Leakage in Collaborative Learning”. In: IEEE Symposium on Security and Privacy , pp. 691–706. Morrison, Alan D and Lucy White (2005). “Crises and capital requirements in banking”. In: 
+
+American Economic Review 95.5, pp. 1548–1572. Myerson, Roger B. (1977). “Graphs and cooperation in games”. In: Mathematics of operations research 2.3, pp. 225–229. 35 Myerson, Roger B. (1981). “Optimal auction design”. In: Mathematics of operations research 
+
+6.1, pp. 58–73. Myerson, Roger B. and Mark A. Satterthwaite (1983). “Efficient Mechanisms for Bilateral Trading”. In: Journal of Economic Theory 29.2, pp. 265–281. Nemhauser, George L, Laurence A Wolsey, and Marshall L Fisher (1978). “An analysis of approximations for maximizing submodular set functions—I”. In: Mathematical program-ming 14.1, pp. 265–294. Pavan, Alessandro, Ilya Segal, and Juuso Toikka (2014). “Dynamic mechanism design: A myersonian approach”. In: Econometrica 82.2, pp. 601–653. Sutton, Richard Stuart (1984). Temporal credit assignment in reinforcement learning . Uni-versity of Massachusetts Amherst. United Nations Office on Drugs and Crime (2025). Money Laundering . https://www.unodc. org/unodc/en/money-laundering/overview.html .Veličković, Petar, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, and Yoshua Bengio (2018). “Graph Attention Networks”. In: International Conference on Learning Representations .Vickrey, William (1961). “Counterspeculation, auctions, and competitive sealed tenders”. In: 
+
+The Journal of finance 16.1, pp. 8–37. Vives, Xavier (1990). “Trade association disclosure rules, incentives to share information, and welfare”. In: the RAND Journal of Economics , pp. 409–430. Weber, Mark, Jie Chen, Toyotaro Suzumura, Aldo Pareja, Tengfei Ma, Hiroki Kanezashi, Tim Kaler, Charles E Leiserson, and Tao B Schardl (2018). “Scalable graph learning for anti-money laundering: A first look”. In: arXiv preprint arXiv:1812.00076 .Weber, Mark, Giacomo Domeniconi, Jie Chen, Daniel Karl I Weidele, Claudio Bellei, Tom Robinson, and Charles E Leiserson (2019). “Anti-money laundering in bitcoin: Exper-imenting with graph convolutional networks for financial forensics”. In: arXiv preprint arXiv:1908.02591 .Whittle, Peter (1988). “Restless bandits: Activity allocation in a changing world”. In: Journal of applied probability 25.A, pp. 287–298. Xu, Keyulu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka (2019). “How Powerful are Graph Neural Networks?” In: 7th International Conference on Learning Representations, ICLR 2019, New Orleans, LA, USA, May 6-9, 2019 . OpenReview.net. Zheng, Lecheng, John Birge, Haiyue Wu, Yifang Zhang, and Jingrui He (2025a). “Cluster Aware Graph Anomaly Detection”. In: pp. 1771–1782. 36 Zheng, Lecheng, John R. Birge, Yifang Zhang, and Jingrui He (2024). “Towards Multi-view Graph Anomaly Detection with Similarity-Guided Contrastive Clustering”. In: arXiv preprint arXiv:2409.09770 .Zheng, Lecheng, Jian Ni, Chris Zobel, and John R Birge (2025b). “Networked Markets, Fragmented Data: Adaptive Graph Learning for Customer Risk Analytics and Policy Design”. In: Working paper . Available upon request from the editor. Zhu, Ligeng, Zhijian Liu, and Song Han (2019). “Deep Leakage from Gradients”. In: Advances in Neural Information Processing Systems . Vol. 32. 37 A Proof 
+
+## A.1 Proof of Theorem 1 (Bayes–Nash Implementation) 
+
+Proof. The proof proceeds in four steps. Step 1 establishes pointwise strict propriety at each edge; Step 2 aggregates across edges to obtain strict dominance of truthful reporting in expected credit; Step 3 incorporates compliance and leakage costs to derive condition (7); Step 4 concludes that the truthful profile is a BNE and uniquely optimal at each edge in the large-federation limit. 
+
+Step 1: Pointwise strict propriety. Fix institution i, edge e ∈ Ei,t , and period t. Con-ditional on the institution’s information (Gi,t , θ i), the true posterior probability of illicit activity is qie ≡ Pr( ye = 1 | Gi,t , θ i) ∈ [0 , 1] . If institution i reports byi,t e , the expected credit contribution from edge e at period t (conditional on eventual confirmation) is 
+
+Eye∼Ber (qie)
+
+Ce · S(byi,t e , y e) = Ce · qie · S(byi,t e , 1) + (1 − qie) · S(byi,t e , 0)  .
+
+By the strict propriety of S (property (5)), this expression is uniquely maximized at byi,t e = qie.For the Brier score S(by, y ) = 1 − (by − y)2, direct computation gives 
+
+E[S(by, y )] = 1 − qie(1 − by)2 − (1 − qie)by2,
+
+whose derivative with respect to by is 2( qie − by), vanishing uniquely at by = qie. The maximum expected credit per edge is therefore Ce · [1 − qie(1 − qie)] , attained at truthful reporting. 
+
+Step 2: Temporal aggregation. Summing the per-period expected credit over all periods t
+
+prior to confirmation, each weighted by the temporal discount factor γtconfirm −t, and summing over edges e ∈ Ei,t :
+
+E[πi 
+
+> ∞
+
+| ρi] = X
+
+> e
+
+Ce
+
+X
+
+> t
+
+γtconfirm −tES(byi,t e , y e) .
+
+Since each inner expectation is strictly maximized at the posterior (Step 1), the total expected credit is strictly maximized by truthful reporting byi,t e = qie at every edge and every period. Let π∗i 
+
+> ∞
+
+denote the truthful expected credit and ∆Si ≡ π∗i 
+
+> ∞
+
+− E[πi 
+
+> ∞
+
+| ρ′
+
+> i
+
+] for any deviation 
+
+ρ′
+
+> i
+
+̸ = ρ∗ 
+
+> i
+
+. Strict propriety implies ∆Si > 0 for any non-truthful ρ′
+
+> i
+
+, with the magnitude scaling as P 
+
+> e
+
+Ce
+
+P 
+
+> t
+
+γtc−t(qie − byi,t e )2 under the Brier score. Under Assumption 2, the per-edge discounted reward P 
+
+> t
+
+γtc−tCe is bounded below by 38 V0/(1 − γ) · Pr( illicit ) for any edge e with positive probability of illicit confirmation. The truthful expected credit thus satisfies 
+
+π∗i 
+
+> ∞
+
+≥ V0
+
+1 − γ · Pr( illicit ) · X
+
+> e
+
+E[S(qie, y e)] . (29) 
+
+Step 3: Compliance and leakage costs as vanishing deviations. Under Assumption 3 and 5, institution i’s compliance cost depends on the aggregated profile ¯ρ, not on i’s own report directly. A unilateral deviation changes ¯ρ by O(1 /m ), so the marginal effect of ρi on its own compliance cost is O(ci/m ). For any deviation ρ′
+
+> i
+
+̸ = ρ∗ 
+
+> i
+
+:
+
+Ui(ρ∗ 
+
+> i
+
+) − Ui(ρ′
+
+> i
+
+) = ∆ Si + O(ci/m ) · ∥ ρ′ 
+
+> i
+
+− ρ∗ 
+
+> i
+
+∥ + κi[I(θi; Gi,t ; ρ′
+
+> i
+
+) − I(θi; Gi,t ; ρ∗ 
+
+> i
+
+)] , (30) where ∆Si > 0 by Step 2 and scales with P 
+
+> e
+
+Ce(qie − by′i,t e )2 under the Brier score. The compliance term is of order 1/m relative to the scoring-rule term, so it is a second-order effect in large federations. The leakage term is non-positive for any deviation because truthful reporting achieves the maximum informativeness of θi. Hence Ui(ρ∗ 
+
+> i
+
+) − Ui(ρ′
+
+> i
+
+) > 0 whenever: 
+
+∆Si > κ iI(θi; Gi,t ) + O(ci/m ),
+
+which is implied by condition (7) combined with the detection-value bound (29). In the large-federation limit ( m → ∞ ), the compliance term vanishes and truthful reporting is a strict best response whenever the scoring-rule accuracy rent exceeds the leakage cost:  
+
+> V0
+> 1−γ
+
+Pr( illicit ) > κ iI(θi; Gi,t ).
+
+Step 4: BNE and uniqueness. Condition (7) holds for all i; each institution’s truthful strategy is a strict best response to others’, and the O(1 /m ) compliance effect is dominated by the scoring-rule rent. Hence (ρ∗
+
+> 1
+
+, . . . , ρ ∗
+
+> m
+
+) is a BNE. For uniqueness in the large-federation limit: by pointwise strict propriety (Step 1), any interior candidate ρ∗∗  
+
+> i
+
+with by∗∗ i,t e̸ = qie admits a strictly profitable deviation at edge e (scoring-rule gain first-order in (qie − by∗∗ i,t e )2, compliance effect O(ci/m )). Hence every interior BNE satisfies by∗∗ i,t e = qie.
+
+## A.2 Proof of Proposition 1 (Regret Bound) 
+
+Proof. The proof uses techniques from adversarial online learning with delayed feedback (Joulani et al., 2013). We note that, as Arora et al. (2012) show, sublinear policy regret 
+
+against adaptive adversaries with unbounded memory is generally impossible without further 39 restrictions. Our bound applies to the standard external regret notion under the bounded-memory assumption implicit in the δ-delay adaptation model: the adversary can respond to observed interventions only after delay δ, which limits its effective memory. Under this restriction, the two-term bound below holds. 
+
+Step 1: Regret decomposition. Define Gt 
+
+> frozen
+
+as the counterfactual graph at time t if the adversary had not adapted (i.e., held the strategy fixed at the period-1 choice). Decompose regret as: Regret (T ) = 
+
+> T
+
+X
+
+> t=1
+
+L(πγ , G t) − L (πγ , G t
+
+> frozen
+
+)| {z } 
+
+> adaptation loss (R1)
+
++
+
+> T
+
+X
+
+> t=1
+
+h
+
+L(πγ , G t
+
+> frozen
+
+) − min  
+
+> π′
+
+L(π′, G t
+
+> frozen
+
+)
+
+i| {z } 
+
+> learning loss (R2)
+
+.
+
+(31) 
+
+Step 2: Bounding the learning loss R2. Against the frozen adversary, the sequence 
+
+{Gt
+
+> frozen
+
+} is fixed (oblivious). The TVA policy is equivalent to an exponential-weights policy over the action space A with importance weights γtconfirm −t. By standard exponential-weights analysis (Joulani et al., 2013), the learning loss satisfies: 
+
+R2 = O
+
+p T |A| log |A| 
+
+
+
+.
+
+Step 3: Bounding the adaptation loss R1. With adaptation delay δ, the adversary at time t responds to interventions observed at t − δ. For any period t, the loss difference 
+
+L(πγ , G t) − L (πγ , G t
+
+> frozen
+
+) reflects how much the adversary’s adaptation changes the graph between Gt 
+
+> frozen
+
+and Gt.Under TVA with discount factor γ, the policy’s action at time t is determined by the discounted sum of past risk scores: 
+
+πγ (Gt) ∝ X
+
+> s≤t
+
+γt−s byse .
+
+The effect of adversarial adaptation at time t on the policy’s loss is mediated through the change in risk scores ∆bye = byGt 
+
+> e
+
+− byGt 
+
+> frozen
+> e
+
+. Since the TVA policy weights recent observations by (1 − γ) and discounts older ones, the policy’s sensitivity to any single-period perturbation is (1 − γ). The adversary adapts at time t − δ, affecting the graph from time t onwards; the additional loss per period from this adaptation is therefore bounded by O((1 − γ) · ∥ ∆by∥).Because the adversary adapts at most T /δ times (each adaptation lasts at least δ periods), 40 and each adaptation affects the policy’s response for at most δ subsequent periods with per-period loss change bounded by O((1 −γ)) , the total adaptation loss over the δ-period window following each adaptation is: 
+
+> t+δ−1
+
+X
+
+> s=t
+
+L(πγ , G s) − L (πγ , G s
+
+> frozen
+
+) ≤ O δ(1 − γ)2 .
+
+The factor (1 − γ)2 arises because: (i) the policy’s exposure to the adapted graph in any one period is O(1 − γ) (temporal discount weight on the most recent period), and (ii) the adversary must wait δ periods before re-adapting, during which the TVA policy’s (1 − γ)
+
+discounting makes the impact of any single past adaptation decay geometrically. Summing over all T /δ adaptation epochs: 
+
+R1 = O
+
+Tδ · δ (1 − γ)2
+
+
+
+= O δ T (1 − γ)2 .
+
+Step 4: Fixed-threshold lower bound. For a fixed-threshold policy ( γ = 0 , no discounting), the adaptation loss in each epoch is O(δ) rather than O(δ(1 − γ)2) = O(δ); however, since there is no temporal discounting the adversary’s adaptation affects the policy’s loss indefi-nitely (not just for δ periods), giving R1 = Ω( δT ). Combined with R2 = O(pT |A| log |A| ),the total regret is Ω( T ).Combining the bounds in Steps 2 and 3 gives Equation (10). 
+
+## A.3 Proof of the Early Detection Equilibrium Result (Section 2.5) 
+
+Proof. The adversary adapts if and only if the expected detection-probability reduction from adaptation exceeds the adaptation cost ratio: 
+
+E[detection reduction from adaptation ] > c(adaptation )
+
+Cpenalty 
+
+.
+
+Under TVA, the regulator places weight (1 − γ) on the most recent period’s signal and weight γs(1 −γ) on the signal from s periods ago. An adversary that adapts with delay δ can only affect the detection policy’s interpretation of signals from δ periods ahead or later. The share of the regulator’s decision weight placed on signals the adversary cannot affect (those from periods before the adaptation) is 1−γδ, which is increasing in γ on (0 , 1) . In particular, as γ → 1, more decision weight falls on signals in the uncorrupted window [t, t + δ).41 Equivalently, the adversary’s benefit from adaptation is bounded by the weight the policy places on signals the adversary can corrupt, which is γδ. This benefit is decreasing in 1 −
+
+γ: policies that discount the past more heavily (larger 1 − γ, smaller γ) are in fact more vulnerable to adaptation because they rely more on recent signals. Since the adversary adapts in response to past observed interventions, a policy that relies heavily on recent signals is more exposed. The key subtlety: TVA chooses γ large so that credit accumulates over long histories, but this also means the policy responds sluggishly to any given period’s adaptation. An adversary that attempts to shift strategy in one period faces a policy whose decision weight on that single period is only (1 − γ), which is small. For adaptation to be worthwhile, the adversary must sustain the shift for many periods: but sustained adaptation has cumulative cost. The threshold ¯γ is defined by the indifference condition that the per-period benefit of adaptation, (1 − γ) · P(detection ), falls below the per-period adaptation cost. Given that the adversary does not adapt, the regulator’s best response is to continue with TVA (which is optimal against static adversaries by Theorem 1 and Proposition 1). Hence the equilibrium is subgame perfect. 
+
+## A.4 Proof: Minimum Viable Coalition (Section 3) 
+
+Proof. Fix an institution i with type θi = ( si, c i, q i, κ i). For any coalition S ⊆ N contain-ing i, write M (S) ≡ P 
+
+> k∈S
+
+skqk for the coalition’s effective information mass (size–quality weighted). Under TVA, institution i’s (interim) participation payoff can be written in re-duced form as 
+
+Πi(S) = Pr( illicit ) · E
+
+"X
+
+> t≥0
+
+V (t) · ∆pi(t; S)
+
+#| {z } 
+
+> expected detection value Bi(S)
+
+− ci E[ni(S)] 
+
+| {z }
+
+> compliance cost
+
+− κi Ii(S)
+
+| {z }
+
+> leakage cost
+
++ TVA i(S)
+
+| {z }
+
+> transfer/credit
+
+,
+
+(32) where ∆pi(t; S) denotes the marginal increase in the probability that an illicit transaction affecting i is detected at time t when coalition S forms (relative to i acting alone), ni(S) is the number of local freezes/investigations triggered for i, and Ii(S) ≡ I(θi; Gi,t ) is shorthand for the mutual-information exposure induced by reporting/participation. TVA enters as a transfer that is (weakly) increasing in contribution, so it does not destroy complementarities. 42 (a): Bounding the detection value and deriving the size threshold. By Assumption 1 (Detection Value) in the main paper, V (t) = V0γt with γ ∈ (0 , 1) , hence 
+
+X
+
+> t≥0
+
+V (t) = V0
+
+X
+
+> t≥0
+
+γt = V0
+
+1 − γ . (33) Moreover, by Assumption 4 (Positive Network Effects) in the main paper and the usual “more signals ⇒ earlier/higher detection” monotonicity, the coalition benefit Bi(S) is increasing in 
+
+M (S) and exhibits diminishing marginal returns in |S| . In particular, we can lower bound the incremental expected detection value by a term proportional to M (S):
+
+Bi(S) ≥ Pr( illicit ) · V0
+
+1 − γ · αi M (S), (34) for some αi > 0 capturing how coalition information mass converts into i’s detection proba-bility gains. 7
+
+Participation is individually rational if Πi(S) ≥ 0. Using (32)–(34) and dropping TVA i(S)
+
+(or treating it as a nonnegative subsidy), a sufficient condition for Πi(S) ≥ 0 for all i ∈ S is 
+
+Pr( illicit ) · V0
+
+1 − γ · M (S) ≥ max  
+
+> i∈S
+
+{ci E[ni(S)] + κiIi(S)} . (35) Under Assumption 2 (Compliance Cost Structure) in the main paper, Ci(n) = cin and the proof sketch’s statement corresponds to the normalization E[ni(S)] ≈ 1 (or to absorbing 
+
+E[ni(S)] into ci), yielding the displayed threshold in part (a). Defining m as the smallest coalition size for which there exists some S with |S| = m satisfying (35) gives the minimum viable coalition .
+
+(c): Supermodularity (increasing differences) and complementarity. Consider the stage-1 participation game in which each i chooses di ∈ { 0, 1} and S(d) = {i : di = 1 }.Define ui(d) ≡ Πi(S(d)) . To show supermodularity it suffices to show increasing differences 
+
+in (di, d −i): for any j̸ = i and any profile d−i with dj = 0 ,
+
+ui(di = 1 , d j = 1 , d −(i,j ))−ui(di = 1 , d j = 0 , d −(i,j )) ≥ ui(di = 0 , d j = 1 , d −(i,j ))−ui(di = 0 , d j = 0 , d −(i,j )).
+
+(36)       
+
+> 7This constant can be interpreted as a reduced-form sensitivity of i’s detection performance to additional coalition data/signals. The proposition uses a normalized form that effectively sets αi= 1 by scaling M(S).
+
+43 The RHS is 0 because when di = 0 institution i does not participate and its payoff is normalized to its outside option (which does not depend on whether j participates in the federation). The LHS equals 
+
+Πi(S ∪ { j}) − Πi(S), where S = S(d) \ { j} and i ∈ S .
+
+By Assumption 4 (Positive Network Effects) in the main paper, Bi(S ∪ { j}) − Bi(S) > 0.Under TVA, the transfer TVA i(·) is designed to be nondecreasing in marginal contribution, so adding j weakly increases (or at least does not decrease) the net transfer to i relative to its contribution. Finally, compliance and leakage costs are weakly increasing in coalition interaction; the proposition’s complementarity claim focuses on the detection-benefit side, and the net increasing-differences condition holds whenever the marginal gain in Bi (plus any TVA adjustment) dominates any incremental compliance/leakage externalities. Hence (36) holds, so the participation game is supermodular. Because the action space {0, 1}N is a finite lattice and ui(d) has increasing differences, Topkis’s theorem implies that the set of pure-strategy Nash equilibria is nonempty and forms a complete lattice. In particular, there exists a least equilibrium d and a greatest equilibrium 
+
+d under the product order. Translating profiles into coalitions, the corresponding coalitions 
+
+S and S satisfy S ⊆ S .Define the individually rational set for coalition S as 
+
+IR( S) ≡ { i ∈ S : Π i(S) ≥ 0}.
+
+A self-enforcing (stage-1) coalition must satisfy IR( S) = S. The minimum viable coalition 
+
+S∗ is then the smallest (by inclusion, equivalently by size among feasible coalitions under monotonicity) self-enforcing coalition: 
+
+S∗ ∈ arg min  
+
+> S⊆ N
+
+{|S| : Π i(S) ≥ 0 ∀i ∈ S} .
+
+Complementarity implies monotonicity of participation incentives: if Πi(S) ≥ 0 and S ⊆ T , then Πi(T ) ≥ Πi(S) (up to the same caveat about incremental costs), so enlarging the coalition makes participation weakly more attractive. This yields the possibility of 
+
+multiplicity : both a small coalition (near S) and a large coalition (near S) can be equilibria. Cascading exits follow from the same monotonicity in reverse. If some marginal institu-44 tion j exits, moving from S to S \ { j}, then for every remaining i ∈ S \ { j},
+
+Bi(S \ { j}) < B i(S),
+
+so Πi falls. If the drop pushes some i below zero, that institution exits as well, further reducing benefits for others, and so on, generating an unraveling cascade. This argument formalizes the proof sketch’s “exit of marginal institution reduces Bi for remaining members, potentially triggering cascading exits.” 
+
+(b): Composition. Part (b) follows from comparing net gains across types. Institutions with higher cross-border exposure have larger αi in (34) (they benefit more from shared signals), while lower ci and lower κi reduce the RHS of (35), so they satisfy Πi(S) ≥ 0 at smaller coalition sizes and thus join earlier along equilibrium-selection dynamics. 
+
+(d): Unraveling without TVA. For part (d), without TVA the participation condition tightens because TVA i(S) = 0 and high-quality institutions (high si, q i) have strong outside options by Assumption 5 (Heterogeneous Outside Options) in the main paper. Writing the participation constraint relative to standing alone, 
+
+Πi(S) − Πi({i}) =  Bi(S) − Bi({i}) − ci ∆ni − κiIi(S),
+
+where ∆ni ≡ E[ni(S)] − E[ni({i})] . If 
+
+max 
+
+> i
+
+h
+
+Bi({i}) − Bi(S) + ci∆ni + κiIi(S)
+
+i
+
+> 0,
+
+then some institution strictly prefers to opt out, and by complementarity this can trigger further exits, paralleling adverse selection: the departure of high-quality participants reduces the federation’s value, making it less attractive for others. TVA counteracts this by awarding credit/subsidy tied to contribution, effectively increasing Πi(S) for high-quality or high-impact participants and preventing the unraveling cascade. 
+
+## A.5 Proof of Proposition 2 (Network Shapley) 
+
+Proof. Under the edge-additive coalition value V (S) = P 
+
+> (i,j )∈E
+
+wij pij (S)Cij , each edge (i, j )
+
+contributes wij Cij · pij (S) to V (S), where pij (S) depends only on whether endpoints i and j
+
+45 are in S. Institution i’s Shapley value is therefore decomposable across edges incident to i:
+
+ϕnet  
+
+> i
+
+= X
+
+> j:( i,j )∈E
+
+Eσ
+
+Vij (S<i σ ∪ { i}) − Vij (S<i σ ) · wij Cij , (37) where σ is a uniformly random permutation and Vij denotes edge (i, j )’s contribution to V .The expectation over σ reduces to two cases. Case 1 (probability 1/2): j arrives after i, so at the moment i arrives, j is not in the coalition. The marginal contribution of i on edge 
+
+(i, j ) is pLij − p0 
+
+> ij
+
+. Case 2 (probability 1/2): j arrives before i. The marginal contribution is 
+
+pHij − pLij . The expected contribution from edge (i, j ) is  
+
+> 12
+
+(pLij − p0 
+
+> ij
+
+) + 12 (pHij − pLij ) = 12 (pHij − p0 
+
+> ij
+
+). (38) Summing over edges incident to i:
+
+ϕnet  
+
+> i
+
+= 12
+
+X
+
+> j:( i,j )∈E
+
+(pHij − p0 
+
+> ij
+
+) · wij · Cij , (39) which is the weighted-degree result stated in the main paper. 
+
+## A.6 Proof of Proposition 3 
+
+Proof. Part (a): Underinvestment. Under the logit demand implied by depositor util-ity (19), bank i’s deposit market share is 
+
+Di(ri, ϕ i) = exp( δi + αrri − αϕϕi + ξi)
+
+P 
+
+> k
+
+exp( δk + αrrk − αϕϕk + ξk),
+
+so ∂D i/∂ϕ i = −αϕDi(1 − Di) < 0: more detection strictly reduces bank i’s market share, because αϕ > 0 represents the customer-facing disutility of monitoring. Bank i maximizes (20) with respect to ϕi, taking rivals’ actions as given. The FOC is 
+
+∂D i
+
+∂ϕ i
+
+· (rL − ri) − ciDi − ciϕi
+
+∂D i
+
+∂ϕ i
+
+= P ′ 
+
+> i
+
+(ϕi) = 2 p0(ϕi − 1) . (40) Rearranging and substituting ∂D i/∂ϕ i = −αϕDi(1 − Di):
+
+2p0(1 − ϕ∗ 
+
+> i
+
+) = ciDi + αϕDi(1 − Di)(rL − ri) − ciϕ∗
+
+> i
+
+. (41) Since rL > r i and ϕ∗ 
+
+> i
+
+< 1 in interior equilibrium, the bracketed term is positive; so the 46 right-hand side of (41) is strictly increasing in αϕ. By the implicit function theorem and strict concavity of Pi, ∂ϕ ∗ 
+
+> i
+
+/∂α ϕ < 0.The socially optimal level ϕsoc  
+
+> i
+
+solves (41) with αϕ = 0 (the planner ignores the compet-itive externality), so ϕ∗ 
+
+> i
+
+< ϕ soc  
+
+> i
+
+for any αϕ > 0. As αϕ → ∞ , ϕ∗ 
+
+> i
+
+converges to a minimal level determined by the balance between the convex penalty P ′ 
+
+> i
+
+(ϕi) and the competitive disincentive, which remains strictly below ϕsoc  
+
+> i
+
+.
+
+Part (b): IC correction. When TVA credit πi(ρi, ρ −i) is included in bank i’s objec-tive (20), the choice of reporting strategy ρi faces the same deviation classes as in Theorem 1, but with an additional private cost term: the competitive cost αϕ|∂D i/∂ϕ i|(rL − ri) reflects the marginal revenue lost when increased reporting raises detection intensity and reduces deposit market share. Adding this term to the right-hand side of the IC condition from Theorem 1 gives (21). Since the left-hand side is increasing in γ, the required discount factor 
+
+γ∗ satisfies ∂γ ∗/∂α ϕ > 0: competitive markets require more aggressive temporal discounting to sustain truthful reporting. 
+
+## A.7 Proof: Proposition 4 (Backfiring Mandate) 
+
+Proof. Let welfare in regime r ∈ { A, B, C, D } be 
+
+W r = X
+
+> i∈N
+
+
+
+Bri − Cri − κiIri − αϕΦri
+
+
+
+,
+
+where Bri is institution i’s detection benefit, Cri = ci
+
+P 
+
+> e
+
+byi,t,r e is the compliance cost under regime r’s equilibrium reporting scores (Assumption 2 (Compliance Cost Structure) in the main paper), κiIri is the information leakage cost, and αϕΦri is the competitive cost from detection investment. 
+
+Part (a): αϕ = 0 .
+
+W A ≤ W C . In Regime C, institutions can replicate autarky by not participating or by submitting uninformative reports. Hence autarky is feasible under C, implying W C ≥ W A.
+
+W C ≤ W D. When αϕ = 0 , the only distortion in C arises from strategic underreporting to reduce leakage cost κiIi. TVA in Regime D aligns private incentives with marginal contribution, increasing informativeness relative to C. Since detection benefits are increasing in informativeness (Assumption 4 (Positive Network Effects) in the main paper), welfare weakly increases: W D ≥ W C .
+
+W D ≤ W B . Regime B corresponds to coordinated sharing that internalizes cross-institutional externalities and maximizes aggregate welfare. Regime D implements a de-47 centralized equilibrium subject to incentive constraints. Hence W B ≥ W D.Thus W A ≤ W C ≤ W D ≤ W B .
+
+Part (b): αϕ > 0 and competition sufficiently intense. 
+
+Under Regime C, institution i chooses reporting intensity mi to maximize 
+
+ΠCi = Bi(S; mi, m −i) − ci
+
+X
+
+> e
+
+byi,t e (mi) − κiIi(mi) − αϕΦi(mi).
+
+The first-order condition for an interior solution is 
+
+∂B i
+
+∂m i
+
+= ci
+
+∂ P 
+
+> e
+
+byi,t e
+
+∂m i
+
++ κi
+
+∂I i
+
+∂m i
+
++ αϕ
+
+∂Φi
+
+∂m i
+
+.
+
+The right side is strictly positive and increasing in αϕ, while ∂B i/∂m i is bounded above (Assumption 4 (Positive Network Effects) in the main paper: diminishing returns). By Assumption 6 (Reporting Spillovers) in the main paper, as αϕ → ∞ , the competitive cost term αϕ∂Φi/∂m i dominates and equilibrium reporting intensity satisfies mCi (αϕ) → 0. By continuity and strict monotonicity of αϕ∂Φi/∂m i, there exists a finite threshold bαϕ such that for αϕ > bαϕ, equilibrium reporting intensity satisfies mCi < m Ai for all i (where mAi is the autarky intensity, determined solely by ∂B i/∂m i = ci∂ P 
+
+> e
+
+by/∂m i + κi∂I i/∂m i, with no competitive cost term). Under systematic underreporting mCi < m Ai for all i, the federated global model aggre-gates distorted parameter updates. By Assumption 7 (Detection Quality Monotonicity) in the main paper, BCi < B Ai for all i. Moreover, Regime C still imposes positive leakage and competitive costs: κiICi > 0 and αϕΦCi > 0 (even under distorted reporting, participating institutions reveal some local information and bear monitoring costs). Therefore: 
+
+W C = X
+
+> i
+
+BCi − ci
+
+X
+
+> e
+
+byi,t,C e − κiICi − αϕΦCi
+
+!
+
+< X
+
+> i
+
+BAi − ci
+
+X
+
+> e
+
+byi,t,A e
+
+!
+
+= W A,
+
+where the inequality holds for αϕ > bαϕ by the combination of BCi < B Ai (detection loss), 
+
+P 
+
+> e
+
+byi,t,C e ≈ P 
+
+> e
+
+byi,t,A e (compliance costs remain since even distorted reporting retains some flagging), and strictly positive leakage and competitive costs that are absent under autarky. Under Regime D, TVA credits institutions according to Ce · S(byi,t e , y e) with a strictly proper scoring rule S on confirmed edges. By the Incentive Compatibility Theorem in the main paper, condition the IC condition in the main paper (extended to include the competitive cost term from the main paper) is sufficient for truthful reporting to be a BNE, 48 restoring mDi = m∗ 
+
+> i
+
+(the detection-optimal intensity). Hence BDi > B Ci , which together with the leakage and compliance costs gives W D > W A for αϕ in the relevant range. The planner benchmark weakly dominates by standard incentive feasibility: W D ≤ W B .
+
+Part (c): Existence of ¯αϕ.
+
+Under Regime B, reporting is fully informative, so competition harm equals αϕ
+
+P 
+
+> i
+
+ΦBi . In Regime D, endogenous participation and incentive alignment reduce exposure, so P 
+
+> i
+
+ΦDi <
+
+P 
+
+> i
+
+ΦBi .Let ∆B = BB − BD > 0 and ∆Φ = P 
+
+> i
+
+ΦBi − P 
+
+> i
+
+ΦDi > 0. Then 
+
+W B − W D = ∆ B − αϕ∆Φ − (cost differences) .
+
+Detection gains are bounded (Assumptions 1–4 in the main paper), whereas the competition term grows linearly in αϕ. Hence there exists ¯αϕ such that for αϕ > ¯αϕ, W B < W D.Combining the inequalities establishes (a)–(c). 
+
+## A.8 Proof of Proposition 5 (Index-Based Intervention Heuristic) 
+
+Proof. The restless-bandit benchmark with network-coupled rewards is PSPACE-hard; we establish only the submodular-greedy bound. (ste, H te) is a sufficient statistic by the Markov property of GNN embeddings. The per-edge Bellman equation νe = R(monitor ) + γE[ν′ 
+
+> e
+
+|
+
+monitor ] defines a Whittle-style index (Whittle, 1988). Since F (E) = P 
+
+> e∈E
+
+peCe + λI (E)
+
+is monotone submodular (premise), by Nemhauser et al. (1978) the greedy top-K algorithm achieves a (1 −1/e )-approximation to the greedy cardinality-constrained optimum of F . This is relative to the submodular surrogate, not the full restless-bandit optimum, since network coupling means the index structure is only approximately preserved. 
+
+## A.9 Proof of Corollary 5.3 
+
+Proof. Part (a): The centrality-weighted index νnet  
+
+> u
+
+decreases in |N (u)|, so high-degree accounts have lower adjusted indices. Part (b): Freezing u reduces each neighbor v’s de-gree, raising the correction term for v’s remaining neighbors (since dw/(dw − 1) decreases in dw), yielding progressively more costly freezes in dense clusters. Part (c): The objective 
+
+F net (S) = F (S) − λnet L(S) is the sum of a submodular F and a modular L, which preserves submodularity; Nemhauser et al. (1978)’s greedy bound applies. 49 A.10 Proof of the Federated Approximation Bound 
+
+Proof. We analyze the convergence and approximation error of federated averaging applied to graph neural networks under truthful reporting. Let L(θ) = 1
+
+> N
+
+Pmi=1 
+
+P 
+
+> u∈Gi
+
+ℓu(θ) denote the global empirical risk, where Gi is the local graph held by institution i with ni accounts and N = Pmi=1 ni. Let θ∗ be the minimizer of L, and let θfed be the model obtained after R
+
+rounds of federated averaging with truthful local updates. We assume L is μ-strongly convex and L-smooth, and that each institution performs E local SGD steps per communication round with step size η. Standard federated optimization analysis decomposes the excess risk as 
+
+L(θfed ) − L (θ∗) ≤ L (θR) − L (θ∗
+
+> fed
+
+)
+
+| {z }
+
+> optimization error
+
++ L(θ∗
+
+> fed
+
+) − L (θ∗)
+
+| {z }
+
+> statistical / heterogeneity bias
+
+, (42) where θ∗ 
+
+> fed
+
+is the fixed point of federated averaging under infinite communication rounds. Under strong convexity and smoothness, federated averaging exhibits linear convergence to 
+
+θ∗ 
+
+> fed
+
+(e.g., (Li et al., 2020)). In particular, 
+
+L(θR) − L (θ∗
+
+> fed
+
+) ≤ (1 − μη )R L(θ0) − L (θ∗
+
+> fed
+
+). (43) Defining ϵ := (1 − μη )R, this term decays exponentially in the number of communication rounds. The gap between θ∗ 
+
+> fed
+
+and θ∗ arises from data heterogeneity across institutions. From federated learning theory, 
+
+L(θ∗
+
+> fed
+
+) − L (θ∗) ≤ O
+
+ 1
+
+μ Ei
+
+∥∇L i(θ∗) − ∇L (θ∗)∥2
+
+, (44) where Li denotes the local loss at institution i.For L-layer GNNs with d-dimensional embeddings, gradients depend on L-hop neighbor-hood aggregation and the spectral norms of local adjacency matrices. Under bounded degree and normalized aggregation, the gradient variance satisfies 
+
+Ei
+
+∥∇L i(θ∗) − ∇L (θ∗)∥2 ≤ C · m · L · dN , (45) where C is a constant depending on graph connectivity and feature norms. The factor m/N 
+
+reflects institutional imbalance, while L and d capture depth-wise message propagation and 50 embedding dimensionality. Substituting the above bounds yields 
+
+L(θfed ) ≤ L (θ∗) + ϵ L(θ0) − L (θ∗
+
+> fed
+
+) + O
+
+m · L · dN
+
+
+
+. (46) Absorbing constants into ϵ and noting that L(θ0) is finite completes the proof: 
+
+L(θfed ) ≤ (1 + ϵ)L(θ∗) + O
+
+m · L · dN
+
+
+
+. (47) 
+
+## A.11 Proof of Risk Memory Approximation 
+
+Proof. For each edge e, the Gittins index admits the decomposition 
+
+νe = pe · Ce + λ · Ie, (48) where the first term represents the immediate exploitation reward and the second term captures the long-term information gain from monitoring edge e. Since the immediate reward term is modular, the optimization complexity arises entirely from the information value component. Let E ⊆ E denote the set of currently monitored edges. By assumption, the information value function 
+
+I(E) := X
+
+> e∈E
+
+Ie(E)
+
+is monotone and submodular, i.e., for any E ⊆ E′ ⊆ E and any e / ∈ E′,
+
+I(E ∪ { e}) − I(E) ≥ I(E′ ∪ { e}) − I(E′). (49) Therefore, the total Gittins objective 
+
+F (E) := X
+
+> e∈E
+
+peCe + λI (E)
+
+is also monotone submodular as a sum of a modular and a submodular function. The risk memory mechanism selects, at each node, the K edges with the largest indices 
+
+νe, which is equivalent to the greedy algorithm for maximizing F (E) under a cardinality constraint |E| ≤ K. By the classical result of Nemhauser et al. (1978), the greedy algorithm 51 satisfies 
+
+F (Egreedy ) ≥
+
+
+
+1 − 1
+
+e
+
+
+
+F (E∗), (50) where E∗ is the optimal set of K edges under the Gittins index policy. The risk memory mechanism estimates νe from noisy observations. Using standard con-centration inequalities (e.g., Hoeffding’s inequality), the empirical estimates bνe satisfy 
+
+Pr ( |bνe − νe| ≥ ϵ) ≤ 2 exp  −cϵ 2Te
+
+ , (51) where Te is the number of observations for edge e and c is a universal constant. Taking a union bound over all edges incident to a node, it suffices to choose 
+
+K = Θ(log |V |) (52) to ensure that the top-K edges are correctly identified with high probability. Consequently, the greedy selection based on empirical indices preserves the (1 − 1/e )-approximation guar-antee. Combining the above steps, the risk memory mechanism with K = Θ(log |V |) achieves a 
+
+(1 − 1/e )-approximation to the optimal Gittins index policy. 
+
+# B Path-Based Extension: Bonacich Centrality 
+
+The weighted-degree characterization above follows from the edge-additive coalition value the edge-additive coalition value in the main paper. A richer coalition value, where institution 
+
+i’s contribution depends on paths through i rather than only on edges incident to i, yields a Bonacich centrality characterization. We sketch this extension here for completeness; it is 
+
+not implied by the main paper’s coalition value function. Suppose the coalition value is extended to include path-based detection effects from the GNN message-passing architecture: institution i’s presence in S improves detection not only on edges incident to i, but also on edges (j, k ) where path i → j → k exists through institutional network G. Under linearity ( pH − pL = pL − p0 = ∆ p), the path-based marginal contribution through a path of length ℓ scales as (∆ p)ℓ Q 
+
+> s
+
+Ajsjs+1 Cjsjs+1 . Defining 
+
+δ ≡ ∆p · Cavg and summing the geometric series gives 
+
+ϕnet,path  
+
+> i
+
+∝
+
+> ∞
+
+X
+
+> ℓ=0
+
+δℓ[Aℓ1]i = bi(G, δ ),
+
+52 which is the Bonacich centrality with convergence condition δ < 1/λ max (A). The connection to Ballester et al. (2006) follows. This extension is illustrative : it requires augmenting the coalition value function beyond the edge-additive form used in the main paper, and is offered as a direction for future work rather than a formal result of this paper. 
+
+# C GNN Architecture Details 
+
+This appendix provides the full technical details of the graph neural network architecture used as the substrate for the strategic analysis in the main text. Each institution i maintains a graph-based detection model f iθ : Gi,t → [0 , 1] |Ei,t | mapping transaction networks to risk scores. The model leverages graph neural networks (Kipf and Welling, 2016; Xu et al., 2019) as the encoder: 
+
+Hi,t u,ℓ +1 = σ
+
+ 1
+
+|N (u)|
+
+X 
+
+> v∈N (u)
+
+Hi,t v,ℓ Wℓ
+
+ (53) where Hi,t u, 0 = Xi,t u are initial node features, Wℓ are learnable weights at layer ℓ, and σ(·)
+
+is an activation function. After L layers, node representations capture L-hop neighborhood structure. To capture temporal dependency, we extend GNNs with attention over time windows: 
+
+Hi,T u =
+
+> T
+
+X
+
+> t′=1
+
+αt′
+
+Hi,t ′ 
+
+> u
+
+, αt′
+
+= exp( Hi,t ′ 
+
+> u
+
+· wt′
+
+)
+
+P 
+
+> t′′
+
+exp( Hi,t ′′  
+
+> u
+
+· wt′′ ) (54) Edge-level representations are constructed by concatenating source node features, the direc-tional discrepancy between destination and source, and transaction-specific attributes: 
+
+zi,T uv = [ Hi,T u ∥(Hi,T v − Hi,T u )∥XEuv ] (55) The directional discrepancy (Hi,T v − Hi,T u ) encodes the asymmetric flow of funds, crucial for detecting suspicious transfers. This representation is passed through a multi-layer perceptron followed by a sigmoid to yield illicit transaction probabilities: byuv = σ(fθ(zi,T uv )) .To address class imbalance, we adopt focal loss (Lin et al., 2017): 
+
+Lfocal = − 1
+
+|E| 
+
+X
+
+> (u,v )∈E
+
+α(1 − byuv )γ yuv log( byuv ) + (1 − α)byγuv (1 − yuv ) log(1 − byuv ), (56) where α = 0 .9 is the class-balancing factor and γ = 2 is the focusing parameter. The model 53 uses a 3-layer GCN with hidden dimension 128, trained with the Adam optimizer at learning rate η = 0 .001 .
+
+# D Additional Simulation Results 
+
+This appendix collects simulation results that complement the main text. All results use the IBM AML synthetic benchmark (Altman et al., 2023) described in the main paper. 
+
+## D.1 Parameter Calibration 
+
+We calibrate the model’s key parameters to match empirical moments from the IBM AML dataset using a method of moments approach. The calibrated parameters are: compliance costs {ci}, leakage sensitivities {κi}, detection value V0, adversarial delay δ, and competitive intensity η. We target market-level moments (detection rates, error rates, cross-border vol-umes, adversarial degradation patterns), yielding 49 moment conditions for 17 parameters. Table 5: Calibrated Parameter Estimates 
+
+Market bci bκi bqi TVA Surplus 
+
+United States 0.142 (0.018) 0.089 (0.012) 0.71 0.034 Germany 0.098 (0.014) 0.067 (0.009) 0.68 0.051 France 0.112 (0.016) 0.073 (0.011) 0.64 0.043 Italy 0.087 (0.013) 0.058 (0.008) 0.66 0.062 Spain 0.093 (0.014) 0.062 (0.009) 0.63 0.056 China 0.078 (0.012) 0.105 (0.015) 0.72 0.047 Rest Countries 0.068 (0.011) 0.045 (0.007) 0.58 0.089 
+
+bV0 = 0 .247 (0 .031) , bδ = 2 .8 (0 .42) , bη = 0 .183 (0 .024) , bγ∗ = 0 .87 (0 .06)      
+
+> Notes : Standard errors via bootstrap (500 replications). TVA Surplus is per-period wel-fare gain over autarky. Hansen’s J= 38 .4(32 d.f., p= 0 .201 ).
+
+Compliance costs are highest for the United States, reflecting its larger reporting bur-den. Leakage sensitivity is largest for China, consistent with stronger competitive frictions. Smaller markets such as Rest Countries benefit disproportionately from federation. The esti-mated competitive intensity bη = 0 .183 indicates nontrivial strategic distortion in the absence of incentives, and the optimal discount factor bγ∗ = 0 .87 is consistent with the IC condition in the Incentive Compatibility Theorem in the main paper. 54 D.2 Welfare Simulations Across Regulatory Regimes 
+
+Table 6 simulates welfare under four regulatory regimes using the calibrated parameters, illustrating the Backfiring Mandate Theorem (the Backfiring Mandate Theorem in the main paper). Because the four regimes do not coexist simultaneously in the data, these are model-based policy simulations rather than empirical counterfactuals. Table 6: Welfare Simulations Across Regulatory Regimes 
+
+Regime AUPRC Type II Welfare (% FB) Participation 
+
+A: Autarky 0.432 0.219 53.7 ,C: Unreg. Federation 0.446 0.207 61.8 5 of 7 D: TVA Federation 0.471 0.104 87.3 7 of 7 B: First-Best (Oracle) 0.496 0.068 100.0 Mandatory 
+
+Additional Simulations 
+
+D′: TVA, US + China only 0.458 0.142 74.1 2 of 7 D′′ : TVA, γ = 0 .5 0.453 0.158 69.2 7 of 7 C′: Mandatory w/o TVA 0.438 0.214 56.4 Mandatory  
+
+> Notes : Welfare as % of first-best. C ′forces all institutions to federate without incentive design.
+
+TVA (Regime D) achieves 87.3% of first-best welfare with full participation (7 of 7 in-stitutions), while mandatory sharing without TVA (C ′) achieves only 56.4%: barely above autarky (53.7%), consistent with part (b) of the Backfiring Mandate Theorem in the main paper. Restricting TVA to only the two largest markets reduces welfare to 74.1%, and lower-ing the discount factor to γ = 0 .5 reduces welfare to 69.2%, consistent with the comparative statics on γ∗.
+
+## D.3 Decomposition of TVA Gains 
+
+Table 7 decomposes total TVA performance gains across five channels: data aggregation, incentive alignment (truthful vs. strategic reporting), network centrality effects, adversarial robustness, and risk memory intervention. The incentive alignment channel, the portion attributable to correcting underreporting distortions, accounts for 22–34% of total gains across markets, confirming that mechanism design beyond data pooling is essential. 55 Table 7: Decomposition of TVA Gains by Channel 
+
+Market Total Aggreg. Incentive Network Anti-Adv. Interv. 
+
+United States 3.9 pp 32% 24% 16% 16% 12% Germany 4.2 pp 30% 27% 14% 16% 13% France 3.5 pp 35% 22% 12% 18% 13% Italy 5.1 pp 29% 29% 10% 16% 16% Spain 4.8 pp 30% 28% 11% 16% 15% China 5.4 pp 25% 29% 18% 15% 13% Rest Countries 8.7 pp 35% 19% 20% 12% 14% 
+
+> Notes : Aggregation = data pooling gain; Incentive = correcting strategic underreporting; Network = network-adjusted credit and centrality-weighted intervention; Anti-Adversarial = adversarial ro-bustness gain; Intervention = risk memory vs. greedy freezing.
+
+The network and anti-adversarial channels together account for a further 26–38% of gains, consistent with TVA operating across multiple complementary dimensions. 
+
+## D.4 Dataset Statistics 
+
+Table 8: Dataset Statistics by Market 
+
+Market Accounts Transactions Illicit Ratio 
+
+United States 71,796 855,006 0.35% Germany 31,566 275,129 0.47% France 28,126 244,589 0.38% Italy 23,262 194,155 0.41% Spain 24,363 207,098 0.36% China 21,345 181,341 0.52% Rest of World 16,213 111,847 0.85% 
+
+Total 216,671 2,069,165 0.42% 
+
+## D.5 Per-Market Heterogeneity of Federation Gains 
+
+Table 9 reports the per-market absolute performance difference between federated and in-dependent local training. Smaller markets (Spain, Italy, France) show the largest AUPRC gains, consistent with the minimum viable coalition result: data-sparse institutions bene-fit most from cross-institutional information sharing. Larger markets trade slight precision losses for substantial recall improvements, reflecting cross-institutional knowledge sharing primarily enhancing coverage of rare or structurally heterogeneous illicit behaviors. 56 Table 9: Per-market absolute performance difference (percentage points). ∆i = ( M fed  
+
+> i
+
+−
+
+M local  
+
+> i
+
+) × 100 .
+
+Market Transactions ∆AUPRC ∆Type I ∆Type II 
+
+United States 855,006 -1.40 +0.70 -4.85 Germany 275,129 -0.91 +1.77 -7.90 France 244,589 +1.61 +1.34 -14.43 Italy 194,155 +2.60 +1.59 -13.09 Spain 207,098 +7.65 +1.46 -12.27 China 181,341 -6.09 +2.08 -14.10 Rest Countries 111,847 +1.54 +1.81 -2.15 
+
+Overall 2,069,165 +0.71 +1.54 -9.83 
+
+## D.6 Fixed-Budget Operational Evaluation 
+
+To assess practical implications, we evaluate models under a realistic compliance constraint, where each institution i has a fixed daily investigation capacity Ki proportional to its his-torical average flagged volume. Table 10: Performance Under No Budget Constraint and Fixed Budget Settings No Budget Constraint Fixed Budget Market AUCROC AUPRC Type I Type II AUCROC AUPRC Type I Type II United States 0.9833 0.4464 0.0289 0.1278 0.9730 0.3299 0.0088 0.4360 Germany 0.9839 0.4577 0.0399 0.0956 0.9805 0.3494 0.0128 0.3496 France 0.9843 0.4117 0.0407 0.1010 0.9830 0.3132 0.0137 0.3416 Italy 0.9850 0.4323 0.0394 0.1057 0.9830 0.3367 0.0126 0.3052 Spain 0.9831 0.4186 0.0398 0.1173 0.9832 0.3509 0.0114 0.3259 China 0.9830 0.4194 0.0415 0.1237 0.9793 0.3003 0.0122 0.3766 Rest Countries 0.9888 0.7090 0.0349 0.0904 0.9833 0.5971 0.0081 0.3472 Overall 0.9845 0.4707 0.0379 0.1088 0.9808 0.3682 0.0114 0.3546 
+
+## D.7 Marginal Contribution: Leave-One-Market-Out 
+
+Table 11 reports the system-wide impact of removing each market, providing an empirical benchmark for each institution’s social contribution. Markets with positive ∆AUPRC  
+
+> i
+
+(Ger-many, China, Italy, Rest Countries) generate positive marginal value for the federation. The cross-sectional variation in ∆AUPRC  
+
+> i
+
+establishes the ground-truth measure of institutional social value against which TVA rewards are evaluated. 57 Table 11: Global Metrics Under Leave-One-Market-Out Setting AUPRC ∆AUPRC  
+
+> i
+
+Type I ∆Type I  
+
+> i
+
+Type II ∆Type II 
+
+> i
+
+Full Federation 0.4707 – 0.0379 – 0.1088 –Leave United States Out 0.4839 -0.0132 0.0347 0.0032 0.1168 -0.0080 Leave Germany Out 0.4606 0.0101 0.0368 0.0011 0.1121 -0.0033 Leave China Out 0.4582 0.0125 0.0378 0.0001 0.1125 -0.0037 Leave France Out 0.4693 0.0014 0.0393 -0.0014 0.1038 0.0050 Leave Spain Out 0.4756 -0.0049 0.0389 -0.0010 0.1014 0.0074 Leave Italy Out 0.4630 0.0077 0.0397 -0.0018 0.1027 0.0061 Leave Rest Countries Out 0.4659 0.0048 0.0339 0.0040 0.1277 -0.0189 
+
+## D.8 Comparison to Prior AML Detection Methods 
+
+Table 12 compares our method to recent AML detection approaches. Our integrated ap-proach, combining federated learning, temporal value assignment, and risk memory, provides state-of-the-art performance while addressing strategic behavior. The results confirm that performance gains arise from the mechanism design layer, not merely from using a more expressive model class. Table 12: Comparison with Prior AML Detection Methods                                         
+
+> Method Type Federated? Adversarial? AUPRC Type II Error
+> Logistic Regression Feature-based No No 0.235 0.026 SVM Feature-based No No 0.125 0.986 FedGraphnn Graph Yes No 0.346 0.443 GCN + Focal Loss Graph No No 0.368 0.355 CARE + Focal Loss Graph anomaly No No 0.364 0.137 ARC + Focal Loss Graph anomaly No No 0.442 0.183
+> Ours (Full System) Graph + Temporal + RL Yes Yes 0.471 0.104
+
+## D.9 Communication-Performance Tradeoff. 
+
+Figure 2 presents the impact of communication frequency R on model performance and com-munication cost. When R increases from 1 (no federation) to 5, both AUPRC and Type II error improve substantially, indicating that initial communication rounds allow the model to effectively aggregate information across institutions. Beyond R = 5 , performance continues to improve but at a much slower rate, with diminishing gains observed for R > 10 , while communication cost grows linearly with the number of rounds. For instance, moving from 
+
+R = 10 to R = 20 increases communication cost by a factor of two, whereas AUPRC im-proves only marginally from 0.471 to 0.475 and Type II error decreases slightly from 0.104 to 58 0.101. These results suggest that a moderate communication frequency, R ∈ [5 , 10] , achieves a favorable balance between predictive accuracy and communication efficiency, making it a practical choice for federated deployment. 
+
+Figure 2: Performance-Communication Cost Tradeoff of Communication Rounds 
+
+# E Toy Parametric Example: Structural Foundation for Assumptions 8 and 9 
+
+Assumptions 8 (Reporting Spillovers) and 9 (Detection Quality Monotonicity) in the main paper are maintained assumptions used in the Backfiring Mandate Proposition. This ap-pendix shows that both assumptions can be derived from primitives in a simple two-bank Gaussian-signal aggregation model, providing structural grounding for the welfare result. Consider two banks i ∈ { 1, 2} each observing a Gaussian signal si = y + ηi about a latent risk variable y ∼ N (0 , σ 2 
+
+> y
+
+), with ηi ∼ N (0 , σ 2 
+
+> η
+
+) i.i.d. Each bank chooses a reporting precision mi ∈ [0 , 1] determining how much of its signal to transmit, with transmitted signal esi = misi + (1 − mi)zi and zi ∼ N (0 , σ 2 
+
+> z
+
+) independent noise. Full truthful reporting corresponds to mi = 1 and uninformative reporting to mi = 0 . The aggregated signal is 
+
+¯s = ( es1 + es2)/2.The posterior mean of y given ¯s, and hence expected detection quality, is B(¯ s) = σ2 
+
+> y
+
+/(σ2 
+
+> y
+
++
+
+σ2
+
+> agg
+
+(m1, m 2)) · ¯s with aggregated noise variance σ2 
+
+> agg
+
+= 14 [m21σ2 
+
+> η
+
++ (1 − m1)2σ2 
+
+> z
+
++ m22σ2 
+
+> η
+
++ (1 −
+
+m2)2σ2 
+
+> z
+
+]. Detection benefit Bi is increasing in mj for j̸ = i whenever σ2 
+
+> z
+
+> σ 2 
+
+> η
+
+, so the spillover structure of Assumption 8 holds. Under banking competition with detection externality αϕ, bank i’s private payoff from reporting intensity mi is Bi −αϕ ·mi, where the linear competitive cost captures the customer-facing disutility of heightened monitoring. The FOC is ∂B i/∂m i = αϕ. As αϕ → ∞ , the equilibrium mCi → 0, precisely Assumption 8’s prediction that reporting becomes uninfor-mative under intense competition. 59 At m1 = m2 = 0 (Regime C under extreme competition), aggregated noise variance is 
+
+σ2 
+
+> z
+
+/2; at m1 = m2 = 1 (autarky-equivalent individual signals), each bank’s local noise is σ2 
+
+> η
+
+. If 
+
+σ2 
+
+> z
+
+> 2σ2 
+
+> η
+
+(plausible when injected noise exceeds natural signal variability), autarky achieves strictly higher detection quality than Regime C at high αϕ. Combined with Regime C’s positive leakage and compliance costs (which are zero under autarky), this yields W C < W A,so Assumption 9 holds as a derived consequence rather than as a maintained primitive. This toy model is not a substitute for the full microfoundation in the GNN-based setting, where detection quality depends on the entire aggregated parameter structure. However, it demonstrates that the Backfiring Mandate result is not a tautology: under standard Gaussian information aggregation with linear competitive costs, Assumptions 8 and 9 emerge structurally from primitives. The main paper’s reliance on these assumptions is therefore economically grounded, even if the full derivation in the complex GNN setting is intractable. 60

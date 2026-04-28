@@ -1,0 +1,477 @@
+Title: AFMRL: Attribute-Enhanced Fine-Grained Multi-Modal Representation Learning in E-commerce
+
+URL Source: https://arxiv.org/pdf/2604.20135v1
+
+Published Time: Thu, 23 Apr 2026 00:27:06 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+## AFMRL: Attribute-Enhanced Fine-Grained Multi-Modal Representation Learning in E-commerce 
+
+Biao Zhang *, Lixin Chen *, Bin Zhang *, Zongwei Wang †, Tong Liu ‡, Bo Zheng 
+
+Taobao & Tmall Group of Alibaba 
+
+Abstract 
+
+Multimodal representation is crucial for E-commerce tasks such as identical product re-trieval. Large representation models (e.g., VLM2Vec) demonstrate strong multimodal un-derstanding capabilities, yet they struggle with fine-grained semantic comprehension, which is essential for distinguishing highly similar items. To address this, we propose Attribute-Enhanced Fine-Grained Multi-Modal Repre-sentation Learning (AFMRL), which defines product fine-grained understanding as an at-tribute generation task. It leverages the gen-erative power of Multimodal Large Language Models (MLLMs) to extract key attributes from product images and text, and enhances repre-sentation learning through a two-stage training framework: 1) Attribute-Guided Contrastive Learning (AGCL), where the key attributes gen-erated by the MLLM are used in the image-text contrastive learning training process to identify hard samples and filter out noisy false negatives. 2) Retrieval-aware Attribute Rein-forcement (RAR), where the improved retrieval performance of the representation model post-attribute integration serves as a reward signal to enhance MLLM’s attribute generation during multimodal fine-tuning. Extensive experiments on large-scale E-commerce datasets demon-strate that our method achieves state-of-the-art performance on multiple downstream retrieval tasks, validating the effectiveness of harness-ing generative models to advance fine-grained representation learning. 
+
+1 Introduction 
+
+The field of multimodal representation learning is undergoing a paradigm shift, moving beyond discriminative matching frameworks towards gen-erative models capable of sophisticated understand-ing and reasoning (Jiang et al., 2025; Zhang et al., 
+
+> *Equal Contribution.
+> †Project Leader.
+> ‡Corresponding Author.
+
+Figure 1: Comparison of multimodal information in General and E-commerce domains. In General domains, text typically provides a global description of the image, with multiple instances corresponding between them. In contrast, in E-commerce domains, product titles often describe only specific instances within the product im-age (which is called the main subject). Moreover, for the same product, there may exist various images (e.g., different shooting angles and backgrounds) and titles (e.g., varying descriptions, marketing phrases). 
+
+2025, 2024a; Zhou et al., 2025). This evolution is particularly critical in domains like E-commerce, where the ability to distinguish between visually similar products hinges on a deep comprehension of fine-grained attributes. Accurately retrieving a product requires not just matching a query like "red dress" to an image, but understanding nuanced de-tails such as "a V-neck A-line dress in crimson silk with cap sleeves" , which necessitates a model that can parse compositional structure and subtle visual cues. This paper explores the transition from tradi-tional representation models to Multimodal Large Language Models (MLLMs) to achieve this leap in capability. Traditional representation models, such as CLIP (Radford et al., 2021), are built on discriminative 
+
+> arXiv:2604.20135v1 [cs.CL] 22 Apr 2026
+
+dual-encoder architectures that learn an aligned metric space for matching. This approach, while effective for broad semantic retrieval, often func-tions as a "bag-of-words" system (Yuksekgonul et al., 2022), struggling with compositional reason-ing. For instance, it can fail to robustly distinguish between "a white t-shirt with a blue logo" and "a 
+
+blue t-shirt with a white logo." In stark contrast, MLLMs, built on auto-regressive principles, are compelled to understand such structural relation-ships in order to produce coherent descriptions se-quentially. This inherent design not only embeds compositional understanding but also unlocks trans-formative advantages, including instruction-driven flexibility to create task-aware representations and emergent commonsense reasoning to infer higher-level abstract concepts (Li et al., 2025). Despite its potential, adapting MLLMs to fine-grained representation learning still faces a fun-damental challenge. Constrained by the causal attention mechanism, prevailing large representa-tion models typically derive embeddings via global average pooling (e.g., LLM2Vec (BehnamGhader et al., 2024)) or last-token hidden states (e.g., VLM2Vec (Jiang et al., 2025)), which is incom-patible with established fine-grained alignment techniques such as Region-of-Interest (RoI)-based methods (Xie et al., 2025). This limitation in-spires our core research question: How can we harness an MLLM’s advanced understanding and instruction-following abilities to overcome its architectural constraints for fine-grained E-commerce tasks? 
+
+Our solution is to define fine-grained product understanding as a key attribute generation task. Continuing with the “red dress” as an example, if MLLMs can infer key attributes such as “dark red” ,
+
+“silk” , “V-neck” , “A-line” , and “cap sleeves” from the product’s image and text, we consider it to have strong fine-grained understanding capability. The next question we need to address is: How can we integrate the generated key product at-tributes into multimodal representation learn-ing? To this end, we propose a two-stage train-ing framework: 1) Attribute-Guided Contrastive Learning (AGCL): We first employ an MLLM to generate a list of critical attributes for each product (e.g., "suede material," "lace-up closure," "rubber sole"). These attributes then serve as an explicit supervisory signal within the contrastive learning process, helping identify hard negatives and filter out noisy false negatives, thereby sharpening the model’s discriminative power; 2) Retrieval-aware Attribute Reinforcement (RAR): To resolve the po-tential misalignment between the generated textual attributes and the learned visual representation, we introduce a reinforcement learning stage. The rep-resentation model itself acts as a reward function, providing feedback to fine-tune the attribute gen-eration model. This creates a self-improving loop, ensuring that the generated attributes are maximally aligned with and beneficial for the final discrimina-tive representation. In summary, this work makes the following con-tributions: • To the best of our knowledge, we system-atically investigate and validate the applica-tion of Multimodal Large Language Mod-els (MLLMs) for fine-grained representation learning within the E-commerce domain. • We propose a novel framework that inte-grates Attribute-Guided Contrastive Learning (AGCL) and Retrieval-aware Attribute Rein-forcement (RAR), significantly improving the model’s fine-grained discriminative capability while ensuring alignment between attribute generation and representation learning. • Extensive experiments on challenging E-commerce datasets demonstrate that our method achieves state-of-the-art performance across multiple downstream retrieval tasks, validating both its effectiveness and superior-ity. 
+
+2 Related Work 
+
+2.1 Fine-grained Multimodal Understanding 
+
+The foundation of modern multimodal representa-tion learning was laid by models like CLIP, which pioneered large-scale contrastive learning between images and text. Building on this, a range of approaches have been proposed to enhance fine-grained vision-language understanding. For exam-ple, FG-CLIP (Xie et al., 2025) improves cross-modal alignment by leveraging hard negative sam-ples and region-level annotations; ECLIP (Jin et al., 2023) introduces instance-centric pretraining for E-commerce applications, while E2 (Qi et al., 2024) employs regional contrastive learning for fashion retrieval. These methods typically enhance model discriminability by incorporating more granular signals. In recent years, Multimodal Large Language Models (MLLMs) have emerged as powerful tools for multimodal understanding. Models such as LLaVA (Liu et al., 2023), CogVLM (Wang et al., 2024b), DeepSeek-VL (Lu et al., 2024), and Qwen2.5-VL (Bai et al., 2025) leverage the world knowledge and reasoning capabilities of large lan-guage models to effectively extract detailed infor-mation from both images and text, achieving signif-icantly stronger performance in fine-grained multi-modal tasks. 
+
+2.2 Generative Models for Representation Learning 
+
+The remarkable success of Large Language Models (LLMs) has motivated a recent surge in research aimed at repurposing decoder-only architectures for dense representation learning (BehnamGhader et al., 2024; Lee et al., 2024; Ma et al., 2024; Shin et al., 2025). Early efforts, such as LLM-Embedder (Zhang et al., 2023), adapted prompt-based tech-niques to extract representations. More recent approaches have introduced architectural modifi-cations; for instance, LLM2Vec (BehnamGhader et al., 2024) enables bidirectional attention and em-ploys a masked next-token prediction objective to convert pre-trained decoders into powerful text en-coders. Similarly, NV-Embed (Lee et al., 2024) im-proves embedding efficiency by incorporating a la-tent attention mechanism and removing the causal mask during contrastive training. This trend has naturally extended into the mul-timodal domain, leveraging the superior architec-tural and reasoning capabilities of MLLMs. Mod-els such as MagicLens (Zhang et al., 2024b) have demonstrated strong performance in instruction-guided retrieval, while frameworks like E5-V (Jiang et al., 2024) and VLM2Vec (Jiang et al., 2025) have set new benchmarks for encoding long, complex multimodal inputs into universal embed-dings. 
+
+3 Methodology 
+
+In this section, we present AFMRL (Attribute-Enhanced Fine-Grained Multi-Modal Representa-tion Learning), a novel framework for learning fine-grained multimodal representations. Our AFMRL framework is designed around a principle of decou-pled responsibilities. We employ two specialized models: a highly efficient Representation Model optimized for generating discriminative embed-dings, and a powerful Attribute Generator dedi-cated to high-level reasoning and extracting key local features. This separation allows each com-ponent to excel at its specific task. The central premise of our work is that explicitly incorporat-ing these attributes can resolve critical ambigui-ties in fine-grained retrieval, particularly with hard negatives—items that are visually similar but se-mantically distinct. 
+
+3.1 Attribute-Guided Contrastive Learning 
+
+As illustrated in Figure 3, AGCL utilizes VLM2Vec (Jiang et al., 2025) as the base embedding model. Following CLIP, VLM2Vec is trained with con-trastive learning using the InfoNCE loss. This leads to two key issues: (1) failing to leverage comple-mentary matching signals beyond the dense embed-dings, and (2) penalizing the model for matching with false negatives (semantically similar items in the batch). To address these challenges, AGCL introduces an MLLM-based attribute generator (distilled from Qwen2.5-VL-72B-Instruct (Bai et al., 2025); de-tails in Appendix D) to produce key attributes for each training sample, and enhances the standard In-foNCE loss. Specifically, we utilize the generated key attributes to guide the selection of hard neg-atives. We compute BM25 scores, Bij , between the key attributes of query qi and each candidate 
+
+pj to quantify their lexical relevance. BM25 is a robust information-retrieval function. High BM25 scores identify samples that are lexically similar to the query, making them challenging negatives that warrant greater attention during training. To integrate these scores, we transform them into nor-malized importance weights using a bounded acti-vation function: 
+
+wij = e1+tanh( Bij ). (1) This formulation ensures weights are bounded, pro-viding stable and targeted emphasis on lexically hard negatives. In addition, for each query qi, we compute cosine similarities sij = cos( qi, p j ) with all candidate samples pj in the batch, and then de-fine a binary masking function: 
+
+Mij = I[( j̸ = i) ∧ (sij > s ii + δ)] , (2) where I[·] is the indicator function. If a candidate negative sample’s similarity to the query exceeds a predefined margin, we remove it from the in-batch pool. This creates a refined set of valid negatives 
+
+Ni = {j : Mij = 0 } for each query, ensuring Figure 2: An overview of our proposed framework. The model is trained in two stages. (a) Stage 1: Attribute-Guided Contrastive Learning: A representation model is trained using an enhanced contrastive loss with false negative masking and hard negative reweighting. (b) Stage 2: Retrieval-aware Attribute Reinforcement: An attribute generator is fine-tuned with reinforcement learning (GRPO), using the frozen representation model to provide a direct, retrieval-based reward. (c) Inference: The optimized generator extracts attributes to enrich the query input, which is then encoded by the representation model for retrieval. 
+
+> Figure 3: Demonstration of our proposed Attribute-Guided Learning process and attribute’s influence on the retrieval.
+
+the model is not penalized for correctly identifying semantically similar samples. The final loss function holistically integrates the two strategies above. For each query qi with sim-ilarity scores scaled by temperature τ , the AGCL loss is formulated as: 
+
+LAGCL = − log wii · esii /τ 
+
+wii · esii /τ + P 
+
+> j∈N i
+
+wij · esij /τ .
+
+(3) Here, the summation in the denominator is re-stricted to the refined negative set Ni, thereby ex-cluding false negatives. The remaining valid neg-atives are re-weighted by their importance scores 
+
+wij . This integrated objective enables the model to learn more robust and discriminative represen-tations by focusing on true, informative negative samples. 
+
+3.2 Retrieval-aware Attribute Reinforcement 
+
+Section 3.1 yields a strong foundation: a Key At-tribute Generator ( πSFT ) proficient at producing plausible attributes, and a powerful Embedding Model trained with AGCL. However, the genera-tor’s distillation objective is disconnected from the final retrieval task. To bridge this optimization gap, we introduce a reinforcement learning (RL) stage that directly aligns the attribute generation policy with downstream retrieval performance. This RL stage fine-tunes the generator policy, πθ, to produce attributes that maximize the efficacy of the fixed representation model. 
+
+Direct-Feedback Reward Mechanism. The design of the reward function is paramount to the effectiveness of reinforcement learning. Moving beyond simplistic proxy signals, we introduce a reward function that is directly coupled with our final task metric. We accomplish this by leveraging our pre-trained representation model as an integral component of the reward evaluation environment. In this setup, the policy πθ generates a set of at-tributes for a given query. These attributes are used to augment the multimodal input, which is subse-quently passed to the representation model to con-duct a retrieval search across a candidate pool. The reward is then defined precisely as the Recall@k Input 
+
+> Rollout
+> Module
+> Policy
+> MLLM
+> Key Attribute
+> Generator
+> Attr 1
+> Attr 2
+> Attr G
+
+··· 
+
+> Reward
+> Model
+> Reference
+> Model
+> A1
+> A2
+> AG
+
+··· 
+
+> Embedding
+> Model
+> E1
+> E2
+> EG
+
+··· Retrieve from gallery 
+
+> R1
+> R2
+> RG
+
+··· 
+
+> Group
+> Computation
+> A1
+> A2
+> AG
+
+···   
+
+> KL Frozen Model
+> Trained Model
+> Pos Neg
+> 𝜋 !"#
+> 𝜋 $%
+
+Figure 4: The overall framework of our proposed Retrieval-aware Attribute Reinforcement training pipeline. G denotes the Attribute Generator, and R denotes the Representation Model (the frozen encoder used for reward calculation). 
+
+of this search. This direct-feedback loop ensures the policy is optimized precisely for enhancing top-k retrieval. The reward R(x, a ) for a query x and generated attributes a is: 
+
+R(x, a ) = |P x ∩ top k(x, a )||P x| , (4) where Px is the set of ground-truth positives, and top k(x, a ) denotes the set of top-k retrieved items when using generated attributes a for query x. To maintain linguistic coherence learned during SFT, we penalize malformed generations. The final re-ward is: 
+
+R(x, a, ϕ ) = R(x, a )·I[ϕ = 1]+ η·I[ϕ = 0] , (5) where ϕ is a validity flag and η = −0.1 is a penalty for invalid outputs. 
+
+Policy Optimization with GRPO. Equipped with the SFT-initialized policy πSFT and our direct-feedback reward R, we employ GRPO (Shao et al., 2024) for policy optimization. GRPO is well-suited for this task due to its stability and sample effi-ciency, mitigating risks associated with potentially sparse rewards. Moreover, it is an efficient algo-rithm that eliminates the need for an explicit re-ward model and value models. The RL process fine-tunes the policy πθ (initialized from πSFT ) to maximize the expected retrieval reward. The objec-tive function of GRPO is defined as follows: 
+
+JGRPO (θ) = Eτ ∼πθold 
+
+
+
+min 
+
+
+
+rt(θ) ˆAt,
+
+clip  rt(θ), 1 − ϵ, 1 + ϵ
+
+ˆAt
+
+
+
+− βD KL (πθ|| πSFT )
+
+
+
+,
+
+(6) where rt(θ) is the probability ratio, and the advan-tage estimate ˆAt is computed by normalizing batch rewards: ˆAi = (Ri−mean (R))  
+
+> std (R)
+
+. The KL-divergence term, regulated by β, acts as a regularization mech-anism, anchoring the policy to the robust linguistic foundation established during SFT while encour-aging exploration towards higher retrieval perfor-mance. ϵ denotes the clipping parameter in the GRPO objective function, used to prevent exces-sive policy updates. 
+
+4 Experiments 
+
+We conduct a series of experiments to evaluate AFMRL on large-scale E-commerce benchmarks and ablate the contributions of its key components. 
+
+4.1 Experimental Setup Dataset. We evaluate our method on the large-scale M5Product E-commerce dataset (Dong et al., 2022). To ensure data quality, we filter out items with missing or invalid images, resulting in a clean set of 5,760,482 products spanning over 6,000 cat-egories. Additionally, to create more diverse real-world scenarios, we collected a large-scale multi-modal product dataset from a popular E-commerce platform, named EIPM (E-commerce Identical Product Matching Dataset). It contains about 2 million groups of same products and over 10 mil-lion product items, covering more than 10,000 sub-categories, such as clothes, cosmetics, toys, and so on. 
+
+Implementation Details. Our AFMRL frame-work consists of two core components: 1) VLM2Vec Model: We initialize the model from Qwen2-VL-2B-Instruct (Wang et al., 2024a) and fine-tune it using LoRA. The learning rate is 5e-5, the InfoNCE temperature is 0.02, and the batch size is 2048. We use a LoRA rank of 8 and train for 2,000 steps; 2) Attribute Generator: We initialize the generator from Qwen2.5-VL-3B-Instruct (Bai et al., 2025) and perform full-parameter fine-tuning. The distillation stage uses a learning rate of 5e-5 Image-to-Text Retrieval Text-to-Image Retrieval Coarse-grained Product Retrieval Model Recall@1 Recall@5 Recall@10 Recall@1 Recall@5 Recall@10 mAP@1 mAP@5 mAP@10                                                                                           
+
+> BERT-based Baselines
+> CLIP 21.5 43.6 54.6 19.5 40.9 52.1 61.7 63.6 63.1 ALBEF 22.4 46.1 57.4 20.2 43.2 54.9 63.2 65.4 64.7 BLIP 24.9 48.5 59.3 23.5 46.2 57.5 64.0 65.9 65.1 Region-CLIP 21.6 43.8 55.1 19.2 40.3 51.7 62.0 63.9 63.9 FG-CLIP 21.8 43.9 55.3 19.4 40.2 51.5 63.3 65.9 64.1 VL-CLIP 21.5 43.8 54.9 19.2 39.9 50.5 62.9 64.9 63.4
+> LLM-based Baselines
+> LLM2CLIP 30.1 56.8 68.2 27.7 54.3 66.2 68.3 71.9 70.4 + AGCL 32.0 58.6 69.7 29.5 55.9 67.5 69.1 72.9 71.3 VLM2Vec 30.5 55.2 66.1 36.4 63.0 73.6 70.3 76.9 72.1 + AGCL 32.8 57.0 67.7 38.1 64.5 75.0 71.3 78.3 73.2
+
+Table 1: Performance on Coarse-Grained and Cross-Modal Retrieval Tasks. The AGCL component of our AFMRL framework provides consistent improvements over strong baselines, demonstrating its broad effectiveness for general retrieval.                                                                   
+
+> Model Recall@1 Recall@5 Recall@10 NDCG@1 NDCG@5 NDCG@10
+> BERT-based Baselines
+> CLIP 14.98 23.07 27.59 14.98 19.20 20.66 ALBEF 20.59 30.13 34.46 20.59 25.65 27.05 BLIP 19.42 29.05 33.27 19.42 24.45 25.81 Region-CLIP 29.35 43.78 58.49 30.01 39.98 46.86 FG-CLIP 31.44 49.78 68.38 28.77 45.29 50.81 VL-CLIP 30.49 48.98 64.57 26.83 41.99 49.31
+> LLM-based Baselines & Ablations
+> VLM2Vec 48.05 64.26 69.65 48.58 59.00 60.90 + AGCL 51.06 68.08 73.52 51.06 60.19 62.02 + AGCL + Distill Gen. 52.42 71.00 76.26 52.42 62.64 64.34
+> AFMRL (Ours) 54.28 72.19 77.27 54.28 64.08 65.69
+
+Table 2: Fine-Grained Instance Retrieval Results. Our full model, AFMRL, demonstrates state-of-the-art perfor-mance, with each component providing a clear incremental benefit. 
+
+AGCL Key Attribute Accuracy NMI ARI Purity 87.67 87.04 44.39 73.16 
+
+✓ 87.80 87.11 44.44 73.24 
+
+✓ πDistill 87.98 87.63 46.24 74.21 
+
+✓ πRL 88.00 87.68 46.61 74.52 
+
+Table 3: Performance on Classification and Clustering Tasks. 
+
+for 2,000 steps. The margin for the false negative masking strategy is set to 0.4. The RL stage uses GRPO for alignment with a learning rate of 1e-6 for 350 steps. The hyperparameters are set as follows: 
+
+β = 0 .01 and ϵ = 0 .2. The number of rollouts is set to 8. Details of the RL training process are provided in Appendix B. 
+
+Baselines. We compare AFMRL against two categories of models: established BERT-based models (CLIP (Radford et al., 2021), ALBEF (Li et al., 2021), etc.) and LLM-based approaches (LLM2CLIP (Huang et al., 2024), VLM2Vec (Jiang et al., 2025)). This enables a comprehensive evaluation against both classic and state-of-the-art architectures. 
+
+4.2 Main Results 
+
+Depending on the retrieval granularity, product re-trieval can be divided into coarse-grained and fine-grained tasks. In coarse-grained retrieval, products belonging to the same category are treated as pos-itive samples, whereas fine-grained retrieval im-poses stricter requirements: items are considered positive samples only when attributes (e.g., style and color) match exactly. 
+
+4.2.1 Coarse-Grained and Cross-Modal Retrieval 
+
+As shown in Table 1, compared with traditional dis-criminative models, representation models based on MLLMs exhibit significantly better retrieval per-formance. Furthermore, after incorporating AGCL, the model performance is further improved. This indicates that the AGCL serves as a strong founda-tion for downstream retrieval tasks: even without a dedicated attribute generator, it can still improve the quality of representations for broad semantic matching, thereby providing a more powerful base model for various retrieval tasks. 
+
+4.2.2 Fine-Grained Instance Retrieval 
+
+Fine-grained instance retrieval imposes high de-mands on discriminative capability. Here, we de-ploy the full AFMRL framework, including the attribute generator. As shown in Table 2, models such as Region-CLIP and FG-CLIP, which incorporate local fea-tures, achieve much better performance than on coarse-grained retrieval tasks, confirming that fine-grained features are crucial for E-commerce tasks. In contrast, the inability to fully exploit local fea-tures nearly erases the representational advantage brought by the strong reasoning capabilities of MLLMs. Notably, building on AGCL, the full AFMRL framework achieves state-of-the-art performance: 1) The distilled generator significantly boosts Re-call@1 to 52.42% by adding high-quality descrip-tive attributes, indicating that key attributes effec-tively enhance the MLLM’s understanding of fine-grained details; 2) Building on this, we further introduce a retrieval-aware policy, culminating in a final Recall@1 of 54.28%. This validates our core hypothesis: for challenging fine-grained tasks, explicitly generating and optimizing descriptive at-tributes based on the end-task retrieval objective is maximally effective. 
+
+4.3 Evaluation on Downstream Tasks 
+
+To assess the generalizability of the learned em-beddings beyond retrieval, we evaluated them on downstream tasks of product classification and clus-tering. On a dataset of 849,207 items across 5,146 classes, we trained a linear probe on frozen em-beddings for classification (Accuracy) and applied k-Means for clustering. The results in Table 3 show that the model equipped with both AGCL and the RAR strategy achieves the best perfor-mance on classification and clustering, indicating that AFMRL exhibits strong generalization capa-bility in E-commerce scenarios. 
+
+5 Discussions 
+
+In this section, we delve deeper into the mecha-nisms behind our experimental results. We ana-lyze the efficacy of our method’s key components, provide insights into the intriguing phenomena ob-served during reinforcement learning, and candidly discuss the limitations of our current approach. query pos + neg - 𝚫𝐃𝐢𝐬𝐭𝐚𝐧𝐜𝐞                        
+
+> 0.045
+> 0.074
+> +0.029
+> {
+> …
+> “size ”:<>,
+> …
+> }
+> 0.020
+> 0.088
+> +0.068
+> {
+> “series ”:<>,
+> “color ”:<>,
+> …
+> }
+> Caudalie Gentle Cleansing Milk,
+> 200ml -Moisturizing Facial
+> Cleanser & Makeup Remover
+> 40% OFF: Caudalie Gentle
+> Cleansing Milk, 200ml -Makeup
+> Remover
+> Caudalie Grape Seed Gentle
+> Cleansing Milk, 400ml -Softening
+> Makeup Remover & Face Cleanser
+> Clearance Sale: Caudalie Mattifying &
+> Oil -Control Moisturizer , 40ml
+> (Expires May 2022)
+> In Stock: Caudalie Vinosource -Hydra
+> Moisturizer (Ice Cream Cream), 40ml -
+> Refreshing & Hydrating Gel for a Matte Finish
+> Clearance & Free Shipping: Caudalie
+> Vinopure Blemish Control Fluid ,
+> 40ml (Expires in 2022)
+
+Figure 5: Showcase of key entities. 
+
+5.1 Efficacy of Generated Attributes and the Representation Model 
+
+Our method’s core contribution is the use of rein-forcement learning to optimize the generation of key attributes that enrich multimodal inputs for re-trieval. The effectiveness of this design is twofold: the direct value of the generated attributes and the robust representation model that serves as its foun-dation. 
+
+Generated attributes provide more discrimi-native power. We argue that the performance gains are primarily attributable to the policy network, 
+
+πθ, generating highly discriminative key attributes. This is intuitively demonstrated by the case study in Figure 5. In the original embedding space, a query can be equidistant to its positive (pos+) and negative (neg-) samples due to high visual and se-mantic similarity (e.g., products from the same brand). After augmenting the input with key at-tributes generated by our model (e.g., "size": "<>", "series": "<>"), the distance to the negative sample is significantly increased ( ∆Distance grows) while similarity to the positive sample is maintained. This indicates that the generated attributes guide the model to focus on subtle yet critical differences, ef-fectively "pushing away" incorrect candidates and making the feature representations more discrimi-native. 
+
+AGCL provides a robust foundation for at-tribute generation. The generation of high-quality attributes relies on a powerful underlying represen-tation model. As shown in Figure 6, our proposed 500 1000 1500 2000    
+
+> Training Stage
+> 0.350
+> 0.375
+> 0.400
+> 0.425
+> 0.450
+> 0.475
+> 0.500
+> 0.525
+> 0.550
+> R@1 Score
+> VLM2Vec+AGCL
+> VLM2Vec
+> 500 1000 1500 2000
+> Training Stage
+> 0.500
+> 0.525
+> 0.550
+> 0.575
+> 0.600
+> 0.625
+> 0.650
+> 0.675
+> 0.700
+> R@5 Score
+> VLM2Vec+AGCL
+> VLM2Vec
+
+Figure 6: Curve chart (w/o AGCL) of training steps and R@1. 
+
+Attribute-Guided Contrastive Learning (AGCL) strategy plays a pivotal role. Compared to the base-line VLM2Vec, which quickly plateaus and gets stuck in a local optimum, our proposed component AGCL exhibits steady and continuous improve-ment on both R@1 and R@5 metrics, eventually surpassing the baseline. We posit that AGCL en-courages the model to learn a more robust and gen-eralized representation space by preventing it from overfitting to simple negatives early in training. This high-quality representation space provides a solid foundation upon which the RL policy can learn to generate precise and effective attributes. 10 50 100 
+
+> K
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Reward Score
+
+Figure 7: Distribution of reward scores for different k.
+
+5.2 In-depth Analysis of the Reinforcement Learning Process 
+
+Having established the effectiveness of our core de-sign, we now analyze the RL training process itself to understand its internal dynamics and emergent properties. 
+
+Motivation for the Choice of k. We use recall as the reward function for RAR. In the Recall@k reward, the hyperparameter k controls the trade-off between the precision and the density of the learn-ing signal: if k is too small, the reward becomes overly sparse; if k is too large, the signal satu-rates and the gradients weaken. Since GRPO relies on discriminative inter-group reward differences, a well-balanced reward distribution is crucial. As shown in Fig. 7, k = 50 strikes the best balance, avoiding the sparsity of k = 10 and the saturation of k = 100 , thereby providing the richest learning signal. In addition, we also compare how differ-ent values of k affect model convergence under different reward functions; details are provided in Appendix B. 0 50 100 150 200 250 300 350        
+
+> Training Step
+> 600
+> 650
+> 700
+> 750
+> 800
+> 850
+> Avg Think Length (Characters)
+> Think Length vs Training Steps
+> Trend Line
+> 050 100 150 200 250 300 350
+> Training Step
+> 117.5
+> 120.0
+> 122.5
+> 125.0
+> 127.5
+> 130.0
+> 132.5
+> 135.0
+> Avg Answer Length (Characters)  Answer Length vs Training Steps
+> Trend Line
+
+Figure 8: Evolution of think and answer lengths during RL. 
+
+Emergent behavior: generation conciseness. 
+
+As illustrated in Figure 8, the average length of generated attributes consistently decreases. Unlike in complex reasoning tasks (e.g., math (Shao et al., 2024)), where models benefit from longer reason-ing chains, our retrieval objective does not require lengthy explanations. The agent learns that redun-dant or irrelevant attributes act as noise and hurt Recall@k, so it is implicitly encouraged to produce the shortest set of attributes that is still sufficient for good retrieval, leading to concise yet effective generations. 
+
+Circular Iterative Training. Our AFMRL framework decouples attribute generation from rep-resentation learning, offering an inherent advan-tage: once the attribute generator is refined via rein-forcement learning, it can feed back into the repre-sentation learning process to enhance it. We refer to this mechanism as Circular Iterative Training (CIT). As shown in Table 4, when we reused the RL-trained attribute generator for AGCL training (us-ing only 30% of the training samples), the model’s performance on downstream tasks improved signif-icantly. Method Accuracy NMI ARI Purity SFT 87.80 87.11 44.44 73.24 SFT+RL 88.00 87.68 46.61 74.52 SFT+RL+CIT 89.13 88.97 47.40 75.98 
+
+Table 4: Performance comparison of different training strategies on downstream tasks. 6 Conclusions 
+
+This paper focuses on a key challenge in fine-grained E-commerce retrieval: representation mod-els based on MLLMs lack sufficient understand-ing of fine-grained information. To address this, we propose the AFMRL framework, which first uses MLLM-generated attributes to mine hard neg-ative samples, and then performs representation reinforcement learning with retrieval performance as the reward. Extensive experiments on large-scale E-commerce datasets demonstrate that our method achieves state-of-the-art performance, vali-dating our central thesis that guiding discriminative learning with generative reasoning is an effective approach to fine-grained multimodal retrieval. 
+
+7 Limitations 
+
+Despite the strong performance on our primary retrieval task, we acknowledge the method’s limi-tations. Generalization on downstream tasks. As shown in Table 3, when evaluated on downstream classification and clustering tasks, our RL-trained policy ( πRL ) is slightly higher than the SFT-trained policy ( πSF T ). We attribute this to a phenomenon known as the "alignment tax." Because the πRL pol-icy is optimized for the highly specific Recall@k retrieval metric, its representations become special-ized for this task, potentially at the cost of their gen-erality. SFT, being a more general-purpose tuning paradigm, appears to better preserve the universal features required for broader tasks like classifica-tion and clustering. 
+
+References 
+
+Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wen-bin Ge, Sibo Song, Kai Dang, Peng Wang, Shi-jie Wang, Jun Tang, Humen Zhong, Yuanzhi Zhu, Mingkun Yang, Zhaohai Li, Jianqiang Wan, Pengfei Wang, Wei Ding, Zheren Fu, Yiheng Xu, and 8 others. 2025. Qwen2.5-vl technical report. arXiv preprint arXiv:2502.13923 .Parishad BehnamGhader, Vaibhav Adlakha, Marius Mosbach, Dzmitry Bahdanau, Nicolas Chapados, and Siva Reddy. 2024. Llm2vec: Large language models are secretly powerful text encoders. arXiv preprint arXiv:2404.05961 .Xiao Dong, Xunlin Zhan, Yangxin Wu, Yunchao Wei, Michael C Kampffmeyer, Xiaoyong Wei, Min-long Lu, Yaowei Wang, and Xiaodan Liang. 2022. M5product: Self-harmonized contrastive learning for e-commercial multi-modal pretraining. In Proceed-ings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 21252–21262. Luyu Gao, Yunyi Zhang, Jiawei Han, and Jamie Callan. 2021. Scaling deep contrastive learning batch size under memory limited setup. In Proceedings of the 6th Workshop on Representation Learning for NLP (RepL4NLP-2021) , pages 316–321. Raia Hadsell, Sumit Chopra, and Yann LeCun. 2006. Dimensionality reduction by learning an invariant mapping. In 2006 IEEE computer society confer-ence on computer vision and pattern recognition (CVPR’06) , volume 2, pages 1735–1742. IEEE. Weiquan Huang, Aoqi Wu, Yifan Yang, Xufang Luo, Yuqing Yang, Liang Hu, Qi Dai, Chunyu Wang, Xiyang Dai, Dongdong Chen, and 1 oth-ers. 2024. Llm2clip: Powerful language model un-locks richer visual representation. arXiv preprint arXiv:2411.04997 .Ting Jiang, Minghui Song, Zihan Zhang, Haizhen Huang, Weiwei Deng, Feng Sun, Qi Zhang, Deqing Wang, and Fuzhen Zhuang. 2024. E5-v: Universal embeddings with multimodal large language models. 
+
+arXiv preprint arXiv:2407.12580 .Ziyan Jiang, Rui Meng, Xinyi Yang, Semih Yavuz, Yingbo Zhou, and Wenhu Chen. 2025. Vlm2vec: Training vision-language models for massive multi-modal embedding tasks. In ICLR .Yang Jin, Yongzhi Li, Zehuan Yuan, and Yadong Mu. 2023. Learning instance-level representation for large-scale multi-modal pretraining in e-commerce. In Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition , pages 11060– 11069. Chankyu Lee, Rajarshi Roy, Mengyao Xu, Jonathan Raiman, Mohammad Shoeybi, Bryan Catanzaro, and Wei Ping. 2024. Nv-embed: Improved techniques for training llms as generalist embedding models. arXiv preprint arXiv:2405.17428 .Junjie Li, Jianghong Ma, Xiaofeng Zhang, Yuhang Li, and Jianyang Shi. 2024. Give: Guiding visual en-coder to perceive overlooked information. arXiv preprint arXiv:2410.20109 .Junnan Li, Ramprasaath Selvaraju, Akhilesh Gotmare, Shafiq Joty, Caiming Xiong, and Steven Chu Hong Hoi. 2021. Align before fuse: Vision and language representation learning with momentum distillation. 
+
+Advances in neural information processing systems ,34:9694–9705. Siting Li, Xiang Gao, and Simon Shaolei Du. 2025. Highlighting what matters: Promptable embeddings for attribute-focused image retrieval. arXiv preprint arXiv:2505.15877 .Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2023. Visual instruction tuning. Advances in neural information processing systems , 36:34892– 34916. Haoyu Lu, Wen Liu, Bo Zhang, Bingxuan Wang, Kai Dong, Bo Liu, Jingxiang Sun, Tongzheng Ren, Zhu-oshu Li, Hao Yang, and 1 others. 2024. Deepseek-vl: towards real-world vision-language understanding. 
+
+arXiv preprint arXiv:2403.05525 .Xueguang Ma, Liang Wang, Nan Yang, Furu Wei, and Jimmy Lin. 2024. Fine-tuning llama for multi-stage text retrieval. In Proceedings of the 47th Inter-national ACM SIGIR Conference on Research and Development in Information Retrieval , pages 2421– 2425. Daiqing Qi, Handong Zhao, and Sheng Li. 2024. Easy regional contrastive learning of expressive fashion representations. Advances in Neural Information Processing Systems , 37:20480–20509. Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sas-try, Amanda Askell, Pamela Mishkin, Jack Clark, and 1 others. 2021. Learning transferable visual models from natural language supervision. In International conference on machine learning , pages 8748–8763. PMLR. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, and 1 others. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .JungKyoo Shin, Bumsoo Kim, and Eunwoo Kim. 2025. Generative modeling of class probability for multi-modal representation learning. In Proceedings of the Computer Vision and Pattern Recognition Confer-ence , pages 20737–20746. Peng Wang, Shuai Bai, Sinan Tan, Shijie Wang, Zhi-hao Fan, Jinze Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, and 1 others. 2024a. Qwen2-vl: Enhancing vision-language model’s perception of the world at any resolution. arXiv preprint arXiv:2409.12191 .Weihan Wang, Qingsong Lv, Wenmeng Yu, Wenyi Hong, Ji Qi, Yan Wang, Junhui Ji, Zhuoyi Yang, Lei Zhao, Song XiXuan, and 1 others. 2024b. Cogvlm: Visual expert for pretrained language models. Ad-vances in Neural Information Processing Systems ,37:121475–121499. Rui Xiao, Sanghwan Kim, Mariana-Iuliana Georgescu, Zeynep Akata, and Stephan Alaniz. 2025. Flair: Vlm with fine-grained language-informed image repre-sentations. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 24884– 24894. Chunyu Xie, Bin Wang, Fanjing Kong, Jincheng Li, Dawei Liang, Gengshen Zhang, Dawei Leng, and Yuhui Yin. 2025. Fg-clip: Fine-grained visual and textual alignment. arXiv preprint arXiv:2505.05071 .Mert Yuksekgonul, Federico Bianchi, Pratyusha Kalluri, Dan Jurafsky, and James Zou. 2022. When and why vision-language models behave like bags-of-words, and what to do about it? arXiv preprint arXiv:2210.01936 .Chao Zhang, Shiwei Wu, Haoxin Zhang, Tong Xu, Yan Gao, Yao Hu, and Enhong Chen. 2024a. Notellm: A retrievable large language model for note recommen-dation. In Companion Proceedings of the ACM Web Conference 2024 , pages 170–179. Kai Zhang, Yi Luan, Hexiang Hu, Kenton Lee, Siyuan Qiao, Wenhu Chen, Yu Su, and Ming-Wei Chang. 2024b. Magiclens: self-supervised image retrieval with open-ended instructions. In Proceedings of the 41st International Conference on Machine Learning ,pages 59403–59420. Peitian Zhang, Shitao Xiao, Zheng Liu, Zhicheng Dou, and Jian-Yun Nie. 2023. Retrieve anything to augment large language models. arXiv preprint arXiv:2310.07554 .Xin Zhang, Yanzhao Zhang, Wen Xie, Mingxin Li, Ziqi Dai, Dingkun Long, Pengjun Xie, Meishan Zhang, Wenjie Li, and Min Zhang. 2025. Bridging modal-ities: Improving universal multimodal retrieval by multimodal large language models. In Proceedings of the Computer Vision and Pattern Recognition Con-ference , pages 9274–9285. Junjie Zhou, Yongping Xiong, Zheng Liu, Ze Liu, Shi-tao Xiao, Yueze Wang, Bo Zhao, Chen Jason Zhang, and Defu Lian. 2025. MegaPairs: Massive data syn-thesis for universal multimodal retrieval. In Proceed-ings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Pa-pers) , pages 19076–19095, Vienna, Austria. Associa-tion for Computational Linguistics. A Evaluation on EIPM dataset 
+
+To further validate the robustness and generaliz-ability of our proposed method, we conducted ad-ditional experiments on a large-scale real-world E-commerce dataset. 
+
+Setup. It contains 10 million products for train-ing and a test set of 200,000 products. The evalua-tion tasks, metrics, and baseline models used here are identical to the experimental setup described in the main body of the paper. 
+
+Results. The results of this supplementary exper-iment are presented in Table 5. The key takeaway is that the performance trends observed on this large-scale dataset are consistent with our findings from the primary experiments. Most importantly, our proposed AGCL method remains highly effective. As shown in Table 5, applying AGCL to both the LLM2CLIP and the stronger VLM2Vec backbones results in clear and consistent performance gains across all three re-trieval tasks (I2T, T2I, and Coarse-grained). For example, VLM2Vec AGCL outperforms the vanilla VLM2Vec by a significant margin, achieving the best results on all metrics. This experiment confirms that our approach is not only effective on standard academic bench-marks but also robust and scalable enough to deliver significant improvements on challenging, large-scale data from a real-world production envi-ronment. 
+
+B Details in training 
+
+We use Recall, Precision, and NDCG—three com-monly used evaluation metrics for retrieval per-formance—as rewards, respectively, and compare the model convergence under different top-k set-tings. As shown in Figures 9-11, different met-rics respond differently to the value of k. NDCG achieves optimal convergence at k=10; further in-creasing k weakens the ranking signals it relies on. In contrast, recall and precision peak at k=50, where the candidate pool provides dense learning signals without exhibiting saturation. 
+
+C Qualitative results 
+
+As illustrated in Figure 12, our reinforcement learn-ing (RL) framework significantly improves the quality of generated attributes. The baseline model often extracts noisy or overly general terms from verbose product titles. After optimization with our retrieval-aware RL policy, the model produces at-tributes that are substantially more succinct and accurate. The RL reward signal actively discour-ages the generation of terms that do not enhance discriminative power, compelling the model to fo-cus only on the most essential and factually correct product features that are crucial for the fine-grained retrieval task. 
+
+D Cold start of the attribute generator 
+
+We used a powerful model, Qwen-2.5-VL-72B-Instruct (Bai et al., 2025), as an "attribute oracle" to generate precise attributes for a query, its positive target, and a hard negative. To enhance the quality and transparency of the generation, we prompted the oracle to first produce a Chain-of-Thought (CoT) reasoning process enclosed in <think> tags, followed by the final structured attributes enclosed in <answer> tags. This process forces the model to first "think" about the distinguishing features before extracting them. We then measured the change in similarity scores produced by a base representation model, with and without the final oracle attributes from the 
+
+<answer> block. As Figure 3(b) illustrates, in the baseline condition, the hard negative achieves a 
+
+Table 5: Performance of Coarse-Grained and Cross-Modal Retrieval Tasks on EIPM Dataset.                                                                           
+
+> Image-to-Text Retrieval Text-to-Image Retrieval Coarse-grained Product Retrieval Model Recall@1 Recall@5 Recall@10 Recall@1 Recall@5 Recall@10 mAP@1 mAP@5 mAP@10
+> BERT-based Baselines
+> CLIP 20.9 42.1 51.7 20.5 42.7 52.8 60.3 62.8 61.6 ALBEF 22.1 43.1 52.5 21.8 43.8 53.7 62.4 65.5 63.5 BLIP 23.7 44.5 53.6 23.4 45.1 54.7 63.1 66.5 64.7
+> LLM-based Baselines
+> LLM2CLIP 27.5 50.9 60.3 27.6 52.0 61.9 67.4 70.3 68.7 + AGCL 29.6 52.7 61.8 29.5 53.7 63.2 68.2 71.2 69.5 VLM2Vec 30.9 52.2 60.5 35.8 62.2 71.6 68.5 72.6 69.9 + AGCL 33.2 54.3 62.1 37.5 63.7 73.0 69.4 73.6 70.7
+
+Figure 9: Training curves under different top-k settings when using NDCG as the RL reward function. 
+
+Figure 10: Training curves under different top - k settings when using Precision as the RL reward function (training fails to converge when top-k is set to 100). 
+
+Figure 11: Training curves under different top-k settings when using Recall as the RL reward function. 
+
+similarity score perilously close to that of the posi-tive target. However, when the model is augmented with the explicit key attributes, the representational space is reshaped, significantly widening the dis-Jelly Lin Recommends!        
+
+> Dermafirm Perilla
+> Balancing & Repairing
+> Emulsion (200ml) -
+> Pregnancy -Safe
+> Bai Sui Sui Bright Red
+> Baby Romper, Lightweight
+> Autumn Onesie for Boys
+> and Girls, for 1 -Month and
+> 100 -Day Celebrations, Fits
+> up to 7 Months
+> Yalget Aloe Vera
+> Clarifying Cleansing Gel -
+> Hydrating & Moisturizing
+> Face Wash for Men &
+> Women, Deep Cleansing
+> and Anti -Acne
+> Image Title Attribute(SFT) Attribute(RL)
+
+Figure 12: Cases of product item and generated attributes w/o RL. 
+
+criminative margin. This confirms our hypothesis: access to accurate, fine-grained attributes is critical for robustly distinguishing between similar items. We argue that relying on such a massive oracle model is impractical for real-world deployment, and that extracting key product attributes is a rel-atively easy text generation task. Therefore, we adopt a knowledge distillation approach, transfer-ring the oracle’s capability into a more inference-friendly model, Qwen-2.5-VL-3B-Instruct (Bai et al., 2025). Specifically, we first perform Super-vised Fine-tuning (SFT) on a dataset of 10,000 CoT examples generated by the oracle. This teaches our smaller generator model to mimic the oracle’s reasoning process, generating both the <think> 
+
+process and the final <answer> attributes. 
+
+E Preliminaries 
+
+E.1 Generative Model for Embedding Tasks 
+
+Following the framework established by VLM2Vec (Jiang et al., 2025), we adapt a generative model to the task of multimodal embedding. The goal is to train a model that can embed diverse data types into a shared semantic space. A training instance is represented as a query-positive target pair, ( q, t+), where both q and t+ can be an image, text, or an interleaved combination of both. To accommodate various downstream tasks, the query 
+
+q is conditioned with a specific task instruction (e.g., "Retrieve the most relevant product for this image"). The learning objective is to train a discrimina-tive representation function f (·) using contrastive learning (Hadsell et al., 2006). This objective aims to maximize the similarity score between the rep-resentations of a query and its positive target, f (q)
+
+and f (t+), while simultaneously minimizing its similarity to all other negative targets {t−} in the batch. Given a Multimodal Large Language Model (MLLM) as our backbone, we obtain representa-tions by extracting the hidden state of the final token from its last layer. Formally, for a mini-batch of N pairs 
+
+{(q1, t 1), ..., (qN , t N )}, the InfoNCE loss is de-fined as: 
+
+L = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+−log esi,i /τ 
+
+esi,i /τ + PNj̸ =i esi,j /τ , (7) where si,j = cosine (f (qi), f (tj )) denotes the cosine similarity between the representations of query qi and target tj . The function f (·) repre-sents the MLLM-based embedding process, and 
+
+τ is the temperature hyperparameter. Following VLM2Vec (Jiang et al., 2025), we set τ to 0.02. 
+
+E.2 Promptable Multimodal Embeddings 
+
+Traditional representation models generate a single, static embedding for each data item, which limits their flexibility for context-dependent tasks where a single item might be relevant to diverse intents (e.g., matching a product’s brand versus its visual style). To address this, the paradigm of promptable embeddings has emerged. This approach generates a context-aware representation by conditioning on a textual prompt , transforming the embedding func-tion to f (item, prompt ) and allowing it to dynam-ically highlight task-relevant attributes (Li et al., 2025). The efficacy of this paradigm has been validated by models like VLM2Vec (Jiang et al., 2025) and E5-V (Jiang et al., 2024) for creating domain-specific embeddings, and by architectures like GiVE (Li et al., 2024) and FLAIR (Xiao et al., 2025) that enable finer-grained control via token-level text-image interactions. Building on this foun-dation, our work systematically studies promptable embeddings for retrieval targets and, crucially, de-velops strategies for their efficient, large-scale de-ployment. 
+
+E.3 Large Batch Training with GradCache 
+
+The efficacy of contrastive learning hinges on large batch sizes to ensure a diverse set of negative sam-ples, yet the memory footprint of MLLMs makes this computationally prohibitive. To overcome this constraint, we employ Grad-Cache (Gao et al., 2021), a gradient caching tech-nique that enables training with a very large ef-fective batch size. The core idea is to decouple the backpropagation process of the contrastive loss from that of the encoder. Instead of performing a backward pass for the entire large batch, Grad-Cache operates in two steps: 1. Representation Gradient Computation and Caching: The large batch is divided into smaller mini-batches that fit into GPU mem-ory. For each mini-batch, a forward pass is performed to compute embeddings, and these embeddings are used to calculate the representation-level gradients δL/δf (xi) for all samples xi in the full batch. These small gradient tensors are then cached; 2. Sub-batch Gradient Accumulation: For each mini-batch, a second forward and backward pass is performed. The full-batch gradients for the model parameters θ are then accu-mulated by multiplying the cached represen-tation gradients with the local model gradi-ents δf (xi)/δθ and summing across all mini-batches.

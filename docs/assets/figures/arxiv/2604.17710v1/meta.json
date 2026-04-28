@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17710v1/fig-001.webp",
+      "caption": "TABLE I THE COMPARISON RESULT (%) WITH OTHER ZSL METHODS ON BENCHMARKS WITH DIFFERENT DEGREES OF RANDOM NOISE. THE BEST AND SECOND-BEST RESULTS ARE HIGHLIGHTED, RESPECTIVELY.",
+      "page": 4,
+      "index": 1,
+      "width": 1076,
+      "height": 489
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17710v1/fig-002.webp",
+      "caption": "TABLE II THE COMPARISON RESULT (%) WITH OTHER ZSL METHODS ON BENCHMARKS. THE BEST AND SECOND-BEST RESULTS ARE HIGHLIGHTED, RESPECTIVELY.",
+      "page": 4,
+      "index": 2,
+      "width": 512,
+      "height": 425
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17710v1/fig-003.webp",
+      "caption": "Fig. 2. The framework of our proposed DVSA. DVSA processes attributes and images with pre-trained encoders and calibrates features via a bidirectional attention module. As shown in (b), the VTA block selectively enhances attribute vectors a under the guidance of visual features f , while the ATV block refines visual features f conditioned on the updated attributes â. The MI-based optimization in (c) further strengthens the semantic correlations encoded in â.",
+      "page": 2,
+      "index": 3,
+      "width": 914,
+      "height": 341
+    }
+  ]
+}

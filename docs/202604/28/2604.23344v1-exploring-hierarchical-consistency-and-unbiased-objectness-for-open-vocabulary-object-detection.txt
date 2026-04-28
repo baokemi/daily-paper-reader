@@ -1,0 +1,1378 @@
+Title: Exploring Hierarchical Consistency and Unbiased Objectness for Open-Vocabulary Object Detection
+
+URL Source: https://arxiv.org/pdf/2604.23344v1
+
+Published Time: Tue, 28 Apr 2026 00:38:38 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+## Exploring Hierarchical Consistency and Unbiased Objectness for Open-Vocabulary Object Detection 
+
+Sanghoon Lee 1 Geon Lee 1 Hyekang Park 1 Bumsub Ham 1,2*
+
+> 1
+
+Yonsei University 2Korea Institute of Science and Technology (KIST) 
+
+https://cvlab.yonsei.ac.kr/projects/HCC 
+
+Abstract 
+
+Conventional object detectors typically operate under a closed-set assumption, limiting recognition to a predefined set of base classes seen during training. Open-vocabulary object detection (OVD) addresses this limitation by lever-aging vision-language models (VLMs) to generate pseudo labels for novel object classes. However, existing OVD methods suffer from two critical drawbacks: (1) inaccu-rate class label assignments, as VLMs are optimized for image-level predictions rather than the region-level predic-tions required for pseudo labeling, and (2) and unreliable objectness scores from region proposal networks (RPNs) trained exclusively on base object classes. To address these issues, we propose a novel pseudo labeling framework for OVD. Our approach introduces a hierarchical confidence calibration (HCC) technique, which ensures reliable class label estimation by assessing consistency across hierarchical semantic levels (class, super- and sub-category). We also present LoCLIP, a parameter-efficient adaptation of CLIP that incorporates an objectness token to mitigate base class bias problem of RPNs and provide reliable objectness es-timations for novel object classes. Extensive experiments on standard OVD benchmarks, including COCO and LVIS, demonstrate that our approach clearly sets a new state of the art, validating the effectiveness of our approach. 
+
+1. Introduction 
+
+Conventional object detectors [ 4, 32 , 40 , 41 , 46 ] typically assume a closed-set scenario, and they are restricted to rec-ognizing only a fixed set of base object classes provided at training time. The closed-set assumption limits scalability in real-world environments, where arbitrary object classes appear [ 3, 21 ]. To overcome this limitation, open-vocabulary object detection (OVD) [13, 57] has been introduced to rec-ognize novel object classes, while exploiting annotations for a set of base object classes only. 
+
+> *Corresponding author
+
+Recent works for OVD employ vision-language mod-els (VLMs) [ 20 , 39 ] that provide semantically aligned image-text representations [ 58 ]. In particular, VLMs are typi-cally used to generate pseudo labels for objects of novel classes [ 48 , 49 , 59 , 60 ]. To this end, given a candidate re-gion of an object ( i.e ., an object proposal) obtained from an RPN [ 41 ], OVD methods assign pseudo labels to candidate regions that are likely to contain objects of novel classes. The object proposals, however, often correspond to irrele-vant regions ( e.g ., misaligned or background regions) that do not contain objects of novel classes. In order to filter out the irrelevant regions, current methods compute confi-dence scores from classification probabilities obtained using a VLM ( e.g ., CLIP [ 39 ]), where the text features represent-ing novel classes are used as classifiers. The object proposals with insufficient confidence scores are regarded as irrelevant regions, and they are discarded during the pseudo labeling process. To further consider the localization accuracy of can-didate regions, objectness scores from the RPN are typically used. Note that the RPN is trained on a set of base class objects, and current OVD methods assume that the RPN is able to provide reliable objectness scores even for unseen object classes during training. Accordingly, pseudo labels are selectively assigned to object proposals that show suf-ficiently high confidence scores from CLIP and objectness scores from the RPN. Current OVD approaches to exploiting pseudo labels [ 48 ,49 , 59 , 60 ] have two major drawbacks. First, confidence scores obtained from CLIP does not well-represent the pres-ence of objects of novel classes. Consequently, the pseudo labels are dominated by irrelevant regions. On COCO [ 30 ], as an example, 76% of the generated pseudo labels from CLIP correspond to background regions [ 48 ]. This mainly stems from the fact that CLIP is optimized for image-level predictions, while pseudo labeling in OVD requires making region-level predictions [ 29 ]. Second, the RPN is exclusively trained using annotations for objects of base classes. That is, all other classes, including novel ones, are treated as back-ground during training. This implies that the RPN could offer    
+
+> arXiv:2604.23344v1 [cs.CV] 25 Apr 2026 Class:
+> “Bench”
+> Super -category:
+> “Furniture”
+> Sub -category:
+> “Picnic Bench”
+> Class :
+> “TV”
+> Super -category :
+> “Plant”
+> Sub -category :
+> “Outdoor TV” Figure 1. Visualization of hierarchical consistency of candidate regions. We use CLIP [ 39 ] to classify regions at class, super-and sub-category levels based on LLM-generated hierarchy on COCO [ 30 ]. We can see that an accurately localized region (left) yields hierarchically consistent predictions (indicated by green arrows), whereas a background region (right) yields inconsistent predictions (indicated by red arrows). Experimental details and quantitative analysis are in the supplementary materials.
+
+unreliable objectness scores for objects of novel classes [ 21 ]. This is more pronounced in the context of pseudo labeling, where the RPN is expected to identify novel object instances as foreground, despite having learned to treat them as back-ground during its training. In this paper, we present a novel pseudo labeling frame-work for OVD that addresses the aforementioned drawbacks of current approaches in estimating reliable confidence and objectness scores of candidate regions. To this end, we pro-pose a hierarchical confidence calibration (HCC) technique that adjusts confidence scores of CLIP, by incorporating super- and sub-categories of novel object classes. Specifi-cally, we observe that regions that well-localize an object tend to yield hierarchically consistent predictions, while ir-relevant regions do not (Fig. 1). Based on this observation, we present a confidence calibration technique that promotes confidence scores of candidate regions whose classification predictions at different hierarchy levels are consistent, while suppressing the confidence scores for the opposite case. We also introduce an objectness estimation method, dubbed Lo-CLIP, using parameter-efficient adaptation of CLIP. LoCLIP introduces an additional objectness token into CLIP that quantifies how well a candidate region localizes an object. Compared to the RPN, objectness estimations from LoCLIP are less biased towards base object classes, offering more reliable objectness estimations for novel object classes. Ex-perimental results on standard OVD benchmarks, including COCO [ 30 ] and LVIS [ 14 ], demonstrate the effectiveness of our approach, which clearly sets a new state of the art. The main contributions can be summarized as follows: • We present a novel pseudo labeling framework for OVD that calibrates confidence scores of candidate regions by exploiting super- and sub-categories of novel object classes. • We introduce LoCLIP that estimates the objectness of candidate regions through a parameter-efficient adaptation scheme. The LoCLIP addresses the base class bias of RPNs, while being computationally efficient. • We achieve a new state of the art on standard benchmarks for OVD including COCO [ 30 ] and LVIS [ 14 ], and demon-strate the effectiveness of our approach through extensive experiments with ablation studies. 
+
+2. Related work 
+
+We describe in this section recent works pertinent to ours, including OVD and VLMs using a language hierarchy. 
+
+OVD. OVD aims at learning semantically aligned region-text representations, such that a detector can localize and classify novel object classes in a zero-shot manner. To this end, many works attempt to train VLMs that are able to make region-level predictions [ 6, 23 , 24 , 36 , 55 , 61 ]. For exam-ple, RegionCLIP [ 61 ] aligns region and text representations using lots of image-caption pairs [ 44 ], where the regions are extracted using an RPN [ 41 ]. The VLMs optimized for region-level predictions provide competitive performance on standard benchmarks for OVD. However, training VLMs tailored for object detection typically involves large-scale pretraining using a lot of image-text pairs [ 20 , 22 , 43 ], which is computationally demanding. To overcome this challenge, OVD methods instead ex-ploit VLMs trained using image-level contrastive learn-ing [ 20 , 39 ]. These methods can be categorized into two groups: The first line of works [ 9, 13 , 34 , 45 , 49 , 52 , 56 ]focuses on distilling knowledge [ 17 ] from VLMs to OV detectors. They employ knowledge distillation techniques to encourage region-level features, extracted from the de-tector, to imitate visual features from the VLM. However, OVD methods using knowledge distillation techniques are typically biased toward base object classes [ 45 ], and offer suboptimal performance for novel ones. Many distillation-based approaches thus ensemble classification probabilities for base and novel classes separately at inference time. This increases the computational cost for inference, while requir-ing tedious hyper-parameter search for better results [ 13 , 26 ]. Another line of works attempt to generate pseudo labels for novel object classes [ 48 , 49 , 59 , 60 ]. In particular, they typ-ically exploit the classification confidence and objectness scores, which are measured using a VLM and an RPN, re-spectively, as criteria for selecting candidate proposals to assign pseudo labels. For example, the work of [ 59 ] com-putes the geometric mean of the classification confidence and the objectness score for each object proposal, and assigns pseudo labels only for the proposal, whose classification confidence and objectness score exceed a certain threshold. The generated pseudo labels, together with ground-truth annotations of base classes, are then used to train an OV detector. In the pseudo labeling regime, effectively determin-ing whether a candidate region contains a novel object class is crucial, as candidate regions mostly correspond to irrele-vant background regions [ 48 ]. To handle distractive noise in the generated pseudo labels, recent works [ 48 , 60 ] further RPN        
+
+> Class Label Assignment
+> HCC (Sec 3.2)
+> Objectness Es6ma6on
+> LoCLIP (Sec 3.3)
+> “a photo of a { cat |…| dog }.”
+> w/ Pseudo Labels
+> OV
+> Detector
+> ℒcls ℒreg
+> Candidate Region Extraction Pseudo Label Genera6on Training (Sec 3.4)
+> Training image Candidate Regions Figure 2. Overview of our framework for OVD, which mainly consists of three steps. First, a set of candidate regions is extracted from an image using an RPN. For each candidate region, we employ the HCC technique for selectively assigning a class label, while LoCLIP estimates an objectness score. Pseudo labels are assigned only to regions with hierarchically consistent predictions and sufficiently high objectness scores. These pseudo labels, together with ground-truth annotations for base object classes, are then used to train an OV detector with classification and regression losses. See the main text for details.
+
+employ self-training techniques [ 47 , 53 ]. For example, the work of [ 60 ] uses separate prediction branches for base and novel classes to prevent noisy pseudo labels from distracting learning base object classes. Rather than employing dedi-cated strategies to handle noisy labels, our work focuses on establishing reliable pseudo labels, which can then be used directly to train an OV detector. To further enhance the recognition capabilities of OV detectors, many works [ 2 , 10 , 19 , 28 , 29 , 33 , 62 ] exploit additional supervision from auxiliary datasets. Such datasets provide images with class labels [ 42 ] or captions [ 5, 44 ], offering strong priors about the presence of objects in images. For example, Detic [ 62 ] leverages a subset of ImageNet-21K [42 ] whose class labels overlap with LVIS [ 14 ] to compensate for the lack of supervision for novel object classes, thereby improving overall detection performance. While OVD methods that rely on auxiliary datasets generally provide better results, acquiring these additional supervision sources requires significant labeling efforts. In contrast, our framework does not rely on any auxiliary datasets for training. 
+
+VLMs with a language hierarchy. Recent studies [ 11 , 19 ,31 , 37 ] have shown that leveraging hierarchical relationships among object classes can significantly enhance the prediction performance of VLMs. By incorporating semantic hierarchy structure of objects, these approaches enable more informed reasoning about visual categories, enhancing generalization and improving robustness across various tasks. For image classification on ImageNet [ 7 ], recent works [ 11 , 37 ] propose to re-rank initial predictions of CLIP using the hierarchical structure of WordNet [ 35 ]. They show that the hierarchy information enhances the recognition capabilities of an off-the-shelf VLM. Building on this idea, OVD methods also adopt the language hierarchy to improve detection perfor-mance, by augmenting classifiers of OV detectors [ 31 ] or class labels themselves [ 19 ], using super-/sub-categories of target object classes. Different from prior works, we leverage hierarchical structure between object classes for determining whether or not a local image region contains an object of interest. Moreover, while current methods that exploit a hier-archy structure focus primarily on the classification subtask, we additionally consider the localization accuracy of local image regions for OVD. 
+
+3. Approach 
+
+We present in this section an overview of our frame-work (Sec. 3.1), which mainly consists of class label as-signment using HCC (Sec. 3.2) and objectness estimation using LoCLIP (Sec. 3.3), and describe an overall training process (Sec. 3.4). 
+
+3.1. Overview 
+
+Following the standard protocol [ 13 ], we split object classes into two disjoint sets of base and novel classes, denoted by 
+
+CB and CN , respectively, and assume that the class names of CN are given at training time, following other OVD meth-ods [ 48 , 49 , 59 , 60 ]. We train an OV detector that can rec-ognize objects of both base and novel classes in CB ∪ CN ,with ground-truth bounding boxes and object labels for base classes in CB only. To this end, we generate pseudo labels for objects of novel classes in CN , facilitating the OV detec-tor to recognize novel object classes, thereby allowing it to generalize beyond base classes provided for training. We provide in Fig. 2 an overview of our framework for generating pseudo labels of novel object classes, which mainly consists of three steps. We first employ an RPN [ 41 ]to generate candidate regions for the pseudo label assign-ment. Notably, while the candidate regions indeed contain objects of novel classes, most of them correspond to irrele-vant ones, e.g ., misaligned or background regions [ 48 ]. To address this problem, we present a HCC technique and Lo-CLIP for assigning pseudo labels only to candidate regions that localize objects of novel classes well. The HCC tech-nique considers the consistency of VLM’s predictions across multiple hierarchy levels (class, super- and sub-categories) to estimate a confidence level of a VLM for its prediction of candidate regions. Meanwhile, LoCLIP estimates object-ness of candidate regions that quantify how well a region localizes an object of any class. The pseudo labels are only assigned to candidate regions that yield sufficient confidence and objectness scores obtained using HCC and LoCLIP, re-spectively. Once the pseudo labels are established, the OV detector is trained with both the ground-truth annotations for base classes and the pseudo labels for novel classes, using classification and regression losses [16, 41]. 
+
+3.2. Class label assignment 
+
+We specify each novel object class into a textual form using, 
+
+e.g ., “a photo of a [class].”. Each sentence is fed into the VLM to obtain a text feature representing a novel object class, denoted by cn ∈ Rd, where n = 1 , . . . , |CN | and d is the feature dimension. We then compute similarities between visual features of candidate regions and text features of novel object classes. Concretely, we denote an image by x and bounding box coordinates of a candidate region by b ∈ R4.We extract a visual feature vb ∈ Rd for the region b using an image encoder V of a VLM as follows: 
+
+vb = V(xb), (1) where xb = crop (x, b ) and the crop (·, ·) operation extracts a corresponding region of an image w.r.t bounding box coordinates. We then compute classification probabilities 
+
+p ∈ R|CN | of a candidate region for novel classes as follows: 
+
+p(n) = exp( sn)
+
+P 
+
+> j
+
+exp( sj ) , where sn = cnv⊤
+
+> b
+
+∥cn∥ ∥ vb∥ , (2) and ∥ · ∥ measures L2-norm of a vector. Note that we omit the temperature parameter for brevity. We can define a confi-dence score ˆp for the region b as the maximum probability across novel object classes, i.e ., ˆp = max( p). It measures a confidence level of a VLM for its classification for a can-didate region, i.e ., how likely a region contains an object of novel class. Current OVD methods [ 48 , 49 , 59 , 60 ] assign a class label selectively only when the confidence score ˆp is sufficiently high. This is, however, problematic, since VLMs are not fit to represent local image regions [ 29 ]. In particular, these VLMs do not discriminate between well-localized and irrelevant image regions. This suggests that the irrelevant regions could have high confidence scores, and thus applying a threshold for the confidence ˆp alone might not filter out incorrect class labels assignments effectively. In light of this, we observe that a region that tightly covers an object tends to yield hierarchically consistent predictions across class, super- and sub-category levels, whereas irrelevant regions do not (Fig. 1). This observation aligns with recent findings for hierarchical image classi-fication [ 38 ], which demonstrate that CLIP [ 39 ] provides hierarchically consistent predictions for object-centric images, but the consistency degrades in complex scenes containing multiple object classes. This suggests that incorporating hierarchical consistency could offer valuable 0.6                  
+
+> max (")
+> 0.1
+> +"#$ (2,2)
+> 0.2
+> +"#$ (2,1)
+> 0.2
+> +"#$ (1,2)
+> 0.5
+> +"#$ (1,1)0.5
+> 0"#$ (1)
+> 0.2
+> 0"#$ (2)
+> 0.79
+> 1"#$ (1)
+> 0.21
+> 1"#$ (2)
+> 0.6
+> '(1)
+> 0.4
+> '(2)
+> 0.79
+> max (2!"# )
+> Input !!
+> Eq. (3) Eq. (5) Eq. (6) Eq. (2)
+> Dachshund
+> 36,6
+> !"#
+> Shiba
+> 36,7
+> !"#
+> Sabana Cat
+> 37,6
+> !"#
+> Bengal Cat
+> 37,7
+> !"#
+> Dog
+> 36
+> Cat
+> 37
+> 0.6
+> max (")
+> 0.1
+> +"#$ (2,2)
+> 0.2
+> +"#$ (2,1)
+> 0.2
+> +"#$ (1,2)
+> 0.5
+> +"#$ (1,1)0.5
+> 0"#$ (1)
+> 0.2
+> 0"#$ (2)
+> 0.79
+> 1"#$ (1)
+> 0.21
+> 1"#$ (2)
+> 0.6
+> '(1)
+> 0.4
+> '(2)
+> 0.79
+> max (2!"# )
+> Input !!
+> Eq. (3) Eq. (5) Eq. (6) Eq. (2)
+> Dachshund
+> 36,6
+> !"#
+> Shiba
+> 36,7
+> !"#
+> Sabana Cat
+> 37,6
+> !"#
+> Bengal Cat
+> 37,7
+> !"#
+> Dog
+> 36
+> Cat
+> 37
+
+Figure 3. An illustration of the operations in the HCC technique for an input image (right), where novel object classes are defined as dog and cat , and K is set to 2. Here, the class label estimation from the class level and the sub-category level are consistent for 
+
+dog , represented in green nodes. Consequently, the HCC technique boosts the confidence score from max( p) = 0 .6 to max( rsub ) = 0.79 . See text for details. 
+
+cues for discarding irrelevant regions during the pseudo labeling process, which is a crucial aspect for suppressing incorrect class label assignments to irrelevant regions [48]. 
+
+HCC. We propose a HCC technique that adjusts confidence scores, ˆp, based on hierarchical consistency across predic-tions from class, super- and sub-category levels. That is, we increase confidence scores for candidate regions that yield hierarchically consistent predictions, while suppressing the confidence scores in the opposite case. To this end, we ob-tain super- and sub-categories of object classes by prompting a LLM, e.g ., GPT-OSS [ 1], as done in [ 31 , 37 ]. We query the LLM to provide multiple super-/sub-categories for each novel object class, in order to consider diverse hierarchical relationships. Specifically, we obtain a hierarchy for novel object classes, where each class is associated with K super-and sub-categories. We denote a text feature for the k-th super- and sub-category of the n-th novel class by csup  
+
+> n,k
+
+∈ Rd
+
+and csub  
+
+> n,k
+
+∈ Rd, respectively, where k = 1 , . . . , K . The HCC technique adjusts confidence scores, ˆp, by leveraging super-and sub-categories separately. In the following, we describe the HCC process using the established sub-categories. We first compute classification probabilities at the sub-category level, denoted by psub ∈ R|CN |× K , as follows: 
+
+psub (n, k ) = exp( ssub  
+
+> n,k
+
+)
+
+P
+
+> m
+
+P 
+
+> l
+
+exp( ssub 
+
+> m,l
+
+) , (3) where 
+
+ssub  
+
+> n,k
+
+= csub  
+
+> n,k
+
+v⊤
+
+> b
+
+∥csub  
+
+> n,k
+
+∥ ∥ vb∥ . (4) Note that the softmax in Eq. (3) is computed across all 
+
+|CN | × K sub-categories. The resulting matrix psub there-fore represents a single probability distribution over all sub-categories ( i.e ., P 
+
+> n,k
+
+psub (n, k ) = 1 ). We then aggregate the K sub-category scores for each class n to make psub and 
+
+p dimensionally compatible. Specifically, we use max pool-ing to consider the most relevant sub-category within each class, yielding class-wise sub-category scores, zsub ∈ R|CN |,as follows: 
+
+zsub (n) = max( psub (n)) , (5) where psub (n) ∈ RK is the n-th row vector of psub . We use the scores zsub to reweight the class probabilities p, thereby ensembling the predictions from the class and sub-category levels, to obtain the calibrated probabilities rsub ∈ R|CN | as follows: 
+
+rsub (n) = p(n)zsub (n)
+
+P 
+
+> m
+
+p(m)zsub (m) . (6) The denominator in Eq. (6) ensures that the elements in 
+
+rsub sum to 1. With the calibrated scores rsub , we can de-fine adjusted confidence score as the maximum score across novel object classes, i.e ., max( rsub ). In particular, when predictions at the class and sub-category levels are consis-tent, HCC guarantees that the adjusted confidence score w.r.t sub-categories is greater than or equal to the uncalibrated one. That is, 
+
+arg max( p) = arg max( zsub ) ⇒ max( rsub ) ≥ ˆp. (7) Proof for Eq. (7) can be found in the supplementary materials. We also show in the supplementary materials that we can enforce the opposite case to hold when the predictions are inconsistent as follows: 
+
+arg max( p)̸ = arg max( zsub ) ⇒ max( rsub ) < ˆp (8) with a minor effort. The calibrated probabilities obtained using super-categories, denoted by rsup ∈ R|CN |, are simi-larly defined. We provide in Fig. 3 an example case for the operations in HCC. We then combine the calibrated scores from both super-and sub-categories to obtain a final confidence score, ˆr, as follows: 
+
+ˆr = max( r), where r(n) = rsub (n) + rsup (n)2 . (9) We selectively assign pseudo labels to candidate regions that yield sufficient adjusted confidence scores, ˆr. That is, we assign a pseudo class label ˆyb for the region b as follows: 
+
+ˆyb = arg max( r) if ˆr ≥ γ, (10) where γ is a predefined threshold. Compared to using ˆp as a confidence score, using the adjusted score ˆr allows to address the core issue in current methods [ 48 , 49 , 59 , 60 ], where the pseudo labels mostly correspond to background regions [ 48 ]. ⃛⃛FC "#! objectness   
+
+> Pretrained ViT Encoder ❄
+> ❄
+> [CLS] "
+> [OBJ]
+
+## ⃛             
+
+> FC "
+> Input "!
+> #!objectness
+> Pretrained Embedding Layer ❄
+> ❄: Frozen
+> ": Training
+> Figure 4. Illustration of LoCLIP. LoCLIP appends a learnable
+> [OBJ] token into a pretrained ViT encoder of CLIP. The output feature for the [OBJ] token is passed through a FC layer, and predicts an objectness score of an input patch xb.Throughout the adaptation process, all pretrained components, including the
+> [CLS] token, embedding layers and ViT encoders, are kept frozen.
+
+3.3. Objectness estimation 
+
+Current methods exploit objectness scores from the RPN to estimate the objectness of candidate regions. However, the RPN is trained on a set of annotations for base object classes, where novel ones are considered as background. This suggests that the RPN is likely to provide incorrect objectness scores for novel object classes. This is more problematic in the context of pseudo label generation, where the RPN is expected to identify objects of novel classes as foreground, even though it is trained to suppress those same instances as background during training. 
+
+LoCLIP. To overcome this problem, we present alocalization-aware CLIP, dubbed LoCLIP (Fig. 4), which is a parameter-efficient adaptation of a CLIP model, to esti-mate objectness of candidate regions. To this end, LoCLIP introduces a learnable [OBJ] token, and appends it to the image encoder of CLIP, enabling the token to interact with frozen CLIP features. The output feature for the [OBJ] 
+
+token is then fed into a fully-connected (FC) layer with a sigmoid activation to predict objectness scores for candidate regions. LoCLIP provides better objectness scores with less bias toward base object classes, compared to the RPN, for the following reasons: First, the [OBJ] token in LoCLIP interacts with frozen CLIP features that are not exclusively biased toward base object classes. Second, LoCLIP involves significantly less number of parameters exclusively tuned for the base object classes. For example, the number of parame-ters in LoCLIP, including ones in the FC layer, is about 3K, whereas the RPN used in the works of [ 48 , 49 , 59 , 60 ] uses 
+
+41 M parameters. This suggests that our LoCLIP is likely to be less overfitted towards base object classes while gener-alizing well to novel ones. We consider candidate regions whose objectness scores from the LoCLIP is lower than a threshold τ as background regions, and discard them in the pseudo labeling process. To implement LoCLIP, we adopt a masked attention tech-nique [ 27 ], that enables retaining visual features from the image encoder of CLIP. In this way, a single forward pass through the LoCLIP model provides visual features and objectness scores of candidate regions simultaneously, fa-cilitating an efficient pseudo labeling pipeline. Note that we could exploit other parameter-efficient strategies, e.g ., by employing an additional FC layer [ 18 ] that takes visual features of CLIP as inputs for estimating the objectness. This strategy indeed provides better results compared to the RPN (See Sec. 4.3). However, its prediction does not directly involve patch-level features that encode useful local informa-tion for estimating the objectness. On the contrary, LoCLIP exploits the [OBJ] token that directly interacts with local features through self-attention mechanism in vision trans-formers [ 8] (ViTs). It is thus more effective in estimating objectness scores for objects belonging to novel classes. To train the [OBJ] token and an additional FC layer, we use bi-nary cross entropy loss. Specifically, we assign a binary label for each candidate region, depending on its intersection over union (IoU) with any objects belonging to the base classes. Note that LoCLIP converges using only 1% of the entire training images from COCO [ 30 ] and LVIS [ 14 ], and takes about 5 minutes to train on a single NVIDIA A6000 GPU. We refer to the supplementary material for more details on the training process of LoCLIP. 
+
+3.4. Training 
+
+We train an OV detector with pseudo labels for novel object classes and ground-truth annotations for base classes. In particular, each pseudo label includes an objectness score from LoCLIP and a confidence ˆr from HCC, which indicate how well the region is localized and how confidently it is classified, respectively. For example, a higher objectness score suggests that the region tightly covers an object of a novel class. Similarly, a higher confidence indicates that a VLM is confident in assigning a class label for a given region. Based on these characteristics, we re-weight classification and regression losses for pseudo labels, with confidence and objectness scores, respectively. Concretely, we denote the bounding box coordinates of the i-th prediction from an OV detector as ˆui ∈ R4 and its predicted class label as ˆci. Simi-larly, we denote by ui and ci bounding box coordinates and a class label, respectively, obtained from ground-truth annota-tions for base classes or pseudo labels for novel classes. Note that when the class label belongs to a novel object class, i.e ., 
+
+ci ∈ CN , it is associated with a calibrated confidence score from HCC and an objectness score from LoCLIP, which we denote by zi and oi, respectively. Our loss Li for the i-th prediction can be represented as follows: 
+
+Li =
+
+(
+
+Lcls (ˆ ci, c i) + 1[ci∈CB ]Lreg (ˆ ui, u i) if ci ∈ CB ∪ { bg }
+
+ziLcls (ˆ ci, c i) + oiLreg (ˆ ui, u i) if ci ∈ CN ,
+
+(11) where Lcls and Lreg are classification and bounding box regression losses, respectively, and 1 is an indicator func-tion that outputs 1 if an argument is true and 0 otherwise. Our overall loss is defined as L = P 
+
+> i
+
+Li. In this way, su-pervisory signals from pseudo labels with low objectness or confidence scores are suppressed during training. This enables the OV detector to focus on more reliable regions, thereby mitigating the distractive influence of misaligned or uncertain pseudo labels and improving its overall detection performance. 
+
+4. Experiments 
+
+In this section, we describe implementation details (Sec. 4.1), and compare our method with the state of the art (Sec. 4.2). We then provide in-depth analysis of our components, in-cluding HCC and LoCLIP (Sec. 4.3). More results, in-cluding qualitative results, analyses on different LLMs, and hyper-parameters, together with additional discussions can be found in the supplementary material. 
+
+4.1. Implementation details 
+
+Dataset. We train and evaluate our model under OV settings using the COCO [ 30 ] and LVIS [ 14 ] datasets, referred to as OV-COCO and OV-LVIS, respectively. For OV-COCO, we split the 65 object classes into 48 base and 17 novel classes. The training set contains 118 , 287 images, while the evalu-ation set consists of 4, 836 images 1. We report box mean AP 50 for base and novel classes separately, denoted by AP B
+
+> 50
+
+and AP N
+
+> 50
+
+, respectively. For OV-LVIS, which contains 1, 203 
+
+object classes, we set the 337 rare classes as novel ones, and the remaining 866 object classes as base classes. We report mask mAP for novel and all object classes separately, denoted by AP Nm and AP All m , respectively. 
+
+Network. We adopt Faster R-CNN [ 41 ] with a ResNet-50 [ 15 ] backbone for OV-COCO, and Mask R-CNN [ 16 ]with a ResNet-50 backbone for OV-LVIS, together with a class-agnostic mask prediction head. Following [ 49 , 51 ], both detection networks are initialized with SoCo [ 50 ] pre-trained weights. For the classifier, we set the weights us-ing text features derived from the prompt “a photo of a [class]”, and set the background class weight to zero, as done in [ 26 , 48 , 59 ]. For the VLM, we employ CLIP [ 39 ]with a ViT-B/32 [ 8] image encoder, with the official weights released by OpenAI. For the LLM, we primarily use GPT-OSS-120b [1].   
+
+> 1Following the standard protocol [ 48 ,59 ], we exclude images without any novel object classes from the COCO validation split.
+
+Training. On OV-COCO, we train our network using the 
+
+1× scheduling scheme, which corresponds to 90 k training iterations. The learning rate is set to 0.02 and decreased by a factor of 10 at the 60 k-th and 80 k-th iterations with a total batch size of 16 . By default, we use random flip only for data augmentation during training. For OV-LVIS, following the protocol described in [ 49 , 51 ], we use the 2× schedule and train our model for 180 k iterations, where the learning rate is set to 0.02 and decreased by a factor of 10 at the 
+
+120 k-th and 160 k-th iterations. For both datasets, we use a warmup strategy that gradually increases a learning rate from 0 to 0.02 during the first 1k training iterations. Training the detectors take approximately 6 hours for OV-COCO and 16 hours for OV-LVIS, with 8 NVIDIA A6000 GPUs. To further demonstrate the generalization capability of our approach, we also apply our method on top of CLIPSelf [ 52 ]. In this case, we replace base annotation used in the original work with our generated pseudo labels and train a detector using the official implementation provided by the authors. To generate pseudo labels, we set γ = 0 .8 and τ = 0 .3
+
+for OV-COCO and γ = 0 .6 and τ = 0 .2 for OV-LVIS. We establish an initial LLM-generated hierarchy by using 
+
+K = 10 for super-categories and K = 30 for sub-categories on both datasets. Note that we further refine the initial super-/sub-categories through an LLM-driven process, which we describe in detail in the supplementary materials. 
+
+4.2. Results 
+
+We provide in Table 1 quantitative comparisons of our method with the state of the art on OV-COCO [ 30 ]. For a fair comparison, all listed method use RCNN-style detec-tors, and do not use additional datasets for training. From the table, we can see that our model clearly sets a new state of the art in terms of AP N
+
+> 50
+
+. This demonstrates the effective-ness of our approach in establishing reliable pseudo labels for novel object classes. Our approach even outperforms SAS-Det [ 60 ], which exploits RegionCLIP [ 61 ], a VLM tai-lored for detection, compared to CLIP in ours. Compared to MarvelOVD [ 48 ], which requires additional stages to handle distractive noise in pseudo labels, our approach provides better performance with less computational cost for train-ing. Specifically, the total training time for MarvelOVD is 
+
+1.5× longer than ours, despite using the same 1× scheduling scheme. This result highlights that obtaining reliable pseudo labels, rather than adopting computationally intensive self-training strategies, is more significant for OVD. Table 2 compares the performance of various OVD methods on the OV-LVIS [ 14 ] dataset, further demonstrating the effective-ness of our approach. It shows that our method achieves the highest performance in terms of AP Nm. Furthermore, we can see that our generated pseudo labels also improve the performance of CLIPSelf [ 52 ] on both OV-COCO and OV-LVIS datasets. This demonstrates that our framework can 
+
+Table 1. Comparison with state-of-the-art methods on the OV-COCO dataset [ 30 ]. To ensure a fair comparison, all listed methods employ RCNN-style detectors [ 16 , 41 ]. We report the mean and standard deviation across 3 independent runs. † indicates results obtained from our re-implementation. Method Backbone Network AP N 
+
+> 50
+
+AP B
+
+> 50
+
+ViLD [13] RN50 27.6 59.5 F-VLM [26] RN50 28.0 40.2 OADP 2 [49] RN50 31.3 -VL-PLM [59] RN50 32.3 54.0 RALF [25] RN50 33.4 54.5 BARON [51] RN50 34.0 60.4 MarvelOVD † [48] RN50 35.4 56.5 SAS-Det [60] RN50 37.4 58.5 Ours RN50 38.9 ±0.3 59.5 ±0.2 
+
+CLIPSelf † [52] ViT-L/14 41.3 65.5 Ours ViT-L/14 44.0 ±0.2 65.8 ±0.1 
+
+Table 2. Comparison with state-of-the-art methods on the OV-LVIS dataset [ 14 ]. To ensure a fair comparison, all listed methods employ RCNN-style detectors [ 16 ]. We report the mean and standard deviation across 3 independent runs. † indicates results obtained from our re-implementation. Method Backbone Network AP Nm AP All m
+
+ViLD [13] RN50 16.6 25.5 F-VLM [26] RN50 18.6 24.2 BARON [51] RN50 19.2 26.5 DetPro [9] RN50 19.8 25.9 OADP 2 [49] RN50 19.9 -SAS-Det [60] RN50 20.9 26.1 Ours RN50 21.7 ±0.4 26.0 ±0.2 
+
+CLIPSelf † [52] ViT-B/16 25.1 24.5 Ours ViT-B/16 25.5 ±0.2 24.7 ±0.1 
+
+generalize well to various backbones and training strategies. We provide in the supplementary material a more compre-hensive comparison with state-of-the-art methods, including ones leveraging additional datasets. 
+
+4.3. Discussion 
+
+Ablation study. We present in Table 3 an ablation analysis of HCC and LoCLIP. We train object detectors with pseudo labels, generated by various combinations of our compo-nents, including super- and sub-categories of the language hierarchy for HCC, and LoCLIP. The baseline in ① corre-sponds to our implementation of VL-PLM [ 59 ]. From the table, we can make the following observations: (1) As shown in ② and ③, exploiting either super- or sub-categories of ob-                                
+
+> 2The results for OADP [ 49 ], reported in the original publication, were obtained using LSJ data augmentation [ 12 ], which is inconsistent with the experimental setting described in the paper. We thus report the results without the LSJ technique, obtained from the official repository. Table 3. Ablative analysis using different combinations of our approach, including HCC and LoCLIP, on OV-COCO [ 30 ]. rsub
+> n
+> and rsup
+> nindicates the use of corresponding terms in Eq. (9). HCC LoCLIP AP N
+> 50 AP B
+> 50
+> rsub rsup
+> ①32.2 58.3
+> ②✓36.8 59.3
+> ③✓36.0 59.5
+> ④✓✓37.8 59.4
+> ⑤✓33.9 59.0
+> ⑥✓✓✓38.9 59.5
+
+ject classes provides more reliable confidence estimations, improving performance drastically for novel object classes. In particular, leveraging sub-categories with rsub provides better pseudo labels compared to using super-categories with 
+
+rsup . We suspect this stems from the fact that CLIP generally performs better when given fine-grained textual descriptions (sub-categories) than coarse-grained ones (super-categories), possibly because fine-grained concepts are known to appear more frequently [ 54 ] in its pretraining dataset [ 43 ]. Never-theless, using both super- and sub-categories in ④ provides complementary performance gains. (2) LoCLIP provides performance improvements in ⑤. This demonstrates the clear advantage of leveraging LoCLIP over the RPN used in 
+
+① for estimating objectness scores for novel object classes. (3) Finally, incorporating all components, as in ⑥, achieves the best performance, suggesting that the proposed com-ponents are complementary to each other. We point out that both HCC and LoCLIP share the common objective of preventing irrelevant regions from being assigned pseudo la-bels. However, they achieve this goal differently. The HCC technique focuses on capturing class-specific cues, while LoCLIP focuses on class-agnostic properties. Note that ob-taining reliable pseudo labels also boost the performance of base classes, as it suppresses noise in training OV detectors. 
+
+LoCLIP. For object proposals generated by RPN, we com-pute the correlation coefficients between their IoU with ground-truth boxes and their objectness scores, where the scores are obtained from the RPN, Adapter [ 18 ], and Lo-CLIP, for unseen object classes. Specifically, we divide object classes into odd and even splits, and use one split for training, while exploiting the other for evaluation. Note that a higher correlation coefficient indicates that the correspond-ing score reflects the objectness of candidate regions more accurately. We can see from Table 4 that the RPN shows low correlation scores, even close to zero, suggesting that it does not quantify how well proposals cover objects of un-seen classes effectively. This also indicates that using RPN scores for objectness, as in previous works [ 48 , 49 , 59 , 60 ], would be suboptimal. Adapter improves the correlation coef-ficients, but it exploits image-level features ( i.e ., the output                            
+
+> Table 4. Comparisons of correlation coefficients for RPN, Adapter [ 18 ] and LoCLIP (ours) for unseen object classes on OV-COCO [30]. SR: Spearman’s ρ. KT: Kendall’s τ.Metric RPN Adapter [18] LoCLIP Even →Odd SR (↑)0.038 0.456 0.473
+> KT (↑)0.024 0.313 0.326
+> Odd →Even SR (↑)0.002 0.434 0.449
+> KT (↑)0.001 0.300 0.310
+
+feature for the [CLS] token) to estimate the objectness, pro-viding slightly worse performance than LoCLIP. This can be attributed to LoCLIP using local features for predicting objectness, in contrast to Adapter. Overall, LoCLIP provides the best results, demonstrating its effectiveness in estimating reliable objectness scores for novel object classes. We pro-vide qualitative comparisons in the supplementary materials. 
+
+Efficiency. We measure runtime to generate pseudo labels and compare with VL-PLM [ 59 ], which does not involve HCC and LoCLIP compared to our method. On average, the VL-PLM method takes 0.872 seconds per image to generate a set of pseudo labels, while our method, including HCC and LoCLIP, takes 0.892 seconds, with only a negligible 
+
+2.3% increase in total. We attribute the efficiency of our method to the following reasons: (1) LoCLIP retains the visual features of the CLIP model, allowing it to be used for both estimating objectness and extracting visual features from candidate regions. In practice, the visual features from LoCLIP are directly used for class label assignments with the HCC technique. (2) HCC is simple by design, requiring only the matrix operations in Eqs. (3)-(6). 
+
+5. Conclusion 
+
+We have presented a novel pseudo labeling framework for OVD that addresses the limitations of existing approaches. To this end, we have introduced HCC technique that exploits a language hierarchy structure of object classes, providing more reliable confidence scores of candidate regions. We have also proposed LoCLIP that employs parameter-efficient adaptation of CLIP, and offers unbiased objectness estima-tions compared to an RPN. Extensive experiments demon-strate the effectiveness of our approach, which clearly sets a new state of the art on standard OVD benchmarks with a negligible increase in overall computational cost.  
+
+> Acknowledgements. This work was partly supported by IITP grant funded by the Korea government (MSIT) (No. RS-2022-00143524, De-velopment of Fundamental Technology and Integrated Solution for Next-Generation Automatic Artificial Intelligence System and No. 2022-0-00124, RS-2022-II220124, Development of Artificial Intelligence Technology for Self-Improving Competency-Aware Learning Capabilities) and the KIST Institutional Program (Project No.2E33001-24-086).
+
+References 
+
+[1] Sandhini Agarwal, Lama Ahmad, Jason Ai, Sam Altman, Andy Applebaum, Edwin Arbus, Rahul K Arora, Yu Bai, Bowen Baker, Haiming Bao, et al. gpt-oss-120b & gpt-oss-20b model card. arXiv preprint arXiv:2508.10925 , 2025. 4, 6[2] Hanoona Bangalath, Muhammad Maaz, Muhammad Uzair Khattak, Salman H Khan, and Fahad Shahbaz Khan. Bridging the gap between object and image-level representations for open-vocabulary detection. In NeurIPS , 2022. 3 [3] Ankan Bansal, Karan Sikka, Gaurav Sharma, Rama Chel-lappa, and Ajay Divakaran. Zero-shot object detection. In 
+
+ECCV , 2018. 1 [4] Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In ECCV , 2020. 1[5] Xinlei Chen, Hao Fang, Tsung-Yi Lin, Ramakrishna Vedan-tam, Saurabh Gupta, Piotr Dollár, and C Lawrence Zitnick. Microsoft COCO captions: Data collection and evaluation server. arXiv preprint arXiv:1504.00325 , 2015. 3 [6] Tianheng Cheng, Lin Song, Yixiao Ge, Wenyu Liu, Xing-gang Wang, and Ying Shan. Yolo-World: Real-time open-vocabulary object detection. In CVPR , 2024. 2 [7] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. ImageNet: A large-scale hierarchical image database. In CVPR , 2009. 3 [8] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Syl-vain Gelly, et al. An image is worth 16x16 words: Transform-ers for image recognition at scale. In ICLR , 2021. 6 [9] Yu Du, Fangyun Wei, Zihe Zhang, Miaojing Shi, Yue Gao, and Guoqi Li. Learning to prompt for open-vocabulary object detection with vision-language model. In CVPR , 2022. 2, 7 [10] Mingfei Gao, Chen Xing, Juan Carlos Niebles, Junnan Li, Ran Xu, Wenhao Liu, and Caiming Xiong. Open vocabulary object detection with pseudo bounding-box labels. In ECCV ,2022. 3 [11] Yunhao Ge, Jie Ren, Andrew Gallagher, Yuxiao Wang, Ming-Hsuan Yang, Hartwig Adam, Laurent Itti, Balaji Lakshmi-narayanan, and Jiaping Zhao. Improving zero-shot generaliza-tion and robustness of multi-modal models. In CVPR , 2023. 3[12] Golnaz Ghiasi, Yin Cui, Aravind Srinivas, Rui Qian, Tsung-Yi Lin, Ekin D Cubuk, Quoc V Le, and Barret Zoph. Simple copy-paste is a strong data augmentation method for instance segmentation. In CVPR , 2021. 7 [13] Xiuye Gu, Tsung-Yi Lin, Weicheng Kuo, and Yin Cui. Open-vocabulary object detection via vision and language knowl-edge distillation. In ICLR , 2022. 1, 2, 3, 7 [14] Agrim Gupta, Piotr Dollar, and Ross Girshick. LVIS: A dataset for large vocabulary instance segmentation. In CVPR ,2019. 2, 3, 6, 7 [15] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR , 2016. 6[16] Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Gir-shick. Mask R-CNN. In ICCV , 2017. 4, 6, 7 [17] Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. Distilling the knowledge in a neural network. In NeurIPS Workshop , 2014. 2[18] Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski, Bruna Morrone, Quentin De Laroussilhe, Andrea Gesmundo, Mona Attariyan, and Sylvain Gelly. Parameter-efficient transfer learning for nlp. In ICML , 2019. 6, 8 [19] Jiaxing Huang, Jingyi Zhang, Kai Jiang, and Shijian Lu. Open-vocabulary object detection via language hierarchy. 
+
+NeurIPS , 2024. 3 [20] Chao Jia, Yinfei Yang, Ye Xia, Yi-Ting Chen, Zarana Parekh, Hieu Pham, Quoc Le, Yun-Hsuan Sung, Zhen Li, and Tom Duerig. Scaling up visual and vision-language representation learning with noisy text supervision. In ICML , 2021. 1, 2 [21] KJ Joseph, Salman Khan, Fahad Shahbaz Khan, and Vi-neeth N Balasubramanian. Towards open world object detec-tion. In CVPR , 2021. 1, 2 [22] Gaoussou Youssouf Kebe, Padraig Higgins, Patrick Jenkins, Kasra Darvish, Rishabh Sachdeva, Ryan Barron, John Winder, Donald Engel, Edward Raff, Francis Ferraro, and Cynthia Matuszek. A spoken language dataset of descriptions for speech-based grounded language learning. In NeurIPS , 2021. 2[23] Dahun Kim, Anelia Angelova, and Weicheng Kuo. Con-trastive feature masking open-vocabulary vision transformer. In ICCV , 2023. 2 [24] Dahun Kim, Anelia Angelova, and Weicheng Kuo. Region-aware pretraining for open-vocabulary object detection with vision transformers. In CVPR , 2023. 2 [25] Jooyeon Kim, Eulrang Cho, Sehyung Kim, and Hyunwoo J Kim. Retrieval-augmented open-vocabulary object detection. In CVPR , 2024. 7 [26] Weicheng Kuo, Yin Cui, Xiuye Gu, AJ Piergiovanni, and Anelia Angelova. F-VLM: Open-vocabulary object detection upon frozen vision and language models. In ICLR , 2023. 2, 6, 7 [27] Dongjun Lee, Seokwon Song, Jihee Suh, Joonmyeong Choi, Sanghyeok Lee, and Hyunwoo J Kim. Read-only prompt optimization for vision-language few-shot learning. In ICCV ,2023. 6 [28] Wuyang Li, Xinyu Liu, Jiayi Ma, and Yixuan Yuan. CLIFF: Continual latent diffusion for open-vocabulary object detec-tion. In ECCV , 2024. 3 [29] Chuang Lin, Peize Sun, Yi Jiang, Ping Luo, Lizhen Qu, Gho-lamreza Haffari, Zehuan Yuan, and Jianfei Cai. Learning object-language alignments for open-vocabulary object detec-tion. In ICLR , 2023. 1, 3, 4 [30] Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. Microsoft COCO: Common objects in context. In 
+
+ECCV , 2014. 1, 2, 6, 7, 8 [31] Mingxuan Liu, Tyler L Hayes, Elisa Ricci, Gabriela Csurka, and Riccardo Volpi. SHiNe: Semantic hierarchy nexus for open-vocabulary object detection. In CVPR , 2024. 3, 4 [32] Wei Liu, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Scott Reed, Cheng-Yang Fu, and Alexander C Berg. SSD: Single shot multibox detector. In ECCV , 2016. 1 [33] Chuofan Ma, Yi Jiang, Xin Wen, Zehuan Yuan, and Xiaojuan Qi. CoDet: Co-occurrence guided region-word alignment for open-vocabulary object detection. In NeurIPS , 2023. 3 [34] Zongyang Ma, Guan Luo, Jin Gao, Liang Li, Yuxin Chen, Shaoru Wang, Congxuan Zhang, and Weiming Hu. Open-vocabulary one-stage detection with hierarchical visual-language knowledge distillation. In CVPR , 2022. 2 [35] George A Miller. WordNet: a lexical database for english. 
+
+ACM , 1995. 3 [36] Matthias Minderer, Alexey Gritsenko, Austin Stone, Maxim Neumann, Dirk Weissenborn, Alexey Dosovitskiy, Aravindh Mahendran, Anurag Arnab, Mostafa Dehghani, Zhuoran Shen, et al. Simple open-vocabulary object detection. In 
+
+ECCV , 2022. 2 [37] Zachary Novack, Julian McAuley, Zachary Chase Lipton, and Saurabh Garg. CHiLS: Zero-shot image classification with hierarchical label sets. In ICML , 2023. 3, 4 [38] Seulki Park, Youren Zhang, Stella X Yu, Sara Beery, and Jonathan Huang. Visually consistent hierarchical image clas-sification. ICLR , 2024. 4 [39] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In ICML , 2021. 1, 2, 4, 6 [40] Joseph Redmon, Santosh Divvala, Ross Girshick, and Ali Farhadi. You only look once: Unified, real-time object detec-tion. In CVPR , 2016. 1 [41] Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster R-CNN: Towards real-time object detection with region proposal networks. TPAMI , 2016. 1, 2, 3, 4, 6, 7 [42] Tal Ridnik, Emanuel Ben-Baruch, Asaf Noy, and Lihi Zelnik-Manor. ImageNet-21K pretraining for the masses. In NeurIPS ,2021. 3 [43] Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, et al. LAION-5B: An open large-scale dataset for training next generation image-text models. NeurIPS , 2022. 2, 8 [44] Piyush Sharma, Nan Ding, Sebastian Goodman, and Radu Soricut. Conceptual captions: A cleaned, hypernymed, image alt-text dataset for automatic image captioning. In ACL , 2018. 2, 3 [45] Cheng Shi and Sibei Yang. EdaDet: Open-vocabulary object detection using early dense alignment. In ICCV , 2023. 2 [46] Mingxing Tan, Ruoming Pang, and Quoc V Le. EfficientDet: Scalable and efficient object detection. In CVPR , 2020. 1 [47] Peng Tang, Xinggang Wang, Xiang Bai, and Wenyu Liu. Mul-tiple instance detection network with online instance classifier refinement. In CVPR , 2017. 3 [48] Kuo Wang, Lechao Cheng, Weikai Chen, Pingping Zhang, Liang Lin, Fan Zhou, and Guanbin Li. Marvelovd: Marrying object recognition and vision-language models for robust open-vocabulary object detection. In ECCV , 2024. 1, 2, 3, 4, 5, 6, 7, 8 [49] Luting Wang, Yi Liu, Penghui Du, Zihan Ding, Yue Liao, Qiaosong Qi, Biaolong Chen, and Si Liu. Object-aware dis-tillation pyramid for open-vocabulary object detection. In 
+
+CVPR , 2023. 1, 2, 3, 4, 5, 6, 7, 8 [50] Fangyun Wei, Yue Gao, Zhirong Wu, Han Hu, and Stephen Lin. Aligning pretraining for detection via object-level con-trastive learning. NeurIPS , 2021. 6 [51] Size Wu, Wenwei Zhang, Sheng Jin, Wentao Liu, and Chen Change Loy. Aligning bag of regions for open-vocabulary object detection. In CVPR , 2023. 6, 7 [52] Size Wu, Wenwei Zhang, Lumin Xu, Sheng Jin, Xiangtai Li, Wentao Liu, and Chen Change Loy. ClipSelf: Vision trans-former distills itself for open-vocabulary dense prediction. In 
+
+ICLR , 2024. 2, 7 [53] Mengde Xu, Zheng Zhang, Han Hu, Jianfeng Wang, Lijuan Wang, Fangyun Wei, Xiang Bai, and Zicheng Liu. End-to-end semi-supervised object detection with soft teacher. In ICCV ,2021. 3 [54] Zhenlin Xu, Yi Zhu, Siqi Deng, Abhay Mittal, Yanbei Chen, Manchen Wang, Paolo Favaro, Joseph Tighe, and Davide Modolo. Benchmarking zero-shot recognition with vision-language models: Challenges on granularity and specificity. In CVPRW , 2024. 8 [55] Lewei Yao, Jianhua Han, Youpeng Wen, Xiaodan Liang, Dan Xu, Wei Zhang, Zhenguo Li, Chunjing Xu, and Hang Xu. DetCLIP: Dictionary-enriched visual-concept paralleled pre-training for open-world detection. In NeurIPS , 2022. 2 [56] Yuhang Zang, Wei Li, Kaiyang Zhou, Chen Huang, and Chen Change Loy. Open-vocabulary DETR with conditional matching. In ECCV , 2022. 2 [57] Alireza Zareian, Kevin Dela Rosa, Derek Hao Hu, and Shih-Fu Chang. Open-vocabulary object detection using captions. In CVPR , 2021. 1 [58] Jingyi Zhang, Jiaxing Huang, Sheng Jin, and Shijian Lu. Vision-language models for vision tasks: A survey. TPAMI ,2024. 1 [59] Shiyu Zhao, Zhixing Zhang, Samuel Schulter, Long Zhao, BG Vijay Kumar, Anastasis Stathopoulos, Manmohan Chan-draker, and Dimitris N Metaxas. Exploiting unlabeled data with vision and language models for object detection. In 
+
+ECCV , 2022. 1, 2, 3, 4, 5, 6, 7, 8 [60] Shiyu Zhao, Samuel Schulter, Long Zhao, Zhixing Zhang, Yu-min Suh, Manmohan Chandraker, Dimitris N Metaxas, et al. Taming self-training for open-vocabulary object detection. In 
+
+CVPR , 2024. 1, 2, 3, 4, 5, 7, 8 [61] Yiwu Zhong, Jianwei Yang, Pengchuan Zhang, Chunyuan Li, Noel Codella, Liunian Harold Li, Luowei Zhou, Xiyang Dai, Lu Yuan, Yin Li, et al. RegionCLIP: Region-based language-image pretraining. In CVPR , 2022. 2, 7 [62] Xingyi Zhou, Rohit Girdhar, Armand Joulin, Philipp Krähen-bühl, and Ishan Misra. Detecting twenty-thousand classes using image-level supervision. In ECCV , 2022. 3 Exploring Hierarchical Consistency and Unbiased Objectness for Open-Vocabulary Object Detection 
+
+## Supplementary Material 
+
+In this supplementary material, we provide more de-tails (Sec. S1), discussions (Sec. S2), results (Sec. S3) and limitations and future work (Sec. S4). 
+
+S1. More details 
+
+In this section, we provided detailed descriptions for our experimental setup for obtaining results in Fig. 1 (Sec. S1.1), and proof/analysis for Eqs. (7) and (8) (Sec. S1.2). We then describe the training details for LoCLIP (Sec. S1.3), and a process for refining a LLM-generated hierarchy (Sec. S1.4). 
+
+S1.1. Experimental setup for Fig. 1 
+
+Our approach is based on the observation that regions that well-localize an object tend to yield hierarchically consistent predictions, while irrelevant ones ( e.g ., misaligned and back-ground regions) do not. To demonstrate this observation, we leverage the class names and the ground-truth bounding box annotations of the base object classes in OV-COCO [ 19 ]. Specifically, we first establish a semantic hierarchy ( i.e ., super- and sub-categories) for the base object classes using GPT-OSS-120b [ 1] as the LLM. For example, this process yields picnic bench as a sub-category of the class bench ,which itself belongs to the super-category furniture . We then gather object proposals from an RPN [ 26 ] and categorize them based on their IoU with the ground-truth boxes. The proposals with an IoU score higher than 0.8 are labeled as foreground (well-localized), while those with an IoU score lower than 0.5 are labeled as background (irrelevant). We use this experimental setup to visualize the hierarchical con-sistency for well-localized and irrelevant regions separately in Fig. 1. Note that this analysis is performed using the class names and the ground-truth annotations for base object classes only. We provide in Fig. S2 more visualizations and quantitative analysis in Sec. S3. 
+
+S1.2. Eqs. (7) and (8) 
+
+Proof of Eq. (7). We wish to show that 
+
+arg max( p) = arg max( zsub ) ⇒ max( rsub ) ≥ ˆp, 
+
+(S1) where ˆp = max( p). Let l be the common index of the maximum elements, defined as: 
+
+l = arg max( p) = arg max( zsub ). (S2) Invoking the generalized mean inequality, specifically for orders set to 1 and ∞, we have: 
+
+∑
+
+> m
+
+p(m)zsub (m) ≤ max( zsub ) = zsub (l). (S3) Applying Eq. (S3) to the definition of the l-th element of 
+
+rsub , we obtain: 
+
+rsub (l) = p(l)zsub (l)
+
+∑ 
+
+> m
+
+p(m)zsub (m)
+
+≥ p(l)zsub (l)
+
+zsub (l) (S4) 
+
+= p(l).
+
+Here, Eq. (S4) holds because replacing the denominator ∑ 
+
+> m
+
+p(m)zsub (m) with its upper bound zsub (l) yields a lower bound for the fraction. Finally, since p(l) = ˆ p, it follows that 
+
+max( rsub ) ≥ ˆp. (S5) 
+
+Property in Eq. (8). In the following, we demonstrate that Eq. (8) holds under two conditions: 1) max( p) is sufficiently large, e.g ., exceeding 0.5, and 2) the score distribution of 
+
+zsub is sufficiently flat. We further show that these conditions can be enforced into our framework with minimal effort. Let l = arg max( p) denote the index of the maximum el-ement in p. We characterize the flatness of zsub by bounding the ratio between its maximum and minimum values with a small constant β ≥ 1 as follows: 
+
+1 ≤ max( zsub )min( zsub ) ≤ β. (S6) To prove that max( rsub ) < max( p), we analyze two cases. First, we examine the value of rsub at the index l. Under the inconsistency assumption ( i.e ., arg max( zsub )̸ = l), the ele-ment zsub (l) is strictly less than the maximum of zsub . Given the condition in Eq. (S6) and zsub (l) < max( zsub ), the mean ∑ 
+
+> m
+
+p(m)zsub (m) strictly exceeds the value zsub (l).That is, 
+
+rsub (l) = p(l)
+
+( zsub (l)
+
+∑ 
+
+> m
+
+p(m)zsub (m)
+
+)
+
+< p(l). (S7) Second, for any index n̸ = l, we can represent rsub (n) as follows: 
+
+rsub (n) = p(n) zsub (n)
+
+∑ 
+
+> m
+
+p(m)zsub (m) . (S8) Note that the scaling factor zsub (n)∑  
+
+> mp(m)zsub (m)
+
+is strictly bounded by β, since ∑ 
+
+> m
+
+p(m)zsub (m) ≥ min( zsub ).Given the condition that p(l) is sufficiently large, imply-ing p(n) is small, it follows that 
+
+p(n) · β < p(l). (S9) Since β is close to 1, this condition holds naturally for any 
+
+max( p) > 0.5, implying rsub (n) < max( p). Combining both cases, we can conclude that max( rsub ) < max( p).In practice, we find that applying a minimum threshold to ˆp is sufficient to ensure that Eq. (8) holds. This is be-cause zsub and zsup are derived by max-pooling the proba-bility distribution computed over the entire set of sub- and super-categories, respectively. Since the softmax operation is applied across a large number of sub-/super-categories, the score is inherently distributed, resulting in a flat distri-bution. Consequently, explicitly constraining the flatness is unnecessary, and enforcing a minimum threshold on ˆp as a prerequisite for HCC is sufficient to guarantee the properties in Eqs. (7)-(8). In our experiments, we adopt a threshold of 
+
+0.5, and candidate regions with lower confidence scores ˆp
+
+are simply discarded in the pseudo labeling process. Note that enforcing the score distributions of zsub and zsup can be performed by simply applying a multiplicative temperature parameter in Eq. (3) set to the value in a range of (0 , 1) .
+
+S1.3. LoCLIP training 
+
+Dataset. We construct a dedicated dataset for training LoCLIP by extracting candidate regions from an RPN [ 26 ]. Each candidate region is assigned a binary label based on its intersection over union (IoU) with any object instance in the ground-truth annotations of the base classes. Specifically, candidate regions with an IoU score greater than 0.8 are labeled as positive, while those with an IoU score of 0.8 or lower are labeled as negative. This process yields a dataset of image patches ( i.e ., cropped candidate regions) paired with their binary labels. Notably, we empirically observe that LoCLIP converges quickly, and using only 1% of the training split from the COCO [ 19 ] or LVIS [ 8] is sufficient to achieve meaningful predictions. Constructing this dataset thus requires only a negligible computational overhead. 
+
+Loss. The candidate regions in our curated dataset are typically imbalanced, with background regions substantially outnumbering foreground regions. Directly training LoCLIP on this imbalanced dataset tends to induce a strong bias toward the background class, leading to objectness scores that are frequently close to the value of 0. To mitigate this issue, we adopt a weighted binary cross-entropy loss, using the ratios of foreground and background regions as weights for the positive and negative terms, respectively. This helps LoCLIP training by suppressing bias toward the background class in its predictions. 
+
+Training. We train LoCLIP for approximately 8k iterations using a cosine learning rate scheduler, with the maximum learning rate set to 0.001 . The parameters are optimized with SGD using a batch size of 192 on a single NVIDIA A6000 GPU. We note that, unlike previous works [ 31 , 32 , 37 , 38 ]which estimate the objectness of candidate regions directly from the RPN, our approach requires an additional training step for LoCLIP. However, this extra step takes no more than 
+
+5 minutes, which is negligible in practice, while providing significantly more reliable objectness estimations for unseen object classes (Table 4). 
+
+Hyperparameter τ . We select τ by evaluating the binary classification accuracy on the dataset used for training Lo-CLIP. We perform a grid search for τ in the range [0 .1, 0.9] 
+
+with a 0.1 interval, and choose the value that yields the best accuracy. While a more extensive approach to searching for the optimal τ could be used, e.g ., by curating a dedicated validation set, we found this simple method to be sufficient. 
+
+S1.4. LLM hierarchy refinement 
+
+We establish an initial LLM-generated hierarchy by querying LLMs to provide K super- and sub-categories of a given object class [ 20 , 24 ]. Directly exploiting LLM responses, however, can introduce incorrect entries into the generated hierarchical structure, as LLMs are prone to make mistakes. We point out that previous methods [ 20 , 24 ] that use LLMs for establishing a hierarchy structure between object classes, have typically been limited to using only a small number of K for establishing the hierarchy, e.g ., 3 in [ 20 ]. On the one hand, using a larger K allows to consider the various super-/sub-categories and helps to capture diverse semantic relationships. On the other hand, it could introduce incorrect concepts in the LLM-generated hierarchy, since the risk of LLM providing incorrect response increases as K grows. To address this problem, we additionally refine the initial super-/sub-categories through an LLM-driven process based on three main criteria: 1) correctness, 2) discriminability, and 3) near-duplicate removal. We describe in the following each step in detail. Note that applying these processes may result in a varying number of super- and sub-categories per class and we have assumed in Eqs. (3) and (4) a uniform number per class for notational simplicity. 
+
+Correctness. For each entry given by the LLM, we ask the LLM if the given entry is indeed correct, i.e ., if the given association ( e.g ., super- or sub-ordinate relationships) holds, using the “Is-A” relationship, which is the foundation of the WordNet database [ 23 ]. For example, if a golden retriever is given as a sub-category of dog , we ask the LLM: Is golden retriever a dog ? Similarly, when companion animal is given as a super-category of dog , we ask the LLM: Is dog a
+
+companion animal ? Although exploiting the same model “knife” “skateboard” “tie” “umbrella”        
+
+> (a) Misaligned regions
+> “knife” “skateboard” “tie” “umbrella”
+> (b) Background regions Figure S1. Examples of candidate regions for novel classes in COCO [ 19 ]. We show regions whose confidence scores predicted using CLIP [ 25 ] exceeds 0.9, together with the estimated class labels.
+
+for both generation and verification may seem redundant, this self-validation step serves as an effective filtering mechanism for incorrect entries. This observation coincides with the self-consistency strategy [ 33 ], which suggests that LLMs are capable of refining their own outputs to achieve better performance. 
+
+Discriminability. While many entries in the LLM-generated hierarchy could provide useful cues for discriminating objects of different classes, some might negatively affect the process by being distractive. This is particularly the case for super-categories, since many distinct objects can share a common, overly broad super-category, making it uninformative. For example, the concept entity is a valid super-category shared across all classes, but it provides no useful discriminatory cues. To alleviate this, we discard super-category entries that are shared by a disproportionately large number of object classes, e.g ., more than 1/3 of the total number of novel object classes on OV-COCO [19]. 
+
+Near-duplicate removal. Lastly, we remove near-duplicates. We compute the cosine similarity between entries in the CLIP embedding space and discard one entry from any pair found to be too close. This process removes, e.g ., simple singular/plural variations of the same concept, such as home appliance and home appliances .We visualize in Fig. S4 our super- and sub-categories of novel object classes in OV-COCO [ 19 ] obtained using GPT-OSS-120b [ 1] as a LLM where K is initially set to 30 and 
+
+10 for sub- and super-categories, respectively. 
+
+S2. More discussions 
+
+Limitations of CLIP confidence score. Standard VLMs employed in OVD, such as CLIP [ 25 ] and ALBEF [ 15 ], are pre-trained for image-level tasks, leading to a discrepancy when applied to region-level predictions in OVD. Con-sequently, their confidence scores do not reliably reflect the presence of novel object classes in candidate regions. To demonstrate this limitation, we show in Fig. S1 the candidate regions whose confidence scores ˆp exceeds 0.9,but correspond to misaligned (Fig. S1 (a)) or correspond to the background (Fig. S1 (b)). We can see that directly using the confidence scores ˆp in the context of pseudo labeling is suboptimal, resulting in the generated pseudo labels to be dominated by irrelevant regions [31]. 
+
+Is confidence adjustment in HCC necessary? With the class-wise sub-category scores zsub and super-category scores zsup in hand, a direct formulation of hierarchical consistency involves verifying whether the class estimations across all levels are consistent. Specifically, we can assign a pseudo class label ˆyb for the region b as follows: 
+
+ˆyb = arg max( p) if 
+
+arg max( p) = arg max( zsub ) = arg max( zsup ).
+
+(S10) This strategy, however, is sub-optimal as it relies solely on the top-ranking indices ( i.e ., arg max ), thereby discarding the rich statistical information ( e.g ., likelihood values) encoded in the full distributions of zsub , zsup , and p. By contrast, HCC exploits these full distributions to calibrate the confidence scores, allowing for a more robust and fine-grained estimation of object presence. Quantitatively, the strategy defined in Eq. (S10) achieves 35 .5 AP N
+
+> 50
+
+,which improves upon the baseline ( 32 .2 AP N
+
+> 50
+
+) but is significantly outperformed by our HCC technique ( 37 .8
+
+AP N
+
+> 50
+
+), confirming the efficacy of our calibration approach. 
+
+Reproducibility of MarvelOVD [ 31 ]. In Sec. 4.2, we report the performance of MarvelOVD [ 31 ] using our re-implementation. Note that although the official code is publicly available 1, we found that it fails to execute due to a fundamental error. We attempted to contact the authors regarding this issue but did not receive a response. Therefore, the results reported in Sec. 4.2 are obtained exclusively from our re-implementation for MarvelOVD [ 31 ], which is based on the official code provided by the authors. 
+
+S3. More results 
+
+More results on hierarchical consistency. We provide additional visualizations of hierarchical consistency in       
+
+> 1https://github.com/wkfdb/MarvelOVD Class: “Bicycle”
+> Super -category:
+> “Two -wheeled
+> vehicle”
+> Sub -category:
+> “Mountain bike”
+> Class:
+> “Car”
+> Super -category:
+> “Container”
+> Sub -category:
+> “Metal bench”
+> Class: “Car”
+> Super -category:
+> “Motor vehicle”
+> Sub -category:
+> “Sedan”
+> Class: “Laptop”
+> Super -category:
+> “Portable
+> computer”
+> Sub -category:
+> “Lenovo Thinkpad ”
+> Class: “Bird”
+> Super -category:
+> “Boards”
+> Sub -category:
+> “Concrete bench”
+> Class: “Banana”
+> Super -category:
+> “Computer”
+> Sub -category:
+> “Business Suitcase”
+
+Figure S2. Visualization of hierarchical consistency of candidate regions. We group the candidate regions into well-localized (left) and irrelevant (right) regions based on their IoU with the ground-truth bounding boxes for base object classes. Green and red arrows indicate consistent and inconsistent hierarchical associations, re-spectively. See text for details. 
+
+Fig. S2. We can see that well-localized regions tend to yield hierarchically consistent predictions, whereas irrelevant ones do not, which aligns with the observations in Fig. 1. We further perform quantitative analysis and observe that 
+
+88 .9% of the well-localized region yield hierarchically consistent predictions, while only 11 .2% of the irrelevant regions do. The results demonstrate a significant gap in consistency ratios between the two groups, suggesting that hierarchical consistency could serve as a valuable cue for discriminating valid objects from the background. 
+
+Comparison between RPN and LoCLIP. The RPN [ 26 ], commonly used in previous works [ 31 , 32 , 37 ] for estimating the objectness of candidate regions, is sub-optimal due to its inherent bias towards base object classes. Consequently, it fails to provide reliable objectness scores for unseen object classes. To address this limitation, we introduce LoCLIP, which employs a parameter-efficient fine-tuning strategy to estimate objectness. We present qualitative comparisons of objectness scores from the RPN and LoCLIP in Fig. S3. The visualizations clearly demonstrate the advantages of LoCLIP over the RPN. For example, for novel object instances shown in the left column ( e.g ., bus , knife , dog and cow ), the RPN yields low objectness scores, failing to identify them as foreground. In contrast, LoCLIP successfully assigns high scores to these regions. Conversely, for the irrelevant background regions in the right column, the RPN tends to produce inappropriately high scores, whereas LoCLIP 
+
+Table S1. Performance comparison between models trained with pseudo labels obtained using different LLMs on OV-COCO [19]. LLM AP N 
+
+> 50
+
+AP B
+
+> 50
+
+- 32.2 58.3 LLaMa-3-8B [6] 36.2 59.2 Qwen-3-30b [30] 37.4 59.4 GPT-OSS-120b [1] 37.8 59.4 
+
+effectively suppresses them, demonstrating its advantage as a reliable objectness score metric. 
+
+Using different LLMs. We primarily use GPT-OSS-120b [ 1] as a LLM throughout all experiments in the main paper. To further demonstrate the generalization capability of our approach, we employ various LLMs and compare the results. Specifically, we establish hierarchical structure of novel object classes by extracting super-/sub-categories using LLaMa-3.1-8B [ 6] and Gemma-3-27b [ 30 ]. We present the results in Table S1. We can see that all entries in Table S1 outperform a baseline that does not exploit the HCC technique, demonstrating that our work can work well with various LLMs. We point out that while it is possible to construct accurate hierarchies for each dataset manually, doing so requires considerable domain expertise and effort, and such hierarchies would need to be rebuilt for every dataset in use. In contrast, LLMs provide an efficient, scalable way to automatically generate such hierarchies, significantly reducing human-driven efforts. In our work, we use LLMs for this purpose, not as a core contribution of our method, but as a practical means to obtain a reasonable hierarchy that our framework can exploit to improve pseudo label generation for OVD. Our framework assumes a reasonable hierarchical structure, rather than a perfect one. This aligns with results reported in prior works, despite the imperfect hierarchical structure, have successfully used LLM-generated hierarchies to improve performance in image classification [24] and object detection [20]. 
+
+Comprehensive comparison with the state-of-the-art methods. Tables S2 and S3 present comprehensive compar-isons with state-of-the-art methods on OV-COCO [ 19 ] and OV-LVIS [ 8 ], respectively. For completeness, we include methods that leverage auxiliary sources of supervision and specify additional datasets, and pretrained models used. The results demonstrate that our method outperforms other approaches that do not utilize additional datasets. Ours even outperforms previous works that employ DETR [ 42 ]as a detector [ 16 , 36 ]. Generally, methods exploiting external datasets and pretrained models ( e.g ., MViT [ 22 ]as a proposal generator) outperform ones that do not. We note that in the OVD setting, it is standard practice to distinguish between these two paradigms, as they operate under fundamentally different assumptions; thus, a direct comparison would be unfair. In this context, exploring how to incorporate such additional datasets into our framework remains an interesting direction for future work. 
+
+Visualization of pseudo labels. We visualize in Fig. S5 the pseudo labels generated with and without the HCC and LoCLIP components. Compared to the baseline in the left-most column, we observe that HCC discards irrelevant re-gions ( e.g ., redundant boxes labelled as dog and incorrect class assignments as cat in the top row), while LoCLIP fil-ters out severely misaligned regions ( e.g ., an excessively large box labelled as skateboard in the top row). Similar observations can be made for the cow object in the second row. Overall, these two components complement each other, effectively preventing irrelevant regions from being assigned pseudo labels. We also present a failure case in the last row, where the tail region of an airplane is mislabelled as an air-plane ; neither HCC or LoCLIP was able to discard this noisy label. Nonetheless, our method still yields significantly less noisy pseudo labels compared to the baseline. 
+
+S4. Limitations and future work 
+
+Although our approach is effective and sets a new state of the art, it shares limitations in other OVD methods using pseudo labels [ 31 , 32 , 37 , 38 ]. First, we use class names of novel object classes to obtain accurate class label predic-tions from VLMs, which may not be available in real-world scenarios. Second, particularly on the OV-LVIS dataset [ 8], our method is outperformed by OVD methods exploiting additional source of supervision [ 2 , 4, 11 , 17 , 18 , 21 , 41 ], 
+
+e.g ., images with corresponding class labels [ 27 ] or cap-tions [ 3, 28 ]. Exploring how to incorporate these additional datasets into a pseudo labeling framework would be an inter-esting direction for future work. RPN: 0.598 | LoCLIP: 0.973 RPN: 0.574 | LoCLIP: 0.219 RPN: 0.284 | LoCLIP: 0.913 RPN: 0.564 | LoCLIP: 0.289 RPN: 0.030 | LoCLIP: 0.958 RPN: 0.794 | LoCLIP: 0.436 RPN: 0.381 | LoCLIP: 0.973 RPN: 0.790 | LoCLIP: 0.240 RPN: 0.650 | LoCLIP: 0.974 RPN: 0.745 | LoCLIP: 0.437 
+
+Figure S3. Qualitative comparison of objectness scores estimated by the RPN [ 26 ] and LoCLIP. LoCLIP consistently yields higher scores for valid objects and lower scores for background regions compared to the RPN, demonstrating more reliable and unbiased objectness estimations. See text for details. COCO aircraft 
+
+animal 
+
+baked goods 
+
+board sports equipment 
+
+> bovidae
+> canine
+> carnivore
+> clothing
+> computer peripherals
+> confectionery
+> craft supplies
+> cutting tool
+> dessert
+> domestic fixtures
+> drinking vessel
+> felidae
+> formal wear
+> furniture
+> hand tool
+> herbivore
+
+household item 
+
+input devices 
+
+kitchenware 
+
+livestock 
+
+living room furniture 
+
+mammal 
+
+> mass transit
+> motor vehicle
+> neckwear
+> office equipment
+> office supplies
+> passenger vehicle
+> personal mobility devices
+> pet
+> plumbing fixtures
+> portable shelters
+> powered flight vehicle
+> proboscidea
+> public transportation
+> rain gear
+> road vehicle
+> sanitaryware
+> seating
+> survival gear
+> tableware
+> transportation device
+
+utility tool weapon 
+
+weather accessories 
+
+wheels-based toys 
+
+winter sports gear 
+
+airplane 
+
+cat 
+
+cow 
+
+dog 
+
+elephant 
+
+cake 
+
+skateboard 
+
+> snowboard
+> cow
+> dog
+> cat
+> dog
+> tie
+> keyboard
+> cake
+> scissors
+> knife
+> scissors
+> cake
+> sink
+> cup
+> cat
+> tie
+> couch
+> scissors
+> cow
+> elephant
+> couch
+> cup
+
+keyboard 
+
+knife scissors 
+
+sink 
+
+keyboard 
+
+cup 
+
+knife 
+
+cow 
+
+couch 
+
+cat 
+
+cow 
+
+dog 
+
+elephant 
+
+> bus
+> bus
+> tie
+> keyboard
+> scissors
+> airplane
+> skateboard
+> cat
+> dog
+> sink
+> umbrella
+> airplane
+> elephant
+> bus
+> umbrella
+> bus
+> sink
+> couch
+> knife
+> cup
+> airplane
+> bus
+
+skateboard 
+
+knife knife 
+
+umbrella 
+
+skateboard 
+
+snowboard (a) Super-categories for novel object classes on OV-COCO [19] COCO 
+
+airplane 
+
+bus 
+
+cat 
+
+dog 
+
+cow 
+
+elephant 
+
+umbrella 
+
+tie 
+
+snowboard 
+
+skateboard 
+
+cup 
+
+knife 
+
+cake couch 
+
+keyboard 
+
+sink 
+
+scissors 
+
+aerobatic aircraft 
+
+airborne refueling tanker 
+
+amphibious aircraft 
+
+bomber aircraft 
+
+business jet 
+
+cargo aircraft 
+
+commercial airliner 
+
+electronic warfare aircraft 
+
+fighter jet 
+
+flying boat 
+
+maritime patrol aircraft 
+
+mini cruiser airplane 
+
+narrow-body jet 
+
+regional jet 
+
+seaplane 
+
+stealth fighter 
+
+trainer aircraft 
+
+turboprop airliner 
+
+shuttle bus 
+
+articulated bus 
+
+electric bus 
+
+bus rapid transit (brt) vehicle 
+
+city bus 
+
+double-decker bus 
+
+electric trolleybus 
+
+high-floor bus 
+
+midi bus 
+
+mid-length bus 
+
+mini cruiser bus 
+
+mini-bus 
+
+open-top bus 
+
+paratransit bus 
+
+party bus 
+
+rural service bus 
+
+school bus 
+
+> sleeper bus
+> abyssinian
+> american shorthair
+> balinese
+> bengal
+> british shorthair
+> burmese
+> chartreux
+> cymric
+> devon rex
+> egyptian mau
+> exotic shorthair
+> himalayan
+> japanese bobtail
+> korat
+> maine coon
+> manx
+> norwegian forest cat
+> ocicat
+> persian
+> pixiebob
+> ragdoll
+> russian blue
+> scottish fold
+> siamese
+> singapura
+> somali
+> sphynx
+> toyger
+> turkish angora
+> akita
+> australian shepherd
+> beagle
+> bernese mountain dog
+> bichon frise
+> bloodhound
+> border collie
+> boxer
+> bulldog
+> chihuahua
+> cocker spaniel
+> collie
+> dachshund
+> doberman pinscher
+> german shepherd
+> golden retriever
+> great dane
+> greyhound
+> labrador retriever
+> maltese
+> mastiff
+> newfoundland
+> poodle
+> pug
+> rottweiler
+> saint bernard
+> shetland sheepdog
+> shih tzu
+> siberian husky
+> yorkshire terrier
+> angus
+> ayrshire
+> belgian blue
+> brown swiss
+> charolais
+> chianina
+> devon
+> gelbvieh
+> guernsey
+> hereford
+> highland
+> holstein
+> irish moiled
+> jersey
+> kankrej
+> limousin
+> murray grey
+> normande
+> romagnola
+> santa gertrudis
+> shorthorn
+> simmental
+> somali
+> texas longhorn
+> zebu
+> african bush elephant
+> asian elephant
+> borneo elephant
+> bull elephant
+> columbian mammoth
+> desert elephant
+> pygmy elephant
+> rainforest elephant
+> savanna elephant
+> sri lankan elephant
+> straight-tusked elephant sumatran elephant woolly mammoth automatic umbrella  beach umbrella  bubble umbrella compact umbrella  golf umbrella  kids' umbrella
+> mid-length umbrella
+> mountain climbing umbrella
+> patio umbrella
+> rain hat umbrella
+> retractable umbrella
+> storm umbrella
+
+straw parasol 
+
+sunshade umbrella 
+
+transparent umbrella 
+
+stroller shades 
+
+ascot tie 
+
+bow tie 
+
+checked tie 
+
+classic silk tie 
+
+clip-on tie 
+
+designer tie 
+
+floral tie 
+
+gradient tie 
+
+knit tie 
+
+linen tie 
+
+metallic tie 
+
+microfiber tie 
+
+novelty print tie 
+
+paisley tie 
+
+plaid tie 
+
+dot tie 
+
+polyester tie 
+
+reversible tie 
+
+skinny tie 
+
+solid color tie 
+
+striped tie 
+
+textured tie 
+
+vintage tie 
+
+wool tie 
+
+all-mountain snowboard 
+
+alpine snowboard 
+
+asymmetrical snowboard 
+
+drop-through snowboard 
+
+freestyle snowboard 
+
+mid-length snowboard 
+
+rocker snowboard 
+
+splitboard 
+
+asymmetrical skateboard 
+
+downhill board 
+
+drop-down board 
+
+electric skateboard 
+
+freestyle skateboard 
+
+kids skateboard 
+
+longboard 
+
+mid-length skateboard 
+
+off-road skateboard 
+
+penny board 
+
+short skateboard 
+
+baby cup 
+
+bone china cup 
+
+camping cup 
+
+cappuccino cup 
+
+ceramic cup 
+
+coffee cup 
+
+collapsible cup 
+
+demitasse cup 
+
+double-walled cup 
+
+eco-friendly cup 
+
+foldable cup 
+
+glass cup 
+
+insulated travel cup 
+
+metal cup 
+
+mug 
+
+novelty cup 
+
+plastic cup 
+
+punch cup 
+
+reusable cup 
+
+sippy cup 
+
+travel mug 
+
+boning knife 
+
+> bread knife
+> butcher knife
+> butterfly knife
+> camping knife
+> carving knife
+> cheese knife
+> chef's knife
+> cleaver
+> dagger
+> fillet knife
+> fruit carving knife
+> hunting knife
+> letter opener
+> machete
+> mid-length knife
+> oyster knife
+> penknife
+> pocket knife
+> rescue knife
+> santoku knife
+> sashimi knife
+> survival knife
+> sushi knife
+> switchblade
+> tomato knife
+> trimming knife
+> twin tip
+> utility knife
+> angel food cake
+> birthday cake
+> black forest cake
+> bundt cake
+> butter cake
+> carrot cake
+> cheesecake
+> chiffon cake
+> chocolate cake
+> coffee cake
+> cupcake
+> flourless cake
+> fruit cake
+> german chocolate cake
+> ice cream cake
+> layer cake
+> mousse cake
+> mud cake
+> opera cake
+> pound cake
+> red velvet cake
+> sheet cake
+> sponge cake
+> tiramisu cake
+> torte
+> wedding cake
+> bridgewater sofa
+> camelback sofa
+> chesterfield sofa
+> contemporary sofa
+> convertible sofa
+> curved sofa
+> english rolled arm sofa
+> fabric sofa
+> futon sofa
+> high-back sofa
+> knotted leather sofa
+> lawson sofa
+> loveseat
+> low-profile sofa
+> mid-century modern sofa
+> minimalist sofa
+> modernist sofa
+> modular sofa
+> reclining sofa
+> sectional sofa
+> sleeper sofa
+> slipcovered sofa
+> sofa with ottoman
+> tufted sofa
+> tuxedo sofa
+> velvet sofa
+> 60% keyboard
+> aluminum frame keyboard
+> backlit keyboard
+> chiclet keyboard
+> ergonomic keyboard
+> mechanical keyboard
+> membrane keyboard
+> midi keyboard
+> ortholinear keyboard
+> portable keyboard
+> programmable keyboard
+> rgb keyboard
+> silent keyboard  split keyboard  synth keyboard  tablet keyboard  tenkeyless keyboard apron sink  bar sink  bathroom sink  cast iron sink  composite granite sink concrete sink  copper sink  corner sink  double-bowl sink
+> drop-in sink
+> enamel sink
+> farmhouse sink
+> fireclay sink
+
+glass sink 
+
+integrated sink 
+
+kitchen sink 
+
+laundry sink 
+
+lavatory sink 
+
+pedestal sink 
+
+porcelain sink 
+
+pot filler sink 
+
+prep sink 
+
+stainless steel sink 
+
+trough sink 
+
+undermount sink 
+
+vessel sink 
+
+wall-mounted sink 
+
+barbershop scissors 
+
+craft scissors 
+
+dressmaking scissors 
+
+electric scissors 
+
+embroidery scissors 
+
+folding scissors 
+
+garden shears 
+
+hedge shears 
+
+industrial shears 
+
+kids safety scissors 
+
+left-handed scissors 
+
+mid-length 
+
+multi-purpose scissors 
+
+pinking shears 
+
+pocket scissors 
+
+pruning shears 
+
+stainless steel scissors 
+
+surgical scissors 
+
+tailor scissors 
+
+twin tip (b) Sub-categories for novel object classes on OV-COCO [19] 
+
+Figure S4. Super-/sub-categories for novel object classes in OV-COCO [ 19 ]. We establish a hierarchical structure between object classes by leveraging GPT-OSS-120b [1] as a LLM. Best viewed by zooming in. Table S2. Comprehensive comparison with state-of-the-art methods on the OV-COCO dataset [ 19 ]. We report the mean and standard deviation across 3 independent runs. † indicates results from our re-implementation. Method Backbone Detector Architecture Additional Supervision Additional Pretrained Models AP N 
+
+> 50
+
+AP B
+
+> 50
+
+ViLD [7] RN50 [9] FR-CNN [26] 27.6 59.5 F-VLM [14] RN50 [9] FR-CNN [26] 28.0 40.2 OV-DETR [36] RN50 [9] DETR [42] 29.4 52.7 OADP 1 [32] RN50 [9] FR-CNN [26] 31.3 -VL-PLM [37] RN50 [9] FR-CNN [26] 32.3 54.0 DK-DETR [16] RN50 [9] DETR [42] 32.3 61.1 RALF [13] RN50 [9] FR-CNN [26] 33.4 54.5 BARON [34] RN50 [9] FR-CNN [26] 34.0 60.4 MarvelOVD † [31] RN50 [9] FR-CNN [26] 35.4 56.5 SAS-Det [38] RN50 [9] FR-CNN [26] RegionCLIP [ 39 ] 37.4 58.5 Ours RN50 [9] FR-CNN [26] 38.9 ±0.3 59.5 ±0.2 
+
+Detic [41] RN50 [9] FR-CNN [26] Captions [3] 27.8 47.1 DV-Det [12] RN50 [9] FR-CNN [26] Captions [3] 35.8 57.0 OC-OVD [2] RN50 [9] FR-CNN [26] Captions [3] MViT [22] 36.6 54.0 RALF [13] RN50 [9] FR-CNN [26] Captions [3] MViT [22] 41.3 54.3 CLIFF [17] RN50 [9] FR-CNN [26] Captions [3] MViT [22] 41.3 54.1 BARON [34] RN50 [9] FR-CNN [26] Captions [3] MViT [22] 42.7 54.9 CLIPSelf † [35] ViT-L/14 [29] F-ViT [35] 41.3 65.5 Ours ViT-L/14 [29] F-ViT [35] 44.0 ±0.2 65.8 ±0.1 
+
+Table S3. Comprehensive comparison with state-of-the-art methods on the OV-LVIS dataset [ 19 ]. We report the mean and standard deviation across 3 independent runs. † indicates results from our re-implementation. Method Backbone Detector Architecture Additional Supervision Additional Pretrained Models AP Nm AP All m
+
+OV-DETR [36] RN50 [9] DETR [42] 17.4 26.6 F-VLM [14] RN50 [9] Mask R-CNN [10] 18.6 24.2 BARON [34] RN50 [9] Mask R-CNN [10] 19.2 26.5 OADP 1 [32] RN50 [9] Mask R-CNN [10] 19.9 -DK-DETR [16] RN50 [9] DETR [42] 20.5 30.0 Ours RN50 [9] Mask R-CNN [10] 21.7 ±0.4 26.0 ±0.2 
+
+VL-Det [18] RN50 [9] CenterNet2 [40] CC3M [28] 21.7 30.1 DV-Det [12] RN50 [9] CenterNet2 [40] CC3M [28] 23.1 31.2 CLIFF [17] RN50 [9] CenterNet2 [40] IN-L [41] MViT [22] 24.5 28.2 Detic [41] RN50 [9] CenterNet2 [40] IN-L [41] 24.6 32.4 OC-OVD [2] RN50 [9] CenterNet2 [40] IN-L [41] MViT [22] 25.2 32.9 CLIPSelf † [35] ViT-B/16 [29] F-ViT [35] 25.1 24.5 Ours ViT-B/16 [29] F-ViT [35] 25.5 ±0.2 24.7 ±0.1              
+
+> 1The results for OADP [ 32 ], reported in the original publication, were obtained using LSJ data augmentation [ 5], which is inconsistent with the experimental setting described in the paper. We thus report the results without the LSJ technique, obtained from the official repository. (a) HCC ✗, LoCLIP ✗(b) HCC ✓, LoCLIP ✗(c) HCC ✗, LoCLIP ✓(d) HCC ✓, LoCLIP ✓
+
+Figure S5. Visualizations of pseudo labels on OV-COCO [ 19 ] with and without the HCC and LoCLIP components. Green and orange boxes represent base and novel object classes, respectively. The usage of each component is marked by ✓ and ✗ . The bottom row shows a failure case. Best viewed in color. References 
+
+[1] Sandhini Agarwal, Lama Ahmad, Jason Ai, Sam Altman, Andy Applebaum, Edwin Arbus, Rahul K Arora, Yu Bai, Bowen Baker, Haiming Bao, et al. gpt-oss-120b & gpt-oss-20b model card. arXiv preprint arXiv:2508.10925 , 2025. 1, 3, 4, 6 [2] Hanoona Bangalath, Muhammad Maaz, Muhammad Uzair Khattak, Salman H Khan, and Fahad Shahbaz Khan. Bridging the gap between object and image-level representations for open-vocabulary detection. In NeurIPS , 2022. 5, 7 [3] Xinlei Chen, Hao Fang, Tsung-Yi Lin, Ramakrishna Vedan-tam, Saurabh Gupta, Piotr Dollár, and C Lawrence Zitnick. Microsoft COCO captions: Data collection and evaluation server. arXiv preprint arXiv:1504.00325 , 2015. 5, 7 [4] Mingfei Gao, Chen Xing, Juan Carlos Niebles, Junnan Li, Ran Xu, Wenhao Liu, and Caiming Xiong. Open vocabulary object detection with pseudo bounding-box labels. In ECCV ,2022. 5 [5] Golnaz Ghiasi, Yin Cui, Aravind Srinivas, Rui Qian, Tsung-Yi Lin, Ekin D Cubuk, Quoc V Le, and Barret Zoph. Simple copy-paste is a strong data augmentation method for instance segmentation. In CVPR , 2021. 7 [6] Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Ab-hinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, et al. The llama 3 herd of models. arXiv preprint arXiv:2407.21783 ,2024. 4 [7] Xiuye Gu, Tsung-Yi Lin, Weicheng Kuo, and Yin Cui. Open-vocabulary object detection via vision and language knowl-edge distillation. In ICLR , 2022. 7 [8] Agrim Gupta, Piotr Dollar, and Ross Girshick. LVIS: A dataset for large vocabulary instance segmentation. In CVPR ,2019. 2, 4, 5 [9] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR , 2016. 7[10] Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Gir-shick. Mask R-CNN. In ICCV , 2017. 7 [11] Jiaxing Huang, Jingyi Zhang, Kai Jiang, and Shijian Lu. Open-vocabulary object detection via language hierarchy. 
+
+NeurIPS , 2024. 5 [12] Sheng Jin, Xueying Jiang, Jiaxing Huang, Lewei Lu, and Shijian Lu. LLMs meet VLMs: Boost open vocabulary object detection with fine-grained descriptors. In ICLR , 2024. 7 [13] Jooyeon Kim, Eulrang Cho, Sehyung Kim, and Hyunwoo J Kim. Retrieval-augmented open-vocabulary object detection. In CVPR , 2024. 7 [14] Weicheng Kuo, Yin Cui, Xiuye Gu, AJ Piergiovanni, and Anelia Angelova. F-VLM: Open-vocabulary object detection upon frozen vision and language models. In ICLR , 2023. 7 [15] Junnan Li, Ramprasaath Selvaraju, Akhilesh Gotmare, Shafiq Joty, Caiming Xiong, and Steven Chu Hong Hoi. Align before fuse: Vision and language representation learning with momentum distillation. In NeurIPS , 2021. 3 [16] Liangqi Li, Jiaxu Miao, Dahu Shi, Wenming Tan, Ye Ren, Yi Yang, and Shiliang Pu. Distilling detr with visual-linguistic knowledge for open-vocabulary object detection. In ICCV ,2023. 4, 7 [17] Wuyang Li, Xinyu Liu, Jiayi Ma, and Yixuan Yuan. CLIFF: Continual latent diffusion for open-vocabulary object detec-tion. In ECCV , 2024. 5, 7 [18] Chuang Lin, Peize Sun, Yi Jiang, Ping Luo, Lizhen Qu, Gho-lamreza Haffari, Zehuan Yuan, and Jianfei Cai. Learning object-language alignments for open-vocabulary object detec-tion. In ICLR , 2023. 5, 7 [19] Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. Microsoft COCO: Common objects in context. In 
+
+ECCV , 2014. 1, 2, 3, 4, 6, 7, 8 [20] Mingxuan Liu, Tyler L Hayes, Elisa Ricci, Gabriela Csurka, and Riccardo Volpi. SHiNe: Semantic hierarchy nexus for open-vocabulary object detection. In CVPR , 2024. 2, 4 [21] Chuofan Ma, Yi Jiang, Xin Wen, Zehuan Yuan, and Xiaojuan Qi. CoDet: Co-occurrence guided region-word alignment for open-vocabulary object detection. In NeurIPS , 2023. 5 [22] Muhammad Maaz, Hanoona Rasheed, Salman Khan, Fa-had Shahbaz Khan, Rao Muhammad Anwer, and Ming-Hsuan Yang. Class-agnostic object detection with multi-modal trans-former. In ECCV , 2022. 4, 7 [23] George A Miller. WordNet: a lexical database for english. 
+
+ACM , 1995. 2 [24] Zachary Novack, Julian McAuley, Zachary Chase Lipton, and Saurabh Garg. CHiLS: Zero-shot image classification with hierarchical label sets. In ICML , 2023. 2, 4 [25] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In ICML , 2021. 3 [26] Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster R-CNN: Towards real-time object detection with region proposal networks. TPAMI , 2016. 1, 2, 4, 5, 7 [27] Tal Ridnik, Emanuel Ben-Baruch, Asaf Noy, and Lihi Zelnik-Manor. ImageNet-21K pretraining for the masses. In NeurIPS ,2021. 5 [28] Piyush Sharma, Nan Ding, Sebastian Goodman, and Radu Soricut. Conceptual captions: A cleaned, hypernymed, image alt-text dataset for automatic image captioning. In ACL , 2018. 5, 7 [29] Quan Sun, Yuxin Fang, Ledell Wu, Xinlong Wang, and Yue Cao. EVA-CLIP: Improved training techniques for CLIP at scale. arXiv preprint arXiv:2303.15389 , 2023. 7 [30] Gemma Team, Aishwarya Kamath, Johan Ferret, Shreya Pathak, Nino Vieillard, Ramona Merhej, Sarah Perrin, Ta-tiana Matejovicova, Alexandre Ramé, Morgane Rivière, et al. Gemma 3 technical report. arXiv preprint arXiv:2503.19786 ,2025. 4 [31] Kuo Wang, Lechao Cheng, Weikai Chen, Pingping Zhang, Liang Lin, Fan Zhou, and Guanbin Li. Marvelovd: Marrying object recognition and vision-language models for robust open-vocabulary object detection. In ECCV , 2024. 2, 3, 4, 5, 7[32] Luting Wang, Yi Liu, Penghui Du, Zihan Ding, Yue Liao, Qiaosong Qi, Biaolong Chen, and Si Liu. Object-aware dis-tillation pyramid for open-vocabulary object detection. In 
+
+CVPR , 2023. 2, 4, 5, 7 [33] Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc Le, Ed Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. Self-consistency improves chain of thought reasoning in lan-guage models. ICLR , 2023. 3 [34] Size Wu, Wenwei Zhang, Sheng Jin, Wentao Liu, and Chen Change Loy. Aligning bag of regions for open-vocabulary object detection. In CVPR , 2023. 7 [35] Size Wu, Wenwei Zhang, Lumin Xu, Sheng Jin, Xiangtai Li, Wentao Liu, and Chen Change Loy. ClipSelf: Vision trans-former distills itself for open-vocabulary dense prediction. In 
+
+ICLR , 2024. 7 [36] Yuhang Zang, Wei Li, Kaiyang Zhou, Chen Huang, and Chen Change Loy. Open-vocabulary DETR with conditional matching. In ECCV , 2022. 4, 7 [37] Shiyu Zhao, Zhixing Zhang, Samuel Schulter, Long Zhao, BG Vijay Kumar, Anastasis Stathopoulos, Manmohan Chan-draker, and Dimitris N Metaxas. Exploiting unlabeled data with vision and language models for object detection. In 
+
+ECCV , 2022. 2, 4, 5, 7 [38] Shiyu Zhao, Samuel Schulter, Long Zhao, Zhixing Zhang, Yu-min Suh, Manmohan Chandraker, Dimitris N Metaxas, et al. Taming self-training for open-vocabulary object detection. In 
+
+CVPR , 2024. 2, 5, 7 [39] Yiwu Zhong, Jianwei Yang, Pengchuan Zhang, Chunyuan Li, Noel Codella, Liunian Harold Li, Luowei Zhou, Xiyang Dai, Lu Yuan, Yin Li, et al. RegionCLIP: Region-based language-image pretraining. In CVPR , 2022. 7 [40] Xingyi Zhou, Vladlen Koltun, and Philipp Krähenbühl. Proba-bilistic two-stage detection. arXiv preprint arXiv:2103.07461 ,2021. 7 [41] Xingyi Zhou, Rohit Girdhar, Armand Joulin, Philipp Krähen-bühl, and Ishan Misra. Detecting twenty-thousand classes using image-level supervision. In ECCV , 2022. 5, 7 [42] Xizhou Zhu, Weijie Su, Lewei Lu, Bin Li, Xiaogang Wang, and Jifeng Dai. Deformable DETR: Deformable transformers for end-to-end object detection. In ICLR , 2021. 4, 7

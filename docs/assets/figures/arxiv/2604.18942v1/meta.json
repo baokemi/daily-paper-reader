@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.18942v1/fig-001.webp",
+      "caption": "Table 2: SpaceVLM reveals typological patterns (∆ = SpaceVLM − Baseline). Green: gain >5pp; Red: decrease >5pp. Languages with adverbial negation benefit consistently; languages with complex morphological negation show variable effects, revealing that negation structure affects behavior.",
+      "page": 3,
+      "index": 1,
+      "width": 710,
+      "height": 214
+    }
+  ]
+}

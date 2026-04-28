@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17654v1/fig-001.webp",
+      "caption": "Figure 2: Training dynamics on POLARIS-53k. Left: Average number of unique reasoning-strategy clusters among the correct generations sampled for each prompt during training. Clusters are assigned by Qwen-3-4b-Instruct, which groups generations according to their high-level reasoning strategy. Higher values indicate a greater diversity of successful reasoning approaches. Right: Fraction of training prompts for which the model generates at least one correct rollout among its sampled responses during training.",
+      "page": 11,
+      "index": 1,
+      "width": 870,
+      "height": 330
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17654v1/fig-002.webp",
+      "caption": "Figure 1: Pass@k evaluations on test sets. The x-axis is the number of attempts k used in the evaluation while the y-axis is the coverage of the test set. The base model used here is Qwen3-4B-Base and the LM-judge used by Poly-EPO and GRPO+DIV for clustering responses is Qwen-3-4B-Instruct.",
+      "page": 10,
+      "index": 2,
+      "width": 976,
+      "height": 727
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17654v1/fig-003.webp",
+      "caption": "Figure 5: Training dynamics on synthetic domains. The two left plots correspond to multi-digit multiplication, and the two right plots correspond to polynomial solving. We measure strategy diversity by clustering generations and reporting the number of distinct clusters among correct and incorrect responses for each prompt, averaged across the batch. Relative to GRPO, Poly-EPO maintains substantially greater diversity throughout training and discovers many more successful strategies.",
+      "page": 14,
+      "index": 3,
+      "width": 956,
+      "height": 262
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17654v1/fig-004.webp",
+      "caption": "Table 1: Training hyperparameters.",
+      "page": 23,
+      "index": 4,
+      "width": 444,
+      "height": 450
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17654v1/fig-005.webp",
+      "caption": "Figure 4: Majority@k evaluations on Test Sets. The x-axis denotes the number of sampled generations k used at test time. Top row: pass rate after selecting the answer returned by majority voting over the k samples. Bottom row: majority vote share, i.e., the fraction of the k votes assigned to the winning answer. Higher values indicate stronger agreement among sampled generations, while lower values indicate greater response diversity. All methods are initialized from Qwen3-4B-Base. The LM-judge used by Poly-EPO and GRPO+DIV for clustering responses is Qwen-3-4B-Instruct.",
+      "page": 13,
+      "index": 5,
+      "width": 976,
+      "height": 443
+    }
+  ]
+}

@@ -1,0 +1,390 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-001.webp",
+      "caption": "Figure 6. (a) Example of an image-text pair containing the directional cue (“in the middle”). (b) Examples of base prompts (first row) and standardized prompts (second row) from BLIP-2 and ChatGPT. Format identifiers are highlighted in red font.",
+      "page": 6,
+      "index": 1,
+      "width": 488,
+      "height": 370
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-002.webp",
+      "caption": "Figure 15. CLIP scores of original 360-degree panoramic images using a frozen CLIP model and its three fine-tuned versions with different fine-tuning methods. (I) and (I & T) denote fine-tuning on image encoder and both encoders, respectively.",
+      "page": 25,
+      "index": 2,
+      "width": 481,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-003.webp",
+      "caption": "Figure 14. CLIP scores of original 360-degree panoramic images using a frozen CLIP model and its three fine-tuned versions with different fine-tuning methods. (I) and (I & T) denote fine-tuning on image encoder and both encoders, respectively.",
+      "page": 25,
+      "index": 3,
+      "width": 997,
+      "height": 440
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-004.webp",
+      "caption": "Table 30. Comparison of different fine-tuning methods under the same training setting, where GPU memory is calculated when batch size is set to 16. The best results are highlighted.",
+      "page": 25,
+      "index": 4,
+      "width": 758,
+      "height": 244
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-005.webp",
+      "caption": "Figure 16. Examples of perspective image-text pairs in per syn, and the horizontally flipped and circular-shifted versions of corresponding images. δj and W denote the shift distance and the image width, respectively.",
+      "page": 26,
+      "index": 5,
+      "width": 1013,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-006.webp",
+      "caption": "Figure 17. Boxplots of absolute score differences (|si − sTi |) under three diverse transformations for (a) SigLIP and (b) CLIP models on the per syn dataset.",
+      "page": 26,
+      "index": 6,
+      "width": 1003,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-007.webp",
+      "caption": "Table 11. [OpenCLIP, LAION-400M], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results under horizontal circular shift of various δj pixels for different CLIP models on the 360 syn dataset, where the null hypothesis (H0) is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 15,
+      "index": 7,
+      "width": 814,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-008.webp",
+      "caption": "Table 12. [Fine-Tuned, OpenCLIP, LAION-400M]. The rest caption is as for Table 11.",
+      "page": 15,
+      "index": 8,
+      "width": 798,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-009.webp",
+      "caption": "Table 23. [OpenAI], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results under horizontal circular shift of various δj pixels for different CLIP models on the 360 syn dataset, where the null hypothesis (H0) is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 21,
+      "index": 9,
+      "width": 796,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-010.webp",
+      "caption": "Table 22. [Fine-Tuned, OpenAI]. The rest caption is as for Table 21.",
+      "page": 21,
+      "index": 10,
+      "width": 798,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-011.webp",
+      "caption": "Table 24. [Fine-Tuned, OpenAI]. The rest caption is as for Table 23.",
+      "page": 21,
+      "index": 11,
+      "width": 798,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-012.webp",
+      "caption": "Figure 1. Example of two types of image-text pairs. Textually, the explicit format identifier is highlighted (left in each pair). Visually, the corresponding horizontally circular-shifted versions are shown (right in each pair).",
+      "page": 2,
+      "index": 12,
+      "width": 1009,
+      "height": 205
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-013.webp",
+      "caption": "Figure 7. Boxplots of absolute score differences (|si − sTi |) under two diverse transformations for three various CLIP models on the 360 real dataset.",
+      "page": 7,
+      "index": 13,
+      "width": 1003,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-014.webp",
+      "caption": "Figure 19. [ViT-B/16, OpenCLIP, LAION-400M], CLIP scores of an original 360-degree panoramic image and its corresponding horizontally circular-shifted versions using frozen and fine-tuned CLIP models, respectively. δj and W denote the shift distance and the image width, respectively.",
+      "page": 29,
+      "index": 14,
+      "width": 1011,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-015.webp",
+      "caption": "Figure 18. [ViT-B/32, OpenCLIP, LAION-400M], CLIP scores of an original 360-degree panoramic image and its corresponding horizontally circular-shifted versions using frozen and fine-tuned CLIP models, respectively. δj and W denote the shift distance and the image width, respectively.",
+      "page": 29,
+      "index": 15,
+      "width": 1011,
+      "height": 364
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-016.webp",
+      "caption": "Figure 20. [ViT-L/14, OpenCLIP, LAION-400M], CLIP scores of an original 360-degree panoramic image and its corresponding horizontally circular-shifted versions using frozen and fine-tuned CLIP models, respectively. δj and W denote the shift distance and the image width, respectively.",
+      "page": 29,
+      "index": 16,
+      "width": 1011,
+      "height": 365
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-017.webp",
+      "caption": "Table 27. [Fine-Tuned, OpenCLIP, LAION-400M], the Wilcoxon Signed-Rank test results under horizontal circular shift of various δj pixels for different CLIP models on the 360 syn dataset, where the null hypothesis is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 22,
+      "index": 17,
+      "width": 671,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-018.webp",
+      "caption": "Table 26. [Fine-Tuned, OpenCLIP, LAION-400M], the Wilcoxon Signed-Rank test results under horizontal circular shift of various δj pixels for different CLIP models on the 360 real dataset, where the null hypothesis is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 22,
+      "index": 18,
+      "width": 671,
+      "height": 194
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-019.webp",
+      "caption": "Table 25. [Fine-Tuned, OpenCLIP, LAION-400M], the Wilcoxon Signed-Rank test results under horizontal circular shift of various δj pixels for different CLIP models on the 360 nature dataset, where the null hypothesis is that |s − sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 22,
+      "index": 19,
+      "width": 798,
+      "height": 193
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-020.webp",
+      "caption": "Table 7. [OpenCLIP, LAION-400M] [V ∗ =“a 360 degree view of ”]. The rest caption is as for Table 6.",
+      "page": 14,
+      "index": 20,
+      "width": 808,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-021.webp",
+      "caption": "Table 8. [OpenCLIP, LAION-400M] [V ∗ =“360 photo, ”]. The rest caption is as for Table 6.",
+      "page": 14,
+      "index": 21,
+      "width": 808,
+      "height": 214
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-022.webp",
+      "caption": "Table 9. [OpenCLIP, LAION-400M] [V ∗ =“360 photo, ”]. The rest caption is as for Table 6.",
+      "page": 14,
+      "index": 22,
+      "width": 808,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-023.webp",
+      "caption": "Table 6. [OpenCLIP, LAION-400M] [V ∗ =“a 360 degree view of ”], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results for different CLIP models on the two paired image-text datasets, where the null hypothesis is the original score s is not greater than the generic score su, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 14,
+      "index": 23,
+      "width": 808,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-024.webp",
+      "caption": "Figure 2. Overview of our framework to evaluate CLIP models’ understanding of 360-degree textual semantics. The format cue V ∗ is a keyword explicitly identifying the 360-degree panoramic image format (e.g., “360 panorama”, “360 photo”), while U∗ is a generic cue (e.g., “photo”, “image”) that lacks specific 360-degree panoramic format information.",
+      "page": 3,
+      "index": 24,
+      "width": 487,
+      "height": 288
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-025.webp",
+      "caption": "Table 13. [OpenCLIP, LAION-2B] [V ∗ =“<360panorama>, ”], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results for different CLIP models on the two paired image-text datasets (360 real and 360 syn), where the null hypothesis is the original score s is not greater than the generic score su, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 18,
+      "index": 25,
+      "width": 808,
+      "height": 216
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-026.webp",
+      "caption": "Table 15. [OpenCLIP, LAION-2B], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results under horizontal circular shift of various δj pixels for different CLIP models on the 360 real dataset, where the null hypothesis (H0) is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 18,
+      "index": 26,
+      "width": 796,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-027.webp",
+      "caption": "Table 14. [OpenCLIP, LAION-2B] [V ∗ =“<360panorama>, ”]. The rest caption is as for Table 13.",
+      "page": 18,
+      "index": 27,
+      "width": 808,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-028.webp",
+      "caption": "Table 32. [OpenCLIP, LAION-400M] [V ∗ =“<360panorama>, ”], the average values (s̄ and s̄u) of original score s and generic score su on the two paired image-text datasets (360 real and 360 syn).",
+      "page": 28,
+      "index": 28,
+      "width": 717,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-029.webp",
+      "caption": "Table 33. [OpenCLIP, LAION-400M] [V ∗ =“<360panorama>, ”], the average values (s̄ and s̄u) of original score s and generic score su on the two paired image-text datasets (360 real and 360 syn).",
+      "page": 28,
+      "index": 29,
+      "width": 835,
+      "height": 190
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-030.webp",
+      "caption": "Table 4. [OpenCLIP, LAION-400M] [V ∗ =“<360panorama>, ”], the Shapiro-Wilk test (Shapiro & Wilk, 1965) results for different CLIP models on the two paired image-text datasets, where the null hypothesis is the distribution of the score differences (s − su) is normal, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 13,
+      "index": 30,
+      "width": 777,
+      "height": 216
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-031.webp",
+      "caption": "Table 5. [OpenCLIP, LAION-400M] [V ∗ =“<360panorama>, ”], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results for different CLIP models on the two paired image-text datasets (360 real and 360 syn), where the null hypothesis is the original score s is not greater than the generic score su, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 13,
+      "index": 31,
+      "width": 808,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-032.webp",
+      "caption": "Figure 8. CLIP scores of original 360-degree panoramic images using a frozen CLIP model and its three fine-tuned (FT) versions.",
+      "page": 8,
+      "index": 32,
+      "width": 474,
+      "height": 389
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-033.webp",
+      "caption": "Figure 3. Overview of our framework to assess CLIP models’ understanding of 360-degree visual semantics. Image Iδ is obtained by applying a horizontal circular shift of δ pixels to I of size H ×W .",
+      "page": 4,
+      "index": 33,
+      "width": 489,
+      "height": 272
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-034.webp",
+      "caption": "Table 16. [Fine-Tuned, OpenCLIP, LAION-2B]. The rest caption is as for Table 15.",
+      "page": 19,
+      "index": 34,
+      "width": 798,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-035.webp",
+      "caption": "Table 18. [Fine-Tuned, OpenCLIP, LAION-2B]. The rest caption is as for Table 17.",
+      "page": 19,
+      "index": 35,
+      "width": 798,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-036.webp",
+      "caption": "Table 17. [OpenCLIP, LAION-2B], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results under horizontal circular shift of various δj pixels for different CLIP models on the 360 syn dataset, where the null hypothesis (H0) is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 19,
+      "index": 36,
+      "width": 796,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-037.webp",
+      "caption": "Figure 12. Fine-tuning loss curves using different λ values of ViT-L/14 (OpenCLIP, LAION-400M).",
+      "page": 17,
+      "index": 37,
+      "width": 1017,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-038.webp",
+      "caption": "Figure 13. CLIP scores of original 360-degree panoramic images using a frozen CLIP model and its three fine-tuned (FT) versions.",
+      "page": 17,
+      "index": 38,
+      "width": 999,
+      "height": 411
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-039.webp",
+      "caption": "Figure 9. Diagram to show the generation process of paired image-text datasets. The format cue V ∗ is “<360panorama>, ”.",
+      "page": 12,
+      "index": 39,
+      "width": 905,
+      "height": 411
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-040.webp",
+      "caption": "Table 28. [Both Encoders, LoRA Fine-Tuning, OpenCLIP, LAION-400M], the Wilcoxon Signed-Rank test results under horizontal circular shift of various δj pixels for different CLIP models on the 360 real dataset, where the null hypothesis is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 24,
+      "index": 40,
+      "width": 798,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-041.webp",
+      "caption": "Table 29. [Image Encoder, Full Fine-Tuning, OpenCLIP, LAION-400M], the Wilcoxon Signed-Rank test results under horizontal circular shift of various δj pixels for different CLIP models on the 360 real dataset, where the null hypothesis is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 24,
+      "index": 41,
+      "width": 798,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-042.webp",
+      "caption": "Table 21. [OpenAI], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results under horizontal circular shift of various δj pixels for different CLIP models on the 360 real dataset, where the null hypothesis (H0) is that |s− sδj | is greater than or equal to the stability bound β, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 20,
+      "index": 42,
+      "width": 796,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-043.webp",
+      "caption": "Table 19. [OpenAI] [V ∗ =“<360panorama>, ”], the Wilcoxon Signed-Rank test (Wilcoxon, 1945) results for different CLIP models on the two paired image-text datasets (360 real and 360 syn), where the null hypothesis is the original score s is not greater than the generic score su, and the significance level (α) is 0.01. The p-values less than α are in bold.",
+      "page": 20,
+      "index": 43,
+      "width": 808,
+      "height": 216
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-044.webp",
+      "caption": "Table 20. [OpenAI] [V ∗ =“<360panorama>, ”]. The rest caption is as for Table 19.",
+      "page": 20,
+      "index": 44,
+      "width": 808,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-045.webp",
+      "caption": "Figure 4. (a) Example of a 360-degree panoramic image-text pair and (c) its CLIP score differences (s− sδ) using ViT-B/32 across diverse shift distances, where stability bound β = 1.7919.",
+      "page": 5,
+      "index": 45,
+      "width": 472,
+      "height": 415
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-046.webp",
+      "caption": "Figure 5. (a) Overview of the fine-tuning framework using LoRA. (b) CLIP score differences (s − sδ) for the same pair in Fig. 4a using fine-tuned ViT-B/32, where stability bound β = 1.7919.",
+      "page": 5,
+      "index": 46,
+      "width": 475,
+      "height": 550
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-047.webp",
+      "caption": "Figure 11. Fine-tuning loss curves using different λ values of ViT-B/16 (OpenCLIP, LAION-400M).",
+      "page": 16,
+      "index": 47,
+      "width": 1017,
+      "height": 330
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24642v1/fig-048.webp",
+      "caption": "Figure 10. Fine-tuning loss curves using different λ values of ViT-B/32 (OpenCLIP, LAION-400M).",
+      "page": 16,
+      "index": 48,
+      "width": 1017,
+      "height": 326
+    }
+  ]
+}

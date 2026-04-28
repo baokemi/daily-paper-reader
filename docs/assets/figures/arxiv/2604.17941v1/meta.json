@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-001.webp",
+      "caption": "Table 1: Relative performance drop (%) after masking the top-1% neurons selected by each ranking method. Higher values indicate greater causal importance (negative values indicate improvement).",
+      "page": 6,
+      "index": 1,
+      "width": 833,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-002.webp",
+      "caption": "Table 15: Prompt and input formats used for evaluation. LLaVA-1.5 is shown in its common textual chat style, while Qwen2.5-VL uses structured multimodal chat messages serialized by the processor chat template. For retrieval, candidates are ranked by the model probability of the Yes response (pairwise matching).",
+      "page": 25,
+      "index": 2,
+      "width": 950,
+      "height": 1377
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-003.webp",
+      "caption": "Figure 5: Attention head importance heatmaps for LLaVA-1.5-7B. Rows denote layer indices and columns denote head indices; colors indicate normalized head importance, with brighter colors meaning higher importance.",
+      "page": 15,
+      "index": 3,
+      "width": 950,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-004.webp",
+      "caption": "Figure 6: Attention head importance heatmaps for Qwen2.5-VL-7B. Rows denote layer indices and columns denote head indices; colors indicate normalized head importance, with brighter colors meaning higher importance.",
+      "page": 15,
+      "index": 4,
+      "width": 950,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-005.webp",
+      "caption": "Table 12: Caption text-factor control. We compare two candidate shared bridges (Triple: VQA+OCR+Cap; Pair: VQA+Cap) under the original setting and the textmasked setting. After masking explicit visual text cues, the dominant bridge for Caption shifts from the Triple group to the Pair group across both backbones.",
+      "page": 21,
+      "index": 5,
+      "width": 447,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-006.webp",
+      "caption": "Figure 9: Logit Lens case studies in LLAVA-1.5. Rows show Top-5 tokens and columns are sampled every 4 layers; color indicates ∆logit (baseline−masked). (a) OCR compares the OCR-specific group and the VQA&OCR shared group. (b) Caption compares the Caption-specific group and the VQA&OCR&Caption shared group. (c) Retrieval compares the Retrieval-specific group and the VQA&Retrieval shared group.",
+      "page": 22,
+      "index": 6,
+      "width": 912,
+      "height": 1012
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-007.webp",
+      "caption": "Table 6: Task-specific examples in our unified benchmark. For OCR, the image is overlaid with a blue bounding box (from COCO-Text annotations) to indicate the target text region. Retrieval is evaluated as image-to-text (I→T) pairwise verification and re-ranking.",
+      "page": 14,
+      "index": 7,
+      "width": 921,
+      "height": 718
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-008.webp",
+      "caption": "Table 10: Cross-task neuron ablation results on LLaVA-1.5. Values report relative performance change (%); positive indicates performance drop, while negative indicates performance gain. For each target task, we bold the single most damaging shared-group ablation (Pair/Triple/General), excluding task-specific (Only) and random controls. Random controls are computed by masking the same number of neurons as the most critical shared group for each target task (mean over 10 trials).",
+      "page": 18,
+      "index": 8,
+      "width": 950,
+      "height": 607
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-009.webp",
+      "caption": "Figure 4: VQA Logit Lens case study in LLaVA-1.5. Rows show Top-5 tokens and columns are sampled every 4 layers; color indicates ∆logit (baseline−masked) for the task-specific group and the VQA&Retrieval shared group.",
+      "page": 8,
+      "index": 9,
+      "width": 950,
+      "height": 306
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-010.webp",
+      "caption": "Table 3: Effectiveness of neuron steering. Fixed-Amp and Grid-Search are train-free amplifications; RandNeuron learns scaling on a random neuron set; Ours w/o KL removes KL regularization; Ours learns sparse scaling with KL. Metrics: Acc. (VQA), ANLS (OCR), BLEU-4 (Caption), NDCG@5 (Retrieval).",
+      "page": 8,
+      "index": 10,
+      "width": 461,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-011.webp",
+      "caption": "Figure 1: Overview of HONES. Left: Discovery task neurons via head-guided, readout-aligned write-in scoring. Right: Steering employs sparse activation scaling on a frozen backbone to enhance task performance.",
+      "page": 4,
+      "index": 11,
+      "width": 875,
+      "height": 269
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-012.webp",
+      "caption": "Table 11: Cross-task neuron ablation results on Qwen2.5-VL. Values report relative performance change (%); positive indicates performance drop, while negative indicates performance gain. For each target task, we bold the single most damaging shared-group ablation (Pair/Triple/General), excluding task-specific (Only) and random controls. Random controls are computed by masking the same number of neurons as the most critical shared group for each target task (mean over 10 trials).",
+      "page": 19,
+      "index": 12,
+      "width": 950,
+      "height": 607
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-013.webp",
+      "caption": "Table 7: Absolute performance after masking top-1% neurons. Avg is the arithmetic mean of the four task scores.",
+      "page": 17,
+      "index": 13,
+      "width": 939,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-014.webp",
+      "caption": "Table 14: Performance difference ∆ (pp) between our bridge-neuron rescaling method and the baselines (Base, Fixed-Amp, and RandNeuron). Statistical significance is assessed via paired bootstrap resampling (B=1000, K=500). Asterisks indicate significance levels; *** denotes p < 0.001 (extremely significant).",
+      "page": 24,
+      "index": 14,
+      "width": 461,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-015.webp",
+      "caption": "Table 4: OOD steering results (Accuracy on GQA, ANLS on TextVQA, BLEU-4 on FlickrCap, and NDCG@5 on FlickrRet). Ours (tuned) tunes scalars on the identified task-critical neurons; RandNeuron tunes scalars on randomly selected neurons with a matched budget; Ours (zero-shot) directly transfers in-domain scales.",
+      "page": 9,
+      "index": 15,
+      "width": 837,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-016.webp",
+      "caption": "Figure 8: Neuron overlap composition across tasks. Counts of task-critical neurons are partitioned into 15 mutually exclusive overlap groups induced by four tasks (VQA/OCR/Caption/Retrieval), including task-specific, pair, triple, and general components.",
+      "page": 20,
+      "index": 16,
+      "width": 912,
+      "height": 817
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17941v1/fig-017.webp",
+      "caption": "Figure 7: Attention head budget sweep. Relative performance drop (%) after masking the top-K localized heads across four tasks. The curves exhibit clear saturation points, motivating K=30 for LLaVA-1.5-7B and K=25 for Qwen2.5-VL-7B to capture the sparse routing backbone with diminishing returns beyond the elbow.",
+      "page": 16,
+      "index": 17,
+      "width": 950,
+      "height": 231
+    }
+  ]
+}

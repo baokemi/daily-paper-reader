@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-001.webp",
+      "caption": "Table 4: System-level efficiency at fixed G=32.",
+      "page": 11,
+      "index": 1,
+      "width": 769,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-002.webp",
+      "caption": "Figure 7: Scaling with search width at fixed model size.",
+      "page": 11,
+      "index": 2,
+      "width": 943,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-003.webp",
+      "caption": "Figure 5: Regime-dependent roles of repair and boundary-focused update.",
+      "page": 10,
+      "index": 3,
+      "width": 462,
+      "height": 301
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-004.webp",
+      "caption": "Figure 6: Scaling with model size. Thin lines denote individual tasks and thick line denotes the average.",
+      "page": 10,
+      "index": 4,
+      "width": 937,
+      "height": 354
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-005.webp",
+      "caption": "Table 1: Main results on RecIF-Bench.",
+      "page": 8,
+      "index": 5,
+      "width": 637,
+      "height": 460
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-006.webp",
+      "caption": "Figure 3: Early-stage learning efficiency on three representative tasks.",
+      "page": 8,
+      "index": 6,
+      "width": 935,
+      "height": 218
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-007.webp",
+      "caption": "Figure 2: Comparison between OpenOneRec-RL and ReCast. OpenOneRec-RL updates from grouprelative reward normalization over the sampled rollout group, whereas ReCast first repairs all-zero groups to restore minimal learnability and then applies a boundary-focused update on the strongest positive and the hardest negative. The outer RL framework remains unchanged.",
+      "page": 4,
+      "index": 7,
+      "width": 835,
+      "height": 481
+    },
+    {
+      "url": "assets/figures/arxiv/2604.22169v1/fig-008.webp",
+      "caption": "Figure 4: Boundary-focused updating stabilizes optimization.",
+      "page": 9,
+      "index": 8,
+      "width": 931,
+      "height": 241
+    }
+  ]
+}

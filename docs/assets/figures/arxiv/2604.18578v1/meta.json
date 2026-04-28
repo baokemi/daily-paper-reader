@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.18578v1/fig-001.webp",
+      "caption": "Figure 1: The Bounded Ratio Reinforcement Learning (BRRL) framework introduces the surrogate policy optimization problem under bounded ratio constraints. Its analytical solution closely relates to the PPO objective function, cross-entropy methods (CEM), and suggests a theoretically grounded policy optimization algorithm with minor changes to PPO: Bounded Policy Optimization (BPO). We observe marked improvements of BPO and its variant Group-relative BPO (GBPO) in the performance and stability for humanoid locomotion and LLM fine-tuning (mathematical reasoning).",
+      "page": 2,
+      "index": 1,
+      "width": 818,
+      "height": 223
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18578v1/fig-002.webp",
+      "caption": "Figure 4: BPO versus PPO on MuJoCo and Atari environments. Shaded regions represent the standard deviation across 10 random seeds. In most environments, BPO matches or outperforms PPO.",
+      "page": 10,
+      "index": 2,
+      "width": 822,
+      "height": 377
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18578v1/fig-003.webp",
+      "caption": "Figure 2: Illustration of Bounded Ratio RL (BRRL). (Left) Old policy π0 within the parameterized policy class Π. (Middle Left) Construction of a trust region (light green) defined by bounded ratio constraints from Problem (4) or (9). (Middle Right) Estimation of the analytic optimal policy within the trust region (dark green, can be outside Π) using (soft-)median-advantages Ãπ0 (Theorem 4.1). In general, actions with positive (resp. negative) advantages Ãπ0 > 0 (resp. Ãπ0 < 0) yield optimal ratios greater (resp. smaller) than 1. (Right) The updated policy within Π (yellow) is obtained by minimizing a divergence from the estimated optimal policy.",
+      "page": 3,
+      "index": 3,
+      "width": 744,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18578v1/fig-004.webp",
+      "caption": "Table 3: Hyperparameters of PPO for benchmarking environments, based on RL-Zoo [20]. The GAEλ is set to 0.95 for all environments except 0.98 for Swimmer, 0.99 for Hopper, 0.9 for Humanoid, and 0.8 for Ant. ADP abbreviates adaptive learning rates based on the KL-divergence, according to [24].",
+      "page": 23,
+      "index": 4,
+      "width": 810,
+      "height": 221
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18578v1/fig-005.webp",
+      "caption": "Table 2: Hyperparameters of BPO for benchmarking environments. We take λ = 0.001, α1 = 0 and w1 = w2 = 0.5 across all environments. The GAE-λ is set to 0.95 for all environments except 0.98 for Swimmer. ADP abbreviates adaptive learning rates based on the KL-divergence, according to [24].",
+      "page": 23,
+      "index": 5,
+      "width": 810,
+      "height": 220
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18578v1/fig-006.webp",
+      "caption": "Figure 9: Ablation study of BPO components in G1-rough environment. Shaded regions represent standard deviation across 10 random seeds. From left to right: ablation of mean vs median value functions, loss functions, regularization weight λ and total variation (TV) weight α1. Using the mean value instead of the median value yields similar final performance. The advantage-weighted total variation (ATV) loss provides better performance compared to TV and KL divergence. In general, smaller λ values lead to better performance, although making λ too small (1e−4) slightly degrades performance. In practice, including the TV loss does not improve results.",
+      "page": 12,
+      "index": 6,
+      "width": 822,
+      "height": 186
+    }
+  ]
+}

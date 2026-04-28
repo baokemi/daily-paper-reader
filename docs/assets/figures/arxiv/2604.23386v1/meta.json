@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-001.webp",
+      "caption": "Fig. 13: A comparison of the original DYNAMOS system and our proof-of-concept FL simulation system.",
+      "page": 6,
+      "index": 1,
+      "width": 1076,
+      "height": 543
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-002.webp",
+      "caption": "Fig. 4: Outbound exclusion, where C2 prevents its model from being incorporated into C3's global model.",
+      "page": 2,
+      "index": 2,
+      "width": 529,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-003.webp",
+      "caption": "Fig. 1: Full exclusion: client C1 fully removes itself from FL.",
+      "page": 2,
+      "index": 3,
+      "width": 529,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-004.webp",
+      "caption": "TABLE I: Overview of Disagreement Types",
+      "page": 2,
+      "index": 4,
+      "width": 529,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-005.webp",
+      "caption": "Fig. 2: Partial data exclusion, where C1 withholds a subset of its local data but continues to participate in model aggregation.",
+      "page": 2,
+      "index": 5,
+      "width": 529,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-006.webp",
+      "caption": "Fig. 3: Inbound exclusion, where C1 requires a personalized global model (GM1) that omits C2's contribution.",
+      "page": 2,
+      "index": 6,
+      "width": 529,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-007.webp",
+      "caption": "Fig. 15: Model performance for Scenario 1 (S1) on both datasets. Both tracks demonstrate stable learning, indicating the resolution mechanism does not impede model training.",
+      "page": 7,
+      "index": 7,
+      "width": 529,
+      "height": 736
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-008.webp",
+      "caption": "Fig. 5: Bidirectional exclusion (one excludes one), establishing mutual isolation between C1 and C2.",
+      "page": 3,
+      "index": 8,
+      "width": 529,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-009.webp",
+      "caption": "Fig. 8: Cross-contamination in the naive approach. The influence of the excluded client (C3) leaks back to C1 via the intermediary client C2 in subsequent rounds.",
+      "page": 3,
+      "index": 9,
+      "width": 529,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-010.webp",
+      "caption": "Fig. 6: Multiple exclusion types disagreement scenario with temporal modifiers for duration (clock) and depth (deep icon).",
+      "page": 3,
+      "index": 10,
+      "width": 529,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-011.webp",
+      "caption": "Fig. 7: The naive resolution strategy. C1 inbound excludes C3, receiving a personalized model (GM1). However, intermediary clients like C2 still aggregate all updates.",
+      "page": 3,
+      "index": 11,
+      "width": 529,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-012.webp",
+      "caption": "Fig. 12: Fairness in the robust approach. Through background participation, C1's contribution to C3's track (GM2) is generated under fair and consistent conditions.",
+      "page": 4,
+      "index": 12,
+      "width": 529,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-013.webp",
+      "caption": "Fig. 11: Isolation in the robust approach. Updates are trackspecific, preventing the influence of an excluded client (C3) from propagating across tracks.",
+      "page": 4,
+      "index": 13,
+      "width": 529,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-014.webp",
+      "caption": "Fig. 9: Unfairness in the naive approach. C1 contributes to C3's model, but its updates are based on a personalized model that excluded C3, creating an inequitable aggregation.",
+      "page": 4,
+      "index": 14,
+      "width": 529,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23386v1/fig-015.webp",
+      "caption": "Fig. 10: The robust multi-track approach. Two separate and isolated tracks (GM1 and GM2) are created to serve the different disagreement requirements of the clients.",
+      "page": 4,
+      "index": 15,
+      "width": 529,
+      "height": 229
+    }
+  ]
+}

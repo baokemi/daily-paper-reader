@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17923v1/fig-001.webp",
+      "caption": "Figure 1: Linear-payment auction with aftermarket collaboration",
+      "page": 11,
+      "index": 1,
+      "width": 932,
+      "height": 187
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17923v1/fig-002.webp",
+      "caption": "Figure 2: Optimal value-sharing comparison across different distributions",
+      "page": 24,
+      "index": 2,
+      "width": 736,
+      "height": 613
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17923v1/fig-003.webp",
+      "caption": "Figure 3: Effort combinations under different collaboration structures",
+      "page": 25,
+      "index": 3,
+      "width": 720,
+      "height": 505
+    }
+  ]
+}

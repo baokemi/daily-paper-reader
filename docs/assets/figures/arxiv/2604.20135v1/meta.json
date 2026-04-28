@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-001.webp",
+      "caption": "Figure 1: Comparison of multimodal information in General and E-commerce domains. In General domains, text typically provides a global description of the image, with multiple instances corresponding between them. In contrast, in E-commerce domains, product titles often describe only specific instances within the product image (which is called the main subject). Moreover, for the same product, there may exist various images (e.g., different shooting angles and backgrounds) and titles (e.g., varying descriptions, marketing phrases).",
+      "page": 1,
+      "index": 1,
+      "width": 458,
+      "height": 395
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-002.webp",
+      "caption": "Table 1: Performance on Coarse-Grained and Cross-Modal Retrieval Tasks. The AGCL component of our AFMRL framework provides consistent improvements over strong baselines, demonstrating its broad effectiveness for general retrieval.",
+      "page": 6,
+      "index": 2,
+      "width": 904,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-003.webp",
+      "caption": "Table 2: Fine-Grained Instance Retrieval Results. Our full model, AFMRL, demonstrates state-of-the-art performance, with each component providing a clear incremental benefit.",
+      "page": 6,
+      "index": 3,
+      "width": 723,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-004.webp",
+      "caption": "Table 5: Performance of Coarse-Grained and Cross-Modal Retrieval Tasks on EIPM Dataset.",
+      "page": 11,
+      "index": 4,
+      "width": 904,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-005.webp",
+      "caption": "Figure 5: Showcase of key entities.",
+      "page": 7,
+      "index": 5,
+      "width": 423,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-006.webp",
+      "caption": "Figure 12: Cases of product item and generated attributes w/o RL.",
+      "page": 13,
+      "index": 6,
+      "width": 834,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-007.webp",
+      "caption": "Figure 2: An overview of our proposed framework. The model is trained in two stages. (a) Stage 1: AttributeGuided Contrastive Learning: A representation model is trained using an enhanced contrastive loss with false negative masking and hard negative reweighting. (b) Stage 2: Retrieval-aware Attribute Reinforcement: An attribute generator is fine-tuned with reinforcement learning (GRPO), using the frozen representation model to provide a direct, retrieval-based reward. (c) Inference: The optimized generator extracts attributes to enrich the query input, which is then encoded by the representation model for retrieval.",
+      "page": 4,
+      "index": 7,
+      "width": 950,
+      "height": 375
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-008.webp",
+      "caption": "Figure 3: Demonstration of our proposed AttributeGuided Learning process and attribute’s influence on the retrieval.",
+      "page": 4,
+      "index": 8,
+      "width": 415,
+      "height": 344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-009.webp",
+      "caption": "Figure 11: Training curves under different top-k settings when using Recall as the RL reward function.",
+      "page": 12,
+      "index": 9,
+      "width": 761,
+      "height": 381
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-010.webp",
+      "caption": "Figure 9: Training curves under different top-k settings when using NDCG as the RL reward function.",
+      "page": 12,
+      "index": 10,
+      "width": 761,
+      "height": 383
+    },
+    {
+      "url": "assets/figures/arxiv/2604.20135v1/fig-011.webp",
+      "caption": "Figure 10: Training curves under different top-k settings when using Precision as the RL reward function (training fails to converge when top-k is set to 100).",
+      "page": 12,
+      "index": 11,
+      "width": 761,
+      "height": 381
+    }
+  ]
+}

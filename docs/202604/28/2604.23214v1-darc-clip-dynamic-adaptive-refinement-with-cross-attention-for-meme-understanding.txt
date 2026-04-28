@@ -1,0 +1,257 @@
+Title: DARC-CLIP: Dynamic Adaptive Refinement with Cross-Attention for Meme Understanding
+
+URL Source: https://arxiv.org/pdf/2604.23214v1
+
+Published Time: Tue, 28 Apr 2026 00:29:35 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# DARC-CLIP: DYNAMIC ADAPTIVE REFINEMENT WITH CROSS-ATTENTION FOR MEME UNDERSTANDING 
+
+# Qiyuan Jin 
+
+# The Hong Kong University of Science and Technology 
+
+ABSTRACT 
+
+Memes convey meaning through the interaction of visual and tex-tual signals, often combining humor, irony, and offense in subtle ways. Detecting harmful or sensitive content in memes requires accurate modeling of these multimodal cues. Existing CLIP-based approaches rely on static fusion, which struggles to capture fine-grained dependencies between modalities. We propose DARC-CLIP, a CLIP-based framework for adaptive multimodal fusion with a hierarchical refinement stack. DARC-CLIP introduces Adaptive Cross-Attention Refiners to for bidirectional information alignment and Dynamic Feature Adapters for task-sensitive signal adaptation. We evaluate DARC-CLIP on the PrideMM benchmark, which in-cludes hate, target, stance, and humor classification, and further test generalization on the CrisisHateMM dataset. DARC-CLIP achieves highly competitive classification accuracy across tasks, with signif-icant gains of +4.18 AUROC and +6.84 F1 in hate detection over the strongest baseline. Ablation studies confirm that ACAR and DFA are the main contributors to these gains. These results show that adaptive cross-signal refinement is an effective strategy for multimodal content analysis in socially sensitive classification. 
+
+Index Terms — Meme Classification, Multimodal Learning, Cross-Modal Alignment, Harmful Content Detection, Natural Lan-guage Processing 
+
+1. INTRODUCTION 
+
+The development of social media has made text-embedded images, known as memes, a dominant form of online communication [1]. While memes serve as a powerful tool for sharing opinions, they are also increasingly used to covertly spread hate speech and misin-formation, posing serious threats to a healthy online ecosystem [2]. Meme interpretation is difficult: an image signal that appears harm-less in isolation may become derogatory when combined with spe-cific text. Cultural context further complicates reliable classification, especially in sensitive domains such as LGBTQ+ movement [3, 4]. Effective meme understanding thus requires multimodal reasoning across multiple aspects including hate, stance, humor, and target identification [5]. Early hate speech detection primarily focused on text-only analysis [6, 7, 8], overlooking the interplay between visual and tex-tual cues in memes. Several architectures have been proposed to address these challenges. MOMENTA [9] uses cross-modality attention fusion to further modulate the concatenated features. CLIP [10] introduced a unified semantic space for images and text signals without task-specific pretraining, inspiring multiple extensions. HateCLIPper [11] employs bilinear pooling to cap-ture fine-grained interactions. MemeCLIP [2] improves parameter efficiency with lightweight feature adapters and semantic-aware ini-tialization in multi-aspect classification tasks. Dataset growth has also driven progress. HMC [5], HarMeme [9], DisinfoMeme [12], CrisisHateMM [13], and PrideMM [2] introduce domain-specific annotations, including multi-aspect labels in real-world memes. Despite these advances, most existing approaches rely on static fusion mechanisms or minimally adapted CLIP features, limiting their ability to model dynamic, context-dependent modality inter-actions. These constraints hinder generalization under domain shifts and multi-aspect classification tasks, which motivates the need for our proposed dynamic and adaptive fusion approach. We address this problem with DARC-CLIP, an efficient CLIP-based framework for adaptive multimodal fusion. DARC-CLIP in-troduces two modules: Adaptive Cross Attention Refiners (ACAR) that iteratively align modality-specific features, and Dynamic Fea-ture Adapters (DFA) that recalibrate feature distributions across tasks. This hierarchical design of progressive refinement stack enables deeper cross-modal interactions while preserving the gen-eralization benefits of pre-trained models. Lightweight linear pro-jections, a cosine classifier with semantic-aware initialization, and optional partial CLIP unfreezing further improve adaptability. Our contributions are summarized as follows: (1) A hierarchi-cal multimodal refinement stack combining ACAR and DFA for fine-grained, context-aware multimodal reasoning; (2) Strong per-formance on PrideMM [2] and CrisisHateMM [13], demonstrating cross-domain robustness; (3) Comprehensive ablations showing the complementary benefits of our core components and provide practical insights into the accuracy–efficiency trade-offs. 
+
+2. METHODOLOGY 
+
+In this section, we present DARC-CLIP, a framework for multimodal meme classification. It augments a pre-trained CLIP backbone with a novel hierarchical refinement stack to enable deeper, more flexible cross-modal interactions. DARC-CLIP begins with CLIP [10] for initial visual and tex-tual representations. To better handle domain-specific semantics, selected layers of CLIP are partially unfrozen for controlled fine-tuning. The raw features from these encoders are linearly projected into a shared embedding space [2, 14] and processed by a stack of refinement blocks, named as Multimodal Refinement Stack. Each block progressively integrates cross-signal information through two lightweight modules: an Adaptive Cross-Attention Refiner (ACAR) and a Dynamic Feature Adapter (DFA). Finally, we aggre-gate outputs across blocks and classify the resulting feature with a cosine classifier initialized from CLIP’s text prototypes. The overall pipeline is shown in Fig. 1. 
+
+2.1. Adaptive Cross-Attention Refiner (ACAR) 
+
+The design of ACAR employs bidirectional refinement specifically tailored to capture the subtle semantic contradictions in memes, such 
+
+> arXiv:2604.23214v1 [cs.CL] 25 Apr 2026
+
+Fig. 1 . An overview of our proposed framework, DARC-CLIP. as textual irony that hinges on specific visual context. We first map raw features Fimg , Ftxt ∈ R768 from CLIP’s encoders into a higher-dimensional space RDmap (Dmap = 1024) via linear projections: 
+
+F′ 
+
+> mod
+
+= ReLU (Wmod Fmod + bmod ) (1) These projected signals are fed into L refinement blocks. In each block l, ACAR (l)(Q, KV ) refines the query Q by attending to key-value pairs derived from K. Specifically, a multi-head cross-attention mechanism first captures cross-modal context[15, 16]: 
+
+A(l) = Concat (head (l)1 , . . . , head (l) 
+
+> H
+
+)WO(l)
+
+head (l) 
+
+> h
+
+= softmax QW (h,l ) 
+
+> Q
+
+(KW (h,l ) 
+
+> K
+
+)⊤
+
+√dk
+
+!
+
+VW (h,l )
+
+> V
+
+(2) To improve expressiveness with minimal cost, ACAR includes an adaptive MLP with learnable scaling [17, 18]: 
+
+eA(l) = λ(l) W(l) 
+
+> ↑
+
+GELU (W(l) 
+
+> ↓
+
+A(l)), (3) where λ(l) modulates the contribution of this branch. Specifically, 
+
+λ(l) is initialized to 0.05 to ensure a stable warm-up of the adap-tive branch during the initial stages of training. ACAR aggregates the original query, the attention output, and the adaptive branch via residual integration and layer normalization: 
+
+ACAR (l)(Q, KV ) = LN( Q + A(l) + eA(l)). (4) ACAR is applied in both directions Z(l) 
+
+> img →txt
+
+= ACAR (l)(F′
+
+> img
+
+, F′
+
+> txt
+
+)
+
+and Z(l) 
+
+> txt →img
+
+= ACAR (l)(F′
+
+> txt
+
+, F′
+
+> img
+
+) to support bidirectional cross-signal alignment. This design ensures stability, preserves original semantics, and integrates adaptively transformed information for ro-bust multimodal alignment. 
+
+2.2. Dynamic Feature Adapter (DFA) 
+
+While ACAR facilitates cross-modal interaction, additional refine-ment is required to capture task-specific nuances and avoid nega-tive transfer in multi-task scenarios. To address this, we propose the Dynamic Feature Adapter (DFA) with gating-based adaptive mechanism[19, 20]. DFA dynamically regulates its influence based on global context, enabling selective feature and task adaptation where necessary. DFA operates on the fused representation from the ACAR out-puts in block l:
+
+Z(l) 
+
+> fuse
+
+= 12
+
+ Z(l) 
+
+> img →txt
+
++ Z(l)
+
+> txt →img
+
+. (5) It first computes a gating score that reflects the input’s global seman-tics, passed through a linear layer and sigmoid: 
+
+g(l) = Sigmoid (W(l) 
+
+> g
+
+· Mean (Z(l)
+
+> fuse
+
+) + b(l) 
+
+> g
+
+) (6) This gating mechanism adaptively modulates the strength of feature transformation for each sample, allowing task-sensitive control. To refine Z(l)
+
+> fuse
+
+, DFA employs a lightweight bottleneck MLP similar to ACAR but scaled by the dynamic gate: 
+
+H(l) 
+
+> gated
+
+= g(l) ⊙  MLP (l)(Z(l)
+
+> fuse
+
+) (7) The final representation is obtained via a residual connection and layer normalization, ensuring stability while achieving dynamic, task-sensitive adaptation. 
+
+DFA (l) = LN( Z(l) 
+
+> fuse
+
++ H(l)). (8) This mechanism selectively adapts features based on global context through dynamic gating, improving robustness under task and do-main variability and ensuring stability during optimization via resid-ual normalization. 
+
+2.3. Hierarchical Feature Aggregation and Classification 
+
+To capture multi-level abstractions, we aggregate the outputs from all L refinement blocks through uniform averaging [21, 22]: 
+
+Ffinal = 1
+
+L
+
+> L
+
+X
+
+> l=1
+
+DFA (l)(Z(l)
+
+> fuse
+
+) (9) This hierarchical aggregation combines coarse and fine-grained cues across blocks, resulting in a more comprehensive multimodal repre-sentation compared to single-block fusion. The final aggregated feature Ffinal is classified using a cosine classifier [23]. 
+
+Zc = σ · Wc · Ffinal 
+
+∥Wc∥2∥Ffinal ∥2
+
+(10) where Wc is initialized from CLIP text embeddings corresponding to natural-language prompts for class c, and σ is a fixed scaling fac-tor. This initialization aligns classifier prototypes with textual se-mantics, improving calibration and generalization at negligible com-putational cost[2]. 
+
+3. EXPERIMENTS 
+
+This section presents a comprehensive evaluation of DARC-CLIP, demonstrating its effectiveness and generalization across domains. We first detail our experimental setup, followed by a comparison against strong baselines and an ablation study to validate the contri-bution of each component. 
+
+3.1. Experimental Setup 
+
+We evaluate DARC-CLIP on two meme benchmarks: the PrideMM [2] and the CrisisHateMM [13]. PrideMM contains 5,063 memes related to the LGBTQ+ Pride movement with multi-aspect annota-tions for four tasks: Hate Speech Detection, Target Classification, Topical Stance Classification, and Intended Humor Detection. It ex-hibits significant class imbalance, as summarized in Table 1, posing challenging for robust multimodal reasoning. CrisisHateMM pro-vides over 4,700 memes for hate speech detection, and is used to assess generalization under domain shift. For PrideMM, we follow the official splits and further divide the training set (90%/10%) for training and internal validation. All reported results use the official validation set. CrisisHateMM is used solely for cross-domain eval-uation. We report Accuracy, Macro F1 Score, and AUROC, with F1 and AUROC being particularly crucial for class-imbalanced tasks. We use ViT-L/14 CLIP as the backbone. Models were trained for 15 epochs with a batch size of 32 on NVIDIA RTX 4090 GPU. The best checkpoint is selected based on validation AUROC. Each experiment was repeated three times; the mean scores are reported. 
+
+3.2. Baseline Comparison 
+
+We compare DARC-CLIP against a range of strong unimodal (BERT [24], ViT-L/14 [25]) and multimodal baselines (CLIP [10], Hate-CLIPper [11], ISSUES [26], MemeCLIP [2]). 
+
+Table 1 . Label distribution for the publicly available subset of the PrideMM dataset (train + validation splits combined). 
+
+Task Label #Samples %
+
+Hate No Hate 2,313 49.23% Hate 2,243 50.77% Target Undirected 694 31.08% Individual 224 10.03% Community 1,047 46.89% Organization 268 12.00% Stance Neutral 1,312 28.80% Support 1,718 37.71% Oppose 1,526 33.49% Humor No Humor 1,477 31.72% Humor 3,179 68.28% 
+
+Fig. 2 . ROC curves of MemeCLIP and DARC-CLIP for Hate Speech Detection on PrideMM. Table 2 shows the results on PrideMM dataset. Unimodal meth-ods perform substantially worse than multimodal ones, highlight-ing the importance of jointly modeling textual and visual signals in memes. DARC-CLIP consistently delivers the best overall results across four tasks, outperforming the best baseline MemeCLIP. Sub-stantial F1 score improvements (e.g., +6.8 on Hate) further validate our approach. The superior capability is further demonstrated by ROC curves in Fig. 2 for Hate Speech Detection, where DARC-CLIP outperforms MemeCLIP across thresholds. To further assess robust-ness to domain shift, we evaluate our model on the CrisisHateMM dataset. As shown in Table 3, DARC-CLIP achieves the highest AU-ROC. This result confirms that our framework not only excels on the target domain but also exhibits strong cross-domain generalization, making it highly applicable to diverse real-world scenarios. 
+
+3.3. Ablation Studies 
+
+We conduct ablation studies on PrideMM to isolate the contribution of each component, with results summarized in Table 4. Introducing ACAR on top of the frozen CLIP brings a substantial improvement across all metrics, highlighting its key role in enhancing cross-modal alignment and refining feature representations. Adding DFA further improves performance, confirming the synergy of our dual-module refinement stack. In contrast, auxiliary components (SAI, LP) offer only marginal gains; while partial unfreezing provides a slight boost Table 2 . Performance metrics for different methods on the PrideMM dataset. 
+
+Method Hate Target Stance Humor Acc. AUC. F1 Acc. AUC. F1 Acc. AUC. F1 Acc. AUC. F1 
+
+BERT 71.23 75.82 71.15 51.42 76.36 51.03 53.10 70.75 51.48 68.93 75.21 67.63 ViT-L/14 50.83 64.51 59.15 53.58 69.83 51.29 51.94 66.49 49.61 59.26 70.53 65.43 CLIP 72.78 79.27 73.06 58.82 78.92 55.37 57.35 73.38 56.63 73.29 79.43 72.04 HateCLIPper 73.46 78.43 71.62 56.34 73.81 51.26 63.19 71.24 55.69 71.43 77.86 69.24 ISSUES 75.38 83.27 72.54 60.34 79.82 54.24 62.12 77.34 60.49 76.51 82.13 70.43 MemeCLIP 74.09 84.45 73.68 60.89 77.31 53.03 62.83 79.26 61.17 79.64 82.88 71.25 DARC-CLIP 80.84 88.63 80.52 60.45 82.58 57.88 62.26 80.97 61.78 80.13 83.45 76.10 Table 3 . Performance metrics for different methods on the Cri-sisHateMM dataset. 
+
+Method Acc. AUC. F1 
+
+BERT 76.65 81.26 74.68 ViT-L/14 73.42 80.46 72.97 CLIP 79.34 86.57 78.26 HateCLIPper 80.57 83.91 75.13 ISSUES 83.63 88.34 75.99 MemeCLIP 82.39 89.62 79.41 DARC-CLIP 85.31 92.52 83.28 Table 4 . Ablation study of DARC-CLIP on the PrideMM hate detection task. Frozen denotes a fully frozen CLIP backbone. Un-frozen indicates partial unfreezing CLIP.                                        
+
+> CLIP ACAR DFA SAI LP Acc. AUC. F1
+> Frozen 72.78 79.27 73.06 Frozen ✓78.23 85.34 78.30 Frozen ✓✓80.14 87.83 79.51 Frozen ✓✓✓80.35 88.12 79.37 Frozen ✓✓✓✓80.43 88.53 79.97 Unfrozen ✓✓✓✓80.84 88.63 80.52
+
+at the cost of 1.3 × longer training time. Overall, ACAR and DFA are the dominant contributors to performance improvement, validating the effectiveness of our adapter-based design. Auxiliary strategies such as SAI, LP, and partial unfreezing provide only minor addi-tional benefits. 
+
+3.4. Qualitative Analysis 
+
+To better understand the behavior of DARC-CLIP, we present repre-sentative cases in Fig. 3. Case (a) contains implicit visual aggression; DARC-CLIP correctly predicts all labels by integrating textual and visual signals, while MemeCLIP misclassifies them due to its shal-low fusion strategy, demonstrating the strength of deep refinement stack. Case (b) illustrates a scenario dominated by chart-based in-formation; both models mispredict stance, yet DARC-CLIP achieves more accurate hate detection compared to MemeCLIP. These exam-ples further highlight DARC-CLIP’s advantage in capturing implicit multimodal cues compared to single-step fusion. A key limitation is the model’s struggle with niche cultural symbols and the difficulty in disentangling image subjects from specific hate speech targets. 
+
+(a) True: {1, 2, 2, 1 }
+
+MemeCLIP: {0, 0, 0, 0 }
+
+DARC-CLIP: {1, 2, 2, 1 }
+
+(b) True: {1, 2, 2, 0 }
+
+MemeCLIP: {0, 3, 2, 0 }
+
+DARC-CLIP: {1, 3, 2, 0 }
+
+Fig. 3 . Qualitative error analysis on PrideMM dataset. Labels correspond to tasks in order: Hate (0=No Hate, 1=Hate), Tar-get (0=Undirected, 1=Individual, 2=Community, 3=Organization), Stance (0=Neutral, 1=Support, 2=Oppose), Humor (0=No Humor, 1=Humor). Consequently, effectively handling complex semantic inference and visual-textual signals integration remain challenges for future work. 
+
+4. CONCLUSION 
+
+We introduced DARC-CLIP, a novel adaptive multimodal frame-work for fine-grained meme classification. By introducing Adaptive Cross-Attention Refiners and Dynamic Feature Adapters, our model achieves deeper and more flexible integration of visual and textual signals, addressing the complex semantics in memes. Experiments on the PrideMM and CrisisHateMM demonstrate that DARC-CLIP consistently outperforms prior methods, validating its effectiveness and strong cross-domain generalization ability. Ablation studies reveal that the majority of performance gains come from ACAR and DFA, while auxiliary strategies Semantic-Aware Initialization and Linear Projection offer marginal complementary benefits. Im-portantly, DARC-CLIP retains competitive accuracy even when the CLIP backbone remains frozen, highlighting the design’s efficiency in resource-constrained scenarios. Despite these advances, chal-lenges remain in handling highly implicit or abstract content. Our future research aims to incorporate external knowledge bases to bet-ter model cultural context in different languages and further enhance the framework’s generalization capabilities. 5. REFERENCES 
+
+[1] C. Moreno-Almeida, “Memes as snapshots of participation: The role of digital amateur activists in authoritarian regimes,” 
+
+New Media & Society , vol. 23, no. 6, pp. 1545–1566, 2021. [2] S. B. Shah, S. Shiwakoti, M. Chaudhary, and H. Wang, “MemeCLIP: Leveraging CLIP representations for multimodal meme classification,” in Proceedings of the 2024 Confer-ence on Empirical Methods in Natural Language Processing (EMNLP) , 2024, pp. 17 320–17 332. [3] C. Imperato, M. Pagano, and T. Mancini, ““all is fair in. . . meme!” how heterosexual users perceive and react to memes, news, and posts discriminating against sexual minorities,” So-cial Sciences , vol. 12, p. 74, 2023. [4] O. S , tef˘ anit , ˘a and D. Buf, “Hate speech in social media and its effects on the lgbt community: A review of the current re-search,” Romanian Journal of Communication and Public Re-lations , vol. 23, p. 47, 2021. [5] D. Kiela, H. Firooz, A. Mohan, V. Goswami, A. Singh, P. Ring-shia et al. , “The hateful memes challenge: Detecting hate speech in multimodal memes,” in Advances in Neural Informa-tion Processing Systems (NeurIPS) , vol. 33, 2020, pp. 2611– 2624. [6] F. Alam, S. Cresci, T. Chakraborty, F. Silvestri, D. Dimitrov, G. D. S. Martino et al. , “A survey on multimodal disinforma-tion detection,” in Proceedings of the 29th International Con-ference on Computational Linguistics , 2022, pp. 6625–6643. [7] A. Chhabra and D. K. Vishwakarma, “A literature survey on multimodal and multilingual automatic hate speech identifica-tion,” Multimedia Systems , vol. 29, p. 1203–1230, 2023. [8] A. Dhankhar, A. Prakash, S. Juneja, and S. Prakash, “A sur-vey on multi-modal hate speech detection,” in 2023 IEEE 11th Region 10 Humanitarian Technology Conference (R10-HTC) ,2023, pp. 225–230. [9] S. Pramanick, S. Sharma, D. Dimitrov, M. S. Akhtar, P. Nakov, and T. Chakraborty, “MOMENTA: A multimodal framework for detecting harmful memes and their targets,” in Findings of the Association for Computational Linguistics: EMNLP 2021 ,2021, pp. 4439–4455. [10] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark, G. Krueger, and I. Sutskever, “Learning transferable visual models from natural language supervision,” in International Conference on Machine Learning (ICML) , 2021. [11] G. K. Kumar and K. Nandakumar, “Hate-CLIPper: Multi-modal hateful meme classification based on cross-modal inter-action of CLIP features,” in Proceedings of the Second Work-shop on NLP for Positive Impact (NLP4PI) , 2022, pp. 171– 183. [12] J. Qu, L. H. Li, J. Zhao, S. Dev, and K.-W. Chang, “Disinfomeme: A multimodal dataset for detecting meme intentionally spreading out disinformation,” arXiv preprint arXiv:2205.12617, 2022. [13] A. Bhandari, S. B. Shah, S. Thapa, U. Naseem, and M. Nasim, “Crisishatemm: Multimodal analysis of directed and undi-rected hate speech in text-embedded images from russia-ukraine conflict,” in 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW) , 2023, pp. 1994–2003. [14] C. Zhou, F. Zhong, and C. Oztireli, “Clip-pae: Projection-augmentation embedding to extract relevant features for a dis-entangled, interpretable and controllable text-guided face ma-nipulation,” in ACM SIGGRAPH 2023 Conference Proceed-ings , 2023. [15] N. Shazeer, “Fast transformer decoding: One write-head is all you need,” arXiv preprint arXiv:1911.02150, 2019. [16] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin, “Attention is all you need,” in Proceedings of the 31st International Con-ference on Neural Information Processing Systems , 2017, p. 6000–6010. [17] Z. Dong, Y. Sun, T. Liu, W. Zuo, and Y. Gu, “Cross-modal bidi-rectional interaction model for referring remote sensing image segmentation,” arXiv preprint arXiv:2410.08613, 2025. [18] Y. Liu, H. Liu, H. Wang, F. Meng, and M. Liu, “Bcan: Bidi-rectional correct attention network for cross-modal retrieval,” 
+
+IEEE Transactions on Neural Networks and Learning Systems ,vol. 35, no. 10, pp. 14 247–14 258, 2024. [19] R. Xu, M. Li, Z. Yang, L. Yang, K. Qiao, and Z. Shang, “Dy-namic feature selection algorithm based on q-learning mecha-nism,” Applied Intelligence , vol. 51, no. 10, p. 7233–7244, Oct. 2021. [20] P. Nawrot, J. Chorowski, A. Lancucki, and E. M. Ponti, “Ef-ficient transformers with dynamic token pooling,” in Proceed-ings of the 61st Annual Meeting of the Association for Compu-tational Linguistics (Volume 1: Long Papers) , 2023, pp. 6403– 6417. [21] W. Wu, X. Wang, H. Luo, J. Wang, Y. Yang, and W. Ouyang, “Bidirectional cross-modal knowledge exploration for video recognition with pre-trained vision-language models,” in 2023 IEEE/CVF Conference on Computer Vision and Pattern Recog-nition (CVPR) , 2023, pp. 6620–6630. [22] Y. Zhou, J. Guo, H. Sun, B. Song, and F. R. Yu, “Attention-guided multi-step fusion: A hierarchical fusion network for multimodal recommendation,” in Proceedings of the 46th in-ternational acm sigir conference on research and development in information retrieval , 2023, pp. 1816–1820. [23] J. Liu, Y. Sun, C. Han, Z. Dou, and W. Li, “Deep representation learning on long-tailed data: A learnable embedding augmen-tation perspective,” in 2020 IEEE/CVF Conference on Com-puter Vision and Pattern Recognition (CVPR) , 2020, pp. 2967– 2976. [24] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, “Bert: Pre-training of deep bidirectional transformers for language under-standing,” in Proceedings of the 2019 conference of the North American chapter of the association for computational linguis-tics: human language technologies, volume 1 (long and short papers) , 2019. [25] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner et al. , “An image is worth 16 ×16 words: Transformers for image recognition at scale,” in Pro-ceedings of the International Conference on Learning Repre-sentations , 2021. [26] G. Burbi, A. Baldrati, L. Agnolucci, M. Bertini, and A. Del Bimbo, “Mapping memes to words for multimodal hateful meme classification,” in 2023 IEEE/CVF International Conference on Computer Vision Workshops (ICCVW) , 2023, pp. 2824–2828.

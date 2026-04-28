@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-001.webp",
+      "caption": "Table 1: Example of Multi-CoSyn-400K. The figure shows our regenerated questionanswer pairs in German, along with their English translation.",
+      "page": 6,
+      "index": 1,
+      "width": 700,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-002.webp",
+      "caption": "Table 14: Full results on Multi-POPE (accuracy %) for all training configurations. †: includes cos data.",
+      "page": 21,
+      "index": 2,
+      "width": 533,
+      "height": 470
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-003.webp",
+      "caption": "Table 15: Full results on Multi-MME (total score) for all training configurations. †: includes cos data.",
+      "page": 22,
+      "index": 3,
+      "width": 635,
+      "height": 472
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-004.webp",
+      "caption": "Table 8: Non-English performance on Yes/No benchmarks. Models are evaluated under four training conditions: English-only (en), Multilingual (mu), and their versions with Multi-PixMo-CoSyn-400k (+cosmu). Results are averaged over the four languages. Best per model group is bold.",
+      "page": 14,
+      "index": 4,
+      "width": 650,
+      "height": 490
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-005.webp",
+      "caption": "Fig. 1: Examples from cap (top) and ama (bottom). The original PixMo annotation in English is shown first, followed by our regenerated version: French caption for cap; QA pair in Italian for ama.",
+      "page": 3,
+      "index": 5,
+      "width": 725,
+      "height": 308
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-006.webp",
+      "caption": "Table 10: Full results on Multi-VQAv2 (held-out, accuracy %) for all training configurations. Only Qwen3-4B backbone produces non-trivial VQAv2 scores; LLaMA backbones yield near-zero accuracy on this generative benchmark.",
+      "page": 18,
+      "index": 6,
+      "width": 611,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-007.webp",
+      "caption": "Table 16: Full results on Multi-ScienceQA (accuracy %) for all training configurations. †: includes cos data.",
+      "page": 23,
+      "index": 7,
+      "width": 533,
+      "height": 472
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-008.webp",
+      "caption": "Table 7: Non-English performance on MCQ benchmarks. Models are evaluated under four training conditions: English-only (en), Multilingual (mu), and their versions with Multi-CoSyn-400K (+cosmu). Results are averaged over the four languages. Best per model group is bold.",
+      "page": 13,
+      "index": 8,
+      "width": 581,
+      "height": 721
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-009.webp",
+      "caption": "Table 11: Full results on Multi-RealWorldQA (held-out, accuracy %) for all training configurations. †: includes cos data.",
+      "page": 19,
+      "index": 9,
+      "width": 533,
+      "height": 472
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-010.webp",
+      "caption": "Table 9: BERTScore F1 on Multi-PixMo-AskModelAnything (ama) and MultiPixMo-Cap (cap) per language and on average. EN: English-only training; Multi: multilingual training. Best per model group is bold.",
+      "page": 17,
+      "index": 10,
+      "width": 429,
+      "height": 292
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-011.webp",
+      "caption": "Table 6: English performance on our translated benchmarks under four training conditions: English-only (en), Multilingual (mu), and their enhanced versions with MultiCoSyn-400K (+cosmu). Best result per model group is bold.",
+      "page": 12,
+      "index": 11,
+      "width": 654,
+      "height": 261
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-012.webp",
+      "caption": "Table 18: External model comparison on the full MEVBench (accuracy %). Qwen2VL-2B-Instruct and SmolVLM2-2.2B-Instruct are evaluated as publicly available baselines not trained on Multi-PixMo.",
+      "page": 24,
+      "index": 12,
+      "width": 546,
+      "height": 250
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-013.webp",
+      "caption": "Table 17: Results on MTVQA and CVQA (held-out, accuracy %). These benchmarks were not used during training for any model. †: includes cos data.",
+      "page": 24,
+      "index": 13,
+      "width": 429,
+      "height": 471
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-014.webp",
+      "caption": "Fig. 2: Unverified inferences in the French caption (are the crab’s legs made of papiermâché or not?—first picture from the left) and in the Spanish answer (is chicken one of the ingredients?—second picture from the left). Counting error (two feet visible instead of one) in the French answer (third picture from the left) and ambiguous color (white or grey? ) in the German caption (first picture from the right).",
+      "page": 9,
+      "index": 14,
+      "width": 725,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-015.webp",
+      "caption": "Table 13: Full results on Multi-MMBench (accuracy %) for all training configurations. †: includes cos data.",
+      "page": 20,
+      "index": 15,
+      "width": 533,
+      "height": 470
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18347v1/fig-016.webp",
+      "caption": "Table 12: Full results on Multi-AI2D (accuracy %) for all training configurations. †: includes cos data.",
+      "page": 20,
+      "index": 16,
+      "width": 533,
+      "height": 471
+    }
+  ]
+}

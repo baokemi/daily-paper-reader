@@ -1,0 +1,349 @@
+Title: Brain2VLM: Hierarchical Alignment Between Cortical Representations and Vision-Language Latent Spaces
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.04.23.720313v1.full.pdf
+
+Number of Pages: 10
+
+Markdown Content:
+# Brain2VLM: Hierarchical Alignment Between Cortical Representations and Vision-Language Latent Spaces 
+
+N. A. Adarsh Pritam a, Jeba Shiney O a, Sanyam Jain b,c 
+
+> aAlliance School of Advanced Computing, Alliance University, India
+> bDepartment of Computer Science and Communication, Østfold University College, 1783 Halden, Norway
+> cDepartment of Dentistry and Oral Health, Aarhus University, 8000 Aarhus, Denmark
+
+Abstract 
+
+This work introduces Brain2VLM, a framework for analyzing how cortical representations align with latent spaces of pretrained di ff usion-based vision-language models for brain-to-image reconstruction. While recent approaches achieve strong performance by mapping functional Magnetic Resonance Imaging (fMRI) signals to model latents, the structure of this mapping remains poorly understood. We hypothesize that brain-to-latent alignment is hierarchical, with early visual cortex exhibiting approximately linear correspondence to structural di ff usion latents, and higher-order visual areas requiring nonlinear mappings to align with semantic embedding spaces. To test this, we decode di ff usion latents and CLIP embeddings from fMRI signals using both linear ridge regression and a nonlinear residual MLP on the Natural Scenes Dataset. Our results reveal that nonlinear decoding provides only marginal improvements for di ff usion latents ( ∆ ≈ 0.05 − 0.06 in correlation), but yields substantial gains for semantic embeddings ( ∆ ≈ 0.47), significantly improving distributional alignment (MMD: 0 .042 vs 0 .358). However, increased decoder expressivity can introduce shifts in latent distributions, highlighting a trade-o ff between prediction accuracy and generative com-patibility. Despite using a simple reconstruction pipeline, Brain2VLM achieves strong performance (PixCorr 0 .33, CLIP 85%), suggesting that improvements in brain-to-latent alignment play an important role in reconstruction qual-ity alongside generative modeling. These findings provide empirical evidence for hierarchical alignment between cortical representations and model latent spaces, positioning the brain-to-latent interface as a primary bottleneck in brain decoding systems. Our code can be found at https: // github.com /adarsh-crafts /Brain2VLM 
+
+Keywords: NeuroAI, Brain Decoding, Reconstruct visual stimuli. 
+
+1. Introduction 
+
+Understanding how the human brain represents and reconstructs visual experience remains a central challenge in NeuroAI. Brain decoding aims to recover sensory stimuli from non-invasive brain recordings such as fMRI, enabling the reconstruction of perceptual and semantic content from neural activity. Earlier studies trained new generative models with fMRI data from scratch, or fine-tuned toward the specific stimuli used in the fMRI experiments [1, 2, 3]. While they showed impressive results, they achieved limited success in pixel-wise and semantic fidelity. This limitation arises partly from the small number of samples available in neuroscience datasets and from the di ffi culties involved in the training of complex generative models [4]. Di ff usion models, particularly latent di ff usion models (LDMs), achieve state-of-the-art performance in conditional image generation by operating in a compressed latent space and conditioning the denoising process on semantic embeddings [5, 6]. These representations capture perceptual and semantic structure, making them suitable for brain decoding, where neural activity is more likely to align with abstract representations rather than raw pixel intensities. Recent work, illustrated in Fig. 1 (middle row), shows that high-resolution (512 × 512) images can be reconstructed from brain activity using simple linear decoders without training or fine-tuning the generative model [4].          
+
+> Email addresses: padarshDS24@arts.alliance.edu.in (N. A. Adarsh Pritam), jeba.shiney@alliance.edu.in (Jeba Shiney O),
+> au775886@uni.au.dk (Sanyam Jain)
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint Original Brain2VLM  Takagi et. al (Reproduced)
+> [person, skis] [teddy bear] [giraffe] [traffic light, car, clock] [tv, mouse, keyboard, cup, book, chair] [sheep] [person, surfboard]
+> COCO Categories  [person, train, traffic light, bench, handbag] [clock] [vase] [cat, bench] [person, baseball bat] [cow] [airplane] Figure 1: Columns show stimuli; rows show (black box, top row) presented images (drawn from the publicly available MS COCO dataset [7]), (red box, middle row) images reconstructed from fMRI signals using linear decoders, and (purple box, bottom row) reconstructions using proposed nonlinear decoders for one subject (subj01). While both methods recover coarse spatial structure, nonlinear decoding improves semantic consis-tency, yielding more recognizable object categories (e.g., animals, vehicles). However, these semantic improvements do not consistently translate into sharper low-level details, highlighting a gap between semantic alignment and pixel-level reconstruction quality. The figures
+
+In such approaches, neural activity patterns are first mapped to latent representations of pretrained generative models using relatively simple decoders such as linear regression or neural networks. These decoded latent represen-tations are then used as conditioning signals for the di ff usion model, which reconstructs the image through an iterative denoising process. This separation allows leveraging strong generative priors while simplifying the decoding task. Although recent models achieve increasingly impressive reconstruction accuracy, performance gains alone do not clarify a deep question: what information is actually represented in the cortical activity during vision? Does brain activity encode detailed pixel-level information, or does it reflect abstract, latent semantic and perceptual structure? A growing field of neuroscience research suggests that the brain does not store literal pixel-level snapshots of scenes [8, 9]. Instead, distributed patterns of activity across visual and higher-order cortex are systematically related to high-level and semantic features, including object categories and conceptual structure, rather than the exact low-level sensory details [10, 11]. In agreement with this perspective, recent brain decoding studies increasingly rely on mappings from fMRI sig-nals into high-level latent spaces of deep neural networks, which organize visual information according to semantic similarity [1, 12, 13, 5, 14]. Interestingly, as shown in Fig. 1 (middle row), even simple linear mappings preserve semantic content despite deviations in low-level detail. Nonlinear decoding further improves the recognizability of high-level semantic attributes, while low-level properties such as texture remain largely unchanged, suggesting that improved latent alignment does not necessarily translate into perceptual gains. However, it remains unclear whether cortical representations align uniformly with the latent spaces of modern generative models, or whether this relationship depends on the level of abstraction in both brain and model repre-sentations. We hypothesize that brain-to-latent alignment is hierarchical: early visual areas exhibit approximately linear mappings to structural di ff usion latents, while higher-order visual areas require nonlinear mappings to align with semantic embedding spaces such as CLIP. To test this, we decode both structural di ff usion latents and semantic embeddings from distinct cortical regions using linear and nonlinear decoders, and analyze how decoder expressivity aff ects alignment and reconstruction. Unlike much of the prior work that primarily improves reconstruction through complex generative pipelines and conditioning mechanisms [13, 14, 15, 16, 12], we isolate and study the role of the brain-to-latent mapping itself, suggesting that its structure depends on representational hierarchy. Our contributions are: 1. A hierarchical analysis of brain-to-latent alignment showing that early visual cortex exhibits approximately linear mappings to structural di ff usion latents, while higher-order visual areas require nonlinear mappings to semantic embedding spaces. 2. Empirical evidence that nonlinear decoding yields substantial improvements for semantic representations (CLIP embeddings) but only marginal gains for structural di ff usion latents, revealing distinct alignment regimes. 2
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint
+
+3. An analysis of the trade-o ff between latent prediction accuracy and reconstruction quality, showing that in-creased decoder expressivity can distort latent distributions despite improving correlation. 4. A simple residual MLP decoder that exposes these e ff ects and provides a stronger brain-to-latent interface compared to standard linear regression. 
+
+2. Related Works 
+
+Early works in visual decoding focused on stimulus identification and constrained reconstruction [17, 18]. Object and action categories are organized within a continuous semantic space distributed across cortex [10]. [1] projected fMRI signals into CLIP-aligned embeddings to reconstruct complex natural scenes using GAN-based generation. [13] proposed a two-stage latent di ff usion framework combining very-deep variational auto-encoder (VDVAE) structure prediction with di ff usion-based refinement, and [4] demonstrated that high-resolution reconstructions could be ob-tained by linearly mapping fMRI signals into Stable Di ff usion (SD) latent components without training or fine-tuning the generative model. Subsequent work extended this paradigm using multimodal decoding and CLIP-aligned rep-resentations, including caption-and-image reconstruction [15, 16], di ff usion-prior approaches [14], and CLIP-based neural alignment [12]. These results suggest that brain decoding is most e ff ective when mapping neural activity into structured latent spaces of pretrained generative models. 
+
+3. Methodology 
+
+3.1. Dataset 
+
+We used the Natural Scenes Dataset (NSD) [19], a large-scale 7 T fMRI dataset in which participants viewed natural scene images during repeated scanning sessions. The stimuli consist of photographs drawn from the Microsoft COCO dataset [7]. Following prior brain decoding studies [13, 4], we analyzed subject subj01 , one of the four participants who completed the full experiment. Each subject viewed approximately 10 ,000 unique images across 30–40 sessions, with multiple repetitions for a subset of stimuli. We used the standardized NSD train /test split, where 982 images shared across subjects form the test set and the remaining trials are used for training. For the test set, responses across repetitions were averaged, while individual trials were used for training. For functional data, we used the preprocessed single-trial beta weights provided by the NSD dataset, estimated using a denoising GLM with fitted hemodynamic response functions, as described in [19]. Voxel responses were extracted from visual cortex regions of interest including early visual areas ( V1– V3) and higher visual areas ( V4, LO, PHC). Following [4], voxel activity from V1– V3 was used to predict di ff usion latents, while voxel activity from V4, LO, and PHC was used to predict CLIP embeddings. This separation allows test-ing whether alignment depends on representational level. To provide an overview of the Brain2VLM pipeline, we illustrate the full reconstruction process in Fig. 2. 
+
+3.2. Latent Di ff usion Models 
+
+Image reconstruction was performed using Stable Di ff usion v1.4, a latent di ff usion model that generates images through iterative denoising in a compressed latent space [5]. Given a stimulus image I resized to 512 × 512, the pretrained model produces two latent representations as shown in equations 1 and 2. 
+
+z = fz(I) (1) c = fc(I) (2) where z ∈ R4×40 ×40 is the latent representation of the Stable Di ff usion autoencoder and c ∈ R768 is the CLIP image embedding used for cross-attention conditioning. During reconstruction, the predicted di ff usion latent ˆ z is first decoded by the Stable Di ff usion autoencoder to produce a coarse image x0. Noise is then added through the forward di ff usion process q(xt|x0) and the image is iteratively refined using a denoising U-Net conditioned on the predicted CLIP embedding ˆ c via cross-attention. All parameters of the generative model remain frozen during training. 3
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint
+
+Overview of the Brain2VLM Reconstruction Framework          
+
+> Decoder Comparison
+> fMRI Measurement
+> voxel activity
+> [x∈ℝv]
+> ROIs
+> V1 - V3
+> V4, LO, PHC
+> (a)
+> Predicted ẑ
+> [z ∈R4×40×40 ]
+> Predicted ĉ
+> [c ∈R768 ]
+> (c)
+> Stable Diffusion Autoencoder
+> Add Noise
+> q(x t| x ₀)
+> xt
+> Denoising U-Net
+> (x t, ĉ, t)
+> Coarse Reconstruction
+> x₀
+> t
+> * Cross-Attention Conditioning
+
+*         
+
+> Reconstruction
+> Visual Stimulus
+> Data Source & ROIs Generative Reconstruction
+> Linear Decoder (Baseline Ridge)
+> MLP Decoder (Proposed)
+> L2 Loss
+> Ground Truth z, c
+> Ground Truth z, c L2 Loss
+> (b)
+> Predicted ẑ,ĉ
+> Predicted ẑ,ĉ
+> ẑ(Diffusion latent) ĉ (CLIP embedding)
+
+Figure 2: Brain2VLM reconstruction framework. (a) Visual stimuli are presented while fMRI responses are recorded from regions of interest (ROIs) in the visual cortex. Voxel activity from early visual areas ( V1– V3) and higher visual areas ( V4, LO, PHC) forms the neural input represen-tation. (b) Neural decoding models map voxel activity to latent representations of a pretrained di ff usion model. We compare a linear Ridge decoder with our proposed nonlinear residual MLP decoder, both trained with ℓ2 loss to predict the di ff usion latent ˆ z and CLIP embedding ˆ c. (c) The predicted di ff usion latent ˆ z is decoded by the Stable Di ff usion autoencoder to produce a coarse image x0. Noise is added via the forward di ff usion process q(xt|x0) and the image is refined through a denoising U-Net conditioned on ˆ c via cross-attention, producing the final reconstruction. 
+
+3.3. Decoding and Reconstruction Pipeline 
+
+Our goal is to reconstruct visual stimuli from fMRI signals by decoding neural activity into the latent representa-tions of a pretrained di ff usion model. 
+
+gθ : RV → (R4×40 ×40 , R768 ) (3) (ˆ z, ˆc) = gθ(x) (4) Let x ∈ RV denote the fMRI activity vector measured across V voxels for a single stimulus presentation. The decoding objective is to learn a mapping defined in Eq. 3 such that the predicted latent variables in Eq. 4 approximate the latent representations ( z, c) extracted from the stimulus image. We compare two neural decoding models that map voxel activity to di ff usion latent representations: (1) a linear ridge regression decoder reproducing [4], and (2) a nonlinear residual multilayer perceptron (MLP) decoder. 
+
+(1) Linear decoder: The baseline model learns a linear mapping between voxel activity x ∈ RV and latent represen-tations ˆ y, where W ∈ Rd×V and b ∈ Rd. Parameters are estimated using ridge regression with an ℓ2 regularization penalty on W.
+
+(2) Residual MLP decoder: To capture nonlinear relationships between cortical activity and latent representations, we introduce a deep residual MLP decoder (Fig. 3). Input Projection Layer      
+
+> Linear (in_dim, hidden_dim)
+> GELU
+> LayerNorm (hidden_dim)
+> Dropout
+> hidden_dim
+> ResidualBlock ResidualBlock
+> hidden_dim
+> Linear
+> (dim, dim) GELU layerNorm (dim) Dropout
+> Residual Block Detail
+> Block-to-Block Skip-Connections in_dim in_dim
+> Output Projection
+> Linear
+> (hiddenn_dim, out_dim)
+
+Residual MLP Decoder Architecture 
+
+Figure 3: Residual MLP decoder architecture. The proposed decoder maps voxel activity to di ff usion latent representations. An input projection first maps the voxel vector to a hidden representation using a linear layer followed by GELU, LayerNorm, and dropout. The hidden representation is processed through a stack of N residual blocks, each consisting of a linear layer, GELU activation, LayerNorm, and dropout with residual connections. A final linear layer projects the hidden representation to the target latent dimension. For illustration, the diagram shows N = 2residual blocks, while the depth N is varied in our ablation experiments. 
+
+The voxel activity is first projected into a 2048-dimensional hidden representation, followed by N residual blocks. Each block consists of a linear transformation with GELU activation, LayerNorm, dropout, and a residual skip con-nection. ˆy = Woh + bo (5) L = ∥y − ˆy∥22 (6) Finally, the hidden representation is projected to the latent space to produce the predicted latent vector ˆ y (Eq. 5). Both the linear baseline and the MLP decoder are trained using the mean squared error loss defined in Eq. 6. 4
+
+.CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint 4. Results & Discussion 
+
+We evaluate the e ff ect of the nonlinear residual MLP decoder on latent prediction accuracy. We further analyze how these improvements impact reconstructed images, both qualitatively (Fig. 1) and quantitatively (Table 1). 
+
+4.1. Latent Prediction Accuracy 
+
+Figure 4 summarizes ablations over model depth, hidden width, and training data fraction. Increasing depth im-proves performance initially but saturates beyond two residual blocks (Fig. 4(i)), while width scaling yields consistent gains up to 2048 hidden units before plateauing (Fig. 4(ii)). Performance improves with additional training data (Fig. 4(iii)), indicating that decoding remains partly data-limited. Table 4b reports the best configurations, which are statistically significant ( p < 0.01, paired t-test across stimuli). 0 1 2 3 4 5 6MLP Depth               
+
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Correlation
+> Depth Ablation
+> 500 1000 1500 2000 2500 3000 3500 4000 MLP Width
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Correlation
+> Width Ablation
+> 0.2 0.4 0.6 0.8 1.0 Training Fraction
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Correlation
+> Training Data Ablation
+> Early ROI (ridge) Ventral ROI (ridge) Early ROI (MLP) Ventral ROI (MLP)
+
+(i) Depth ablation (ii) Width ablation (iii) Training data ablation                     
+
+> 0123456MLP Depth
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Correlation
+> Depth Ablation
+> 500 1000 1500 2000 2500 3000 3500 4000 MLP Width
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Correlation
+> Width Ablation
+> 0.2 0.4 0.6 0.8 1.0 Training Fraction
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Correlation
+> Training Data Ablation
+> Early ROI (ridge) Ventral ROI (ridge) Early ROI (MLP) Ventral ROI (MLP)
+
+(a) MLP hyperparameter ablations. 
+
+Target Ablation Best Param Mean Corr ↑ Std ∆ vs Ridge 
+
+z
+
+depth 0 0.2959 0.0036 0.0569 width 512 0.3002 0.0037 0.0612 
+
+frac 1.0 0.2843 0.0027 0.0453 
+
+c
+
+depth 6 0.7819 0.0008 0.4779 
+
+width 2048 0.7761 0.0012 0.4721 frac 1.0 0.7761 0.0012 0.4721 
+
+(b) Ablation study on model hyperparameters for predicting the latent representations z and c. We report the best-performing parameter value for each ablation along with the mean correlation ↑. “vs Ridge” indicates the improvement over a ridge regression baseline. 
+
+Figure 4: Residual MLP decoder ablation analysis. (a) Top: E ff ect of decoder depth, hidden width, and training data fraction on latent prediction accuracy. (b) Bottom: Quantitative summary of the best-performing configurations compared with a ridge regression baseline. 
+
+A clear divergence between structural and semantic latent targets is observed. For di ff usion latents ( z), nonlinear decoding provides only modest improvements over linear regression ( ∆ ≈ 0.05–0 .06), suggesting that the mapping from early visual cortex to structural latent representations is approximately linear with some nonlinear corrections. In contrast, for semantic embeddings (CLIP, c), nonlinear decoding yields substantial gains ( ∆ ≈ 0.47), indicating that mappings from higher-order visual areas to semantic latent spaces are strongly nonlinear. Interestingly, we observe a systematic mismatch between latent prediction accuracy and reconstruction quality. This e ff ect is also reflected qualitatively in Fig. 1, where nonlinear decoding improves the qualitative recognizability of high-level semantic content without consistently enhancing low-level visual detail. We hypothesize that this is due to distribution shifts introduced by the nonlinear decoder, which improve regression accuracy but reduces the compatibility with the generative prior. This reveals a fundamental limitation in current brain-to-image pipelines: accurate latent prediction is necessary but not su ffi cient for high-quality image reconstruction. 5
+
+.CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint 4.2. Reconstruction Quality 
+
+As shown in Table 1, nonlinear decoding improves both low-level and high-level metrics, with larger gains ob-served in semantic alignment than in pixel-level fidelity. The trend is consistent with the qualitative examples in Figure 1, where improvements are more apparent in semantic consistency (e.g., object identity) than in fine-grained visual structure. This suggests that improvements in latent prediction accuracy are reflected more strongly in semantic consistency than in fine-grained visual detail. 
+
+> Table 1: E ff ect of decoder choice on reconstruction quality using pixel correlation (PixCorr), Structural Similarity Index (SSIM), Learned Percep-tual Image Patch Similarity (LPIPS), and CLIP-based semantic similarity.
+
+Decoder PixCorr ↑ SSIM ↑ LPIPS ↓ CLIP ↑
+
+Linear 0.32 0.24 0.72 0.65 MLP 0.36 0.32 0.69 0.85 
+
+Figure 5 shows a consistent pattern across reconstruction regimes: (1) Good cases: both decoders recover global structure; the MLP produces more semantically consistent object representations, indicating improved alignment with high-level latent structure. (2) Average cases: di ff erences become more pronounced — linear reconstructions exhibit blurred or fragmented content, while the MLP preserves object identity and scene layout. (3) Challenging cases: linear decoding often collapses to noise or spurious textures, whereas the MLP retains coarse semantic organization despite loss of fine detail. These observations support the finding that improving brain-to-latent alignment primarily enhances semantic consistency rather than low-level fidelity. Notably, even when pixel-level quality is limited, better latent alignment yields more recognizable object categories, consistent with the large gains observed for CLIP embeddings. Sample Reconstructions     
+
+> (a) Good Reconstructions (b) Average Reconstructions (c) Challenging Reconstructions
+> Figure 5: Reconstruction quality across regimes. Columns show stimuli; rows show (top, black box) ground truth (drawn from the publicly available MS COCO dataset [7]), (middle, red box) linear decoding, and (bottom, purple box) nonlinear (MLP) decoding reconstructions. Samples are grouped as good (green), average (yellow), and challenging (red). Nonlinear decoding consistently yields better semantic and structural fidelity than linear decoding.
+
+4.3. Distributional Alignment 
+
+We evaluate distributional alignment using MMD and visualize latent structure via PCA (Fig. 6). For di ff usion latents z, linear decoding is su ffi cient to match the ground-truth distribution (0 .1213 vs 0 .1327), and the small gap between zlinear and zMLP indicates minimal structural change. This is reflected in the overlapping PCA clusters. For CLIP embeddings c, the MLP substantially improves alignment (0 .0424 vs 0 .3585) and results in a large shift from the linear decoder, which is consistent with the separation observed in PCA visualization (Fig. 6). The separation in PCA space visualization confirms the nonlinear transformation introduced by the MLP. Interestingly, we observe weak correlation between MMD and reconstruction quality, consistent with prior findings that distribution-level similarity does not necessarily reflect perceptual or semantic reconstruction quality [20]. 6                
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint −100 −75 −50 −25 025 50 75 PC1
+> −75
+> −50
+> −25
+> 0
+> 25
+> 50
+> 75
+> 100
+> PC2
+> PCA - CLIP Embeddings (c)
+> GT
+> Linear
+> MLP (a) CLIP embeddings ( c)−80 −60 −40 −20 020 40 60 80 PC1
+> −40
+> −20
+> 0
+> 20
+> 40
+> PC2
+> PCA - Diffusion Latents (init_latent)
+> GT
+> Linear
+> MLP (b) Di ff usion latents ( z)
+
+Comparison Latent MMD ↓
+
+zgt vs zlinear SD ( z) 0.1213 ± 0.0018 
+
+zgt vs zMLP SD ( z) 0.1327 ± 0.0019 
+
+cgt vs clinear CLIP ( c) 0.3585 ± 0.0016 
+
+cgt vs cMLP CLIP ( c) 0.0424 ± 0.0004 
+
+zlinear vs zMLP SD ( z) 0.0190 ± 0.0007 
+
+clinear vs cMLP CLIP ( c) 0.3892 ± 0.0004   
+
+> (c) MMD comparison (mean ±std, bootstrap).
+
+Figure 6: Distribution alignment across latent spaces. (a-b) Top: PCA projections of ground truth (GT), linear, and MLP predictions. (c) Bottom: MMD quantifies distribution mismatch (lower is better). MLP aligns with CLIP embeddings but deviates from di ff usion latents, while linear decoding preserves di ff usion structure but fails for CLIP. 
+
+4.4. Cortical Localization of Alignment Gains 
+
+We visualize where nonlinear decoding improves brain-to-latent alignment across the cortex. Figure 7 reveals a clear hierarchical structure consistent with our hypothesis: (1) Early visual cortex (V1–V3): improvements are small and spatially sparse, indicating that mappings from voxel activity to di ff usion latents are largely linear, consistent with the modest quantitative gains for structural latent prediction. (2) Ventral visual regions (V4, LO, PHC): strong and spatially coherent improvements follow the visual processing pathway, indicating that nonlinear transformations are required to align these representations with semantic embedding spaces. This spatial dissociation provides direct evidence for hierarchical brain-to-latent alignment: early visual areas encode information well captured by linear mappings, whereas higher-order areas encode abstract semantic features requiring nonlinear decoding. These findings also explain the observed discrepancy between latent prediction and reconstruction quality: while nonlinear decoding substantially improves semantic alignment in CLIP space, the resulting distribution shifts limit improvements in pixel-level reconstruction. 
+
+4.5. Comparison with Prior Work 
+
+As shown in Table 2, Brain2VLM achieves competitive performance compared to recent latent di ff usion-based methods, including Brain-Di ff user [13], MindLDM [21], and Takagi et al. [4], across both low-level fidelity and high-level semantic metrics. While Brain2VLM achieves a strong performance, these improvements are primarily driven by enhanced semantic alignment rather than substantial gains in pixel-level fidelity. A key distinction lies in the brain-to-latent mapping. Prior works predominantly use linear or ridge regressions to project fMRI activity into latent spaces of pretrained generative models [4, 13], with performance improvements driven by additional conditioning 7
+
+.CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint Nonlinear Decoding Improves Alignment in Higher Visual Cortex Figure 7: Cortical localization of alignment gains. Change in alignment ( ∆ = nonlinear − linear) projected onto cortical surfaces. Top: early visual cortex (V1–V3). Bottom: ventral visual cortex (V4, LO, PHC). Nonlinear decoding yields minimal gains in early areas but strong, spatially coherent improvements along the ventral stream. 
+
+mechanisms rather than improvements in the decoder itself. In contrast, our results show that improving cortical alignment alone leads to consistent gains across metrics (Table 2, Table 4b). 
+
+Table 2: Quantitative comparison of image reconstruction performance with prior work on the benchmark dataset. Metrics evaluate both low-level fidelity (e.g., PixCorr, SSIM, LPIPS) and high-level semantic alignment (e.g., CLIP, AlexNet, Inception). For feature-based metrics such as CLIP( l), AlexNet( l), and DINO( l), l denotes the feature representation extracted from the l-th layer of the corresponding pretrained network. ↑
+
+indicates higher is better and ↓ indicates lower is better. Our method, Brain2VLM , is compared with BrainDi ff user [13], MindLDM [21], and Takagi et al. [4] 
+
+Metric BrainDi ff user MindLDM Takagi et al. Brain2VLM Low-Level PixCorr ↑ 0.294 0.119 - 0.33 
+
+SSIM ↑ 0.406 0.328 - 0.31 PSNR ↑ - - - 9.86 
+
+LPIPS ↓ - - - 0.69 
+
+AlexNet(5) ↑ 87% 92% 83% 92% 
+
+CLIP(6) ↑ - - - 71% 
+
+DINOv2(6) ↑ - - - 69% 
+
+High-Level AlexNet ↑ - - - 92% 
+
+CLIP ↑ 63% 83% 77% 85% 
+
+DINO ↑ - - - 92% 
+
+Inception ↑ 66% 81% 76% 89% 
+
+Retrieval @1 ↑ - - - 4% @10 ↑ - - - 23% 
+
+Notably, state-of-the-art pipelines employ complex multi-stage architectures while retaining simple regression-based decoding. Brain-Di ff user combines VDVAE based initialization with dual-guided di ff usion using CLIP features [13], while MindLDM integrates MAE-based feature learning, CLIP alignment, VDVAE depth reconstruction, and ControlNet-based structural guidance [21]. In both cases, only regression models are used in mapping fMRI to latent variables while generative components remain fixed. Similarly, Takagi et al. rely on linear mappings from fMRI to di ff usion latents and conditioning embeddings [4]. Despite these architectural complexities, the brain-to-latent interface remains simple. Our results indicate that improving this interface through nonlinear decoding enhances latent prediction quality, which can propagate through the generative pipeline and improve reconstructions. 8
+
+.CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint 5. Conclusion 
+
+We investigated how decoder expressivity a ff ects brain-to-latent alignment in di ff usion-based reconstruction. Our results suggest that brain-to-latent alignment depends on representational level: early visual cortex can be e ff ec-tively mapped to structural di ff usion latents using linear models, whereas higher-order visual areas require nonlinear transformations to align with semantic embedding spaces, supporting the hierarchical alignment hypothesis. This is consistent with prior work highlighting the nonlinear nature of neural representations and the limitations of simple lin-ear mappings [22, 16, 23]. We further identify a limitation in current brain decoding systems: improvements in latent prediction, particularly for semantic embeddings, do not reliably translate into improved perceptual reconstruction quality. This highlights a disconnect between representation learning and generative reconstruction in brain-to-image pipelines. These findings suggest that the e ff ectiveness of decoding models depends on the structure of the target latent space, and that improving reconstruction requires balancing latent accuracy with distributional compatibility to the generative prior. Moreover, they provide empirical support for a hierarchical alignment between cortical represen-tations and model latent spaces, consistent with prior work on semantic organization in the visual cortex [10, 8] and recent advances in di ff usion-based brain decoding [4, 14]. 
+
+6. Limitations and Future Work 
+
+This domain of research can be strengthened in several areas. First, this study focuses on one subject, so extend-ing the analysis to multiple subjects and cross-subject generalization is essential for validating the robustness of the observed alignment patterns [23]. Second, the current decoding framework does not explicitly model latent distribu-tions, and, as observed, can introduce distribution shifts that degrade reconstruction fidelity despite improved latent accuracy. Explicitly modeling these distributions during decoding (e.g., via distribution-aware losses or di ff usion pri-ors) may improve compatibility and mitigate the observed trade-o ff s. Third, the use of relatively simple decoders may restrict the ability to capture complex nonlinear structure in semantic representations, and exploring richer decoders (e.g., transformer-based or multimodal architectures) could better capture these representations. Finally, integrating brain decoding with generative modeling, such as jointly optimizing latent alignment and di ff usion dynamics remains an open direction for improving both fidelity and interpretability. 
+
+Acknowledgment 
+
+I would like to express my sincere gratitude to Prof. Jeba Shiney O and Sanyam Jain for their continuous guidance, valuable feedback, and support throughout this project. I also extend my special thanks to Alliance University and Sanyam Jain for providing essential GPU resources on Amazon EC2 (g4dn.2xlarge and g4dn.4xlarge instances). This work was carried out as part of my master’s degree at Alliance University and did not receive any external funding. 
+
+References               
+
+> [1] S. Lin, T. Sprague, A. K. Singh, Mind Reader: Reconstructing complex images from brain activities, Advances in Neural Information Processing Systems 35 (2022) 29624–29636. [2] R. VanRullen, L. Reddy, Reconstructing faces from fMRI patterns using deep generative neural networks, Communications Biology 2 (1) (2019) 193. doi:10.1038/s42003-019-0438-y .[3] G. Shen, K. Dwivedi, K. Majima, T. Horikawa, Y. Kamitani, End-to-End Deep Image Reconstruction From Human Brain Activity, Frontiers in Computational Neuroscience 13 (2019) 21. doi:10.3389/fncom.2019.00021 .[4] Y. Takagi, S. Nishimoto, High-resolution image reconstruction with latent di ff usion models from human brain activity, in: 2023 IEEE /CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2023, pp. 14453–14463. doi:10.1109/CVPR52729.2023.01389 .[5] R. Rombach, A. Blattmann, D. Lorenz, P. Esser, B. Ommer, High-Resolution Image Synthesis with Latent Di ff usion Models, in: 2022 IEEE /CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2022, pp. 10674–10685. doi:10.1109/CVPR52688.2022. 01042 .[6] J. Ho, A. Jain, P. Abbeel, Denoising Di ff usion Probabilistic Models, in: Advances in Neural Information Processing Systems, Vol. 33, 2020, pp. 6840–6851. [7] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Doll´ ar, C. L. Zitnick, Microsoft COCO: Common Objects in Context, in: Computer Vision – ECCV 2014, 2014, pp. 740–755. doi:10.1007/978-3-319-10602-1_48 .[8] N. Kriegeskorte, Deep Neural Networks: A New Framework for Modeling Biological Vision and Brain Information Processing, Annual Review of Vision Science 1 (2015) 417–446. doi:10.1146/annurev-vision-082114-035447 .
+
+9
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint
+
+[9] T. Naselaris, K. N. Kay, S. Nishimoto, J. L. Gallant, Encoding and decoding in fMRI, NeuroImage 56 (2) (2011) 400–410. doi:10.1016/ j.neuroimage.2010.07.073 .[10] A. G. Huth, S. Nishimoto, A. T. Vu, J. L. Gallant, A Continuous Semantic Space Describes the Representation of Thousands of Object and Action Categories across the Human Brain, Neuron 76 (6) (2012) 1210–1224. doi:10.1016/j.neuron.2012.10.014 .[11] S.-M. Khaligh-Razavi, N. Kriegeskorte, Deep Supervised, but Not Unsupervised, Models May Explain IT Cortical Representation, PLoS Computational Biology 10 (11) (2014) e1003915. doi:10.1371/journal.pcbi.1003915 .[12] Y. Ma, Y. Liu, L. Chen, G. Zhu, B. Chen, N. Zheng, BrainCLIP: Brain Representation via CLIP for Generic Natural Visual Stimulus Decoding, IEEE Transactions on Medical Imaging 44 (10) (2025) 3962–3972. doi:10.1109/TMI.2025.3537287 .[13] F. Ozcelik, R. VanRullen, Natural scene reconstruction from fMRI signals using generative latent di ff usion, Scientific Reports 13 (1) (2023) 15666. doi:10.1038/s41598-023-42891-8 .[14] P. Scotti, A. Banerjee, J. Goode, S. Shabalin, A. Nguyen, E. Cohen, A. Dempster, N. Verlinde, E. Yundler, D. Weisberg, K. Norman, T. Abraham, Reconstructing the Mind’s Eye: fMRI-to-Image with Contrastive Learning and Di ff usion Priors, Advances in Neural Information Processing Systems 36 (2023) 24705–24728. [15] M. Ferrante, T. Boccato, F. Ozcelik, R. VanRullen, N. Toschi, Generative Multimodal Decoding: Reconstructing Images and Text from Human fMRI, in: Deep Generative Models for Health Workshop NeurIPS 2023, 2023. [16] M. Ferrante, T. Boccato, L. Passamonti, N. Toschi, Retrieving and reconstructing conceptually similar images from fMRI with latent di ff usion models and a neuro-inspired brain decoding model, Journal of Neural Engineering 21 (4) (2024) 046001. doi:10.1088/1741-2552/ ad593c .[17] Y. Miyawaki, H. Uchida, O. Yamashita, M.-a. Sato, Y. Morito, H. C. Tanabe, N. Sadato, Y. Kamitani, Visual image reconstruction from human brain activity using a combination of multiscale local image decoders, Neuron 60 (5) (2008) 915–929. doi:10.1016/j.neuron. 2008.11.004 .[18] K. N. Kay, T. Naselaris, R. J. Prenger, J. L. Gallant, Identifying natural images from human brain activity, Nature 452 (7185) (2008) 352–355. 
+
+doi:10.1038/nature06713 .[19] E. J. Allen, G. St-Yves, Y. Wu, J. L. Breedlove, J. S. Prince, L. T. Dowdle, M. Nau, B. Caron, F. Pestilli, I. Charest, J. B. Hutchinson, T. Naselaris, K. Kay, A massive 7T fMRI dataset to bridge cognitive neuroscience and artificial intelligence, Nature Neuroscience 25 (1) (2022) 116–126. doi:10.1038/s41593-021-00962-x .[20] R. Zhang, P. Isola, A. A. Efros, E. Shechtman, O. Wang, The Unreasonable E ff ectiveness of Deep Features as a Perceptual Metric, in: 2018 IEEE /CVF Conference on Computer Vision and Pattern Recognition, 2018, pp. 586–595. doi:10.1109/CVPR.2018.00068 .[21] J. Guo, C. Yi, F. Li, P. Xu, Y. Tian, MindLDM: Reconstruct Visual Stimuli from fMRI Using Latent Di ff usion Model, in: 2024 IEEE International Conference on Computational Intelligence and Virtual Environments for Measurement Systems and Applications (CIVEMSA), 2024, pp. 1–6. doi:10.1109/CIVEMSA58715.2024.10586647 .[22] Z. Chen, J. Qing, T. Xiang, W. L. Yue, J. H. Zhou, Seeing Beyond the Brain: Conditional Di ff usion Model with Sparse Masked Modeling for Vision Decoding, in: 2023 IEEE /CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2023, pp. 22710–22720. doi: 10.1109/CVPR52729.2023.02175 .[23] S. Wang, S. Liu, Z. Tan, X. Wang, MindBridge: A Cross-Subject Brain Decoding Framework, in: 2024 IEEE /CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2024, pp. 11333–11342. doi:10.1109/CVPR52733.2024.01077 .
+
+10 
+
+.CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 23, 2026. ;https://doi.org/10.64898/2026.04.23.720313 doi: bioRxiv preprint

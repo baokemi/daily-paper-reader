@@ -1,0 +1,347 @@
+Title: Dynamic Visual-semantic Alignment for Zero-shot Learning with Ambiguous Labels
+
+URL Source: https://arxiv.org/pdf/2604.17710v1
+
+Published Time: Tue, 21 Apr 2026 01:45:55 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Dynamic Visual-semantic Alignment for Zero-shot Learning with Ambiguous Labels 
+
+Jiangnan Li 1, Linqing Huang 2, Xiaowen Yan 1, Min Gan 1, Wenpeng Lu 3, Jinfu Fan 1,∗ 
+
+> 1
+
+College of Computer Science and Technology, Qingdao University  
+
+> 2
+
+School of Computer Science, Shanghai JiaoTong University  
+
+> 3
+
+Key Laboratory of Computing Power Network and Information Security, Ministry of Education, Shandong Computer Science Center, Qilu University of Technology (Shandong Academy of Sciences) 
+
+Abstract —Zero-shot learning (ZSL) aims to recognize unseen classes without visual instances. However, existing methods usu-ally assume clean labels, overlooking real-world label noise and ambiguity, which degrades performance. To bridge this gap, we propose the Dynamic Visual-semantic Alignment (DVSA), a robust ZSL framework for learning from ambiguous labels. DVSA uses a bidirectional visual–semantic alignment module with attention to mutually calibrate visual features and attribute prototypes, and a contrastive optimization grounded in Mutual Information (MI) at the attribute level to strengthen discrim-inative, semantically consistent attributes. In addition, a dy-namic label disambiguation mechanism iteratively corrects noisy supervision while preserving semantic consistency, narrowing the instance-label gap, and improving generalization. Extensive experiments on standard benchmarks verify that DVSA achieves stronger performance under ambiguous supervision. 
+
+Index Terms —zero-shot learning, ambiguous labels, mutual information estimation, dynamic disambiguation 
+
+I. I NTRODUCTION 
+
+Zero-shot learning (ZSL) has emerged as an important paradigm for visual recognition that aims to mimic human cognition by recognizing unseen classes without requiring labeled visual instances [1]. By leveraging semantic side information shared across classes such as attributes [1], word embeddings [2], and textual descriptions [3], ZSL transfers knowledge from seen to unseen classes and thereby alleviates the need for exhaustive manual annotation. Existing approaches can be broadly classified into genera-tive and embedding-based methods. Generative methods use auxiliary generators [4]–[6] to synthesize visual features for unseen classes. Although effective, their reliance on addi-tional external data transforms ZSL into a fully supervised task. In contrast, embedding-based methods instead learn a shared space where visual features and semantic prototypes are aligned for nearest-neighbor prediction [7]–[9]. Despite its success, a predominant limitation of existing methods is their reliance on the strong assumption that the training instances from seen classes are annotated with accurate and reliable class labels. This assumption is often unrealistic in practice, especially for fine-grained species recognition or large-scale long-tail scenarios, where annotations are more prone to 
+
+> ∗
+
+Corresponding author (fan jinfu@163.com). This work was supported by the National Natural Science Foundation of China (Nos. 62401309, 62401362, 62576183), the China Postdoctoral Science Foundations (No. 2025M771692), the Natural Science Foundation of Shandong Province and Qingdao (No. 2R2024QF119, No. 24-4-4-zrjj-89-jch), and open project (No. 2024PY030). 0.00 0.01 0.03 0.05 0.07 
+
+> Partial Rate (q)
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> Harmonic Mean Accuracy (%)
+> Gap
+> Transzero
+> MSDN
+> GEM-ZSL
+> CoAR-ZSL
+> CvSC
+> DVSA
+
+Fig. 1. How Ambiguous Labels Affect ZSL Performance. 
+
+ambiguity and noise. Similar robustness challenges have also been discussed in incomplete-data classification settings [10]. As illustrated in Figure 1, when we inject such ambiguity into the CUB dataset, state-of-the-art ZSL models suffer a sharp performance drop, revealing a clear vulnerability of current ZSL pipelines to imperfect supervision. 
+
+To alleviate the annotation burden, weakly supervised learn-ing methods such as Partial label learning (PLL) [11], [12] have been explored. PLL allows training instances to be annotated with ambiguous labels, where each instance may have multiple candidate labels, with only one being correct. By exploiting relationships among candidate labels of simi-lar instances, PLL alleviates the detrimental effects of label ambiguity on classifier performance. Building on these insights, we aim to combine the strengths of ZSL and PLL to mitigate ambiguous labels in training data while effectively predicting unseen classes. To this end, we propose the Dynamic Visual-semantic Alignment (DVSA) framework for zero-shot learning with ambiguous labels. DVSA first aligns visual features and attribute vectors via a bidirectional attention module, ensuring mutual reinforce-ment between visual and semantic representations. Visual-to-Attribute (VTA) block refines attribute prototypes using visual cues, while an Attribute-to-Visual (ATV) block cali-brates visual features conditioned on the updated attributes. An attribute-level mutual information (MI) based contrastive objective encourages the selected attributes to maximally pre-serve semantic consistency while increasing separation from negatives, yielding more discriminative and noise-resilient attribute representations. Finally, a dynamic label disambigua-tion mechanism iteratively updates soft label distributions over candidate labels using both visual and semantic predictions, and feeds the refined supervision back into training, narrowing the semantic gap between instances and candidate labels.                   
+
+> arXiv:2604.17710v1 [cs.CV] 20 Apr 2026 Resnet  Glove
+> Attribute Discription Image
+> ‘gray’
+> ‘swims’
+> ‘ocean’
+> ……VTA
+> Attention …
+> ATV
+> Attention …
+> Corrected Label
+> Correction Factor
+> ………
+> ... ... update
+> (a) Model
+> ... ...
+> …
+> MI Estimator
+> (c) MI Representation Learning
+> Linear  Linear  Linear
+> Softmax
+> …
+> Attention
+> Map
+> (b) Bidirectional Attention
+> …
+> update Fig. 2. The framework of our proposed DVSA. DVSA processes attributes and images with pre-trained encoders and calibrates features via a bidirectional attention module. As shown in (b), the VTA block selectively enhances attribute vectors aunder the guidance of visual features f, while the ATV block refines visual features fconditioned on the updated attributes ˆa. The MI-based optimization in (c) further strengthens the semantic correlations encoded in ˆa.
+
+In summary, our main contributions are threefold:  
+
+> •
+
+We devise a novel visual-semantic alignment module that combines bidirectional attention and MI optimization, enabling more discriminative and robust cross-modal alignment under ambiguous supervision.  
+
+> •
+
+We propose a novel dynamic label disambiguation mech-anism to progressively refine supervision signals, which requires no clean label assumptions.  
+
+> •
+
+Extensive experiments demonstrate the effectiveness of our DVSA with superior robustness to label ambiguity. II. R ELATED WORK 
+
+Zero-shot learning (ZSL) transfers semantic knowledge from seen to unseen classes via shared representations. Generative-based methods synthesize unseen features with auxiliary generators (e.g., GAN [4], VAE [5], diffusion [6]). While embedding-based methods learn a joint space aligning visual features and semantic prototypes for nearest-neighbor. Although recent models leverage attention [9], graphs [13], and transformers [14] to obtain more discriminative features, they still degrade notably under label noise or ambiguity. 
+
+Partial label learning (PLL) associates each instance with a candidate label set, of which only one is correct. Conventional PLL disambiguates by exploiting similarity among instances and candidate labels through averaging [11] or identifica-tion [15] strategies. Deep PLL further couples representation learning with disambiguation using regularization [16], data augmentation [17], and dynamic loss reweighting [18], sub-stantially improving robustness to noisy supervision. 
+
+Mutual information (MI) measures statistical dependency and has become a key tool for representation learning. MINE [19] introduced neural estimation of MI for high-dimensional continuous variables. Deep InfoMax [20] demonstrates that maximizing MI between local and global representations im-proves downstream task performance. In ZSL and PLL, MI-based objectives have been used to strengthen alignment and guide disambiguation [21], demonstrating the effectiveness and promising prospects. III. M ETHOD 
+
+Problem Setting. Let the instance space be X = X s ∪ X u.The seen label space is Ys = {yc}Qc=1 , where each class yc
+
+has an semantic vector Sc = [ sc
+
+> 1
+
+, . . . , s cK ]⊤ with K attributes. The training set D = (xi, L i, SLi )|1 ≤ i ≤ N contains 
+
+N instances, Li ⊆ Y s is a candidate label set for xi with cardinality |Li|, and SLi collects the attribute vectors of labels in Li. Li can also be represented by a label vector li, where 
+
+lic ∈ { 0, 1} denotes whether the label yc is present in the candidate labels (‘1’) or not (‘0’). During training, the true label of an instance xi is only partially observed through its candidate label set Li, and the model must leverage SLi to learn from such ambiguous supervision. In the conventional ZSL (CZSL), the task is to recognize only unseen classes, whereas in generalized ZSL (GZSL) instances may come from both seen and unseen classes, with Ys ∩Y u = ∅. The objective of our model is to learn a classifier f : X 7 → Y s ∪ Y u that can effectively remove the influence of noise in the candidate labels, accurately predicting the true labels for instances. 
+
+A. Visual-semantic Alignment Module 1) Bidirectional Attention: a) Visual-to-Attribute Attention Block: The VTA block refines attribute vectors using visual features extracted from the image. As shown in the pink rectangular box in Fig. 2(b), original attribute representation a ∈ RK×dw2v act as the query and perform attention to regional visual features f ∈ RD×dv
+
+from ResNet101. We obtain query, key, and value projections by linear transformation layers, 
+
+Q1 = aW Q1 , K1 = fW K1 , V1 = fW V1 , (1) where WQ1 ∈ Rdw2v ×d, WK1 ∈ Rdv ×d and WV1 ∈ Rdv ×d
+
+are learnable parameter matrices. To capture the relationships between the attributes and the visual features, the correlation between the Q1 and K1 is computed via the dot product, followed by a SoftMax operation to produce an attention map. Then, the attention map is applied to V1 with a residual connection to form instance-specific attribute prototypes, 
+
+ˆam = Softmax 
+
+ Q1 × K⊤
+
+> 1
+
+√d
+
+
+
+V1 + Q1. (2) Finally, we project back to the original attribute dimension with WO ∈ Rd×dv to obtain refined attributes representations, 
+
+ˆa = ˆ amWO . (3) By incorporating the VTA block, DVSA is capable of progressively refining the visual-semantic alignment and ex-tracting attribute representations related to instances during the iterative process of focusing on visual-semantic correlations. This module narrows the semantic gap between visual features and attribute prototypes by using discriminative visual cues to guide the calibration of attribute vectors. 
+
+b) Attribute-to-Visual Attention Block: The ATV block refines visual features based on the updated attribute represen-tations obtained from the VTA block. This block operates in the reverse direction compared to the VTA attention block. As shown in the purple rectangular box in Figure 2 (b), the visual features f now act as the query, while the updated attribute representations ˆa serve as both the key and value. Similarly, unambiguous and transferable visual representations is 
+
+ˆv =
+
+
+
+Softmax 
+
+ fW Q2 × (ˆ aW K2 )⊤
+
+√d
+
+
+
+ˆaW V2 + fW Q2
+
+
+
+WO .
+
+(4) Together with VTA, ATV forms a bidirectional alignment loop. VTA distills attribute representations from visual evi-dence, while ATV projects these purified attributes back to the visual space, thereby iteratively minimizing cross-modal discrepancies and mitigating overfitting under ambiguous la-bels. Such bidirectional alignment is particularly critical for ambiguous labels, as the mutual reinforcement between modal-ities effectively prevents overfitting to erroneous annotations. 
+
+2) Attribute Mutual Information Representation Learning: 
+
+Owing to label ambiguity, we only observe a set of candidate semantic vectors rather than the true class semantics. This injects noise into the semantics, making it crucial to obtain discriminative attribute representations. Therefore, we intro-duce an MI-based contrastive optimization that preserves fine-grained attribute relationships in the embedding space. Attribute feature selection is based on the entropy distri-bution of different classes of attributes. For each dataset, we calculate the Shannon entropy of each attribute column, which quantifies the contribution of each attribute to classification, 
+
+Hk = −
+
+> Q
+
+X
+
+> c=1
+
+p(sck) log p(sck), (5) where p(sck) is the normalized occurrence probability. An adaptive threshold μ = median (H1, ..., H K ) selects the top 50% most discriminative attributes (A = {ˆak | Hk < μ }). For each selected attribute ˆak ∈ A, features from the same attribute form positives A+, and all other attribute features serve as negatives A−.To mitigate the high-variance instability typically observed in MI estimation via variational f -divergences, we adopt a stabilized training strategy based on the Jensen–Shannon (JS) divergence [22]. Specifically, we train the critic V (·) using a JS-based objective, which provides more stable gradients compared to directly optimizing exponential-form bounds. During the forward pass, the MI value is computed using an NWJ-style estimator, 
+
+IM I = EP[V (A, A+)] − EQ[exp( V (A, A−))] + 1 , (6) We encourage high MI between samples and their positives and low MI with negatives, and define the attribute MI loss as 
+
+LAM I = IM I , (7) 
+
+B. Dynamic Label Disambiguation Mechanism 
+
+The label disambiguation mechanism aims to resolve am-biguity in the candidate label set by identifying the most probable ground-truth label for each instance. The updated labels are then used to guide the learning process of the model, gradually narrowing the semantic gap between instances and candidate labels. This mechanism is particularly crucial in scenarios with ambiguous labels, as it enables the model to iteratively refine its supervision signal, thereby enhancing its generalization capability. For input image xi, the global visual features v is obtained via Global Average Pooling (GAP) on backbone features fi.The class prototypes p are obtained by embedding the class semantic vector S into the visual space. Then the visual prediction probability matrix M = [ mij ]N ×Q is denoted by, 
+
+mij = exp ( τ · cos ( vi, pj )) 
+
+PQk=1 exp ( τ · cos ( vi, pj )) , (8) where τ is the scaling factor. Instead of relying on pre-determined values, we update soft labels via dynamic disam-biguation in the process of iterative learning, 
+
+˜lt+1  
+
+> ij
+
+=
+
+ Utij / P 
+
+> yc∈Li
+
+Utic if yj ∈ Li
+
+0 otherwise , (9) where Utij = (1 −α)Ut−1 
+
+> ij
+
++αMtij , with U0 
+
+> ij
+
+is initialized from the candidate labels. We set α = 0 .5 to balance stable label refinement with responsiveness to new predictions. Thus the corrected labels for the t-th epoch are computed as a weighted combination of corrected labels from the previous epoch and current predictions. The corrected labels are subsequently passed into the model for training as the updated supervision signal in the next iteration. To further mitigate label ambiguity, we introduce a correction factor that measures the alignment between refined visual features ˆvi and class prototypes pj ,
+
+ωtij = Softmax ˆvti pTj
+
+∥ˆvti ∥2 pTj 2
+
+!
+
+, (10) This term acts as a weight in the loss, 
+
+Lvis = −
+
+> N
+
+X
+
+> i=1
+> Q
+
+X
+
+> j=1
+
+
+
+(1 + ωtij )˜ltij log mtij 
+
+
+
+, (11) TABLE I THE COMPARISON RESULT (%) WITH OTHER ZSL METHODS ON BENCHMARKS WITH DIFFERENT DEGREES OF RANDOM NOISE . T HE BEST AND SECOND -BEST RESULTS ARE HIGHLIGHTED , RESPECTIVELY .Datasets Methods 
+
+q = 0 .01 q = 0 .03 q = 0 .05 q = 0 .07 
+
+CZSL GZSL CZSL GZSL CZSL GZSL CZSL GZSL 
+
+T 1 U S H T 1 U S H T 1 U S H T 1 U S H
+
+AwA2 GEM-ZSL [9] 33.8 33.2 43.0 37.5 28.6 25.8 32.0 28.6 21.8 21.5 34.0 26.3 18.5 18.2 27.8 22.0 Transzero [14] 65.4 61.2 76.5 68.0 65.5 62.6 68.8 65.6 63.4 61.4 55.2 58.1 61.2 55.8 41.9 47.9 MSDN [23] 66.4 59.3 75.1 66.3 62.2 54.6 82.1 65.6 57.9 52.8 74.4 61.8 57.0 45.0 84.4 58.7 CoAR-ZSL [24] 62.2 61.4 70.6 65.7 63.2 62.1 68.2 65.0 60.6 59.6 65.6 62.5 53.1 52.1 66.8 58.5 CvSC [25] 52.7 49.0 85.1 62.2 50.8 49.2 83.2 61.8 50.0 48.5 81.2 60.7 48.8 47.8 77.6 59.2 
+
+DVSA 76.4 75.1 74.1 74.6 73.7 75.5 73.2 74.4 73.6 73.0 75.0 74.0 70.4 68.4 80.3 73.9 
+
+CUB GEM-ZSL [9] 56.9 49.2 49.7 49.4 39.9 34.9 36.9 35.9 34.8 27.3 28.1 27.7 23.0 19.0 20.2 19.6 Transzero [14] 62.9 51.0 56.0 53.4 39.4 25.9 38.0 30.8 31.1 21.5 33.0 26.0 28.7 14.8 29.7 19.8 MSDN [23] 56.5 47.1 59.1 52.4 39.1 27.9 49.8 35.7 27.6 21.4 45.0 29.0 24.1 19.1 29.0 23.0 CoAR-ZSL [24] 60.0 50.6 51.1 50.8 42.4 36.9 40.8 38.8 37.5 27.1 30.2 28.6 30.9 20.6 22.3 21.4 CvSC [25] 67.9 55.1 68.8 61.2 58.3 53.1 50.2 51.6 50.0 44.7 30.1 36.0 36.6 36.5 15.2 21.5 
+
+DVSA 71.9 65.8 72.5 69.0 69.4 61.1 74.4 67.1 70.7 62.5 71.4 66.7 66.1 58.0 67.3 62.3 
+
+Datasets Methods r = 1 r = 2 r = 3 r = 4 
+
+SUN GEM-ZSL [9] 61.4 38.4 35.3 36.8 58.0 37.4 29.3 31.9 57.0 31.8 29.3 30.5 56.2 30.2 28.3 29.2 Transzero [14] 58.5 47.4 22.6 30.6 55.7 48.7 15.7 23.7 53.6 48.5 11.0 17.9 53.9 46.9 7.1 12.4 MSDN [23] 61.1 50.1 21.0 29.6 59.5 48.9 16.4 24.6 57.3 45.8 11.9 18.8 54.9 35.5 10.3 16.0 CoAR-ZSL [24] 60.9 43.5 34.3 38.4 61.7 42.6 30.1 35.3 57.6 37.7 29.8 33.3 54.9 35.4 27.3 30.8 CvSC [25] 68.2 64.8 32.8 43.6 67.4 64.3 30.2 41.1 66.6 65.3 24.0 35.1 66.2 64.2 19.0 29.3 
+
+DVSA 62.1 44.4 36.6 40.1 63.3 42.5 35.4 38.6 60.9 38.1 35.8 36.9 60.7 35.6 32.7 34.1 
+
+In parallel, we compute semantic confidence from refined attributes ˆai and class semantic embeddings sj ,
+
+m′
+
+ij = exp ( τ · cos (ˆ ai, sj )) 
+
+PQk=1 exp ( τ · cos (ˆ ai, sj )) , (12) leading to a semantic cross-entropy loss 
+
+Lsem = −
+
+NX
+
+i=1 
+
+QX
+
+j=1 
+
+(˜ltij log m′tij ). (13) Adaptive cross-entropy loss combines both modalities with equal importance, i.e., LACE = Lvis +Lsem . This mechanism ensures that the label information is progressively refined, mitigating the impact of noise during training. 
+
+C. Model Optimization and Inference 
+
+We optimize DVSA by minimizing a joint objective of adaptive cross-entropy and attribute mutual information loss, 
+
+L = LACE − L AM I . (14) After training the model, we perform nearest-prototype clas-sification in a cosine similarity space: 
+
+y∗ = arg max 
+
+yc∈Y t
+
+ v · pc − γ I[yc ∈ Y s]. (15) where I(·) denotes an indicator function. For CZSL, we classify only over unseen labels by setting Yt = Yu and 
+
+γ = 0 . For GZSL, test instances may come from both seen and unseen classes, i.e., Yt = Ys ∪Y u, so we adopt calibrated stacking with γ > 0 to reduce the bias toward seen classes. 
+
+TABLE II THE COMPARISON RESULT (%) WITH OTHER ZSL METHODS ON BENCHMARKS . T HE BEST AND SECOND -BEST RESULTS ARE HIGHLIGHTED , RESPECTIVELY .Methods Venue AwA2 CUB SUN 
+
+T 1 H T 1 H T 1 H
+
+Generative-based Methods HSVA [26] NeurIPS’21 - 66.8 62.8 55.3 63.8 43.3 CE-GZSL [27] CVPR’21 70.4 70.0 77.5 65.3 63.3 43.1 ICCE [28] CVPR’22 72.7 72.8 78.4 66.4 - -BSeGN [29] TNNLS’22 71.5 67.4 65.3 58.0 66.4 42.9 AREES [30] TNNLS’22 73.6 66.1 65.7 55.2 64.3 42.2 DGCNet [31] TCSVT’23 74.1 62.1 71.6 53.2 62.6 30.8 D3GZSL [32] AAAI’24 - 70.1 - 67.8 - -VFD-ZSL [33] ICME’24 73.6 68.1 62.2 56.9 63.8 43.5 Embedding-based Methods APN [34] NeurIPS’20 68.4 65.5 72.0 67.2 61.6 37.6 GEM-ZSL [9] CVPR’21 67.3 70.6 77.8 70.4 62.8 36.9 A-RSR [35] TNNLS’22 69.0 65.6 72.1 68.0 64.0 39.0 Transzero [14] AAAI’22 70.1 70.2 76.8 68.8 65.6 40.8 MSDN [23] CVPR’22 70.1 67.7 76.1 68.1 65.8 41.3 CoAR-ZSL [24] TNNLS’23 74.1 73.2 79.2 74.0 66.7 43.4 BGSNet [36] TMM’23 69.1 69.9 73.3 66.7 63.9 39.0 ZS-VAT [37] TNNLS’25 62.8 70.9 66.4 69.4 42.9 40.7 DVSA Ours 76.7 75.8 74.9 70.8 64.3 44.8 
+
+IV. E XPERIMENTS 
+
+A. Experimental Setup a) Datasets: We evaluate DVSA on three widely used datasets, i.e., CUB [38], SUN [39], and AwA2 [40]. The seen-unseen class division is set according to [40]. Following the synthesis method of PLL datasets [11], we construct candidate label sets by adding noisy labels to each instance. For CUB and AwA2, we use Q − 1 independent decisions with q ∈ {0.01 , 0.03 , 0.05 , 0.07 } controlling the inclusion TABLE III ABLATION STUDY OF DIFFERENT COMPONENTS ON CUB AND AWA2                                                                                                        
+
+> DATASETS WITH q= 0 .05 . (’/’ INDICATES THAT ONLY REGULAR CROSS ENTROPY TRAINING IS USED ,WITHOUT LABEL UPDATES )VTA Lvis Lsem ωLAM I CUB AwA2
+> T1USHT1USH
+> ×/×××25.0 17.7 22.7 19.9 42.8 42.0 62.4 50.2
+> ✓/×××38.8 28.6 35.0 31.5 59.4 58.4 67.5 62.6
+> ✓✓×××51.0 45.9 51.2 48.4 60.4 59.0 71.3 64.6
+> ✓✓✓××54.2 47.6 51.4 49.4 65.8 65.1 73.2 68.9
+> ✓✓✓×✓62.9 57.2 67.0 61.7 70.8 68.7 71.0 69.8
+> ✓✓✓✓×63.4 56.7 69.1 62.3 67.3 66.9 71.4 69.1
+> ✓✓✓✓✓70.7 62.5 71.4 66.7 73.6 73.0 75.0 74.0
+
+probability of each noisy label. For SUN dataset, r ∈ 1, 2, 3, 4
+
+specifies the number of false positive labels attached to each ambiguously labeled instance. Larger q or r yields more noisy labels and thus a harder disambiguation problem. On all three benchmarks, irrelevant labels are randomly sampled to form the candidate sets together with the ground-truth label. 
+
+b) Metrics: For CZSL, we measure performance using class-wise Top-1 accuracy on unseen classes. For GZSL, we employ the harmonic mean H = (2 × S × U )/(S + U ) to evaluate the performance, where S and U denote the Top-1
+
+accuracy of seen and unseen classes, respectively. 
+
+B. Comparison with State-of-the-Arts 
+
+We first compare DVSA with strong embedding-based ZSL baselines under different levels of label ambiguity. As reported in Tab. I, DVSA achieves the best or second-best performance on all three datasets and across all ambiguity level in both CZSL and GZSL metrics. As the ambiguity level increases, all methods suffer performance degradation, but the drop of DVSA is substantially smaller than that of these. This indicates that the proposed modules jointly provide strong robustness to ambiguous labels. To further assess the effectiveness of DVSA in the standard ZSL scenario without synthetic ambiguity, we compare it with recent generative-based and embedding-based methods on the original benchmarks. As shown in Tab. II, DVSA achieving the best or near-best T 1 and H on CUB, AwA2, and SUN. These results demonstrate that DVSA not only excels in challenging ambiguous-label settings, but also remains competitive with state-of-the-art ZSL models on clean benchmarks, confirming the general effectiveness of the proposed framework. 
+
+C. Ablation Study 
+
+We conduct ablations on fine-grained CUB and coarse-grained AwA2 datasets with q = 0.05 , as summarized in Tab. III. Starting from a naive baseline that directly optimizes standard cross-entropy on candidate labels without bidirec-tional attention, dynamic disambiguation, semantic branch, calibration factor ω, or MI loss, the model exhibits limited performance, showing that naive learning from ambiguous la-bels is suboptimal. Equipping this baseline with the VTA block already brings a noticeable gain. Introducing the visual adap-tive cross-entropy loss with dynamically updated soft labels on top of VTA then yields a clear improvement across all metrics, indicating that iterative label refinement provides much cleaner       
+
+> Fig. 3. Visualization of disambiguation results of DVSA on AwA2 dataset. image leg color black breast color brown bill color brown nape color brown image wing pattern striped bill color grey
+> Fig. 4. Visualization of attribute attention maps on CUB dataset.
+
+supervision. Adding the semantic pathway further improves results by enforcing consistency between attribute-based and visual predictions. Comparing variants with and without ω and 
+
+LAM I shows that both calibration and MI-based contrastive optimization contribute additional gains. The calibration factor 
+
+ω links the loss reweighting to the ATV block, while LAM I 
+
+exerts a stronger influence by producing more discriminative attribute embeddings. Combining all components yields the full DVSA, which achieves the best results on both datasets, confirming that these modules are highly complementary. 
+
+D. Visualization Analysis a) Disambiguation Process: To elucidate the disam-biguation mechanism, we conducted disambiguation visualiza-tion for the seen class on AwA2 dataset with q = 0 .07 . As il-lustrated in Fig. 3, the candidate label sets are displayed below each image instance, while the corresponding disambiguation results are shown above. The results clearly demonstrate that DVSA maintains robust disambiguation accuracy despite substantial label ambiguity. 
+
+b) Attribute Localization: Fig. 4 qualitatively evaluates the VTA attention block through visualized attention maps. The results demonstrate that our method localizes attribute-relevant regions across diverse semantic concepts with high precision. V. C ONCLUSION 
+
+In this paper, we presented DVSA, a novel framework that addresses ambiguous labels in zero-shot learning through dy-namic visual-semantic alignment. By integrating bidirectional visual-semantic attention and mutual information optimization, DVSA enhances the alignment between visual features and semantic attributes, improving the robustness of the model to label noise. Additionally, the dynamic label disambiguation mechanism progressively refines supervision signals, ensur-ing accurate predictions even in the presence of ambiguous annotations. Comprehensive experiments validate that DVSA achieves superior performance compared to existing methods, particularly in high-noise scenarios. REFERENCES [1] Christoph H Lampert, Hannes Nickisch, and Stefan Harmeling, “Learn-ing to detect unseen object classes by between-class attribute transfer,” in 2009 IEEE conference on computer vision and pattern recognition .IEEE, 2009, pp. 951–958. [2] Richard Socher, Milind Ganjoo, Christopher D Manning, and Andrew Ng, “Zero-shot learning through cross-modal transfer,” Advances in neural information processing systems , vol. 26, 2013. [3] Scott Reed, Zeynep Akata, Honglak Lee, and Bernt Schiele, “Learning deep representations of fine-grained visual descriptions,” in Proceedings of the IEEE conference on computer vision and pattern recognition ,2016, pp. 49–58. [4] Jingjing Li, Mengmeng Jing, Ke Lu, Zhengming Ding, Lei Zhu, and Zi Huang, “Leveraging the invariant side of generative zero-shot learning,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2019, pp. 7402–7411. [5] Edgar Schonfeld, Sayna Ebrahimi, Samarth Sinha, Trevor Darrell, and Zeynep Akata, “Generalized zero-and few-shot learning via aligned variational autoencoders,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2019, pp. 8247–8255. [6] Zihan Ye, Shreyank N Gowda, Shiming Chen, et al., “Zerodiff: Solidified visual-semantic correlation in zero-shot learning,” in The Thirteenth International Conference on Learning Representations , 2025. [7] Andrea Frome, Greg S Corrado, Jon Shlens, Samy Bengio, Jeff Dean, et al., “Devise: A deep visual-semantic embedding model,” Advances in neural information processing systems , vol. 26, 2013. [8] Bernardino Romera-Paredes and Philip Torr, “An embarrassingly simple approach to zero-shot learning,” in International conference on machine learning . PMLR, 2015, pp. 2152–2161. [9] Yang Liu, Lei Zhou, Xiao Bai, Yifei Huang, Lin Gu, Jun Zhou, and Tatsuya Harada, “Goal-oriented gaze estimation for zero-shot learning,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 3794–3803. [10] Linqing Huang, Jinfu Fan, Shilin Wang, Gongshen Liu, et al., “In-complete data classification via distribution alignment with evidence combination,” Machine Intelligence Research , pp. 1–23, 2026. [11] Min-Ling Zhang and Fei Yu, “Solving the partial label learning problem: An instance-based approach.,” in IJCAI , 2015, pp. 4048–4054. [12] Jinfu Fan, Linqing Huang, Chaoyu Gong, et al., “Kmt-pll: K-means cross-attention transformer for partial label learning,” IEEE Transactions on Neural Networks and Learning Systems , 2024. [13] Lu Liu, Tianyi Zhou, Guodong Long, et al., “Attribute propagation network for graph zero-shot learning,” in Proceedings of the AAAI conference on artificial intelligence , 2020, vol. 34, pp. 4868–4875. [14] Shiming Chen, Ziming Hong, Yang Liu, et al., “Transzero: Attribute-guided transformer for zero-shot learning,” in Proceedings of the AAAI conference on artificial intelligence , 2022, vol. 36, pp. 330–338. [15] Yu Zhou, Jianjun He, and Hong Gu, “Partial label learning via gaussian processes,” IEEE transactions on cybernetics , vol. 47, no. 12, pp. 4443– 4450, 2016. [16] Haobo Wang, Ruixuan Xiao, Yixuan Li, Lei Feng, Gang Niu, Gang Chen, and Junbo Zhao, “Pico+: Contrastive label disambiguation for robust partial label learning,” arXiv preprint arXiv:2201.08984 , 2022. [17] Jing Chai, Ivor W Tsang, and Weijie Chen, “Large margin partial label machine,” IEEE Transactions on Neural Networks and Learning Systems , vol. 31, no. 7, pp. 2594–2608, 2019. [18] Hongwei Wen, Jingyi Cui, Hanyuan Hang, Jiabin Liu, et al., “Leveraged weighted loss for partial label learning,” in International conference on machine learning . PMLR, 2021, pp. 11091–11100. [19] Mohamed Ishmael Belghazi, Aristide Baratin, Sai Rajeswar, Sherjil Ozair, et al., “Mine: mutual information neural estimation,” arXiv preprint arXiv:1801.04062 , 2018. [20] R Devon Hjelm, Alex Fedorov, Samuel Lavoie-Marchildon, Karan Grewal, et al., “Learning deep representations by mutual information estimation and maximization,” arXiv preprint arXiv:1808.06670 , 2018. [21] Jinfu Fan, Yang Yu, Linqing Huang, et al., “Graphdpi: Partial label disambiguation by graph representation learning via mutual information maximization,” Pattern Recognition , vol. 134, pp. 109133, 2023. [22] Ben Poole, Sherjil Ozair, Aaron Van Den Oord, Alex Alemi, and George Tucker, “On variational bounds of mutual information,” in International conference on machine learning . PMLR, 2019, pp. 5171–5180. [23] Shiming Chen, Ziming Hong, Guo-Sen Xie, Wenhan Yang, et al., “Msdn: Mutually semantic distillation network for zero-shot learning,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 7612–7621. [24] Yu Du, Miaojing Shi, Fangyun Wei, and Guoqi Li, “Boosting zero-shot learning via contrastive optimization of attribute representations,” IEEE Transactions on Neural Networks and Learning Systems , 2023. [25] Shuhuang Chen, Dingjie Fu, Shiming Chen, Shuo Ye, Wenjin Hou, and Xinge You, “Causal visual-semantic correlation for zero-shot learning,” in Proceedings of the 32nd ACM International Conference on Multimedia , 2024, pp. 4246–4255. [26] Shiming Chen, Guosen Xie, Yang Liu, et al., “Hsva: Hierarchical semantic-visual adaptation for zero-shot learning,” Advances in Neural Information Processing Systems , vol. 34, pp. 16622–16634, 2021. [27] Zongyan Han, Zhenyong Fu, Shuo Chen, and Jian Yang, “Contrastive embedding for generalized zero-shot learning,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 2371–2381. [28] Xia Kong, Zuodong Gao, Xiaofan Li, et al., “En-compactness: Self-distillation embedding & contrastive generation for generalized zero-shot learning,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 9306–9315. [29] Guo-Sen Xie, Xu-Yao Zhang, Tian-Zhu Xiang, Fang Zhao, et al., “Leveraging balanced semantic embedding for generative zero-shot learning,” IEEE Transactions on Neural Networks and Learning Sys-tems , vol. 34, no. 11, pp. 9575–9582, 2022. [30] Yang Liu, Yuhao Dang, Xinbo Gao, Jungong Han, and Ling Shao, “Zero-shot learning with attentive region embedding and enhanced semantics,” IEEE Transactions on Neural Networks and Learning Systems , vol. 35, no. 3, pp. 4220–4231, 2022. [31] Yilei Zhang, Yi Tian, Sihui Zhang, and Yaping Huang, “Dual-uncertainty guided cycle-consistent network for zero-shot learning,” IEEE Transac-tions on Circuits and Systems for Video Technology , vol. 33, no. 11, pp. 6872–6886, 2023. [32] Yijie Wang, Mingjian Hong, Luwen Huangfu, and Sheng Huang, “Data distribution distilled generative model for generalized zero-shot recogni-tion,” in Proceedings of the AAAI Conference on Artificial Intelligence ,2024, vol. 38, pp. 5695–5703. [33] Qingzhi He, Rong Quan, Weifeng Yang, and Jie Qin, “Visual feature disentanglement for zero-shot learning,” in 2024 IEEE International Conference on Multimedia and Expo (ICME) . IEEE, 2024, pp. 1–6. [34] Wenjia Xu, Yongqin Xian, Jiuniu Wang, et al., “Attribute prototype network for zero-shot learning,” Advances in Neural Information Processing Systems , vol. 33, pp. 21969–21980, 2020. [35] Zhe Liu, Yun Li, Lina Yao, Julian McAuley, and Sam Dixon, “Re-think, revisit, revise: A spiral reinforced self-revised network for zero-shot learning,” IEEE Transactions on Neural Networks and Learning Systems , vol. 35, no. 1, pp. 657–669, 2022. [36] Yun Li, Zhe Liu, Xiaojun Chang, et al., “Diversity-boosted generalization-specialization balancing for zero-shot learning,” IEEE Transactions on Multimedia , vol. 25, pp. 8372–8382, 2023. [37] Zongyan Han, Zhenyong Fu, Shuo Chen, et al., “Zs-vat: Learning unbiased attribute knowledge for zero-shot recognition through visual attribute transformer,” IEEE Transactions on Neural Networks and Learning Systems , vol. 36, no. 4, pp. 7025–7036, 2024. [38] Peter Welinder, Steve Branson, Takeshi Mita, Catherine Wah, Florian Schroff, et al., “Caltech-ucsd birds 200,” 2010. [39] Genevieve Patterson, Chen Xu, Hang Su, and James Hays, “The sun attribute database: Beyond categories for deeper scene understanding,” 
+
+International Journal of Computer Vision , vol. 108, pp. 59–81, 2014. [40] Yongqin Xian, Christoph H Lampert, Bernt Schiele, and Zeynep Akata, “Zero-shot learning—a comprehensive evaluation of the good, the bad and the ugly,” IEEE transactions on pattern analysis and machine intelligence , vol. 41, no. 9, pp. 2251–2265, 2018.

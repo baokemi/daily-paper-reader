@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-001.webp",
+      "caption": "Figure 5: AUC scores of MIAs against Adapter-based BERT-base across different training epochs on CoLA.",
+      "page": 11,
+      "index": 1,
+      "width": 959,
+      "height": 237
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-002.webp",
+      "caption": "Figure 1: Overview of the feasibility study results. (a) A glance at the complexity of traditional Computer Vision (CV) models and LLMs. (b) Comparison of shadow model convergence between language task (BERT-Base model [2] on SST2 [22] dataset) and vision task (CNN model on CIFAR-10 [23] dataset). (c) Comparison of gradient-gata correlation with BERT-Base model on SST-2 dataset. (d) Gradient cosine similarity comparison.",
+      "page": 2,
+      "index": 2,
+      "width": 1052,
+      "height": 214
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-003.webp",
+      "caption": "TABLE 4: AUC scores corresponding to the ROC curves in Fig. 4. Higher AUC indicates better attack performance. “Relative Gain” shows the percentage improvement of ProjRes over the best baseline against each model on each dataset.",
+      "page": 10,
+      "index": 3,
+      "width": 1052,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-004.webp",
+      "caption": "TABLE 7: Memory consumption (in MB) of various MIA against the four models on CoLA. The “Model Only” row denotes the memory overhead of loading the model, while the other rows represent the additional memory overhead incurred by the respective methods.",
+      "page": 12,
+      "index": 4,
+      "width": 525,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-005.webp",
+      "caption": "TABLE 8: Time overhead (in seconds) of various MIAs on CoLA across four models.",
+      "page": 12,
+      "index": 5,
+      "width": 525,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-006.webp",
+      "caption": "Figure 4: Comparison of attack performance across different models and datasets using ROC curves.",
+      "page": 9,
+      "index": 6,
+      "width": 1046,
+      "height": 852
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21197v1/fig-007.webp",
+      "caption": "Figure 2: Overview of the proposed ProjRes attack. Using the adapter as the trainable module, an honest-but-curious server conducts the ProjRes attack as follows: ① Perform a forward pass on a target sample x to obtain its hidden embedding f(x) at the adapter layer, where f(·) denotes the model segment preceding the adapter. ② Construct a linear subspace S spanned by the adapter downsampling-layer gradients uploaded by clients. ③ Projection: Compute the orthogonal projection of f(x) onto S to obtain f(x)rec. ④ Residual computation: Calculate the difference f(x)− f(x)rec. ⑤ Residual measurement: Compute the residual magnitude r = ∥f(x) − f(x)rec∥1. ⑥ Membership inference: If r < τ , infer x as a member; otherwise, classify it as a non-member.",
+      "page": 5,
+      "index": 7,
+      "width": 1034,
+      "height": 515
+    }
+  ]
+}

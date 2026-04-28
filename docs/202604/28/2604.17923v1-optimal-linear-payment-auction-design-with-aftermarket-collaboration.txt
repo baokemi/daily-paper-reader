@@ -1,0 +1,10154 @@
+Title: Optimal linear-payment auction design with aftermarket collaboration
+
+URL Source: https://arxiv.org/pdf/2604.17923v1
+
+Published Time: Tue, 21 Apr 2026 02:48:57 GMT
+
+Number of Pages: 79
+
+Markdown Content:
+# Optimal linear-payment auction design with aftermarket collaboration ∗
+
+Dazhong Wang † Ruqu Wang ‡ Xinyi Xu §
+
+Abstract 
+
+This paper studies optimal auction design when valuations depend endogenously on post-auction collaboration between the seller and the winning bidder. Both parties exert non-contractible efforts after the auction, generating a double moral hazard prob-lem alongside adverse selection. We analyze two role structures—winner-pivotal and seller-pivotal collaboration—and characterize optimal direct mechanisms using linear payment schemes that combine cash transfers with proportional value sharing. The optimal mechanism allocates the asset to the bidder with the highest virtual surplus, employs a deterministic value-sharing rule, and achieves full type revelation through the signal realization rule. Comparing the two scenarios yields three main findings. First, regarding value sharing, the seller secures a strictly higher share under seller-pivotal collaboration: for sufficiently low-type winners, the seller extracts the entire value, whereas under winner-pivotal collaboration every winner must retain a positive share to sustain his critical effort. Second, regarding effort exertion, the pivotal party always exerts higher post-auction effort than the supporting party, and each party exerts greater effort when pivotal than when providing support. Third, seller-pivotal collaboration yields strictly higher seller revenue than winner-pivotal collaboration for any type distribution. Finally, these optimal mechanisms can be implemented through ascending auctions with endogenously determined linear contracts. 
+
+Keywords: Linear-payment auction; Optimal design; Pivotal role divergence; Non-contractible efforts 
+
+JEL Classification : D44; D82. 
+
+> ∗
+
+We would like to thank James Bergin, Xun Chen, Yunan Li, Tingjun Liu, Jingfeng Lu, Ning Sun, Guofu Tan, Mengxi Zhang, Jun Zhang, Charles Zheng, Yu Zhou, and all participants in the 2023 Asian Meeting of the Econometric Society, the 2025 World Congress of the Econometric Society and the 7th World Congress of the Game Theory Society for their helpful comments. All remaining errors are ours. 
+
+> †
+
+School of Digital Economics and Management, Nanjing University, No.1520 Taihu Avenue, Suzhou, Jiangsu 215163, China. E-mail: wangdazhong@nju.edu.cn .
+
+> ‡
+
+Department of Economics, Queen’s University. E-mail: wangr@queensu.ca .
+
+> §
+
+Corresponding author. Lingnan College, Sun Yat-Sen University, Guangzhou, Guangdong, China. E-mail: xuxinyi3@mail.sysu.edu.cn .
+
+1
+
+> arXiv:2604.17923v1 [econ.TH] 20 Apr 2026
+
+# 1 Introduction 
+
+1.1 Motivation 
+
+Auction designers often sell assets or projects whose valuations endogenously depend on sub-sequent collaboration between the seller and winning bidder. Examples include franchising (potential franchisees bid for licensing rights and collaborate with franchisors in brand devel-opment), patent licensing (firms compete for technology licenses requiring ongoing collabo-ration in technical development), and infrastructure concessions (construction firms compete for public projects with post-auction collaboration determining project success). These settings share a common feature: sellers employ auctions to select partners for post-auction collaboration, and this collaboration exhibits pivotal role divergence . Either the seller or the winning bidder assumes the pivotal role in value creation. In franchising and infrastructure concessions, the winning bidder typically plays the pivotal role through operational responsibility. In patent licensing, the licensor’s continued research efforts are often essential for value creation. This pivotal role divergence determines which party’s effort is critical for generating value. We illustrate this through four examples. 
+
+Example 1 (Pharmaceutical Drug Development) . A biotechnology firm (seller) auctions commercialization rights for a drug compound to pharmaceutical companies (bidders). The winning company plays the pivotal role by directing mass production, regulatory approval, and marketing strategies. Value creation depends critically on the pharmaceutical company’s commercialization efforts; without these efforts, the drug generates no market value. The biotechnology firm provides supporting technical data but cannot substitute for the winner’s pivotal role. This exemplifies winner-pivotal collaboration. 
+
+Example 2 (TikTok U.S. Operating Rights) . ByteDance (seller) auctions operating rights for TikTok’s U.S. business to American technology companies (bidders) through an informal competitive process. The winning company plays the pivotal role by managing user acqui-sition, content moderation, and advertiser relationships; without these operational efforts, the platform generates no commercial value. ByteDance provides algorithmic technology and ongoing technical support as the supporting party. This exemplifies winner-pivotal collabora-tion. 
+
+Example 3 (University Technology Licensing) . A research university (seller) auctions li-censing rights for artificial intelligence algorithms to technology companies (bidders). The university plays the pivotal role by providing continuous algorithm refinements and research insights that determine commercial viability. Without the university’s continued scientific 
+
+2development, the licensed technology becomes obsolete regardless of the company’s implemen-tation capabilities. This exemplifies seller-pivotal collaboration. 
+
+Example 4 (Telecommunications Spectrum License Auction) . A national telecommunica-tions regulator (seller) auctions spectrum licenses to mobile network operators (bidders). In underserved rural markets, the regulator’s continued contributions—subsidizing backbone in-frastructure and coordinating utility access—are pivotal: without this support, commercially viable service is infeasible regardless of operator capability. This exemplifies seller-pivotal collaboration. In dense urban markets, by contrast, backbone infrastructure is already in place, and commercial success depends on the operator’s capital deployment and marketing. The regulator provides the license and policy framework in a supporting role, exemplifying winner-pivotal collaboration. 
+
+These examples illustrate a common pattern: one party’s effort is indispensable for value creation—if this party exerts zero effort, total value collapses to zero. We call this party the pivotal party and model aftermarket value as Value = (Inherent productivity + Support effort) × Pivotal effort. We analyze two scenarios: winner-pivotal and seller-pivotal 
+
+collaboration. In winner-pivotal scenarios, the winner’s effort is pivotal, and productivity captures the synergy of the winning bidder’s operational capabilities, determined by his inherent characteristics and enhanced by the seller’s supporting contributions (Examples 1 and 2). In seller-pivotal scenarios, the seller’s effort is pivotal, and productivity reflects the winner’s intrinsic implementation capacity, strengthened through the winner’s resource investments (Example 3). The pivotal role need not be fixed: as Example 4 illustrates, the same seller can be pivotal in one market segment and supportive in another. 
+
+1.2 Results 
+
+Both scenarios feature double moral hazard alongside adverse selection. Post-auction actions are non-contractible, and value is generated after the auction. Standard one-shot cash pay-ments are insufficient to incentivize post-auction collaboration. Optimal payment schemes must combine fixed cash transfers with value-sharing arrangements contingent on realized outcomes. We focus on linear payments—a combination of fixed cash transfers and pro-portional value sharing—which are tractable and widely used in practice (see, e.g., Stiglitz, 1974; Weitzman, 1980; Arrow, 1984; Gibbons and Murphy, 1992). 1 The winner compensates the seller through such a linear combination. Auctions with linear payments under double moral hazard remain largely unexplored in the existing literature. 
+
+> 1When adverse selection and double-sided moral hazard coexist, the optimal mechanism design approach is typically inapplicable for non-linear contracts.
+
+3We characterize optimal auctions with aftermarket collaboration under both scenarios. The seller commits to an auction rule comprising bidding patterns and linear payment schemes. In perfect Bayesian equilibrium, the seller and winner choose post-auction ef-forts that maximize their payoffs based on public signals revealed during the auction. By the revelation principle (Myerson, 1982), we restrict attention to direct mechanisms with linear payments. These “direct linear mechanisms” generate allocation rules, payment rules (linear payments for winners, cash payments for losers), and signal realization rules con-ditional on reported types. Mechanism feasibility requires incentive-compatibility (truthful reporting constitutes a Bayesian Nash equilibrium) and individual rationality (non-negative expected payoffs). To characterize the optimal mechanism, we first establish aftermarket equilibrium strate-gies, which differ across leadership scenarios. We then determine the upper bound of the seller’s expected payoff across all feasible direct linear mechanisms, and present a feasible mechanism achieving this upper bound. The optimal mechanism allocates the asset to the bidder with the highest virtual surplus rather than the highest type, where virtual surplus is non-negative and increasing in type. When bidders are non-identically distributed, hazard rates enter differently into each bidder’s virtual surplus, generating discriminatory allocation. Under both scenarios, the optimal signal realization rule reveals the winner’s type, achieving full information revelation. The optimal payment rule specifies a deterministic value-sharing rate and cash transfers satisfying a binding expected-payment condition. Comparing optimal mechanisms across different pivotal structures reveals three main findings. First, regarding value sharing , under seller-pivotal collaboration, the seller con-sistently secures a majority share (exceeding half) of the eventual value, with a pooling region where the seller extracts the entire value from sufficiently low-type winners. Under winner-pivotal collaboration, even the lowest-type winner must receive a positive value share to prevent value collapse. Consequently, the seller always obtains a higher value share under seller-pivotal collaboration. Second, concerning effort exertion , the pivotal party consistently exerts higher effort: under winner-pivotal scenarios, the winner exerts higher effort than the seller; under seller-pivotal scenarios, the seller exerts higher effort than the winner. Each party also chooses higher effort when pivotal than when providing support. Third, regard-ing seller’s revenue , seller-pivotal collaboration yields higher revenue than winner-pivotal collaboration for any distribution. This revenue advantage stems from reduced information rents rather than higher social surplus. Under seller-pivotal collaboration, the seller’s effort alone sustains value creation, allowing the mechanism to extract surplus from high types without leaving excessive rents. Under winner-pivotal collaboration, the winner’s effort is 4essential, requiring the mechanism to compensate the winner more generously, resulting in higher information rent costs. We implement optimal mechanisms through ascending auctions combining cash bids and linear contracts. The winner’s linear contract—comprising value share and cash payment—is determined endogenously by his bid and the penultimate bidder’s drop-out price. Perfect implementation is unattainable in seller-pivotal scenarios because the seller can extract the entire value by imposing full value-sharing on bidders below type thresholds. To approximate optimality, we allow sellers to retain some value share for winning bidders with extremely low types. In equilibrium, bidders adopt “quasi-dominant strategies”: each bidder exits at his true virtual surplus regardless of others’ strategies. We extend our analysis to examine effort substitution and a generalized value creation function nesting both role structures via an interdependence parameter. Under effort substi-tution, similar optimal mechanism structures emerge with full value extraction, since winner efforts do not drive value creation. Under the generalized nesting structure, we characterize sufficient conditions for the optimal mechanism to exist and show that the seller optimally chooses her own effort to be more critical, consistent with the revenue advantage of seller-pivotal collaboration. 
+
+1.3 Related literature 
+
+This study builds on the literature on auctions with security-form payments. DeMarzo et al .(2005) establish that steeper securities yield higher seller revenue in competitive auctions. Gorbenko and Malenko (2011) analyze competition among sellers in securities auctions and show that seller competition pushes equilibrium security designs toward flatter instruments. Subsequent work characterizes optimal equity and royalty auctions across a range of environ-ments: Liu (2016) for heterogeneous bidders, Liu and Bernhardt (2019) for two-dimensional private types, Wang and Xu (2022) for interdependent valuations, and Bernhardt et al .(2020) for settings with endogenous entry and fixed royalty rates. Abhishek et al . (2013) show that royalty auctions dominate their cash counterparts when valuations are interde-pendent. Liu and Bernhardt (2021) establish full surplus extraction via equity-plus-cash mechanisms when bidders’ outside options relate concavely to their valuations. Sogo (2017) shows that in equity auctions requiring post-auction investment, the seller may benefit from withholding information because equity payments distort the winner’s investment incentives. Wang et al . (2023) compare standard royalty auctions in which bids signal and affect the seller’s post-auction effort. Huang and Li (2023) characterize optimal linear mechanisms with pre-auction information acquisition. While Sogo (2017) and Wang et al . (2023) incor-5porate one-sided post-auction moral hazard, none of these papers address bilateral moral hazard between the seller and winner. Our paper extends this literature by embedding a double moral hazard problem into the optimal security-bid auction framework: the seller’s non-contractible post-auction effort shapes both the optimal value-sharing rate and the al-location rule. We contribute to the literature on auction design with bidder moral hazard. McAfee and McMillan (1986) derive optimal cost-sharing contracts in competitive procurement where the winner exerts effort to reduce costs. Laffont and Tirole (1987) show that the optimal incentive auction can be implemented as a dominant-strategy mechanism with transfers that depend on the first and second bids, and establish the optimality of linear contracts when re-alized costs are non-contractible. McAfee and McMillan (1987) characterize conditions under which linear direct mechanisms are optimal when adverse selection and bidder moral hazard coexist. We extend these results by introducing seller moral hazard: the seller’s active role in post-auction value creation means she cannot credibly commit to her effort level, requiring a mediator to restore mechanism tractability. Our setting also relates to the broader literature on post-auction interactions. Goeree (2003) shows that aftermarket signaling biases bids up-ward and breaks the strategic equivalence between second-price and English auctions; Haile (2003) shows that resale opportunities introduce common-value elements that reshape bid-der valuations. Giovannoni and Makris (2014) study how reputational concerns arising from aftermarket competition distort bidding across disclosure rules. Dworczak (2020) character-izes optimal cutoff mechanisms when the designer’s involvement extends beyond the auction, and Chen et al . (2024) study how anticipated aftermarket competition shapes the optimal allocation rule. Bos and Pollrich (2025) analyze how bidders’ signaling incentives toward an outside receiver shape optimal auction design and information disclosure. We share the concern with post-auction value creation but differ in that collaboration between seller and winner is cooperative rather than competitive, and involves bilateral moral hazard. Our research relates to contract design under double moral hazard. Eswaran and Kotwal (1985) first formalize bilateral moral hazard in agricultural share contracts, showing how linear sharing rules balance incentives under joint production. Romano (1994) and Bhat-tacharyya and Lafontaine (1995) establish conditions under which linear sharing contracts are optimal when both contracting parties face moral hazard. Kim and Wang (1998) show that the optimality of linear sharing is not robust to risk aversion: the unique optimal contract under double moral hazard with a risk-averse agent is non-linear. Carroll and Bolte (2023) demonstrate the robustness of linear contracts under double moral hazard: among contracts satisfying monotonicity and limited liability, linear contracts perform optimally across a broad class of effort distributions. We embed this structure into an auction mechanism, 6linking the linear-contract literature to optimal mechanism design. The linear-quadratic specification adopted here—bilinear value functions with quadratic effort costs—extends the canonical principal-agent framework of Holmstrom and Milgrom (1987) and Holmstrom and Milgrom (1991) to a bilateral effort setting (see Laffont and Martimort (2002) and Bolton and Dewatripont (2005) for comprehensive treatments). Value-sharing and ad valorem ar-rangements of the kind studied here are empirically prevalent, as documented by Rao and Srinivasan (1995) and Hagiu and Wright (2019). Since the seller cannot commit to her post-auction effort, our problem aligns with mecha-nism design with a form of limited commitment. Laffont and Tirole (1988) first demonstrate that the standard revelation principle fails in such settings. Myerson (1982) establishes the communication revelation principle, showing that outcomes achievable through any commu-nication system can be replicated by an incentive-compatible direct mechanism operated by a mediator. We build on this insight: a trustworthy mediator manages the auction, generates post-auction public signals, and restores the tractability of the direct revelation approach. Bester and Strausz (2007) show that a mediator controlling the principal’s obser-vations resolves the commitment problem under single-crossing conditions; our framework adopts a similar structure. Skreta (2015) characterizes optimal auctions for a sequentially rational seller who allocates to the highest positive virtual-surplus buyer conditional on updated beliefs. Doval and Skreta (2022) study a dynamic mechanism-selection game un-der limited commitment and characterize the set of direct mechanisms that replicate any equilibrium outcome; their signal-space construction directly informs our treatment of the outcome-equivalent direct mechanism. This paper is organized as follows: Section 2 introduces the model, including functional forms representing pivotal role divergence, linear payment schemes, and aftermarket equi-librium. Section 3 characterizes optimal mechanisms under both scenarios and compares their features. Section 4 presents implementations. Section 5 discusses extensions. Section 6 concludes. Omitted proofs are in the Appendices. 
+
+# 2 The model 
+
+A risk-neutral seller auctions an indivisible asset or a project to n risk-neutral bidders. Let 
+
+N = {1, 2, . . . , n } denote the set of bidders. Each bidder i ∈ N has a private type θi
+
+that represents the bidder’s inherent productivity and ability, independently and identically drawn from a continuously differentiable distribution Fi(·) with density fi(·) > 0 on support Θi ≡ [θi, θ i], where θi ≥ 0. We assume that θi · fi(θi) < 1 and that the hazard rate fi(·)1−Fi(·) is 7increasing for all i ∈ N .2
+
+We denote θ ≡ (θ1, θ 2, . . . , θ n), θ−i ≡ (θ1, . . . , θ i−1, θ i+1 , . . . , θ n), Θ ≡ ×i∈N Θi, and 
+
+Θ−i ≡ ×j∈N ,j ̸ =i Θj as the profile of bidders’ types and their corresponding supports. The joint densities are f (θ) ≡ Q 
+
+> i∈N
+
+fi(θi) and f−i(θ−i) ≡ Q   
+
+> j∈N ,j ̸=i
+
+fj (θj ). We use tildes to distinguish random variables from their realizations: eθi denotes the random variable and θi
+
+denotes its realization. All parties have no time discounting. 
+
+2.1 Value creation: pivotal role divergence 
+
+The asset’s value is created through aftermarket collaboration between the seller and winning bidder. Both parties simultaneously choose non-contractible efforts esi ∈ Esi ⊆ R+ and 
+
+ebi ∈ Ebi ⊆ R+, respectively. These efforts, together with the winner’s type θi, determine the asset’s value in a multiplicative form: Value ( Vi) = (Inherent Productivity + Support Effort) × Pivotal Effort , (1) where one party plays the pivotal role while the other provides support, as illustrated by Examples 1–4. We analyze two cases characterized by this pivotal role divergence. 
+
+Winner-pivotal: The “Pivotal Effort” term in (1) is ebi ∈ Ebi . The “Inherent Productiv-ity” captures the winner’s asset-specific production capability, determined by his type and enhanced by the seller’s supporting effort esi . The value function becomes: 
+
+Vi(θi, e si , e bi ) = ( θi + esi ) · ebi .3 (2) 
+
+Seller-pivotal: The “Pivotal Effort” term in (1) is esi ∈ Esi . The “Inherent Productivity” reflects the winner’s intrinsic ability to operate and promote the asset, enhanced by his supporting effort ebi . The value function becomes: 
+
+Vi(θi, e si , e bi ) = ( θi + ebi ) · esi . (3) In both scenarios, post-auction efforts incur quadratic costs of 12 e2 for e ∈ { esi , e bi }.4          
+
+> 2The increasing hazard rate condition is satisfied when the density is log-concave, a standard assumption in auction theory. This holds for many common distributions, including uniform, normal, and exponential distributions (see Bagnoli and Bergstrom, 2005).
+> 3In reality, the value creation function involves a random term eϵ, i.e., eVi= ( θi+esi)·ebi+eϵ, rendering efforts unverifiable. However, the random term does not affect the linear payment scheme design (Section 2.2). We omit it for simplicity.
+> 4The quadratic cost function is standard in the principal-agent moral hazard literature (see, e.g., Rao
+
+8Fact 1 (Pivotal role) . As shown in (2) and (3) , the “pivotal role” arises when one party’s effort determines whether any value is created: if this party exerts zero effort, total value is zero regardless of the other party’s contribution. 
+
+The involvement of both the seller’s and the winning bidder’s non-contractible post-auction efforts in aftermarket collaboration generate a double moral hazard problem along-side adverse selection. We analyze these two scenarios separately. 
+
+2.2 Linear-payment auction 
+
+Since value is generated after the auction, one-shot cash payments are unable to incentivize post-auction investment. To provide adequate incentives for aftermarket collaboration, the seller and winner must adopt a value-sharing arrangement based on the realized value in addition to any cash payment during the auction. Therefore, the payment mode that the seller commits to must involve both cash and value sharing. For tractability and practical operability, we consider a linear payment scheme. 5 For-mally, we denote the linear payment scheme for winning bidder i as: 
+
+ci = ( αi, t wi ),
+
+where αi ∈ [0 , 1] is the share of realized value that the winner transfers to the seller, and 
+
+twi ∈ T wi ⊆ R+ is the winner’s cash payment. Losing bidders may pay a fixed amount 
+
+tlj ∈ T lj ⊆ R+ for j̸ = i, depending on the auction format. Losing bidders do not pay any value share. 6
+
+The seller may commit to a cash-bid auction, though other bidding formats are possible, such as bids on value-sharing rates or direct bidding on the linear payment scheme. 7 The seller determines a selection rule based on bids, selects a winner, and collects the linear payment after value realization. 8
+
+For the value creation functions (2) and (3), under the linear payment scheme ci = 
+
+> and Srinivasan, 1995; Hagiu and Wright, 2019).
+> 5Linear payments and contracts are standard in the mechanism design literature.
+> 6The analysis follows Liu and Bernhardt (2021), which examines scenarios where winners pay with equity and cash combinations.
+> 7As noted in DeMarzo et al . (2005), bidding formats can be diversified. The optimal mechanism can be implemented through a cash-bid auction with a linear payment scheme (Section 4).
+> 8Without time discounting, bidders are indifferent between making cash payments before or after after-market collaboration.
+
+9(αi, t wi ), the seller’s ex-post expected payoff is: 
+
+dRev = twi + X 
+
+> j̸=i
+
+tlj
+
+| {z }
+
+> seller’s cash income
+
++ αi · Vi(θi, e si , e bi ) − 12 · (esi )2
+
+| {z }
+
+> seller’s value-sharing-related payoff
+
+, (4) The winning bidder i’s ex-post expected payoff is: ˆUi = −twi + (1 − αi) · Vi(θi, e si , e bi ) − 12 ·  ebi
+
+2
+
+| {z }
+
+> winner’s value-sharing-related payoff
+
+, (5) and ˆUj = −tlj for all j̸ = i.
+
+2.3 Aftermarket equilibrium 
+
+The interaction is a dynamic game where the seller commits to an auction rule (bidding pattern and linear payment scheme) but cannot commit to her post-auction effort. The seller and winner simultaneously choose efforts during aftermarket collaboration. In perfect Bayesian equilibrium (if any), both parties choose efforts to maximize their value-sharing payoffs (value shares net of effort costs, as in (4) and (5)). These equilibrium strategies depend on signals revealed during the auction. The seller relies on signal realizations to infer the winner’s type. 9
+
+Following the literature (e.g., Kamenica and Gentzkow, 2011; Dworczak, 2020; Chen 
+
+et al ., 2024), signals are publicly announced after the auction. 10 This ensures the seller’s posterior beliefs are common knowledge during aftermarket collaboration. 11 For any public signal realization s ∈ S, the seller forms posterior beliefs μ(·| s) ∈ ∆(Θ i) over winning bidder 
+
+i’s type, which is common knowledge. In perfect Bayesian equilibrium (if any), given the winner’s identity i ∈ N , each party’s 
+
+> 9
+
+Unlike classical signal/information disclosure literature (see, e.g., Dworczak, 2020; Chen et al ., 2024), which considers disclosure to third parties, our setting involves disclosure to the seller who participates in value creation. If a separating equilibrium exists, the seller can infer the winner’s type. If the auction induces pooling or semi-pooling equilibria, the seller’s posterior beliefs cannot achieve perfect inference. De-termining separating equilibrium existence requires conditions on bidders’ valuations (such as single-crossing conditions). However, such conditions assume exogenous valuations, whereas in our setting, valuations are endogenously determined by non-contractible efforts, making it impossible to confirm separating equilibrium existence at the auction stage. 
+
+> 10
+
+The signal space is a subspace of the bid space, denoted S ⊆ B. For example, when S = B, this repre-sents auctions with ex-post bid disclosure, commonly mandated for credibility, as in open-outcry ascending auctions and spectrum auctions. 
+
+> 11
+
+If the seller’s posterior beliefs were private information, characterizing equilibrium efforts during after-market collaboration would be unsolvable. 
+
+10 equilibrium strategy εsi ∈ ∆( Esi ) and εbi ∈ ∆( Ebi ) satisfies (from (4) and (5)): 
+
+εsi =εsi (μ(·| s)) ∈ argmax   
+
+> ˆεsi∈∆( Esi)
+
+
+
+Eˆεsi
+
+
+
+αi · Eeθi
+
+h
+
+Eεbi (eθi)
+
+h
+
+Vi(eθi, e si , e bi )
+
+i
+
+μ(·| s)
+
+i
+
+− 12 · (esi )2
+
+ 
+
+,εbi =εbi (θi, μ (·| s)) ∈ argmax   
+
+> ˆεbi∈∆( Ebi)
+
+
+
+Eˆεbi
+
+
+
+(1 − αi) · Eεsi (μ)
+
+Vi(θi, e si , e bi ) − 12 ·  ebi
+
+2
+
+ 
+
+,
+
+(6) which maximize the net value-sharing payoffs of both parties simultaneously. The timeline of interaction between the seller and bidders can be summarized in the following figure:       
+
+> Seller commits to a linear payment auction
+> Bidders bid
+> •Winner selected
+> •Linear-payment scheme offered
+> •Cash payments collected
+> Public signal announced
+> Seller exerts effort
+> Winner exerts effort
+> •Value realized
+> •Winner compensates seller via linear payment scheme
+> Auction Stage Aftermarket Collaboration
+
+Figure 1: Linear-payment auction with aftermarket collaboration 
+
+# 3 Optimal Mechanism 
+
+3.1 Direct linear mechanism and feasibility 
+
+We characterize the optimal linear-payment auction under the existence of a perfect Bayesian equilibrium. By the revelation principle (see Myerson, 1982; Doval and Skreta, 2022), ev-ery linear-payment auction with aftermarket collaboration is outcome-equivalent to a direct mechanism with linear payment schemes executed by a trustworthy mediator. We focus on direct mechanisms (“direct linear mechanisms”), represented by ( q, c, π), where bidders truthfully report their types. A direct linear mechanism consists of: (1) Allocation rule : Given reported types, the mechanism determines the winning prob-ability qi(θ) ∈ [0 , 1] for each bidder i, subject to P 
+
+> i∈N
+
+qi(θ) ≤ 1. The asset may not be sold if the seller’s expected payoff is negative. (2) Payment rule : The mechanism determines payment schemes ( ci, t li) ∈ [0 , 1] × R2+ for each bidder i:(2.1) The winning bidder i receives a linear payment scheme ci = ( αi, t wi ), drawn ac-cording to probability measure κi(·, ·| θ) ∈ ∆([0 , 1] × T wi ). 11 (2.2) Each losing bidder i pays a fixed amount tli, drawn according to probability mea-sure νli (·| θ) ∈ ∆( T li ). (3) Signal realization rule : Given the winner’s identity i ∈ N and payment profile 
+
+c =  ci, tl =  αi, t wi , tl
+
+> −i
+
+ , (7) the mechanism generates a public signal realization s ∈ Si, where Si denotes the winner’s signal space. The signal is drawn from probability measure πi(·| i, c, θ) ∈
+
+∆( Si). No additional signals are transmitted. A trustworthy mediator operates the mechanism, revealing the winner’s identity, deter-mining payment schemes, and generating a public signal regarding the winner through a random draw. 12 Based on the public signal realization s ∈ Si and payment profile (7), the seller forms posterior beliefs about the winner’s type: 
+
+μ = μ(·| i, c, s ) ∈ ∆(Θ i). (8) Subsequently, both parties choose their aftermarket equilibrium strategies: 
+
+ εsi , ε bi
+
+ =  εsi (μ), ε bi (θi, μ ) ∈ ∆( Esi ) × ∆( Ebi ),
+
+as specified in (6). The seller receives cash payments collected by the mediator and value shares from the winner (with no discounting due to absence of time preference). We denote bidder i’s expected payoff from reporting ˆθi ∈ Θi as Ui(ˆθi, ε bi , ε si , θ i), given that other bidders report truthfully and both parties adopt their aftermarket equilibrium strategies. 13 Let Ui(θi) ≜ Ui(θi, ε bi , ε si , θ i) denote bidder i’s expected payoff from truthful reporting. 
+
+> 12
+
+Doval and Skreta (2022) study dynamic mechanism design under limited commitment—a dynamic mechanism-selection game between an uninformed designer and a privately informed agent where the de-signer commits only to short-term mechanisms. They identify a class of direct mechanisms that replicate the outcomes of any equilibrium in this mechanism-selection game by restricting the signal set to the designer’s posterior beliefs about the agent’s type. Our model is a two-period mechanism-selection game, so in the outcome-equivalent direct mechanism, the signal space can be Si = ∆(Θ i) as in Doval and Skreta (2022). In Myerson (1982), the outcome-equivalent direct mechanism publicly recommends decisions; in our frame-work, this corresponds to recommending the seller’s and winner’s post-auction efforts, which induces the seller’s posterior beliefs about the winner’s type. Bester and Strausz (2007) similarly introduces a mediator to resolve the seller’s commitment problems. 
+
+> 13
+
+Due to seller moral hazard, our direct mechanism incorporates a signal revelation rule. Bidder misre-porting affects allocation, payment, and the seller’s posterior beliefs through the signal-revealing rule. 
+
+12 Definition 1. A direct linear mechanism (q, c, π) is feasible if it satisfies both incentive compatibility and individual rationality. Incentive compatibility requires that truthful report-ing by each bidder constitutes a Bayesian Nash equilibrium, such that Ui(θi) ≥ Ui(ˆθi, ε bi , ε si , θ i)
+
+for all i ∈ N and all θi, ˆθi ∈ Θi. Individual rationality requires that each bidder obtains non-negative expected payoff from participation, i.e., Ui(θi) ≥ 0 for all i ∈ N and all θi ∈ Θi.
+
+We characterize the optimal linear mechanism for each scenario based on the pivotal role in aftermarket collaboration. 
+
+Remark 1 (Linear-quadratic specification) . Our model adopts a linear-quadratic specifica-tion, a commonly used framework in the contract theory and principal-agent literature (see, e.g., Holmstrom and Milgrom, 1987, 1991; Laffont and Martimort, 2002; Bolton and Dewa-tripont, 2005). As shown in (4) and (5) , under both winner- and seller-pivotal collaboration, each party’s optimization problem exhibits the standard linear-quadratic form given the other party’s effort. Specifically, under the winner-pivotal scenario, the seller’s ex-post expected payoff twi + P  
+
+> j̸=i
+
+tlj + αi · (θi + esi ) · ebi − 12 (esi )2 is linear in esi with a quadratic cost, and symmetrically for the winner. The seller-pivotal case is analogous, with esi and ebi swapped in the value function. Since the value function is bilinear in both efforts under either collab-oration mode, this specification extends the classical single-agent linear-quadratic framework to a double moral hazard setting. It also preserves analytical tractability and transparently reveals how the pivotal role shapes the optimal mechanism—including the allocation rule, linear payment scheme, post-auction effort choices, and the seller’s payoff. 
+
+3.2 Winner-pivotal collaboration 
+
+We begin with the scenario where the winner’s effort plays the pivotal role, characterized by the function 
+
+Vi(θi, e si , e bi ) = ( θi + esi ) · ebi ,
+
+as in (2). Both parties’ value-sharing payoffs are concave in their effort choices. Each party’s aftermarket equilibrium strategy εsi ∈ ∆( Esi ) and εbi ∈ ∆( Ebi ) degenerates to a Dirac measure, 
+
+δ(·). We use the superscript “ wp ” to denote winner-pivotal collaboration. For any signal 13 realization s ∈ Si and posterior belief (8), ( εwp −si , ε wp −bi ) = ( δ{ewp −si }, δ {ewp −bi }) satisfies: 
+
+ewp −si ∈ argmax  
+
+> esi∈Esi
+
+
+
+αi · Eeθi
+
+Eεwp −bi (eθi)
+
+h eθi + esi
+
+
+
+· ebi
+
+i| {z }
+
+> =
+
+(eθi+esi )·ewp −bi (eθi)
+
+μ
+
+
+
+−12 · (esi )2
+
+
+
+> F.O.C.
+
+===== αi · Eeθi
+
+h
+
+ewp −bi (eθi) μ
+
+i
+
+,ewp −bi ∈ argmax  
+
+> ebi∈Ebi
+
+
+
+(1 − αi) · Eεwp −si (μ)
+
+(θi + esi ) · ebi
+
+| {z }
+
+> =
+
+(θi+ewp −si (μ))·ebi
+
+−12 ·  ebi
+
+2
+
+
+
+> F.O.C.
+
+===== (1 − αi) ·  θi + ewp −si (μ) ,
+
+which are derived from (6). Solving the above system of equations yields: 
+
+ewp −si = ewp −si (μ) = (1 − αi) · αi · E
+
+h eθi μ
+
+i
+
+1 − (1 − αi) · αi
+
+,ewp −bi = ewp −bi (θi, μ ) = (1 − αi) ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ
+
+i
+
+1 − (1 − αi) · αi
+
+ ,
+
+(9) where E[eθi|μ] = E[eθi|μ(·| i, c, s )] denotes the posterior mean of the winner’s type. Therefore, for any direct linear mechanism ( q, c, π), bidder i’s expected payoff under winner-pivotal 14 collaboration, U wp i (ˆθi, e wp −bi , e wp −si , θ i), is given by: 
+
+U wp i (ˆθi, e wp −bi , e wp −si , θ i) = 
+
+ˆ
+
+> Θ−i
+
+qi(ˆθi, θ−i)
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+(1 − αi) ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> ewp −si
+
+
+
+· (1 − αi) ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> ewp −bi
+
+−12 ·
+
+
+
+(1 − αi) ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> ewp −bi
+
+
+
+> 2
+
+− twi
+
+
+
+πi(ds |i, c, ˆθi, θ−i)
+
+· κi(dα i, dt wi |ˆθi, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|ˆθi, θ−i)f−i(θ−i)dθ−i
+
++
+
+ˆ
+
+> Θ−i
+
+
+
+1 − qi(ˆθi, θ−i)
+
+ ˆ 
+
+> Tli
+
+ −tli
+
+ νli (dt li|ˆθi, θ−i)f−i(θ−i)dθ−i,
+
+(10) where T l 
+
+> −i
+
+≡×j∈N ,j ̸ =i T lj and νl
+
+> −i
+
+(dtl
+
+> −i
+
+|ˆθi, θ−i) ≡ Q   
+
+> j∈N ,j ̸=i
+
+νlj (dt lj |ˆθi, θ−i). The seller’s objective is to maximize expected payoff. According to (4), the seller’s payoff comprises the sum of bidders’ cash payments and value shares, net of effort costs. Under winner-pivotal collaboration, for any feasible direct linear mechanism (cf. Definition 1), the 15 seller’s expected equilibrium payoff is given by (see Appendix A for derivations): Rev wp (q, c, π) = X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+1 − α2
+
+> i
+
+2 · θ2 
+
+> i
+
++ (1 − α2 
+
+> i
+
+) · θi ·
+
+(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+−α2
+
+> i
+
+2 ·
+
+(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+−(1 − αi)2 · θi · 1 − Fi(θi)
+
+fi(θi)
+
+−(1 − αi)2 ·
+
+(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+· 1 − Fi(θi)
+
+fi(θi)
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|ˆθi, θ−i)f (θ)dθ − X
+
+> i∈N
+
+U wp i (θi).
+
+(11) The seller’s expected payoff depends on the allocation rule, payment rule, signal realiza-tion rule, and bidders’ lowest-type payoffs. This complexity precludes direct application of the standard Myersonian approach (Myerson, 1981). 14 We propose the following approach. 
+
+Methodology. We characterize the optimal mechanism in two steps: 
+
+• Step 1: Establish an upper bound on the seller’s expected payoff across all feasible direct mechanisms. 
+
+• Step 2: Propose a mechanism achieving this upper bound. 
+
+For Step 1 , we establish: 
+
+Lemma 1. Under winner-pivotal collaboration, for any feasible mechanism (q, c, π), the seller’s expected payoff is bounded above by: Rev wp (q, c, π) = 
+
+ˆ
+
+> Θ
+
+max {ϕwp  
+
+> 1
+
+(θ1), . . . , ϕ wp i (θi), . . . , ϕ wp n (θn)} f (θ)dθ. 
+
+> 14 In standard mechanisms, the seller’s expected payoff can be expressed as the expectation of qi(θ) times virtual valuation. The optimal mechanism allocates to the bidder with highest non-negative virtual valuation, which is increasing in type.
+
+16 Here, ϕwp i (θi) represents the virtual surplus for bidder i with type θi, defined as: 
+
+ϕwp i (θi) = max 
+
+> αi∈[0 ,1]
+
+1 − 2αi · (1 − αi) · αi − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2 · θ2 
+
+> i
+
+− (1 − αi)2
+
+1 − (1 − αi) · αi
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+| {z }  
+
+> defined as Ψwp i(αi,θ i)
+
+.
+
+(12) 
+
+Proof . Please refer to Appendix B. ■
+
+Each bidder’s virtual surplus is endogenously determined by the maximizing value-sharing scheme: 
+
+αwp −max  
+
+> i
+
+= αwp −max  
+
+> i
+
+(θi) ∈ argmax 
+
+> αi∈[0 ,1]
+
+Ψwp i (αi, θ i), (13) which satisfies: 
+
+Lemma 2. αwp −max  
+
+> i
+
+(θi) is unique, decreasing in θi, and interior with αwp −max  
+
+> i
+
+(θi) ∈ (0 , 1) .
+
+Proof . Please refer to Appendix C. ■
+
+Consequently, the virtual surplus defined in (12) can be written as: 
+
+ϕwp i (θi) = max  
+
+> αi∈[0 ,1]
+
+Ψwp i (αi, θ i) = Ψ wp i (αwp −max  
+
+> i
+
+(θi), θ i), (14) and satisfies: 
+
+Lemma 3. Under winner-pivotal collaboration, each bidder’s virtual surplus is non-negative and increasing in θi.
+
+Proof . Please refer to Appendix D. ■
+
+For Step 2 , we present a feasible mechanism achieving the upper bound in Lemma 1. 
+
+Theorem 1 (Winner-pivotal collaboration) . A feasible direct linear mechanism (qwp ∗
+
+, cwp ∗
+
+,
+
+πwp ∗
+
+) is optimal if: (i) The allocation rule is given by: 
+
+qwp ∗ 
+
+> i
+
+(θ) = 
+
+
+
+1, if ϕwp i (θi) > max j̸ =i ϕwp j (θj )0, otherwise 
+
+(15) 
+
+for all i ∈ N , where ϕwp i (·) is each bidder’s virtual surplus as defined in (14) . Ties are broken uniformly at random. 
+
+17 (ii) The payment rule cwp ∗
+
+induces a deterministic value-sharing rule for the winner: 
+
+αwp ∗ 
+
+> i
+
+(θi) = αwp −max  
+
+> i
+
+(θi), (16) 
+
+where αwp −max  
+
+> i
+
+(θi) is defined in (13) . Moreover, the cash payments upon winning and losing are determined by νwp ∗−wi (·| θ) and νwp ∗−li (·| θ) that satisfy: 15 
+
+ˆ
+
+> Θ−i
+
+
+
+qwp ∗ 
+
+> i
+
+(θi, θ−i) ·
+
+ˆ 
+
+> Twi
+
+twi νwp ∗−wi (dt wi |θi, θ−i)+
+
+
+
+1 − qwp ∗ 
+
+> i
+
+(θi, θ−i)
+
+ ˆ 
+
+> Tli
+
+tliνwp ∗−li (dt li|θi, θ−i)
+
+
+
+f−i(θ−i)dθ−i
+
+=
+
+ˆ
+
+> Θ−i
+
+
+
+qwp ∗ 
+
+> i
+
+(θi, θ−i) · (1 − αwp −max  
+
+> i
+
+(θi)) 2
+
+2
+
+·
+
+
+
+θi + (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)
+
+2
+
+−
+
+ˆ θi
+
+> θi
+
+qwp ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αwp −max  
+
+> i
+
+(τ )) 2
+
+·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+
+
+dτ 
+
+
+
+f−i(θ−i)dθ−i.
+
+(17) 
+
+This expression (integration form) shows that the cash payments for both the winner and the losers can be constructed in multiple ways. (iii) The signal realization rule πwp ∗ 
+
+> i
+
+(·| i, c, θ) ∈ ∆( Si), conditional on the profile of bidders’ reported types, winner’s identity, and bidders’ payments, is a Dirac measure: 
+
+πwp ∗ 
+
+> i
+
+(·| i, c, θ) = δ{θi},
+
+which assigns probability mass one to the winner’s truthfully reported type θi.
+
+Proof . Please refer to Appendix E. ■
+
+Theorem 1 establishes that the optimal direct linear mechanism selects the bidder with the highest virtual surplus rather than the highest type, where each bidder’s virtual surplus is increasing in type. The asset can always be sold, since ϕwp i (θi) ≥ 0 for all θi ∈ Θi by Lemma 3. This allocation rule can lead to discrimination due to bidder heterogeneity. Specifically, given the deterministic value-sharing rule, αwp ∗ 
+
+> i
+
+(θi) = αwp −max  
+
+> i
+
+(θi) for each winning bidder, 
+
+> 15
+
+The definition of νwp ∗−wi (·| θ) refers to (44). 
+
+18 variations in hazard rates across bidders with identical types result in different winning probabilities. 16 
+
+Under the winner-pivotal scenario, the optimal direct linear mechanism generates linear payments for the winner with deterministic value shares that are decreasing in the bidder’s type and independent of the number of bidders (see Lemma 2). The winner’s cash payments and losing bidders’ cash payments are jointly determined by the optimal allocation rule and the value-sharing rule, which admits multiple constructions. Theorem 1 also establishes that the optimal signal realization rule takes a Dirac measure form; that is, the optimal feasible linear mechanism publicly reveals the winning bidder’s truthfully reported type, achieving full revelation. Consequently, during aftermarket collaboration and given the equilibrium strategies in (9), the seller and winner choose post-auction efforts under ( qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+)as follows: 
+
+ewp −si (θi) = 
+
+
+
+1 − αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+· αwp ∗ 
+
+> i
+
+(θi) · θi
+
+1 −  1 − αwp ∗ 
+
+> i
+
+(θi) · αwp ∗ 
+
+> i
+
+(θi) ,ewp −bi (θi) = 
+
+
+
+1 − αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+·
+
+θi +
+
+
+
+1 − αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+· αwp ∗ 
+
+> i
+
+(θi) · θi
+
+1 −  1 − αwp ∗ 
+
+> i
+
+(θi) · αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+=
+
+
+
+1 − αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+· θi
+
+1 −  1 − αwp ∗ 
+
+> i
+
+(θi) · αwp ∗ 
+
+> i
+
+(θi),
+
+(18) both of which are non-negative. 
+
+3.3 Seller-pivotal collaboration 
+
+We examine seller-pivotal collaboration. The value creation function is V (θi, e si , e bi ) = ( θi +
+
+ebi ) · esi . Zero seller effort yields zero value, establishing the seller’s pivotal role (Fact 1). Similar to (9), each party’s equilibrium strategy degenerates to a Dirac measure. We use the superscript “ sp ” to denote seller-pivotal collaboration and derive the equilibrium strategies: 
+
+esp −si = esp −si (μ) = 
+
+αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+,esp −bi = esp −bi (μ) = (1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+.
+
+(19)                 
+
+> 16 Distribution Fidominates Fjin hazard rate order, denoted Fi≻hr Fj, if fi(θ)1−Fi(θ)<fj(θ)1−Fj(θ)for all θ(see, e.g., Shaked and Shanthikumar, 1994; Kirkegaard, 2012).
+
+19 Unlike the winner-pivotal scenario, the winner’s optimal effort no longer depends on his own type. Bidder i’s expected payoff U sp i (ˆθi, e sp −bi , e sp −si , θ i) is: 
+
+U sp i (ˆθi, e sp −bi , e sp −si , θ i)=
+
+ˆ
+
+> Θ−i
+
+qi(ˆθi, θ−i) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+(1 − αi) ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+·
+
+αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+−12 ·
+
+(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+− twi
+
+
+
+πi(ds |i, c, ˆθi, θ−i)
+
+· κi(dα i, dt wi |ˆθi, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|ˆθi, θ−i)f−i(θ−i)dθ−i
+
+−
+
+ˆ
+
+> Θ−i
+
+
+
+1 − qi(ˆθi, θ−i)
+
+ ˆ 
+
+> Tli
+
+tliνli (dt li|ˆθi, θ−i)f−i(θ−i)dθ−i,
+
+(20) which is analogous to U wp i (see (10)). Following the winner-pivotal scenario, we derive the seller’s expected payoff for any fea-sible mechanism (see (64)) and apply the same two-step approach from Methodology. 
+
+Lemma 4. Under seller-pivotal collaboration, for any feasible mechanism (q, c, π), the seller’s expected payoff is bounded above by: Rev sp (q, c, π) = 
+
+ˆ
+
+> Θ
+
+max {ϕsp  
+
+> 1
+
+(θ1), . . . , ϕ sp i (θi), . . . , ϕ sp n (θn)} f (θ)dθ.
+
+Here, ϕsp i (θi) represents the virtual surplus for bidder i with type θi, defined as: 
+
+ϕsp i (θi) = max 
+
+> αi∈[0 ,1]
+
+2αi · (1 − (1 − αi) · αi) − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2 · θ2 
+
+> i
+
+− (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+| {z }  
+
+> defined as Ψsp i(αi,θ i)
+
+.
+
+(21) 
+
+Proof . Please refer to Appendix F. ■
+
+Each bidder’s virtual surplus is endogenously determined by the maximizing value-sharing 20 scheme (like the winner-pivotal case in (14)): 
+
+αsp −max  
+
+> i
+
+= αsp −max  
+
+> i
+
+(θi) ∈ argmax 
+
+> αi∈[0 ,1]
+
+Ψsp i (αi, θ i), (22) which satisfies: 
+
+Lemma 5. αsp −max  
+
+> i
+
+(θi) is unique, non-increasing, and satisfies αsp −max  
+
+> i
+
+(θi) ≥ 12 for all θi ∈
+
+[θi, θ i]. Moreover, 
+
+αsp −max  
+
+> i
+
+(θi)
+
+
+
+= 1 , for θi ∈ [θi, θ ci ]
+
+is decreasing in θi for θi ∈ [θci , θ i]
+
+,
+
+where the threshold type θci is uniquely determined by 1−Fi(θci )   
+
+> θci·fi(θci)
+
+= 1 .17 
+
+Proof . Please refer to Appendix G. ■
+
+The virtual surplus defined in (21) can be expressed as: 
+
+ϕsp i (θi) = max  
+
+> αi∈[0 ,1]
+
+Ψsp i (αi, θ i) = Ψ sp i (αsp −max  
+
+> i
+
+(θi), θ i), (23) and satisfies: 
+
+Lemma 6. Under seller-pivotal collaboration, each bidder’s virtual surplus is non-negative and increasing in θi.
+
+Proof . Please refer to Appendix H. ■
+
+We characterize the optimal mechanism using the upper bound in Lemma 4, following Theorem 1. 
+
+Theorem 2 (Seller-pivotal collaboration) . A feasible direct linear mechanism (qsp ∗
+
+, csp ∗
+
+,
+
+πsp ∗
+
+) is optimal if: (i) The allocation rule is given by: 
+
+qsp ∗ 
+
+> i
+
+(θ) = 
+
+
+
+1, if ϕsp i (θi) > max j̸ =i ϕsp j (θj )0, otherwise for all i ∈ N , where ϕsp i (·) is each bidder’s virtual surplus as defined in (23) . Ties are broken uniformly at random. 
+
+> 17
+
+The threshold type θci ∈ [θi, θ i] exists since θi · fi(θi) < 1. 
+
+21 (ii) The payment rule csp ∗
+
+induces a deterministic value-sharing rule for the winner: 
+
+αsp ∗ 
+
+> i
+
+(θi) = αsp −max  
+
+> i
+
+(θi),
+
+where αsp −max  
+
+> i
+
+(θi) is defined in (22) . Moreover, the cash payments upon winning and losing are determined by νsp ∗−wi (·| θ) and νsp ∗−li (·| θ) that satisfy: 18 
+
+ˆ
+
+> Θ−i
+
+
+
+qsp ∗ 
+
+> i
+
+(θi, θ−i) ·
+
+ˆ 
+
+> Twi
+
+twi νsp ∗−wi (dt wi |θi, θ−i)+
+
+
+
+1 − qsp ∗ 
+
+> i
+
+(θi, θ−i)
+
+ ˆ 
+
+> Tli
+
+tliνsp ∗−li (dt li|θi, θ−i)
+
+
+
+f−i(θ−i)dθ−i
+
+=
+
+ˆ
+
+> Θ−i
+
+
+
+qsp ∗ 
+
+> i
+
+(θi, θ−i) ·
+
+
+
+(1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi)1 − (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi)+12 ·
+
+ (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi)
+
+2
+
+ · θ2
+
+> i
+
+−
+
+ˆ θi
+
+> θi
+
+qsp ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αsp −max  
+
+> i
+
+(τ )) · αsp −max  
+
+> i
+
+(τ )1 − (1 − αsp −max  
+
+> i
+
+(τ )) · αsp −max  
+
+> i
+
+(τ ) · τ dτ 
+
+
+
+f−i(θ−i)dθ−i.
+
+(24) 
+
+This expression parallels (17) , where the cash payments can be constructed in multiple ways. (iii) The signal realization rule πsp ∗ 
+
+> i
+
+(·| i, c, θ) ∈ ∆( Si) is a Dirac measure: 
+
+πsp ∗ 
+
+> i
+
+(·| i, c, θ) = δ{θi},
+
+assigning probability mass one to the winner’s truthfully reported type θi.
+
+Proof . Please refer to Appendix I. ■
+
+The optimal mechanism ( qsp ∗
+
+, csp ∗
+
+, πsp ∗
+
+) exhibits similar properties to the winner-pivotal case (Theorem 1). The asset can always be sold since ϕsp i (θi) ≥ 0 for all θi ∈ Θi (Lemma 5). The mechanism selects the bidder with highest virtual surplus and generates deterministic value-sharing rules and multi-constructed cash payments in both scenarios. The optimal mechanism achieves full revelation by disclosing the winner’s truthfully reported type. Under 
+
+> 18
+
+The marginal probability measure νsp ∗−wi (·| θ) is also derived from κi(·, ·| θ) ∈ ∆([0 , 1] × T wi ) (see (44)), as in the winner-pivotal collaboration scenario. 
+
+22 (qsp ∗
+
+, csp ∗
+
+, πsp ∗
+
+), the seller and winner choose post-auction efforts (from (19)): 
+
+esp −si (θi) = αsp ∗ 
+
+> i
+
+(θi) · θi
+
+1 −  1 − αsp ∗ 
+
+> i
+
+(θi) · αsp ∗ 
+
+> i
+
+(θi),esp −bi (θi) = 
+
+
+
+1 − αsp ∗ 
+
+> i
+
+(θi)
+
+
+
+· αsp ∗ 
+
+> i
+
+(θi) · θi
+
+1 −  1 − αsp ∗ 
+
+> i
+
+(θi) · αsp ∗ 
+
+> i
+
+(θi) ,
+
+(25) both of which are non-negative. 
+
+3.4 Impact of pivotal role divergence 
+
+This subsection compares optimal linear mechanisms under winner-pivotal and seller-pivotal collaboration. We examine how the pivotal role affects value sharing, effort exertion, and the seller’s revenue. 
+
+3.4.1 Pivotal role on value sharing 
+
+Does the pivotal party benefit from value sharing under the optimal mechanism? Under seller-pivotal collaboration, the optimal value-sharing rule satisfies αsp ∗ 
+
+> i
+
+(θi) ≥ 12 by Lemma 5. The seller consistently secures a majority share of the eventual value when she drives the aftermarket value creation. This structural feature aligns with the inherent power dynamics in seller-pivotal cooperation. In contrast, under winner-pivotal collaboration, the pivotal role does not guarantee the winner a majority share. Specifically, 1 − αwp ∗ 
+
+> i
+
+(θi) ≤ 12 may occur for winners with relatively low types. Figure 2 illustrates this asymmetry across four different distributions. More precisely, we establish that: 
+
+Proposition 1. Fix the same distribution, Fi(·), we have αsp ∗ 
+
+> i
+
+(θi) ≥ αwp ∗ 
+
+> i
+
+(θi) for all θi ∈
+
+[θi, θ i].
+
+Proof . Please refer to Appendix J. ■
+
+Figure 2 reveals a pooling region where αsp ∗ 
+
+> i
+
+(θi) = 1 for θi ∈ [θi, θ ci ] under seller-pivotal collaboration, while 0 < α wp ∗ 
+
+> i
+
+(θi) < 1 for all types under winner-pivotal collaboration, which is consistent with the optimal deterministic value sharing derived in Theorem 1 and 2. This asymmetry reflects the different incentive structures. Under winner-pivotal collaboration, the winner’s effort is essential for value creation. Positive value shares must be allocated to all types; otherwise, eventual value would be zero (Fact 1). Under seller-pivotal collaboration, the seller’s effort alone sustains positive value. For sufficiently low types, the seller extracts 23 Figure 2: Optimal value-sharing comparison across different distributions the entire value, leaving the winner indifferent between participating and not. Following the standard convention that ties are broken in favor of the principal, we focus on equilibria where bidders participate when indifferent. Example 4 illustrates this asymmetry in a spectrum licensing context. In rural mar-kets, the regulator (seller) is pivotal: the optimal mechanism assigns her a majority share (αsp ∗ 
+
+> i
+
+≥ 12 ), and for operators with limited rural capacity ( θi ≤ θci ), the regulator extracts the entire realized value ( αsp ∗ 
+
+> i
+
+= 1). This is feasible because the regulator’s own infrastructure investment sustains service viability regardless of operator contribution—such operators add little marginal value and can be left with zero share without destroying it. In urban markets, where the operator’s deployment is pivotal, withdrawing the operator’s revenue share en-tirely would collapse service quality to zero, so every winning operator must retain a positive share. 
+
+3.4.2 Pivotal role on effort exertion 
+
+We now examine how the pivotal role affects post-auction effort exertion. Based on the optimal effort choices given by (18) (winner-pivotal) and (25) (seller-pivotal), we establish that: 24 Proposition 2. For any distribution Fi(·) and winner’s type θi, we have: (1) Under winner-pivotal collaboration, the winner exerts more post-auction effort than the seller at the optimum, i.e., ewp −bi (θi) > e wp −si (θi); under seller-pivotal collaboration, the seller exerts more post-auction effort than the winner at the optimum, i.e., esp −si (θi) >esp −bi (θi).(2) The winner’s post-auction effort is higher under winner-pivotal collaboration than un-der seller-pivotal collaboration, i.e., ewp −bi (θi) > e sp −bi (θi); the seller’s post-auction ef-fort is higher under seller-pivotal collaboration than under winner-pivotal collaboration, i.e., esp −si (θi) > e wp −si (θi).
+
+Proof . Please refer to Appendix K. ■
+
+The results can be summarized in the following Figure 3. Under the optimal linear mech-anism, the pivotal party exerts higher effort than the non-pivotal party (row comparison), and each party exerts higher effort when pivotal than when non-pivotal (column comparison). In the figure, each shaded area dominates the corresponding unshaded areas.   
+
+> Winner-pivotal Collaboration
+> Seller-pivotal Collaboration
+> Winner’s Post-auction Effort
+> Seller’s Post-auction Effort
+> ewp −biewp −si
+> esp −biesp −si
+
+Figure 3: Effort combinations under different collaboration structures 25 3.4.3 Pivotal role on seller’s revenue 
+
+The previous two subsections establish that the seller secures a larger share of the eventual value under seller-pivotal collaboration (Proposition 1), while bearing higher post-auction effort costs. These opposing effects raise a natural question: does the pivotal party’s role in aftermarket collaboration affect the seller’s optimal revenue? We establish that: 
+
+Proposition 3. For any distribution Fi(·), seller-pivotal collaboration yields higher revenue than winner-pivotal collaboration, that is: Rev sp (qsp ∗
+
+, csp ∗
+
+, πsp ∗
+
+) > Rev wp (qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+).
+
+Proof . Please refer to Appendix L. ■
+
+Proposition 3 shows that seller-pivotal collaboration yields the seller a higher expected payoff. This follows because each bidder’s virtual surplus under seller-pivotal collaboration pointwise dominates that under winner-pivotal collaboration. The virtual surplus decom-poses as ϕi(θi) = A(α) · θ2 
+
+> i
+
+− B(α) · 1−Fi(θi) 
+
+> fi(θi)
+
+· θi, where the first term represents the social surplus and the second captures information rents. The parameters A(α) and B(α) differ across different pivotal role scenarios. The pointwise dominance of ϕsp i (·) arises from a higher social surplus and lower information rents under seller-pivotal collaboration. Example 4 illustrates the revenue channel. In rural spectrum auctions (seller-pivotal), the regulator’s infrastructure investment generates substantial value even for low-capability oper-ators, compressing the value advantage that high-type operators would otherwise command. With less to gain from misrepresenting type, operators leave smaller information rents, and the regulator captures greater expected auction revenue. In urban auctions (winner-pivotal), value creation depends more directly on operator type, amplifying information rents and reducing the regulator’s expected revenue—despite urban spectrum typically commanding higher per-unit commercial value. 
+
+# 4 Implementation 
+
+We implement the optimal direct linear mechanism under both scenarios through ascending auctions. 
+
+Winner-pivotal collaboration. For winner-pivotal collaboration, we employ an ascend-ing auction with payments ecwp = ( eαwp i , etwp −wi ; etwp −li ) for the winner and losing bidders, re-spectively, to implement the optimal direct linear mechanism in Theorem 1. 26 The ascending clock displays virtual surplus values (defined in (14)), increasing contin-uously from ϕwp until the last active bidder exits. For simplicity, we assume ϕwp i (θi) ≜ ϕwp 
+
+for all i ∈ N . Each bidder can freely drop out by releasing the button; quitting the auction is irrevocable. The last remaining active bidder wins and can continue to increase his bid to exit the auction at a higher price pn, even after the penultimate bidder has exited at pn−1.The payment scheme ecwp determines winning bidder i’s value shares endogenously from the final price pn:
+
+eαwp i (pn) ≜ αwp −max  
+
+> i
+
+(G(pn)) , (26) where αwp −max  
+
+> i
+
+(·) is defined in (13), and 
+
+G(·) ≜ (ϕwp i )−1(·) (27) denotes the inverse of the bidder’s virtual surplus function in (14). Winning bidder i’s cash payment depends on ( pn−1, p n): 
+
+etwp −wi (pn, p n−1) = (1 − eαwp i (pn)) 2
+
+2 ·
+
+
+
+G(pn) + (1 − eαwp i (pn)) · eαwp i (pn) · G (pn)1 − (1 − eαwp i (pn)) · eαwp i (pn)
+
+2
+
+−
+
+ˆ G(pn)
+
+> G(pn−1)
+
+ 1 − αwp −max  
+
+> i
+
+(τ )2 ·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+
+
+dτ, 
+
+(28) while losing bidders pay nothing, i.e., etwp −li = 0. Each bidder chooses his exit price based on the number k of exited bidders and their exit prices p1 ≤ · · · ≤ pk. Assuming each bidder follows strategy eβwp i (θi|p1, . . . , p k), we characterize the following equilibrium. 
+
+Proposition 4. The ascending auction with payments ecwp admits a quasi-dominant strategy equilibrium, denoted ( eβwp , eμwp , eewp ), where: (i) Each bidder’s drop-out strategy is given by: 
+
+eβwp i (θi|p1, · · · , p k) = ϕwp i (θi), (29) 
+
+for each i ∈ N .(ii) The seller holds a Dirac-form posterior belief over bidder i’s type upon his winning: 
+
+eμwp (·| i, p n, p n−1) = δ{G (pn)}, (30) 27 for pn−1 ≤ pn ≤ ϕwp i (θi), and eμwp (·| i, p n, p n−1) = θi for pn > ϕ wp i (θi). In case of a tie, the seller holds a Dirac-form belief over the randomly selected winner’s type per (30) .(iii) The post-auction effort choices of the seller and winning bidder i are given by: 
+
+eewp (pn, p n−1) = 
+
+eewp −si (pn, p n−1) = (1 −eαwp i (pn)) ·eαwp i (pn)·G (pn)1−(1 −eαwp i (pn)) ·eαwp i (pn) ,
+
+eewp −bi (pn, p n−1) = (1 − eαwp i (pn)) ·
+
+
+
+θi + (1 −eαwp i (pn)) ·eαwp i (pn)·G (pn)1−(1 −eαwp i (pn)) ·eαwp i (pn)
+
+
+
+.
+
+(31) 
+
+This ascending auction implements the optimal direct linear mechanism under winner-pivotal collaboration. 
+
+Proof . Please refer to Appendix M. ■
+
+We call this equilibrium “quasi-dominant strategy” because, given payment rule ecwp and the seller’s rational posterior beliefs, each bidder’s payoff is maximized by the drop-out strategy in (29), regardless of other bidders’ strategies. The winner’s fixed payment (28) increases with his type, while the value-sharing payment (26) decreases with his type. 
+
+Seller-pivotal collaboration. For seller-pivotal collaboration, zero value-shares for low-type winners (Section 3.4.1) allow the seller to extract the entire surplus through full value-sharing below a threshold. Consequently, perfect implementation of the optimal mechanism cannot be achieved. We employ an ascending auction with payments ecsp = ( eαsp i , etsp −wi ; etsp −li ) for winning and losing bidders, respectively. The auction rules mirror those for winner-pivotal collaboration, except for the winner’s value shares and cash payments. Conditional on the final winner’s and penultimate bidder’s drop-out prices ( pn, p n−1), we define: 
+
+eαsp i (pn) ≜ αsp −max  
+
+> i
+
+(H(pn)) − ϵ, 
+
+for sufficiently small ϵ > 0, where αsp −max  
+
+> i
+
+(·) is defined in (22). Analogous to (27), we denote the inverse function of ϕsp i (·) (defined in (23)) as: 
+
+H(·) ≜ (ϕsp i )−1(·).
+
+28 The cash payments for winning and losing bidders are given by: 
+
+etsp −wi (pn, p n−1) = (1 − eαsp i (pn)) · eαsp i (pn) · H (pn)1 − (1 − eαsp i (pn)) · eαsp i (pn) ·
+
+
+
+H(pn) + 12 · (1 − eαsp i (pn)) · eαsp i (pn) · H (pn)1 − (1 − eαsp i (pn)) · eαsp i (pn)
+
+
+
+−
+
+ˆ H(pn)
+
+> H(pn−1)
+
+(1 − αsp −max  
+
+> i
+
+(τ ) + ϵ) · (αsp −max  
+
+> i
+
+(τ ) − ϵ)1 − (1 − αsp −max  
+
+> i
+
+(τ ) + ϵ) · (αsp −max  
+
+> i
+
+(τ ) − ϵ) · τ dτ, 
+
+while losing bidders pay nothing, i.e., etsp −li = 0. This ascending auction approximately implements the optimal mechanism under seller-pivotal collaboration. 
+
+Proposition 5. The ascending auction with payments ecsp admits a quasi-dominant strategy equilibrium, denoted ( eβsp , eμsp , eesp ), where: (i) Each bidder’s drop-out strategy is given by: 
+
+eβsp i (θi|p1, · · · , p k) = ϕsp i (θi),
+
+for each i ∈ N .(ii) The seller holds a Dirac-form posterior belief over bidder i’s type upon his winning: 
+
+eμsp (·| i, p n, p n−1) = δ{H (pn)}, (32) 
+
+for pn−1 ≤ pn ≤ ϕsp i (θi), and eμsp (·| i, p n, p n−1) = θi for pn > ϕ sp i (θi). In case of a tie, the seller holds a Dirac-form belief over the randomly selected winner’s type per (32) .(iii) The post-auction effort choices of the seller and winning bidder i are given by: 
+
+eesp (pn, p n−1) = 
+
+eesp −si (pn, p n−1) = eαsp i (pn)·H (pn)1−(1 −eαsp i (pn)) ·eαsp i (pn) ,
+
+eesp −bi (pn, p n−1) = (1 −eαsp i (pn)) ·eαsp i (pn)·H (pn)1−(1 −eαsp i (pn)) ·eαsp i (pn) .
+
+This ascending auction approximately implements the optimal direct linear mechanism under seller-pivotal collaboration. 
+
+Proof . Please refer to Appendix N. ■
+
+The approximation arises in the winner’s value shares: eαsp i → αsp ∗ 
+
+> i
+
+as ϵ → 0. The seller must leave a small value share ϵ > 0 for low-type winners; otherwise, the highest-type bidder may not be selected, preventing optimal mechanism implementation. 29 5 Extensions 
+
+5.1 Aftermarket collaboration with effort substitution 
+
+In the preceding analysis, regardless of whether winner-pivotal or seller-pivotal aftermar-ket collaboration is employed, both parties’ post-auction efforts exhibit a complementary form, i.e., ebi · esi appearing in multiplicative form. However, seller and winner efforts may exhibit substitutability , where one party’s input reduces the other’s need. In Infrastructure concessions , project quality relies on either government oversight or contractor controls. In 
+
+Franchising , national advertising may replace local promotion. If one party exerts high effort, the other may reduce their own investment. We consider the extreme case where aftermarket efforts are perfect substitutes: 
+
+Vi(θi, e si , e bi ) = θi · (esi + ebi ). (33) Following the framework in Sections 3.1-3.3, we apply the same Methodology to derive the optimal mechanism. Denoting the direct linear mechanism as (ˆ q, ˆc, ˆπ), we characterize the seller’s payoff upper bound analogously to Lemmas 1 and 4: 
+
+Lemma 7. For effort substitution (ES) with value creation (33) , the seller’s expected equi-librium payoff in any feasible direct linear mechanism (ˆ q, ˆc, ˆπ) is bounded above by Rev ES :Rev ES (ˆ q, ˆc, ˆπ) = 
+
+ˆ
+
+> Θ
+
+max ϕES  
+
+> 1
+
+(θ1), . . . , ϕ ES i (θi), . . . , ϕ ES n (θn) f (θ)dθ.
+
+Here, ϕES i (θi) represents the virtual surplus for bidder i with type θi, defined as: 
+
+ϕES i (θi) = 
+
+ 
+
+> 34
+
+· θ2 
+
+> i
+
++ 14
+
+1−Fi(θi)
+
+> fi(θi)
+
+2
+
+− 12 · 1−Fi(θi) 
+
+> fi(θi)
+
+· θi, for ˆθci ≤ θi ≤ θiθ2 
+
+> i
+> 2
+
+, for θi ≤ θi ≤ ˆθci
+
+, (34) 
+
+where the threshold ˆθci is defined as: 
+
+ˆθci ≜ inf 
+
+
+
+θi ∈ [θi, θ i] : 1 − Fi(θi)
+
+fi(θi) · 1
+
+θi
+
+≤ 1
+
+
+
+. (35) The derivation follows Appendices B and F (omitted; available upon request). Applying Step 2 of the Methodology, we construct a feasible mechanism achieving this bound: 
+
+Proposition 6 (Effort substitution) . A feasible direct linear mechanism (ˆ q∗, ˆc∗, ˆπ∗) is op-timal if: 
+
+30 (i) The allocation rule is given by: 
+
+ˆq∗ 
+
+> i
+
+(θ) = 
+
+
+
+1, if ϕES i (θi) > max j̸ =i ϕES j (θj )0, otherwise for all i ∈ N , where ϕES i (·) is each bidder’s virtual surplus as defined in (34) . Ties are broken uniformly at random. (ii) The payment rule ˆc∗ induces a deterministic value-sharing rule for the winner: 
+
+ˆα∗ 
+
+> i
+
+(θi) = 
+
+ 
+
+> 12
+
+·
+
+
+
+1 + 1−Fi(θi) 
+
+> fi(θi)
+
+· 1
+
+> θi
+
+
+
+, for ˆθci ≤ θi ≤ θi
+
+1, for θi < ˆθci
+
+(36) 
+
+for the threshold θci in (35) . Cash payments are determined by measures ˆνw∗ 
+
+> i
+
+(·| θ) and 
+
+ˆνl∗ 
+
+> i
+
+(·| θ), analogous to (17) and (24) , satisfying: 
+
+ˆ
+
+> Θ−i
+
+
+
+ˆq∗ 
+
+> i
+
+(θi, θ−i) ·
+
+ˆ 
+
+> Twi
+
+twi ˆνw∗ 
+
+> i
+
+(dt wi |θi, θ−i)+ (1 − ˆq∗ 
+
+> i
+
+(θi, θ−i)) 
+
+ˆ 
+
+> Tli
+
+tli ˆνl∗ 
+
+> i
+
+(dt li|θi, θ−i)
+
+
+
+f−i(θ−i)dθ−i
+
+=
+
+ˆ
+
+> Θ−i
+
+
+
+1 − (ˆ α∗ 
+
+> i
+
+(θi)) 2
+
+2 · θ2 
+
+> i
+
+· ˆq∗ 
+
+> i
+
+(θi, θ−i)
+
+−
+
+ˆ θi
+
+> θi
+
+(1 − ˆα∗ 
+
+> i
+
+(τ )) · τ · ˆq∗ 
+
+> i
+
+(τ, θ−i)dτ 
+
+
+
+f−i(θ−i)dθ−i.
+
+(iii) The signal realization rule ˆπ∗ 
+
+> i
+
+(·| i, ˆc, θ) ∈ ∆( Si), conditional on the profile of bidders’ reported types, winner’s identity, and bidders’ payments, is a Dirac measure: 
+
+ˆπ∗ 
+
+> i
+
+(·| i, ˆc, θ) = δ{θi},
+
+which assigns probability mass one to the winner’s truthfully reported type θi.
+
+The proof follows Appendices E and I (omitted; available upon request). The optimal mechanism shares key structural features with effort-complementarity cases: virtual surplus allocation, deterministic value-sharing, and full revelation. A notable difference is that value-sharing is explicitly given by (36), whereas it is implicitly determined by maximization problems (13) and (22) in winner-pivotal and seller-pivotal cases. Similar to seller-pivotal collaboration, optimal value-sharing decreases with the winner’s type, and full surplus extraction occurs for types below threshold ˆθci (equation (36)). The 31 reason mirrors the seller-pivotal case: when ebi = 0, neither Vi(θi, e si , e bi ) = ( θi + ebi ) · esi nor 
+
+Vi(θi, e si , e bi ) = θi · (ebi + esi ) yields zero value, making low-type winners unacceptable. 
+
+5.2 Discussions on value function 
+
+Optimal mechanism characterization relies on aftermarket equilibrium existence. However, general value creation functions may preclude such equilibrium. For example, consider a value creation function of the form: 
+
+Vi(θi, e si , e bi ) = θi · esi · ebi . (37) The seller’s and winner’s aftermarket equilibrium strategies satisfy ebi = (1 − αi) · θi · esi (μ)and esi = αi ·Eeθi [eθi ·ebi (eθi)|μ]. Solving this system yields ebi (θi) = (1 −αi)·αi ·θi ·Eeθi [eθi ·ebi (eθi)|μ], which implies: 
+
+Eeθi
+
+h eθi · ebi (eθi) μ
+
+i
+
+= Eeθi
+
+h
+
+(1 − αi) · αi · eθ2 
+
+> i
+
+μ
+
+i
+
+· Eeθi
+
+h eθi · ebi (eθi) μ
+
+i
+
+,
+
+holds for any posterior μ. For equilibrium existence, the following must hold: 
+
+Eeθi
+
+h eθ2 
+
+> i
+
+μ
+
+i
+
+= 1(1 − αi) · αi
+
+(38) when Eeθi [eθi ·ebi (eθi)|μ]̸ = 0. Since (38) fails generally, (37) may preclude equilibrium existence. General functions may also prevent the seller’s payoff upper bound (Step 1 of Method-ology) from being attained, or yield non-monotonic virtual surplus. We therefore focus on two representative effort-complement forms balancing tractability with practical relevance in the main body of the article. Below, we consider a generalized nesting structure that encompasses both cases. 
+
+5.3 Generalized nesting structure and seller’s preference 
+
+We consider a generalized value creation function nesting both cases via an interdependence term: 
+
+Vi(θi, e si , e bi ) = ( ζ · θi + esi ) ·  (1 − ζ) · θi + ebi
+
+ , (39) for ζ ∈ [0 , 1]. When ζ ∈ [0 , 12 ], the seller’s effort is more critical ( ζ = 0 recovers the seller-pivotal case); when ζ ∈ (12 , 1], the winner’s effort is more critical ( ζ = 1 recovers the winner-pivotal case). 32 Optimal mechanism. Similar to the winner- and seller-pivotal scenarios, we use the superscript “ opt ” to denote this generalized nesting structure. Applying the Methodology, for any ζ ∈ [0 , 1], we first establish the seller’s payoff upper bound: Rev opt (q, c, π) ≤ Rev opt (q, c, π) ≜
+
+ˆ
+
+> Θ
+
+max ϕopt  
+
+> 1
+
+(θ1, ζ ), · · · , ϕ opt n (θn, ζ ) f (θ)dθ, (40) where 
+
+ϕopt i (θi, ζ ) ≜ max 
+
+> σi(dα i|θ)
+
+ˆ 10
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2 + αi · (1 − αi · ζ) · (1 − ζ · α2 
+
+> i
+
+)1 − (1 − αi) · αi
+
+− α4 
+
+> i
+
+· (1 − αi · ζ)2
+
+2(1 − (1 − αi) · αi)2
+
+| {z }
+
+> ≜A(αi,ζ )
+
+·θ2
+
+> i
+
+− (1 − αi) ·
+
+
+
+ζ · (2 − ζ · (1 + αi)) + αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> ≜B(αi,ζ )
+
+·1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+σi(dα i|θ)=
+
+ˆ 10
+
+
+
+A(αi, ζ ) · θ2 
+
+> i
+
+− B(αi, ζ ) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+| {z } 
+
+> defined as Ψ opt i(αi,θ )
+
+σopt −max  
+
+> i
+
+(dα i|θ)
+
+| {z }
+
+> Dirac measure maximizer
+
+,
+
+(41) which denotes bidder i’s virtual surplus (non-negative and increasing in θi). The maximizer 
+
+σopt −max  
+
+> i
+
+(·| θ) ∈ ∆([0 , 1]) is a Dirac measure concentrated at αopt −max  
+
+> i
+
+= αopt −max  
+
+> i
+
+(θi, ζ ), so 
+
+ϕopt i (θi, ζ ) = Ψ opt i (αopt −max  
+
+> i
+
+, θ i, ζ ). This function nests: 
+
+
+
+ϕopt i (θi, ζ ) ζ=1 = ϕwp i (θi), winner-pivotal collaboration, cf. (12) ,ϕopt i (θi, ζ ) ζ=0 = ϕsp i (θi), seller-pivotal collaboration, cf. (21) .
+
+The detailed derivation is provided in Appendix O. Given the upper bound in (40), following Step 2 of the Methodology, one can construct a feasible mechanism achieving Rev( q, c, π), thereby identifying the optimal mechanism, analogously to Theorems 1 and 2. Under the general nesting structure, however, additional conditions are required to guarantee feasibility and attainability. Specifically, 
+
+Proposition 7. For any ζ ∈ [0 , 1] , if the maximizing value-sharing scheme, αopt −max  
+
+> i
+
+(θi, ζ ),satisfies ∂A (αi,ζ ) 
+
+> ∂α i
+
+|αi=αopt −max 
+
+> i
+
+< 0 and ∂H (αi,ζ ) 
+
+> ∂α i
+
+|αi=αopt −max 
+
+> i
+
+< 0, where H(αi, ζ ) ≜ (1 − αi)2 ·
+
+(ζ + αi·(1 −αi·ζ)1−(1 −αi)·αi ). Then, an optimal linear mechanism exists that is feasible and achieves the 
+
+33 seller’s payoff upper bound in (40) .
+
+Proof . Please refer to Appendix P. ■
+
+These conditions are automatically satisfied in the winner-pivotal and seller-pivotal cases. The optimal mechanism selects the bidder with the highest virtual surplus, assigns deter-ministic value-sharing αmax  
+
+> i
+
+(θi, ζ ) from (41), and reveals the winner’s type. 
+
+Seller’s preference. If the seller can choose the interdependence term ζ to determine aftermarket dominance, we claim that: 
+
+Proposition 8. The interdependence term that maximizes the seller’s payoff upper bound Rev (q, c, π) satisfies ζ∗ ≤ 12 . Additionally, if such ζ∗ satisfies the conditions in Proposition 7, then the seller will choose this ζ∗ such that: Rev ∗(ζ∗) = Rev (q, c, π).
+
+Otherwise, the optimal ζ∗ is intractable. 
+
+Proof . Please refer to Appendix Q. ■
+
+The seller’s preference for ζ∗ ≤ 12 means she would choose her own effort to be more critical in value creation, consistent with the revenue advantage of seller-pivotal collaboration (Proposition 3). 
+
+# 6 Conclusion 
+
+This paper characterizes optimal auction mechanisms in which the asset’s value is created endogenously through post-auction collaboration between the seller and the winning bid-der. The role structure—winner-pivotal or seller-pivotal—fundamentally shapes the optimal mechanism. The optimal mechanisms in both settings share three structural properties: allocation to the bidder with the highest virtual surplus, a deterministic value-sharing rule, and full information revelation through the signal realization rule. The role structure nevertheless generates systematic differences: the seller captures a strictly larger value share under seller-pivotal collaboration—with full extraction from sufficiently low-type winners—whereas under winner-pivotal collaboration every winner must retain a positive share to sustain his critical effort. The pivotal party exerts higher post-auction effort in every setting, and seller-pivotal collaboration yields strictly higher seller revenue for any type distribution. 34 We implement the optimal mechanisms through ascending auctions with endogenously determined linear contracts. While perfect implementation under seller-pivotal collaboration is challenging due to surplus extraction incentives, close approximation is achievable. These results provide practical guidance for franchising, patent licensing, infrastructure concessions, and platform operating rights, where value is co-created through post-auction interaction. 35 Appendices 
+
+# Appendix A Derivation of seller’s expected payoff un-der winner-pivotal collaboration 
+
+Under the winner-pivotal scenario, in a feasible direct linear mechanism, the incentive com-patibility condition for each bidder requires that U wp i (θi) = max ˆθi∈Θi U wp i (ˆθi, e wp −bi , e wp −si , θ i), where U wp i (ˆθi, e wp −bi , e wp −si , θ i) is specified by (10). Applying the general envelope theorem (see Milgrom and Segal (2002)), any incentive-compatible direct mechanism must satisfy: 
+
+U wp i (θi) = U wp i (θi) + 
+
+ˆ θi
+
+> θi
+
+Wi(τ )dτ, (42) where Wi(τ ) is defined as follows: 
+
+Wi(τ ) ≜
+
+ˆ
+
+> Θ−i
+
+qi(τ, θ−i)
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+(1 − αi)2 ·
+
+τ +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+ πi(ds |i, c, τ, θ−i)
+
+· κi(dα i, dt wi |τ, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|τ, θ−i)f−i(θ−i)dθ−i.
+
+In addition, according to (10), bidder i’s expected payoff from truthful reporting is: 
+
+U wp i (θi) = 
+
+ˆ
+
+> Θ−i
+
+qi(θi, θ−i)
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+12 · (1 − αi)2 ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+ πi(ds |i, c, θ i, θ−i)
+
+· κi(dα i, dt wi |θi, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θi, θ−i)f−i(θ−i)dθ−i
+
+−
+
+ˆ
+
+> Θ−i
+
+
+
+qi(θi, θ−i)
+
+ˆ 
+
+> Twi
+
+twi νwi (dt wi |θi, θ−i)+ (1 − qi(θi, θ−i)) 
+
+ˆ 
+
+> Tli
+
+tliνli (dt li|θi, θ−i)
+
+
+
+f−i(θ−i)dθ−i
+
+| {z }
+
+> ≜Pi(θi)
+
+,
+
+(43) 36 where 
+
+νwi (·| θ) ≜
+
+ˆ 10
+
+κi(dα i, ·| θ) (44) denotes the marginal probability measure of κi(·, ·| θ), representing the winner’s cash payment rule. Similarly, the winner’s value-sharing rule is derived from the linear payment rule as: 
+
+σi(·| θ) ≜
+
+ˆ 
+
+> Twi
+
+κi(·, dt wi |θ). (45) Combining (42) and (43), we obtain an expression for Pi(θi): 
+
+X
+
+> i∈N
+
+ˆ
+
+> Θi
+
+Pi(θi)fi(θi)dθ i
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+12 · (1 − αi)2 ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+−(1 − αi)2 ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+ · 1 − Fi(θi)
+
+fi(θi)
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ − X
+
+> i∈N
+
+U wp i (θi).
+
+Therefore, the desired result in (11) follows from: Rev wp (q, c, π) = X
+
+> i∈N
+
+ˆ
+
+> Θi
+
+Pi(θi)fi(θi)dθ i + X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+αi ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+(1 − αi) ·
+
+θi +(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+−12 ·
+
+(1 − αi) · αi · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ.
+
+37 Appendix B Proof of Lemma 1 
+
+Let ξ(i, d c, ds ) denote the probability measure associated with bidder i winning, where the direct linear mechanism generates payment profile c = ( ci, tl) = ( αi, t wi , (tlj )j̸ =i) and public signal s ∈ Si. Conditional on this, from the seller’s perspective, bidder types are drawn according to the probability measure ϱ(·| i, c, s ) ∈ ∆( Θ), which implies ´ 
+
+> Θ−i
+
+ϱ(dθ|i, c, s ) = 
+
+μ(dθ i|i, c, s ). The seller’s expected equilibrium payoff in (11) can then be expressed as: Rev wp (q, c, π)= X
+
+> i∈N
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+
+
+1 − α2
+
+> i
+
+2 · E
+
+h eθ2 
+
+> i
+
+μ(·| i, c, s )
+
+i
+
++(1 − α2 
+
+> i
+
+) · (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+· E2
+
+h eθi μ(·| i, c, s )
+
+i
+
+−α2
+
+> i
+
+2 ·
+
+ (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+2
+
+· E2
+
+h eθi μ(·| i, c, s )
+
+i
+
+−(1 − αi)2
+
+·E
+
+h eθi μ(·| i, c, s )
+
+i
+
+· E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) μ(·| i, c, s )
+
+#
+
+−(1 − αi)2 · (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+·E
+
+h eθi μ(·| i, c, s )
+
+i
+
+· E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) μ(·| i, c, s )
+
+#
+
+ξ(i, d c, ds )
+
+− X
+
+> i∈N
+
+U wp i (θi).
+
+(46) Given that E2[eθi|μ(eθi|i, c, s )] ≤ E[eθ2 
+
+> i
+
+|μ(eθi|i, c, s )] by Jensen’s inequality, and 
+
+E
+
+"
+
+Fi(eθi) − 1
+
+fi(eθi) μ(eθi|i, c, s )
+
+#
+
+· E
+
+h eθi μ(eθi|i, c, s )
+
+i
+
+≤ E
+
+"
+
+Fi(eθi) − 1
+
+fi(eθi) · eθi μ(eθi|i, c, s )
+
+#
+
+,
+
+which follows from the covariance inequality for monotonic functions (Schmidt, 2014, The-orem 2.2), given that the expectations E[eθi|μ(eθi|i, c, s )] and E[1−Fi(eθi) 
+
+> fi(eθi)
+
+|μ(eθi|i, c, s )] are finite, and that Fi(eθi)−1 
+
+> fi(eθi)
+
+is increasing due to the log-concavity of fi(·). Moreover, individual ratio-nality implies P 
+
+> i∈N
+
+U wp i (θi) ≥ 0 since U wp i (θi) ≥ 0 for all θi ∈ Θi. We therefore obtain the 38 following inequality: Rev wp (q, c, π)
+
+≤ X
+
+> i∈N
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+1 − α2
+
+> i
+
+2 + (1 − α2 
+
+> i
+
+) · (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+− α2
+
+> i
+
+2 · (1 − αi)2 · α2
+
+> i
+
+(1 − (1 − αi) · αi)2
+
+| {z }
+
+> non-negative
+
+·E
+
+h eθ2 
+
+> i
+
+μ(·| i, c, s )
+
+i
+
+−
+
+
+
+(1 − αi)2 + (1 − αi)2 · (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> non-negative
+
+·E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) · eθi μ(·| i, c, s )
+
+#
+
+ξ(i, d c, ds )= X
+
+> i∈N
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+ˆ
+
+> Θ
+
+
+
+1 − 2αi · (1 − αi) · αi − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2 · θ2
+
+> i
+
+− (1 − αi)2
+
+1 − (1 − αi) · αi
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+ϱ(dθ|i, c, s )ξ(i, d c, ds )= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+1 − 2αi · (1 − αi) · αi − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2 · θ2
+
+> i
+
+− (1 − αi)2
+
+1 − (1 − αi) · αi
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 10
+
+
+
+1 − 2αi · (1 − αi) · αi − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2
+
+| {z }
+
+> ≜Awp (αi)
+
+·θ2
+
+> i
+
+− (1 − αi)2
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> ≜Bwp (αi)
+
+·1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+σi(dα i|θ)f (θ)dθ,
+
+(47) where the equalities follow from a change of measure and the marginal probability measure 
+
+σi(·| θ) defined in (45). We focus on the maximization problem with respect to σi(·| θ). For any type profile 39 θ ∈ Θ, we solve: max 
+
+> σi(dα i|θ)
+
+ˆ 10
+
+
+
+Awp (αi) · θ2 
+
+> i
+
+− Bwp (αi) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+σi(dα i|θ). (48) The maximizer, denoted σwp −max  
+
+> i
+
+(·| θ) ∈ ∆([0 , 1]), is a Dirac measure that places unit mass on αwp −max  
+
+> i
+
+= αwp −max  
+
+> i
+
+(θi), where 
+
+αwp −max  
+
+> i
+
+(θi) ∈ argmax 
+
+> αi∈[0 ,1]
+
+Ψwp i (αi, θ i) ≜ argmax 
+
+> αi∈[0 ,1]
+
+
+
+Awp (αi) · θ2 
+
+> i
+
+− Bwp (αi) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+.
+
+We define the corresponding maximal value as bidder i’s virtual surplus: 
+
+ϕwp i (θi) ≜
+
+ˆ 10
+
+Ψwp i (αi, θ i)σwp −max  
+
+> i
+
+(dα i|θ) = Ψ wp i (αwp −max  
+
+> i
+
+, θ i), (49) which matches the expression in (12). For any feasible direct linear mechanism ( q, c, π), the seller’s expected payoff under winner-pivotal collaboration is therefore bounded above by Rev wp (q, c, π), characterized by: Rev wp (q, c, π) ≜ max  
+
+> 0≤qi(θ)≤1; P
+> i∈N qi(θ)≤1
+
+X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) · ϕwp (θi)f (θ)dθ
+
+=
+
+ˆ
+
+> Θ
+
+max {ϕwp  
+
+> 1
+
+(θ1), · · · , ϕ wp i (θi), · · · , ϕ wp n (θn)} f (θ)dθ.
+
+# Appendix C Proof of Lemma 2 
+
+Interior maximizer. The maximizer αwp −max  
+
+> i
+
+= αwp −max  
+
+> i
+
+(θi) in (13) is the solution to the following constrained optimization problem: max 
+
+> αi
+
+
+
+Awp (αi) · θ2 
+
+> i
+
+− Bwp (αi) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+, s.t. 1 − αi ≥ 0 and αi ≥ 0.
+
+The Kuhn-Tucker conditions give: 
+
+      
+
+> 1−4αwp −max
+> i+3( αwp −max
+> i)2−(αwp −max
+> i)3
+> (1 −αwp −max
+> i+( αwp −max
+> i)2)3
+
+· θ2 
+
+> i
+
++ 1−(αwp −max     
+
+> i)2
+> (1 −αwp −max
+> i+( αwp −max
+> i)2)2
+
+· 1−Fi(θi) 
+
+> fi(θi)
+
+· θi − λ1 + λ2 = 0; 
+
+λ1 · (1 − αwp −max  
+
+> i
+
+) = 0 , λ2 · αwp −max  
+
+> i
+
+= 0; 1 − αwp −max  
+
+> i
+
+≥ 0, αwp −max  
+
+> i
+
+≥ 0; 
+
+λ1 ≥ 0, λ2 ≥ 0.
+
+(50) 40 Applying the complementary slackness conditions: (1) if λ1 > 0 and λ2 = 0, then 
+
+αwp −max  
+
+> i
+
+= 1, which yields −θ2 
+
+> i
+
+− λ1 = 0, contradicting λ1 > 0; (2) if λ1 = 0 and λ2 > 0, then 
+
+αwp −max  
+
+> i
+
+= 0, which yields θ2 
+
+> i
+
++ 1−Fi(θi) 
+
+> fi(θi)
+
+· θi + λ2 = 0, contradicting λ2 > 0. Hence, αwp −max 
+
+> i
+
+cannot be a corner solution. 
+
+Decreasing. The interior solution αwp −max  
+
+> i
+
+∈ (0 , 1) implies that λ1 = 0 and λ2 = 0 in (50), yielding: 1 − 4αwp −max  
+
+> i
+
++ 3( αwp −max  
+
+> i
+
+)2 − (αwp −max  
+
+> i
+
+)3
+
+(1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2)3 ·θ2 
+
+> i
+
++ 1 − (αwp −max  
+
+> i
+
+)2
+
+(1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2)2 ·1 − Fi(θi)
+
+fi(θi) ·θi = 0 ,
+
+which gives the following stationary condition for the interior maximizer: (αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1(1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2) · (1 − (αwp −max  
+
+> i
+
+)2) = 1 − Fi(θi)
+
+θi · fi(θi) . (51) Since 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≥ 0, we have: (αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1 ≥ 0, (52) where the equality in (52) holds only if θi = θi since 1−Fi(θi) 
+
+> θi·fi(θi)
+
+= 0. For all θi < θ i, taking the logarithm of (51) yields: 
+
+
+
+ln  (αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1
+
+− ln  1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2
+
+− ln  1 − αwp −max 
+
+> i
+
+ − ln  1 + αwp −max 
+
+> i
+
+ = ln 
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+− ln ( θi) . (53) Differentiating both sides with respect to θi yields: 
+
+
+
+3( αwp −max  
+
+> i
+
+)2 − 6αwp −max  
+
+> i
+
++ 4 (αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1 − 2αwp −max  
+
+> i
+
+− 11 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2
+
+| {z }
+
+> term 1
+
++ 11 − αwp −max 
+
+> i
+
+− 11 + αwp −max 
+
+> i
+
+| {z }
+
+> term 2
+
+
+
+· dα wp −max  
+
+> i
+
+(θi)
+
+dθ i
+
+= fi(θi)1 − Fi(θi) · ddθ i
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+− 1
+
+θi
+
+< 0,
+
+(54) where the right-hand side of (54) is negative because 1−Fi(θi) 
+
+> fi(θi)
+
+decreases in θi under the log-41 concavity of fi(·). For the left-hand side, term 2 is positive and term 1 = (1 − αwp −max  
+
+> i
+
+) · (3 − αwp −max  
+
+> i
+
++ (1 − αwp −max  
+
+> i
+
+) · (αwp −max  
+
+> i
+
+)2)(( αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1) · (1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2) > 0,
+
+by (52). Therefore, dα wp −max   
+
+> i(θi)
+> dθ i
+
+< 0. 
+
+Uniqueness. The second-order partial derivative with respect to αi in (12) is: 
+
+∂2Ψwp i (αi, θ i)
+
+∂α 2
+
+> i
+
+= θ2
+
+> i
+
+(1 − αi + α2 
+
+> i
+
+)4 ·
+
+
+
+(2 − 8αi + 8 α2 
+
+> i
+
+− 4α3 
+
+> i
+
+− 2α4 
+
+> i
+
++ 2 α5 
+
+> i
+
+) · 1 − Fi(θi)
+
+θi · fi(θi)+( −1 − 8αi + 20 α2 
+
+> i
+
+− 12 α3 
+
+> i
+
++ 3 α4 
+
+> i
+
+)
+
+| {z }
+
+> ≜Γi(αi,θ i)
+
+. (55) Applying the stationary condition (51), we evaluate (55) at αi = αwp −max  
+
+> i
+
+as: 
+
+∂2Ψwp i (αi, θ i)
+
+∂α 2 
+
+> iαi=αwp −max
+> i
+
+= − (αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1(1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2)3 · (1 − (αwp −max  
+
+> i
+
+)2)
+
+·
+
+
+
+3( αwp −max  
+
+> i
+
+)2 − 6αwp −max  
+
+> i
+
++ 4 (αwp −max  
+
+> i
+
+)3 − 3( αwp −max  
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+− 1
+
+− 2αwp −max  
+
+> i
+
+− 11 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2
+
++ 2αwp −max 
+
+> i
+
+1 − (αwp −max  
+
+> i
+
+)2
+
+
+
+· θ2 
+
+> i
+
+≤ 0,
+
+(56) where the inequality holds by (52) and the positivity of the bracketed terms in (54). Thus, (56) establishes the local concavity at the interior maximizer αwp −max  
+
+> i
+
+.For global uniqueness, from (55) we compute: 
+
+∂2Γi(αi, θ i)
+
+∂α 2
+
+> i
+
+=(16 − 24 αi − 24 α2 
+
+> i
+
++ 40 α3 
+
+> i
+
+) · 1 − Fi(θi)
+
+θi · fi(θi) + (40 − 72 αi + 36 α2 
+
+> i
+
+)=8 (2 − 3αi − 3α2 
+
+> i
+
++ 5 α3 
+
+> i
+
+)
+
+| {z }
+
+> ≜Λ( αi)
+
+·1 − Fi(θi)
+
+θi · fi(θi) + 36(1 − αi)2 + 4 .
+
+Since Λ( αi) ≥ Λ( 1+ √65 ) > 0 for all αi ∈ [0 , 1], Γ i(αi, θ i) is strictly convex in αi. Thus, 
+
+∂Γi(αi, θ i)
+
+∂α i
+
+= ( −8 + 16 αi − 12 α2 
+
+> i
+
+− 8α3 
+
+> i
+
++ 10 α4 
+
+> i
+
+) · 1 − Fi(θi)
+
+θi · fi(θi) + ( −8 + 40 αi − 36 α2 
+
+> i
+
++ 12 α3 
+
+> i
+
+)42 increases in αi.(1) Case 1. For 0 ≤ 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≤ 12 , we have: 
+
+∂Γi(αi, θ i)
+
+∂α i αi=0 
+
+= −8 · 1 − Fi(θi)
+
+θi · fi(θi) − 8 < 0; ∂Γi(αi, θ i)
+
+∂α i αi=1 
+
+= −2 · 1 − Fi(θi)
+
+θi · fi(θi) + 8 > 0, (57) thus, ∂Γi(αi,θ i) 
+
+> ∂α i
+
+has a unique real root; that is, there exists a unique α0 
+
+> i
+
+∈ (0 , 1) such that  
+
+> ∂Γi(αi,θ i)
+> ∂α i
+
+|αi=α0 
+
+> i
+
+= 0. Hence, Γ i(αi, θ i) is decreasing on [0 , α 0 
+
+> i
+
+], which implies Γ i(αi, θ i) < 0for any αi ∈ (0 , α 0 
+
+> i
+
+) since Γ i(α0 
+
+> i
+
+, θ i) < Γi(0 , θ i) = 2 · 1−Fi(θi) 
+
+> θi·fi(θi)
+
+− 1 < 0 by the definition of Γi(αi, θ i) in (55). Meanwhile, Γ i(αi, θ i) is increasing on [ α0 
+
+> i
+
+, 1]. Combined with Γ i(1 , θ i) = 
+
+−2 · 1−Fi(θi) 
+
+> θi·fi(θi)
+
++ 2 > 0, this implies that Γ i(αi, θ i) has a unique real root on [ α0 
+
+> i
+
+, 1], denoted ˆ α0 
+
+> i
+
+.Therefore, Γ i(αi, θ i) < 0 for any αi ∈ (α0 
+
+> i
+
+, ˆα0 
+
+> i
+
+) and Γ i(αi, θ i) > 0 for any αi ∈ (ˆ α0 
+
+> i
+
+, 1). From the second-order partial derivative in (55), we have: 
+
+∂2Ψwp i (αi, θ i)
+
+∂α 2
+
+> i
+
+= θ2
+
+> i
+
+(1 − αi + α2 
+
+> i
+
+)4 · Γi(αi, θ i)
+
+
+
+≤ 0, for any αi ∈ [0 , ˆα0 
+
+> i
+
+]
+
+≥ 0, for any αi ∈ [ˆ α0 
+
+> i
+
+, 1] 
+
+.
+
+Note that the maximum of Ψ wp i (αi, θ i) on [ˆ α0 
+
+> i
+
+, 1] is attained at the corner since Ψ wp i (αi, θ i)is convex on [ˆ α0 
+
+> i
+
+, 1]. Given the concavity of Ψ wp i (αi, θ i) on [0 , ˆα0 
+
+> i
+
+] and αwp −max  
+
+> i
+
+∈ [0 , ˆα0 
+
+> i
+
+] by (56), to verify that αwp −max  
+
+> i
+
+∈ [0 , 1] is the global unique maximizer, we need only com-pare the corresponding objective value to that at the corner αi = 1. Specifically, we have Ψwp i (αwp −max  
+
+> i
+
+, θ i) ≥ Ψwp i (0 , θ i) = ( 12 − 1−Fi(θi) 
+
+> θi·fi(θi)
+
+) · θ2 
+
+> i
+
+≥ 0 = Ψ wp i (1 , θ i), where the first inequality follows from the concavity of Ψ wp i (αi, θ i) on [0 , ˆα0 
+
+> i
+
+]. (2) Case 2. For 12 ≤ 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≤ 1, the relations in (57) still hold. Thus, we obtain the same results as in Case 1: ∂Γi(αi,θ i) 
+
+> ∂α i
+
+has a unique real root α0 
+
+> i
+
+∈ (0 , 1), and Γ i(αi, θ i) is decreasing on [0 , α 0 
+
+> i
+
+] and increasing on [ α0 
+
+> i
+
+, 1]. From (55) and (56), we have: 
+
+∂2Ψwp i (αi, θ i)
+
+∂α 2 
+
+> iαi=αwp −max
+> i
+
+= θ2
+
+> i
+
+(1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2)4 · Γi(αwp −max  
+
+> i
+
+, θ i) ≤ 0,
+
+which implies Γ i(αwp −max  
+
+> i
+
+, θ i) ≤ 0. The minimum value Γ i(α0 
+
+> i
+
+, θ i) satisfies: Γi(α0 
+
+> i
+
+, θ i) ≤ Γi(αwp −max  
+
+> i
+
+, θ i) ≤ 0. (58) Given that Γ i(0 , θ i) = 2 · 1−Fi(θi) 
+
+> θi·fi(θi)
+
+− 1 > 0 and Γ i(1 , θ i) = −2 · 1−Fi(θi) 
+
+> θi·fi(θi)
+
++ 2 > 0, there exist 43 two real roots, ¯ α0 
+
+> i
+
+∈ (0 , α 0 
+
+> i
+
+) and ˆ α0 
+
+> i
+
+∈ (α0 
+
+> i
+
+, 1), such that: Γi(αi, θ i)
+
+
+
+> 0, for any αi ∈ [0 , ¯α0 
+
+> i
+
+) ∪ (ˆ α0 
+
+> i
+
+, 1] 
+
+< 0, for any αi ∈ (¯ α0 
+
+> i
+
+, ˆα0 
+
+> i
+
+)=⇒ ∂2Ψwp i (αi, θ i)
+
+∂α 2
+
+> i
+
+= θ2
+
+> i
+
+(1 − αi + α2 
+
+> i
+
+)4 · Γi(αi, θ i)
+
+
+
+≥ 0, for any αi ∈ [0 , ¯α0 
+
+> i
+
+] ∪ [ˆ α0 
+
+> i
+
+, 1] 
+
+≤ 0, for any αi ∈ [¯ α0 
+
+> i
+
+, ˆα0 
+
+> i
+
+]
+
+.
+
+To establish the global unique maximizer of αwp −max  
+
+> i
+
+∈ [0 , 1], we compare the corre-sponding objective values: Ψ wp i (αwp −max  
+
+> i
+
+, θ i), Ψ wp i (0 , θ i), and Ψ wp i (1 , θ i). Given the objective function in (12) and the stationary condition (51), we show that Ψ wp i (αwp −max  
+
+> i
+
+, θ i) > 0: Ψwp i (αwp −max  
+
+> i
+
+, θ i)=(1 − αwp −max  
+
+> i
+
+) ·  (3 + ( αwp −max  
+
+> i
+
+)2) · (1 − αwp −max  
+
+> i
+
+)2 + 2( αwp −max  
+
+> i
+
+)2
+
+2  1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)22 · (1 + αwp −max  
+
+> i
+
+) · θ2 
+
+> i
+
+> 0. (59) Therefore, we establish that Ψ wp i (αwp −max  
+
+> i
+
+, θ i) > Ψwp i (0 , θ i), Ψwp i (1 , θ i), since Ψ wp i (0 , θ i) = (12 − 1−Fi(θi) 
+
+> θi·fi(θi)
+
+) · θ2 
+
+> i
+
+< 0 and Ψ wp i (1 , θ i) = 0. (3) Case 3. For 1−Fi(θi) 
+
+> θi·fi(θi)
+
+> 1, following the analysis in the previous two cases, there exists a unique real root α0 
+
+> i
+
+∈ (0 , 1) such that Γ i(αi, θ i) decreases on [0 , α 0 
+
+> i
+
+] and increases on [ α0 
+
+> i
+
+, 1]. Given inequalities (58), and that Γ i(0 , θ i) = 2 · 1−Fi(θi) 
+
+> θi·fi(θi)
+
+− 1 > 0 and Γ i(1 , θ i) = 
+
+−2 · 1−Fi(θi) 
+
+> θi·fi(θi)
+
++ 2 < 0, there exists a unique real root ˆ α0 
+
+> i
+
+∈ (0 , α 0 
+
+> i
+
+) such that: Γi(αi, θ i)
+
+
+
+> 0, for any αi ∈ [0 , ˆα0 
+
+> i
+
+)
+
+< 0, for any αi ∈ (ˆ α0 
+
+> i
+
+, 1] =⇒ ∂2Ψwp i (αi, θ i)
+
+∂α 2
+
+> i
+
+= θ2
+
+> i
+
+(1 − αi + α2 
+
+> i
+
+)4 · Γi(αi, θ i)
+
+
+
+≥ 0, for any αi ∈ [0 , ˆα0 
+
+> i
+
+]
+
+≤ 0, for any αi ∈ [ˆ α0 
+
+> i
+
+, 1] 
+
+.
+
+Hence, to establish the global unique maximizer αwp −max  
+
+> i
+
+∈ [0 , 1], we need only compare the corresponding objective value to that at the corner. Specifically, we have Ψ wp i (αwp −max  
+
+> i
+
+, θ i) >
+
+Ψwp i (0 , θ i) since Ψ wp i (αwp −max  
+
+> i
+
+, θ i) > 0 by (59) and Ψ wp i (0 , θ i) = ( 12 − 1−Fi(θi) 
+
+> θi·fi(θi)
+
+) · θ2 
+
+> i
+
+< 0. 44 Appendix D Proof of Lemma 3 
+
+Applying the general envelope theorem, we differentiate (49) with respect to θi to obtain: 
+
+dϕ wp i (θi)
+
+dθ i
+
+=Awp (αwp −max  
+
+> i
+
+) · 2θi − Bwp (αwp −max  
+
+> i
+
+) ·
+
+1 − Fi(θi)
+
+fi(θi) + ddθ i
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+· θi
+
+
+
+.
+
+The term Bwp (αwp −max  
+
+> i
+
+)· ddθ i (1−Fi(θi) 
+
+> fi(θi)
+
+)·θi is negative because Bwp (αwp −max  
+
+> i
+
+) > 0 (since αwp −max 
+
+> i
+
+is an interior maximizer) and 1−Fi(θi) 
+
+> fi(θi)
+
+is decreasing in θi. For the remaining terms, using the stationary condition for the interior maximizer (51), we obtain that Awp (αwp −max  
+
+> i
+
+) · 2θi −
+
+Bwp (αwp −max  
+
+> i
+
+) · 1−Fi(θi) 
+
+> fi(θi)
+
+equals: 
+
+ 1 − αwp −max 
+
+> i
+
+ ·  2 − 2αwp −max  
+
+> i
+
++ 3( αwp −max  
+
+> i
+
+)2 − (αwp −max  
+
+> i
+
+)3 + ( αwp −max  
+
+> i
+
+)4 · θi
+
+(1 − αwp −max  
+
+> i
+
++ ( αwp −max  
+
+> i
+
+)2)2 · (1 + αwp −max  
+
+> i
+
+) > 0.
+
+This establishes that dϕ wp i (θi) 
+
+> dθ i
+
+> 0. It remains to show that ϕwp i (θi) ≥ 0 for each i ∈ N and any θi ∈ Θi. By the definition of virtual surplus in (49), the result follows from: 
+
+ϕwp i (θi) = max 
+
+> αi∈[0 ,1]
+
+Ψwp i (αi, θ i) ≥ Ψwp i (1 , θ i) = 0 , (60) which holds for any θi ∈ Θi.
+
+# Appendix E Proof of Theorem 1 
+
+Feasibility. Under the mechanism ( qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+), using the bidder’s expected payoff in (10), we derive bidder i’s expected payoff from truth-telling as follows: 
+
+U wp i (θi) = 
+
+ˆ
+
+> Θ−i
+
+ˆ θi
+
+> θi
+
+
+
+qwp ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αwp −max  
+
+> i
+
+(τ )) 2
+
+·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+ dτ f−i(θ−i)dθ−i. (61) Note that U wp i (θi) is increasing in θi and satisfies individual rationality: U wp i (θi) ≥
+
+U wp i (θi) = 0. To establish incentive compatibility, according to Definition 1, it suffices 45 to establish the following inequality based on (61): 
+
+U wp i (θi) − U wp i (ˆθi, θ i)=U wp i (θi) − U wp i (ˆθi) + U wp i (ˆθi) − U wp i (ˆθi, θ i)=
+
+ˆ
+
+> Θ−i
+
+
+
+ˆ θi
+
+> ˆθi
+
+
+
+qwp ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αwp −max  
+
+> i
+
+(τ )) 2
+
+·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+ dτ 
+
+−qwp ∗ 
+
+> i
+
+(ˆθi, θ−i) · (1 − αwp −max  
+
+> i
+
+(ˆθi)) 2
+
+2
+
+· θi + ˆθi + 2 · (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi) · ˆθi
+
+1 − (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi)
+
+!
+
+·
+
+
+
+θi − ˆθi
+
+| {z }
+
+> ≜I(θi)
+
+f−i(θ−i)dθ−i ≥ 0,
+
+(62) for any θi, ˆθi ∈ Θi (without loss of generality, assume θi > ˆθi). We first claim that: 
+
+Claim 1. According to Lemma 2, αwp −max  
+
+> i
+
+(θi) is such that: 
+
+ddθ i
+
+
+
+(1 − αwp −max  
+
+> i
+
+(θi)) 2 · (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+
+
+≥ 0.
+
+Proof of Claim 1. Taking the logarithm and differentiating the objective with respect to θi:
+
+
+
+− 31 − αwp −max  
+
+> i
+
+(θi)+ 1
+
+αwp −max  
+
+> i
+
+(θi)
+
+− −1 + 2 αwp −max  
+
+> i
+
+(θi)1 − αwp −max  
+
+> i
+
+(θi) + ( αwp −max  
+
+> i
+
+(θi)) 2
+
+
+
+· dα wp −max  
+
+> i
+
+(θi)
+
+dθ i
+
++ 1
+
+θi
+
+= 1
+
+θi
+
++ dα wp −max  
+
+> i
+
+(θi)
+
+dθ i
+
+· 1 − 4αwp −max  
+
+> i
+
+(θi) + 2( αwp −max  
+
+> i
+
+(θi)) 2 − 2( αwp −max  
+
+> i
+
+(θi)) 3
+
+(1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · (1 − αwp −max  
+
+> i
+
+(θi) + ( αwp −max  
+
+> i
+
+(θi)) 2),
+
+(63) 46 where the numerator equals 1 − 4αwp −max  
+
+> i
+
+(θi) + 2( αwp −max  
+
+> i
+
+(θi)) 2 − 2( αwp −max  
+
+> i
+
+(θi)) 3
+
+=2(1 − αwp −max  
+
+> i
+
+(θi)) 3 − 1 + 2 αwp −max  
+
+> i
+
+(θi) − 4( αwp −max  
+
+> i
+
+(θi)) 2
+
+=2  1 − 4αwp −max  
+
+> i
+
+(θi) + 3( αwp −max  
+
+> i
+
+(θi)) 2 − (αwp −max  
+
+> i
+
+(θi)) 3 + αwp −max  
+
+> i
+
+(θi)
+
+− 1 + 2 αwp −max  
+
+> i
+
+(θi) − 4( αwp −max  
+
+> i
+
+(θi)) 2
+
+≤2αwp −max  
+
+> i
+
+(θi) − 1 + 2 αwp −max  
+
+> i
+
+(θi) − 4( αwp −max  
+
+> i
+
+(θi)) 2
+
+= − (1 − 2αwp −max  
+
+> i
+
+(θi)) 2
+
+≤0,
+
+where the first inequality follows from (52). Therefore, combined with Lemma 2, the derivative in (63) is non-negative. ■
+
+To establish that inequality (62) holds for any θi, ˆθi ∈ Θi, we show that I(θi) ≥ 0: 
+
+I(θi) ≥qwp ∗ 
+
+> i
+
+(ˆθi, θ−i) ·
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2 ·
+
+ˆ θi
+
+> ˆθi
+
+τ dτ 
+
++
+
+ˆ θi
+
+> ˆθi
+
+
+
+(1 − αwp −max  
+
+> i
+
+(τ )) 2
+
+· (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+ dτ 
+
+
+
+− qwp ∗ 
+
+> i
+
+(ˆθi, θ−i) ·
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2 · θ2 
+
+> i
+
+− ˆθ2
+
+> i
+
+2+
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2
+
+· (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi) · ˆθi
+
+1 − (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi) ·
+
+
+
+θi − ˆθi
+
+
+
+>q wp ∗ 
+
+> i
+
+(ˆθi, θ−i) ·
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2 · θ2 
+
+> i
+
+− ˆθ2
+
+> i
+
+2+
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2
+
+· (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi)1 − (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi) · ˆθi ·
+
+ˆ θi
+
+> ˆθi
+
+dτ 
+
+
+
+− qwp ∗ 
+
+> i
+
+(ˆθi, θ−i) ·
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2 · θ2 
+
+> i
+
+− ˆθ2
+
+> i
+
+2+
+
+
+
+(1 − αwp −max  
+
+> i
+
+(ˆθi)) 2
+
+· (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi) · ˆθi
+
+1 − (1 − αwp −max  
+
+> i
+
+(ˆθi)) · αwp −max  
+
+> i
+
+(ˆθi) ·
+
+
+
+θi − ˆθi
+
+
+
+=0 ,
+
+47 where the first inequality follows from: (1) qwp ∗ 
+
+> i
+
+(θi, θ−i) is increasing in θi since the virtual surplus is increasing in θi by Lemma 3; and (2) (1 − αwp −max  
+
+> i
+
+(θi)) 2 is increasing in θi since 
+
+αwp −max  
+
+> i
+
+(·) is an interior maximizer and αwp −max  
+
+> i
+
+(·) is decreasing by Lemma 2. The second inequality follows from Claim 1. 
+
+Optimality. We establish optimality by showing that this mechanism attains the upper bound Rev wp (q, c, π) in Lemma 1. Under the feasible linear mechanism ( qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+), according to (11) and the expression for ϕwp i (·) in (14), we obtain: Rev wp (qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+)= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qwp ∗ 
+
+> i
+
+(θ) ·
+
+
+
+12 · (1 − (αwp −max  
+
+> i
+
+(θi)) 2) · θ2
+
+> i
+
++(1 − (αwp −max  
+
+> i
+
+(θi)) 2) · θi · (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)
+
+−(αwp −max  
+
+> i
+
+(θi)) 2
+
+2 ·
+
+ (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)
+
+2
+
+−(1 − αwp −max  
+
+> i
+
+(θi)) 2 · θi · 1 − Fi(θi)
+
+fi(θi)
+
+−(1 − αwp −max  
+
+> i
+
+(θi)) 2 · (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)
+
+·1 − Fi(θi)
+
+fi(θi)
+
+
+
+f (θ)dθ
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qwp ∗ 
+
+> i
+
+(θ) · ϕwp i (θi)f (θ)dθ
+
+=
+
+ˆ
+
+> Θ
+
+max {0, ϕ wp  
+
+> 1
+
+(θ1), · · · , ϕ wp i (θi), · · · , ϕ wp n (θn)} f (θ)dθ
+
+=Rev wp (q, c, π).
+
+# Appendix F Proof of Lemma 4 
+
+Following the derivation of the seller’s expected payoff under winner-pivotal collaboration (see Appendix A, which uses the general envelope theorem), we apply the same change-of-48 measure approach as in (46) to derive: Rev sp (q, c, π)= X
+
+> i∈N
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+
+
+2αi · (1 − (1 − αi) · αi) − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2
+
+·E2
+
+h eθi μ(·| i, c, s )
+
+i
+
+− (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+·E
+
+h eθi μ(·| i, c, s )
+
+i
+
+· E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) μ(·| i, c, s )
+
+#
+
+ξ(i, d c, ds )
+
+− X
+
+> i∈N
+
+U sp i (θi).
+
+(64) Following the same approach as in (47), we obtain: Rev sp (q, c, π) ≤ X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ)
+
+ˆ 10
+
+
+
+2αi · (1 − (1 − αi) · αi) − α4
+
+> i
+
+2(1 − (1 − αi) · αi)2
+
+| {z }
+
+> ≜Asp (αi)
+
+·θ2
+
+> i
+
+− (1 − αi) · αi
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> ≜Bsp (αi)
+
+·1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+σi(dα i|θ)f (θ)dθ.
+
+The maximizer is: 
+
+σsp −max  
+
+> i
+
+(·| θ) ∈ argmax 
+
+> σi(dα i|θ)∈∆([0 ,1])
+
+ˆ 10
+
+
+
+Asp (αi) · θ2 
+
+> i
+
+− Bsp (αi) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+| {z } 
+
+> ≜Ψsp i(αi,θ i)
+
+σi(dα i|θ), (65) which is a Dirac measure that places unit mass on αsp −max  
+
+> i
+
+(θi) ∈ argmax αi∈[0 ,1] Ψsp i (αi, θ i). Accordingly, we define the corresponding maximal value as bidder i’s virtual surplus: 
+
+ϕsp i (θi) ≜
+
+ˆ 10
+
+Ψsp i (αi, θ i)σsp −max  
+
+> i
+
+(dα i|θ) = Ψ sp i (αsp −max  
+
+> i
+
+, θ i), (66) which matches the expression in (21). Therefore, for any feasible direct linear mechanism 49 (q, c, π), the seller’s expected payoff under seller-pivotal collaboration is bounded above by: Rev sp (q, c, π) ≜ max  
+
+> 0≤qi(θ)≤1; P
+> i∈N qi(θ)≤1
+
+X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) · ϕsp (θi)f (θ)dθ
+
+=
+
+ˆ
+
+> Θ
+
+max {ϕsp  
+
+> 1
+
+(θ1), · · · , ϕ sp i (θi), · · · , ϕ sp n (θn)} f (θ)dθ.
+
+# Appendix G Proof of Lemma 5 
+
+Equivalence. We first show the equivalence between the following two constrained opti-mization problems: max   
+
+> αi∈[12,1]
+
+Ψsp i (αi, θ i) = max  
+
+> αi∈[0 ,1]
+
+Ψsp i (αi, θ i),
+
+which differ only in their constraint sets. The function Ψ sp i (αi, θ i) is defined by (65); it suffices to show αsp −max  
+
+> i
+
+(θi) /∈ [0 , 12 ). We proceed by contradiction. Suppose αsp −max  
+
+> i
+
+∈ [0 , 12 ). Then there exists α′ 
+
+> i
+
+∈ (12 , 1] such that αsp −max  
+
+> i
+
++ α′ 
+
+> i
+
+= 1. Thus, (1 − α′
+
+> i
+
+) · α′ 
+
+> i
+
+= (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+and the second term of the objective function Ψ i(·, θ i) satisfies: (1 − α′
+
+> i
+
+) · α′
+
+> i
+
+1 − (1 − α′
+
+> i
+
+) · α′
+
+> i
+
+· 1 − Fi(θi)
+
+fi(θi) · θi = (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+1 − (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+· 1 − Fi(θi)
+
+fi(θi) · θi.
+
+For the first term, we denote (1 − α′
+
+> i
+
+) · α′ 
+
+> i
+
+= (1 − αsp −max  
+
+> i
+
+) · αsp −max  
+
+> i
+
+≜ K ∈ [0 , 14 ) and show that the difference between the numerators satisfies: 2α′ 
+
+> i
+
+· (1 − K) − (α′
+
+> i
+
+)4 −  2αsp −max  
+
+> i
+
+· (1 − K) − (αsp −max  
+
+> i
+
+)4
+
+=2(1 − K) ·  α′ 
+
+> i
+
+− αsp −max 
+
+> i
+
+ −  (α′
+
+> i
+
+)2 − (αsp −max  
+
+> i
+
+)2 ·  (α′
+
+> i
+
+)2 + ( αsp −max  
+
+> i
+
+)2
+
+>2(1 − K) ·  α′ 
+
+> i
+
+− αsp −max 
+
+> i
+
+ −  (α′
+
+> i
+
+)2 − (αsp −max  
+
+> i
+
+)2 ·  α′ 
+
+> i
+
++ αsp −max 
+
+> i
+
+2
+
+=  α′ 
+
+> i
+
+− αsp −max 
+
+> i
+
+ · (1 − 2K) > 0.
+
+Therefore, α′ 
+
+> i
+
+∈ (12 , 1] yields a strictly higher objective value, contradicting the assumption that αsp −max  
+
+> i
+
+∈ [0 , 12 ). Hence, we establish αsp −max  
+
+> i
+
+(θi) ≥ 12 for all θi ∈ [θi, θ i]. 
+
+Non-increasing. We analyze the monotonicity of αsp −max  
+
+> i
+
+(θi) separately for the cases of corner and interior solutions. (1) Corner solution. We consider the equivalent optimization problem max αi∈[1 /2,1] Ψsp i (αi, θ i): max 
+
+> αi
+
+
+
+Asp (αi) · θ2 
+
+> i
+
+− Bsp (αi) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+s.t. 1 − αi ≥ 0 and αi ≥ 12.
+
+50 The Kuhn-Tucker conditions for the maximizer αsp −max  
+
+> i
+
+(θi) are: 
+
+
+
+− (αsp −max      
+
+> i)3+αsp −max
+> i−1(1 −αsp −max
+> i+( αsp −max
+> i)2)3
+
+· θ2 
+
+> i
+
++ 2αsp −max     
+
+> i−1(1 −αsp −max
+> i+( αsp −max
+> i)2)2
+
+· 1−Fi(θi) 
+
+> fi(θi)
+
+· θi − λ1 + λ2 = 0; 
+
+λ1 · (1 − αsp −max  
+
+> i
+
+) = 0 , λ2 · (αsp −max  
+
+> i
+
+− 12 ) = 0; 1 − αsp −max  
+
+> i
+
+≥ 0, αsp −max  
+
+> i
+
+− 12 ≥ 0; 
+
+λ1 ≥ 0, λ2 ≥ 0.
+
+(67) Based on the slackness conditions: (1) if λ1 > 0 and λ2 = 0, then αsp −max  
+
+> i
+
+= 1, which implies −θ2 
+
+> i
+
++ 1−Fi(θi) 
+
+> fi(θi)
+
+· θi − λ1 = 0, yielding 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≥ 1; (2) if λ1 = 0 and λ2 > 0, then 
+
+αsp −max  
+
+> i
+
+= 12 , which implies 89 θ2 
+
+> i
+
++ λ2 = 0. This contradicts λ2 > 0. Therefore, for any θi ∈ [θi, θ i] satisfying 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≥ 1, the maximizer αsp −max  
+
+> i
+
+(θi) = 1 constitutes a corner solution. Moreover, given that 
+
+ddθ i
+
+1 − Fi(θi)
+
+θi · fi(θi)
+
+
+
+= ddθ i
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+· 1
+
+θi
+
+−
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+· 1
+
+θ2
+
+> i
+
+< 0,
+
+where the inequality follows from the fact that 1−Fi(θi) 
+
+> fi(θi)
+
+decreases in θi under log-concavity of fi(·), we establish that 1−Fi(θi) 
+
+> θi·fi(θi)
+
+is decreasing in θi. Consequently, there exists a unique threshold θci such that: 1 − Fi(θci )
+
+θci · fi(θci ) = 1 . (68) Thus, αsp −max  
+
+> i
+
+(θi) = 1 for all θi ≤ θci .(2) Interior maximizer and decreasing nature. When the maximizer is an interior solution, i.e., αsp −max  
+
+> i
+
+∈ (12 , 1), the stationary condition in (67) with λ1 = λ2 = 0 gives: (αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1(1 − αsp −max  
+
+> i
+
++ ( αsp −max  
+
+> i
+
+)2) · (2 αsp −max  
+
+> i
+
+− 1) = 1 − Fi(θi)
+
+θi · fi(θi) . (69) First, since 2 αsp −max  
+
+> i
+
+− 1 > 0 and 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≥ 0, we have ( αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1 ≥ 0 >
+
+(23 )3 + 23 − 1, which implies: 
+
+αsp −max  
+
+> i
+
+> 23. (70) Next, following the approach in (53), taking the logarithm and differentiating both sides 51 with respect to θi yields: 
+
+
+
+3( αsp −max  
+
+> i
+
+)2 + 1 (αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1
+
+− 2αsp −max  
+
+> i
+
+− 1(αsp −max  
+
+> i
+
+)2 − αsp −max  
+
+> i
+
++ 1 
+
+− 22αsp −max  
+
+> i
+
+− 1
+
+
+
+· dα sp −max  
+
+> i
+
+(θi)
+
+dθ i
+
+= ddθ i
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+· fi(θi)1 − Fi(θi) − 1
+
+θi
+
+< 0.
+
+The negativity of the right-hand side follows from the same reasoning as in (54). The terms in the bracket on the left-hand side derive as follows: 
+
+
+
+3( αsp −max  
+
+> i
+
+)2 − 2αsp −max 
+
+> i
+
+(αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1
+
+| {z }
+
+> term 1
+
++ 2αsp −max  
+
+> i
+
+− 1(αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1 − 2αsp −max  
+
+> i
+
+− 1(αsp −max  
+
+> i
+
+)2 − αsp −max  
+
+> i
+
++ 1 
+
+| {z }
+
+> term 2
+
++ 2(αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1 − 22αsp −max  
+
+> i
+
+− 1
+
+| {z }
+
+> term 3
+
+
+
+> 0,
+
+where term 1 is positive by (70). Term 2 is non-negative since the denominators satisfy (( αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1) − (( αsp −max  
+
+> i
+
+)2 − αsp −max  
+
+> i
+
++ 1) = ( αsp −max  
+
+> i
+
+− 1) · (( αsp −max  
+
+> i
+
+)2 + 2) ≤ 0. Term 3 is non-negative since ( αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1 ≤ 2αsp −max  
+
+> i
+
+− 1, as ( αsp −max  
+
+> i
+
+)3 ≤
+
+αsp −max  
+
+> i
+
+≤ 1. Therefore, dα sp −max   
+
+> i(θi)
+> dθ i
+
+< 0 when the maximizer is an interior solution. 
+
+Uniqueness. First, for any θi ≤ θci , the maximizer of (22) is a corner solution, αsp −max  
+
+> i
+
+(θi) = 1, where the threshold type is uniquely determined by (68). Second, for any θi ≥ θci , we show that the interior maximizer is unique. From the objective function in (65), we derive the second-order partial derivative with respect to αi:
+
+∂2Ψsp i (αi, θ i)
+
+∂α 2
+
+> i
+
+= θ2
+
+> i
+
+(1 − αi + α2 
+
+> i
+
+)4 ·
+
+
+
+(3 α4 
+
+> i
+
++ 2 α2 
+
+> i
+
+− 8αi + 2) +6 αi · (1 − αi) · (1 − αi + α2 
+
+> i
+
+) · 1 − Fi(θi)
+
+θi · fi(θi)
+
+| {z }
+
+> ≜Ωi(αi,θ i)
+
+. (71) 52 Since 1−Fi(θi) 
+
+> θi·fi(θi)
+
+≤ 1 for θi ≥ θci , we obtain: 
+
+∂2Ωi(αi, θ i)
+
+∂α 2
+
+> i
+
+=(36 α2 
+
+> i
+
++ 4) − (72 α2 
+
+> i
+
+− 72 αi + 24) · 1 − Fi(θi)
+
+θi · fi(θi)
+
+>(36 α2 
+
+> i
+
++ 4) − (72 α2 
+
+> i
+
+− 72 αi + 24) = 16 − 36(1 − αi)2 > 0.
+
+Thus, Ω i(αi, θ i) is convex in αi on [ 12 , 1). Moreover, note that Ω i(12 , θ i) = −21 16 + 981−Fi(θi) 
+
+> θi·fi(θi)
+
+<
+
+0 and Ω i(1 , θ i) = −1 < 0. Therefore, Ω i(αi, θ i) < 0 for all αi ∈ [12 , 1), which implies strict concavity of the objective function, i.e., ∂2Ψsp i (αi,θ i)
+
+> ∂α 2
+> i
+
+< 0 by (71). Consequently, for any 
+
+θi ≥ θci , the interior maximizer αsp −max  
+
+> i
+
+∈ [12 , 1) is unique. 
+
+# Appendix H Proof of Lemma 6 
+
+When αsp −max  
+
+> i
+
+(θi) is an interior maximizer, according to (69) and (70), applying the envelope theorem and differentiating (66) with respect to θi yields: 
+
+dϕ sp i (θi)
+
+dθ i
+
+= (αsp −max  
+
+> i
+
+)3 − αsp −max  
+
+> i
+
+· (1 − αsp −max  
+
+> i
+
+)4
+
+(1 − αsp −max  
+
+> i
+
++ ( αsp −max  
+
+> i
+
+)2) · (2 αsp −max  
+
+> i
+
+− 1) · θi
+
+− (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+1 − (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+· ddθ i
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+· θi
+
+> (αsp −max  
+
+> i
+
+)3 + αsp −max  
+
+> i
+
+− 1(1 − αsp −max  
+
+> i
+
++ ( αsp −max  
+
+> i
+
+)2) · (2 αsp −max  
+
+> i
+
+− 1) · θi
+
+− (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+1 − (1 − αsp −max  
+
+> i
+
+) · αsp −max 
+
+> i
+
+· ddθ i
+
+1 − Fi(θi)
+
+fi(θi)
+
+
+
+· θi ≥ 0.
+
+(72) This establishes that each bidder’s virtual surplus is increasing in θi. It remains to show that ϕsp i (θi) ≥ 0 for each i ∈ N and any θi ∈ Θi. Similar to (60), by the definition of virtual surplus in (66), the result follows from: 
+
+ϕsp i (θi) = max 
+
+> αi∈[0 ,1]
+
+Ψsp i (αi, θ i) ≥ Ψsp i (1 , θ i) = 12 · θ2 
+
+> i
+
+≥ 12 · θ2 
+
+> i
+
+≥ 0,
+
+which holds for any θi ∈ Θi, where the final inequality follows from θi ≥ 0. 
+
+# Appendix I Proof of Theorem 2 
+
+Following the proof of Theorem 1 (see Appendix E), we first verify the feasibility of the mechanism ( qsp ∗
+
+, csp ∗
+
+, πsp ∗
+
+). From the expression for a bidder’s expected payoff in (20), we 53 derive bidder i’s expected payoff under truthful reporting as follows: 
+
+U sp i (θi) = 
+
+ˆ
+
+> Θ−i
+
+ˆ θi
+
+> θi
+
+qsp ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αsp −max  
+
+> i
+
+(τ )) · αsp −max  
+
+> i
+
+(τ )1 − (1 − αsp −max  
+
+> i
+
+(τ )) · αsp −max  
+
+> i
+
+(τ ) · τ dτ f−i(θ−i)dθ−i.
+
+To establish the bidder’s truth-telling incentive, we show that, analogous to (62): 
+
+U sp i (θi) − U sp i (ˆθi, θ i)=
+
+ˆ
+
+> Θ−i
+
+ˆ θi
+
+> ˆθi
+
+qsp ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αsp −max  
+
+> i
+
+(τ )) · αsp −max  
+
+> i
+
+(τ )1 − (1 − αsp −max  
+
+> i
+
+(τ )) · αsp −max  
+
+> i
+
+(τ ) · τ dτ f−i(θ−i)dθ−i
+
+−
+
+ˆ
+
+> Θ−i
+
+qsp ∗ 
+
+> i
+
+(ˆθi, θ−i) · (1 − αsp −max  
+
+> i
+
+(ˆθi)) · αsp −max  
+
+> i
+
+(ˆθi)1 − (1 − αsp −max  
+
+> i
+
+(ˆθi)) · αsp −max  
+
+> i
+
+(ˆθi) · ˆθi ·
+
+
+
+θi − ˆθi
+
+
+
+f−i(θ−i)dθ−i ≥ 0holds for any θi, ˆθi ∈ Θi (without loss of generality, assume θi > ˆθi). This follows because 
+
+qsp ∗ 
+
+> i
+
+(θi, θ−i) is increasing in θi, since the virtual surplus is increasing in θi (see (72)). Addi-tionally, 
+
+ddθ i
+
+ (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi)1 − (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi) · θi
+
+
+
+= (αsp −max  
+
+> i
+
+(θi)) ′ · (1 − 2αsp −max  
+
+> i
+
+(θi)) (1 − (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi)) 2 · θi + (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi)1 − (1 − αsp −max  
+
+> i
+
+(θi)) · αsp −max  
+
+> i
+
+(θi) ≥ 0,
+
+due to αsp −max  
+
+> i
+
+≥ 12 and the fact that αsp −max  
+
+> i
+
+(·) is non-increasing (see Lemma 5). Optimality follows from showing that Rev sp (qsp ∗
+
+, csp ∗
+
+, πsp ∗
+
+) = Rev sp (q, c, π), using the same approach as in Appendix E. 
+
+# Appendix J Proof of Proposition 1 
+
+First, according to Lemmas 2 and 5, both optimal deterministic value-sharing rules αwp ∗ 
+
+> i
+
+(θi) = 
+
+αwp −max  
+
+> i
+
+(θi) and αsp ∗ 
+
+> i
+
+(θi) = αsp −max  
+
+> i
+
+(θi) are uniquely determined, and αsp −max  
+
+> i
+
+(θi) > α wp −max  
+
+> i
+
+(θi)for any θi ≤ θci since αsp −max  
+
+> i
+
+(θi) = 1 while αwp −max  
+
+> i
+
+(θi) < 1 within this interval. Next, for 
+
+θi > θ ci , we define: 
+
+αc ≜ inf {α ∈ [0 , 1] : α3 > 1 − α}, (73) which satisfies αc > 12 . The stationary condition (69) and inequality (70) imply that (αsp −max  
+
+> i
+
+(θi)) 3 + αsp −max  
+
+> i
+
+(θi) − 1 ≥ 0 for any θi > θ ci , thus: 
+
+αsp −max  
+
+> i
+
+(θi) ≥ αc > 12, (74) 54 for any θi > θ ci . We further claim that: 
+
+Claim 2. αwp −max  
+
+> i
+
+(θi) < α c for any θi > θ ci .Proof of Claim 2. We proceed by contradiction. Suppose there exists θ0 
+
+> i
+
+> θ ci such that 
+
+αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) ≥ αc. Then ( αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)) 3 ≥ 1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) by (73). Rearranging yields: 
+
+αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) ≥  1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2 + 3 αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+). (75) According to the stationary condition in the winner-pivotal scenario in (51), we have: 
+
+ αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)3 − 3  αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2 + 4 αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) − 1
+
+
+
+1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) +  αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2
+
+·
+
+
+
+1 −  αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2 = 1 − Fi(θ0 
+
+> i
+
+)
+
+θ0 
+
+> i
+
+· fi(θ0 
+
+> i
+
+) < 1, (76) where the inequality follows from ddθ i (1−Fi(θi) 
+
+> θi·fi(θi)
+
+) < 0 and 1−Fi(θci )   
+
+> θci·fi(θci)
+
+= 1, given that θ0 
+
+> i
+
+> θ ci .Inequality (76) can be rewritten as: 
+
+αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) <  1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2 + 1 +  αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)3 . (77) Combining (75) and (77) gives: 
+
+ 1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2 + 3 αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) ≤ αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) <  1 − αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)2 + 1 +  αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)3 ,
+
+implying 3 αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) < 1+( αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)) 3. This contradicts 3 αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) > 1+( αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+)) 3,which holds since αwp −max  
+
+> i
+
+(θ0 
+
+> i
+
+) ≥ αc and αc > 12 by (74), given that θ0 
+
+> i
+
+> θ ci . ■
+
+Hence, combining Claim 2 and inequality (74), we obtain: 
+
+αsp −max  
+
+> i
+
+(θi) ≥ αc > α wp −max  
+
+> i
+
+(θi),
+
+for any θi > θ ci . Combined with the result that αsp −max  
+
+> i
+
+(θi) > α wp −max  
+
+> i
+
+(θi) for any θi ≤ θci ,this establishes the desired result. 55 Appendix K Proof of Proposition 2 
+
+Case (1): From the efforts chosen by both parties at optimum under winner-pivotal col-laboration given in (18), we derive: 
+
+ewp −bi (θi)
+
+ewp −si (θi) = 
+
+> 
+> 1−αwp ∗
+> i(θi)
+> 
+> ·θi
+> 1−
+
+(1−αwp ∗ 
+
+> i(θi)
+
+)·αwp ∗ 
+
+> i(θi)
+
+(1−αwp ∗ 
+
+> i(θi)
+
+)·αwp ∗ 
+
+> i(θi)·θi
+> 1−
+
+(1−αwp ∗ 
+
+> i(θi)
+
+)·αwp ∗ 
+
+> i(θi)
+
+= 1
+
+αwp ∗ 
+
+> i
+
+(θi) > 1,
+
+where the inequality follows from the non-negativity of both parties’ efforts and 0 < α wp ∗ 
+
+> i
+
+(θi) <
+
+1 (cf. Lemma 2). Hence, ewp −bi (θi) > e wp −si (θi) for all θi ∈ [θi, θ i]. For the seller-pivotal sce-nario, using (25) and an analogous argument, we obtain: 
+
+esp −si (θi)
+
+esp −bi (θi) = 
+
+> αsp ∗
+> i(θi)·θi
+> 1−
+
+(1−αsp ∗ 
+
+> i(θi)
+
+)·αsp ∗ 
+
+> i(θi)
+
+(1−αsp ∗ 
+
+> i(θi)
+
+)·αsp ∗ 
+
+> i(θi)·θi
+> 1−
+
+(1−αsp ∗ 
+
+> i(θi)
+
+)·αsp ∗ 
+
+> i(θi)
+
+= 11 − αsp ∗ 
+
+> i
+
+(θi) > 1,
+
+by Lemma 5, which implies esp −si (θi) > e sp −bi (θi) for all θi ∈ [θi, θ i]. 
+
+Case (2): Comparing the seller’s effort across scenarios, ewp −si (θi) and esp −si (θi). For θi ∈
+
+[θi, θ ci ], we have αsp ∗ 
+
+> i
+
+(θi) = 1, which implies: 
+
+esp −si (θi) = θi >
+
+
+
+1 − αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+· αwp ∗ 
+
+> i
+
+(θi)1 −  1 − αwp ∗ 
+
+> i
+
+(θi) · αwp ∗ 
+
+> i
+
+(θi) · θi = ewp −si (θi),
+
+where the inequality follows from the properties of αwp ∗ 
+
+> i
+
+(θi) established in Lemma 2. For 
+
+θi ∈ [θci , θ i], both αwp ∗ 
+
+> i
+
+(θi), α sp ∗ 
+
+> i
+
+(θi) ∈ (0 , 1). We define: 
+
+g(α) ≜ α · θi
+
+1 − (1 − α) · α ,
+
+which is non-negative and strictly increasing since g′(α) = 1−α2 
+
+> (1 −α+α2)2
+
+· θi > 0. Therefore, from (18) and (25), we obtain: 
+
+esp −si (θi) = g(αsp ∗ 
+
+> i
+
+) > g (αwp ∗ 
+
+> i
+
+) > (1 − αwp ∗ 
+
+> i
+
+) · g(αwp ∗ 
+
+> i
+
+) = ewp −si (θi),
+
+where the first inequality follows from Proposition 1. Next, comparing the winner’s effort across scenarios, ewp −bi (θi) and esp −bi (θi). For θi ∈
+
+56 [θi, θ ci ], we have αsp ∗ 
+
+> i
+
+(θi) = 1, which implies: 
+
+esp −bi (θi) = 0 <
+
+
+
+1 − αwp ∗ 
+
+> i
+
+(θi)
+
+
+
+· θi
+
+1 −  1 − αwp ∗ 
+
+> i
+
+(θi) · αwp ∗ 
+
+> i
+
+(θi) = ewp −bi (θi).
+
+For θi ∈ [θci , θ i], both αwp ∗ 
+
+> i
+
+(θi), α sp ∗ 
+
+> i
+
+(θi) ∈ (0 , 1). Similarly, we define: 
+
+h(α) ≜ (1 − α) · θi
+
+1 − (1 − α) · α ,
+
+which is non-negative and strictly decreasing since h′(α) = α·(α−2) (1 −α+α2)2 · θi < 0. Therefore, from (18) and (25), we obtain: 
+
+esp −bi (θi) = αsp ∗ 
+
+> i
+
+· h(αsp ∗ 
+
+> i
+
+) < h (αsp ∗ 
+
+> i
+
+) < h (αwp ∗ 
+
+> i
+
+) = ewp −bi (θi),
+
+where the second inequality follows from Proposition 1. 
+
+# Appendix L Proof of Proposition 3 
+
+According to Theorems 1 and 2, the seller’s expected equilibrium payoffs under optimal linear mechanisms satisfy: Rev wp (qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+) = 
+
+ˆ
+
+> Θ
+
+max {ϕwp  
+
+> 1
+
+(θ1), · · · , ϕ wp n (θn)}f (θ)dθ,
+
+Rev sp (qsp ∗
+
+, csp ∗
+
+, πsp ∗
+
+) = 
+
+ˆ
+
+> Θ
+
+max {ϕsp  
+
+> 1
+
+(θ1), · · · , ϕ sp n (θn)}f (θ)dθ,
+
+that attain the upper bound values, respectively, as presented in Lemmas 1 and 4. To prove that seller-pivotal collaboration yields higher revenue than winner-pivotal col-laboration, it suffices to establish pointwise dominance of the virtual surplus functions. Specifically, we show that for any bidder i and type θi ∈ Θi:
+
+ϕsp i (θi) > ϕ wp i (θi),
+
+where the virtual surpluses are defined in (49) and (66). Algebraic computation shows that: 
+
+Awp (α) = Asp (1 − α), (78) 57 for any α ∈ [0 , 1]. Next, we compute the difference: 
+
+Bwp (α) − Bsp (1 − α) = (1 − α)2 − α · (1 − α)
+
+D(α) = (1 − α) · (1 − 2α)
+
+D(α) ,
+
+where D(α) ≜ 1 − α + α2. Thus: 
+
+Bwp (α) ≥ Bsp (1 − α) ⇐⇒ α ≤ 12. (79) We examine the difference function ∆Ψ( α) ≜ Ψsp i (α, θ i) − Ψwp i (α, θ i), expressed as: ∆Ψ( α) = ∆ A(α) · θi ·
+
+
+
+θi − (1 − α) · 1 − Fi(θi)
+
+fi(θi)
+
+
+
+, (80) for any α ∈ [0 , 1], where ∆ A(α) = 2α−11−α+α2 .We then analyze the sign of ∆Ψ( α) at the optimum. Specifically, let ˆ α ≜ αwp −max  
+
+> i
+
+(θi); by definition, 
+
+ϕwp i (θi) = Ψ wp i (ˆ α, θ i) = Awp (ˆ α) · θ2 
+
+> i
+
+− Bwp (ˆ α) · 1 − Fi(θi)
+
+fi(θi) · θi. (81) 
+
+Case 1: For ˆ α < 12 . Given that αsp −max  
+
+> i
+
+≥ 1/2 by Lemma 5, consider ˜ α = 1 − ˆα > 1/2. Thus, Asp (˜ α) = Asp (1 − ˆα) = Awp (ˆ α) by (78). Since ˆ α < 12 , we have Bsp (˜ α) < B wp (ˆ α)strictly by (79). Since 1−Fi(θi) 
+
+> fi(θi)
+
+· θi > 0 for θi > θ i, this gives: Ψsp i (˜ α, θ i) = Awp (ˆ α) · θ2 
+
+> i
+
+− Bsp (˜ α) · 1 − Fi(θi)
+
+fi(θi) · θi > ϕ wp i (θi),
+
+from (81). Combined with ϕsp i (θi) ≥ Ψsp i (˜ α, θ i), we have ϕsp i (θi) > ϕ wp i (θi). 
+
+Case 2: For ˆ α = 12 . Then ∆ A(ˆ α) = 0, so ∆Ψ(ˆ α) = 0 by (80). However, since 
+
+αsp −max  
+
+> i
+
+(θi) ≥ αc > 12 by (74) and Lemma 5, we have αsp −max  
+
+> i
+
+(θi)̸ = ˆ α, and: 
+
+ϕsp i (θi) = Ψ sp i (αsp −max  
+
+> i
+
+(θi), θ i) > Ψsp i (ˆ α, θ i) = Ψ wp i (ˆ α, θ i) = ϕwp i (θi),
+
+where the strict inequality follows from αsp −max  
+
+> i
+
+being the unique maximizer of Ψ sp i .
+
+Case 3: For ˆ α > 12 . Since ∆ A(ˆ α) = 2 ˆ α−11− ˆα+ ˆ α2 > 0, by (80), proving Ψ sp i (ˆ α, θ i) > Ψwp i (ˆ α, θ i)reduces to showing: 
+
+θi − (1 − ˆα) · 1 − Fi(θi)
+
+fi(θi) > 0. (82) 58 Since ˆ α = αwp -max  
+
+> i
+
+(θi) is an interior maximizer of Ψ wp i (α, θ i), the FOC gives: 1 − Fi(θi)
+
+fi(θi) = (Awp (ˆ α)) ′
+
+(Bwp (ˆ α)) ′ · θi. (83) Substituting (83) into (82), and using ( Bwp (α)) ′ = −(1 −α)(1+ α) 
+
+> D(α)2
+
+< 0, condition (82) is equivalent to: 
+
+(Awp (ˆ α)) ′ < (1 + ˆ α) · D(ˆ α)2
+
+(1 − ˆα) · D(ˆ α)2 = 1 + ˆ α
+
+1 − ˆα . (84) Direct computation gives (Awp (α)) ′ = α3−3α2+4 α−1 
+
+> D(α)3
+
+, where the numerator is non-negative for ˆ α > 12 by the stationary condition (51). Using (1 + α) · D(α) = 1 + α3, condition (84) becomes: ˆα3 − 3ˆ α2 + 4ˆ α − 1
+
+D(ˆ α)3 < 1 + ˆ αD(ˆ α)2 ⇐⇒ ˆα3−3ˆ α2+4ˆ α−1 < (1+ˆ α)·D(ˆ α) = 1+ˆ α3 ⇐⇒ − 3ˆ α2+4ˆ α−2 < 0,
+
+which holds since −3ˆ α2 + 4ˆ α − 2 = −3 ˆα − 23
+
+2 − 23 < 0 for all ˆ α.Thus (82) is satisfied, and consequently: 
+
+ϕsp i (θi) ≥ Ψsp i (ˆ α, θ i) > Ψwp i (ˆ α, θ i) = ϕwp i (θi).
+
+Combining both cases, we establish strict pointwise dominance ϕsp i (θi) > ϕ wp i (θi) for all 
+
+θi. Since the seller’s expected revenue is the expectation of the maximum virtual surplus of the allocated bidder: Rev sp = Eθ
+
+h
+
+max  
+
+> i
+
+ϕsp i (θi)
+
+i
+
+> Eθ
+
+h
+
+max  
+
+> i
+
+ϕwp i (θi)
+
+i
+
+= Rev wp .
+
+This completes the proof. 
+
+# Appendix M Proof of Proposition 4 
+
+Verify equilibrium. We first establish that each bidder’s drop-out strategy, 
+
+eβwp i (θi|p1, · · · , p k), is increasing in θi for any k, since ϕwp i (·) is an increasing function by Lemma 3. Given the history of exit prices p1 ≤ · · · ≤ pk, an effective deviation depends on the winner’s identity. Using the winner’s value-sharing payment eαwp i (·) from (26), which is independent of other bidders’ exit strategies, we compute bidder i’s ex-post payoff upon winning after exiting at price pn. Based on the winner-pivotal structure from equation (2) 59 and expression (5), this payoff is given as follows: ˆU wp i (pn, θ i) = (1 − eαwp i (pn)) ·
+
+
+
+θi + (1 − eαwp i (pn)) · eαwp i (pn) · G (pn)1 − (1 − eαwp i (pn)) · eαwp i (pn)
+
+
+
+·(1 − eαwp i (pn)) ·
+
+
+
+θi + (1 − eαwp i (pn)) · eαwp i (pn) · G (pn)1 − (1 − eαwp i (pn)) · eαwp i (pn)
+
+
+
+− 12 ·
+
+
+
+(1 − eαwp i (pn)) ·
+
+
+
+θi + (1 − eαwp i (pn)) · eαwp i (pn) · G (pn)1 − (1 − eαwp i (pn)) · eαwp i (pn)
+
+ 2
+
+−
+
+
+
+(1 − eαwp i (pn)) 2
+
+2 ·
+
+
+
+G(pn) + (1 − eαwp i (pn)) · eαwp i (pn) · G (pn)1 − (1 − eαwp i (pn)) · eαwp i (pn)
+
+2
+
+−
+
+ˆ G(pn)
+
+> G(pn−1)
+
+ 1 − αwp −max  
+
+> i
+
+(τ )2
+
+·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+ dτ 
+
+
+
+,
+
+given that the seller and winner choose post-auction efforts as specified in (31), and the seller holds the posterior belief outlined in (30). Applying the envelope theorem yields winning bidder i’s ex-post equilibrium payoff as: ˆU wp i (θi) = 
+
+ˆ θi
+
+> G(pn−1)
+
+ 1 − αwp −max  
+
+> i
+
+(τ )2 ·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+
+
+dτ. 
+
+Then, for any deviating strategy, that is, exiting at pn = ϕwp i (ˆθi)̸ = ϕwp i (θi), without loss of generality assume θi > ˆθi. We demonstrate that ˆU wp i (θi) − ˆU wp i (pn, θ i) ≥ 0 using an approach analogous to that in (62), by setting qwp ∗ 
+
+> i
+
+= 1 upon winning and applying Claim 1. Hence, each bidder adopting the drop-out strategy eβwp i (θi|p1, · · · , p k) = ϕwp i (θi) constitutes a quasi-dominant strategy equilibrium. 
+
+Implementation. In this equilibrium, the last active bidder wins, meaning the winning probability is 1{i:pi≥max p−i}. This aligns with the optimal allocation rule qwp ∗ 
+
+> i
+
+(θ) specified in (15), given that each bidder exits when the price reaches ϕwp i (θi), thereby selecting the bidder with the highest virtual surplus. We now implement the optimal payment rule specified in (16) and (17). The winner’s value-sharing rule remains unchanged since eαwp i = αwp −max  
+
+> i
+
+according to (26). For the cash payments ( νwp ∗−wi , ν wp ∗−li ), based on the winner and losing bidders’ cash payments in this ascending auction as specified in (28), we define each bidder i’s minimum type to guarantee winning as ˆθi(θ−i) ≜ (ϕwp i )−1(max j∈N \{ i} ϕwp j (θj )) = G(pn−1) for any profile of opponent 60 types θ−i. We then derive each bidder i’s expected cash payment at equilibrium as follows: 
+
+ˆ
+
+> Θ−i
+
+ 1 − αwp −max  
+
+> i
+
+(θi)2
+
+2 ·
+
+
+
+θi + (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)
+
+2
+
+−
+
+ˆ θi
+
+> ˆθi(θ−i)
+
+ 1 − αwp −max  
+
+> i
+
+(τ )2 ·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+
+
+dτ 
+
+
+
+· 1{θi:θi≥ˆθi(θ−i)}f−i(θ−i)dθ−i
+
+=
+
+ˆ
+
+> Θ−i
+
+ 1 − αwp −max  
+
+> i
+
+(θi)2
+
+2 ·
+
+
+
+θi + (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi) · θi
+
+1 − (1 − αwp −max  
+
+> i
+
+(θi)) · αwp −max  
+
+> i
+
+(θi)
+
+2
+
+· qwp ∗ 
+
+> i
+
+(θi, θ−i)
+
+−
+
+ˆ θi
+
+> θi
+
+ 1 − αwp −max  
+
+> i
+
+(τ )2 ·
+
+
+
+τ + (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ ) · τ
+
+1 − (1 − αwp −max  
+
+> i
+
+(τ )) · αwp −max  
+
+> i
+
+(τ )
+
+
+
+· qwp ∗ 
+
+> i
+
+(τ, θ−i) dτ 
+
+
+
+· f−i(θ−i)dθ−i,
+
+(85) which coincides with the optimal cash payment rule specified in (17). Finally, the seller’s Dirac-form posterior belief and the monotonicity of G(·) ensured by Lemma 3 align with the Dirac-measure optimal signal realization rule. Moreover, the post-auction effort choices of the seller and winner eewp (pn, p n−1) correspond to the bilateral post-auction efforts under (qwp ∗
+
+, cwp ∗
+
+, πwp ∗
+
+) as specified in (18). We have thus established that the equilibrium of this ascending auction implements the optimal direct linear mechanism. 
+
+# Appendix N Proof of Proposition 5 
+
+Similar to winner-pivotal collaboration, consider bidder i’s ex-post payoff upon winning, ˆU sp i (pn, θ i). Following Appendix M, we show that ˆU sp i (θi) ≥ ˆU sp i (pn, θ i) for any deviation 
+
+pn = ϕsp i (ˆθi)̸ = ϕsp i (θi), establishing that no profitable deviation exists. Details are omitted. The approximate implementation of the optimal mechanism follows the same approach as in the winner-pivotal case. Specifically, exiting at the bidder’s virtual surplus implements the optimal allocation rule. The winner’s value-sharing rule approximates αsp ∗ 
+
+> i
+
+(·| θ) as ϵ → 0. Additionally, the cash payments ( etsp −wi , etsp −li ) implement the optimal cash payment rule in expected form as given in (24) as ϵ → 0, analogous to (85). 61 Appendix O Seller’s expected payoff upper bound 
+
+Seller’s expected payoff. We derive each party’s equilibrium aftermarket strategies, εsi ∈
+
+∆( Esi ) and εbi ∈ ∆( Ebi ), which also degenerates to a Dirac measure. For any signal realization 
+
+s ∈ Si and seller’s posterior belief μ, we derive ( εopt −si , ε opt −bi ) = ( δ{eopt −si }, δ {eopt −bi }) from: 
+
+eopt −si ∈ argmax  
+
+> esi∈Esi
+
+
+
+αi · Eeθi
+
+Eεopt −bi (eθi)
+
+h 
+
+ζ · eθi + esi
+
+
+
+·
+
+
+
+(1 − ζ) · eθi + ebi
+
+i | {z }
+
+> =
+
+(ζ·eθi+esi )·((1 −ζ)·eθi+eopt −bi (eθi))
+
+μ
+
+ − 12 · (esi )2
+
+
+
+> F.O.C.
+
+===== αi · Eeθi
+
+h 
+
+(1 − ζ) · eθi + eopt −bi (eθi)
+
+
+
+μ
+
+i
+
+,eopt −bi ∈ argmax  
+
+> ebi∈Ebi
+
+
+
+(1 − αi) · Eεopt −si (μ)
+
+(ζ · θi + esi ) ·  (1 − ζ) · θi + ebi
+
+ | {z }
+
+> =
+
+(ζ·θi+eopt −si (μ))·((1 −ζ)·θi+ebi )
+
+−12 ·  ebi
+
+2
+
+> F.O.C.
+
+===== (1 − αi) ·  ζ · θi + eopt −si (μ) .
+
+Solving the above system of equations yields: 
+
+eopt −si =eopt −si (μ) = 
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ
+
+i
+
+1 − (1 − αi) · αi
+
+,eopt −bi =eopt −bi (θi, μ ) = (1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ
+
+i
+
+1 − (1 − αi) · αi
+
+ ,
+
+where E[eθi|μ] = E[eθi|μ(·| i, c, s )] denotes the posterior mean of the winner’s type. Therefore, 62 for any direct linear mechanism ( q, c, π), bidder i’s expected payoff is given by: 
+
+U opt i (ˆθi, e opt −bi , e opt −si , θ i)=
+
+ˆ
+
+> Θ−i
+
+qi(ˆθi, θ−i)
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+(1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+·
+
+(1 − ζ) · θi + (1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+−12 ·
+
+(1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+− twi
+
+
+
+πi(ds |i, c, ˆθi, θ−i)
+
+· κi(dα i, dt wi |ˆθi, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|ˆθi, θ−i)f−i(θ−i)dθ−i
+
++
+
+ˆ
+
+> Θ−i
+
+
+
+1 − qi(ˆθi, θ−i)
+
+ ˆ 
+
+> Tli
+
+ −tli
+
+ νli (dt li|ˆθi, θ−i)f−i(θ−i)dθ−i.
+
+where T l 
+
+> −i
+
+≡×j∈N ,j ̸ =i T lj and νl
+
+> −i
+
+(dtl
+
+> −i
+
+|ˆθi, θ−i) ≡ Q   
+
+> j∈N ,j ̸=i
+
+νlj (dt lj |ˆθi, θ−i). In a feasible direct linear mechanism, the incentive compatibility condition for each bidder requires that U opt i (θi) = max ˆθi∈Θi U opt i (ˆθi, e opt −bi , e opt −si , θ i). By applying the general envelope theorem (see Milgrom and Segal (2002)), we find that an incentive-compatible direct mech-anism necessarily satisfies: 
+
+U opt i (θi) = U opt i (θi) + 
+
+ˆ θi
+
+> θi
+
+Wi(τ )dτ, (86) where Wi(τ ) is defined as follows: 
+
+Wi(τ ) ≜
+
+ˆ
+
+> Θ−i
+
+qi(τ, θ−i)
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+(1 − αi) ·
+
+ζ · τ +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+· ((1 − ζ) + (1 − αi) · ζ)
+
+
+
+πi(ds |i, c, τ, θ−i)
+
+· κi(dα i, dt wi |τ, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|τ, θ−i)f−i(θ−i)dθ−i.
+
+Meanwhile, according to the expression above, bidder i’s expected payoff from truthfully 63 reporting is: 
+
+U opt i (θi) = 
+
+ˆ
+
+> Θ−i
+
+qi(θi, θ−i)
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+(1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+·
+
+(1 − ζ) · θi + (1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+−12 ·
+
+(1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+
+
+πi(ds |i, c, θ i, θ−i)
+
+· κi(dα i, dt wi |θi, θ−i)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θi, θ−i)f−i(θ−i)dθ−i
+
+−
+
+ˆ
+
+> Θ−i
+
+
+
+qi(θi, θ−i)
+
+ˆ 
+
+> Twi
+
+twi νwi (dt wi |θi, θ−i)+ (1 − qi(θi, θ−i)) 
+
+ˆ 
+
+> Tli
+
+tliνli (dt li|θi, θ−i)
+
+
+
+f−i(θ−i)dθ−i
+
+| {z }
+
+> ≜Pi(θi)
+
+,
+
+(87) where the marginal probabilities, νwi (·| θ) ≜ ´ 10 κi(dα i, ·| θ) and σi(·| θ) ≜ ´ 
+
+> Twi
+
+κi(·, dt wi |θ) are defined in the same way as previous two scenarios. Combining (86) and (87), we derive the expression for Pi(θi) and obtain: 
+
+X
+
+> i∈N
+
+ˆ
+
+> Θi
+
+Pi(θi)fi(θi)dθ i = X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+12 · (1 − αi)2 ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+· ((1 − ζ) + (1 − αi) · ζ)2
+
+−(1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+· ((1 − ζ) + (1 − αi) · ζ) · 1 − Fi(θi)
+
+fi(θi)
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ − X
+
+> i∈N
+
+U opt i (θi).
+
+64 Then, the seller’s expected payoff comprises the sum of bidders’ cash payments and value shares, net of effort costs, expressed as: Rev opt (q, c, π)= X
+
+> i∈N
+
+ˆ
+
+> Θi
+
+Pi(θi)fi(θi)dθ i + X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+αi ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+·
+
+(1 − ζ) · θi + (1 − αi) ·
+
+ζ · θi +
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+−12 ·
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2
+
+
+
+· θ2
+
+> i
+
++(1 − ζ · α2 
+
+> i
+
+) · θi ·
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+−α2
+
+> i
+
+2 ·
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+−(1 − αi) · ζ · (2 − ζ · (1 + αi)) · θi · 1 − Fi(θi)
+
+fi(θi)
+
+−(1 − αi) · (1 − αi · ζ) ·
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+· 1 − Fi(θi)
+
+fi(θi)
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ − X
+
+> i∈N
+
+U opt i (θi).
+
+(88) 
+
+Determine the feasible upper bound. SImilar to the winner- and seller-pivotal cases, we denote ξ(i, d c, ds ) as the probability measure associated with bidder i winning, where the direct linear mechanism generates payment profile c = ( ci, tl) = ( αi, t wi , (tlj )j̸ =i) and public signal s ∈ Si. Conditional on this, from the seller’s perspective, bidders’ types are 65 drawn according to probability measure ϱ(·| i, c, s ) ∈ ∆( Θ), which implies ´ 
+
+> Θ−i
+
+ϱ(dθ|i, c, s ) = 
+
+μ(dθ i|i, c, s ). The seller’s expected equilibrium payoff in (88) can then be expressed as: Rev opt (q, c, π)= X
+
+> i∈N
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2
+
+
+
+· E
+
+h eθ2 
+
+> i
+
+μ(·| i, c, s )
+
+i
+
++(1 − ζ · α2 
+
+> i
+
+) · αi · (1 − αi · ζ) · E2
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+−α2
+
+> i
+
+2 ·
+
+αi · (1 − αi · ζ) · E
+
+h eθi μ(·| i, c, s )
+
+i
+
+1 − (1 − αi) · αi
+
+
+
+> 2
+
+−(1 − αi) · ζ · (2 − ζ · (1 + αi)) 
+
+·E
+
+h eθi μ(·| i, c, s )
+
+i
+
+· E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) μ(·| i, c, s )
+
+#
+
+−(1 − αi) · αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+·E
+
+h eθi μ(·| i, c, s )
+
+i
+
+· E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) μ(·| i, c, s )
+
+#
+
+ξ(i, d c, ds )
+
+− X
+
+> i∈N
+
+U opt i (θi).
+
+Using the following two inequalities: E2[eθi|μ(eθi|i, c, s )] ≤ E[eθ2 
+
+> i
+
+|μ(eθi|i, c, s )] by Jensen’s inequality, and 
+
+E
+
+"
+
+Fi(eθi) − 1
+
+fi(eθi) μ(eθi|i, c, s )
+
+#
+
+· E
+
+h eθi μ(eθi|i, c, s )
+
+i
+
+≤ E
+
+"
+
+Fi(eθi) − 1
+
+fi(eθi) · eθi μ(eθi|i, c, s )
+
+#
+
+.
+
+Moreover, individual rationality implies P 
+
+> i∈N
+
+U opt i (θi) ≥ 0 since U opt i (θi) ≥ 0 for all θi ∈ Θi.66 We therefore obtain the following inequality: Rev opt (q, c, π)
+
+≤ X
+
+> i∈N
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2 + αi · (1 − αi · ζ) · (1 − ζ · α2 
+
+> i
+
+)1 − (1 − αi) · αi
+
+− α4 
+
+> i
+
+· (1 − αi · ζ)2
+
+2(1 − (1 − αi) · αi)2
+
+| {z }
+
+> non-negative
+
+·E
+
+h eθ2 
+
+> i
+
+μ(·| i, c, s )
+
+i
+
+− (1 − αi) ·
+
+
+
+ζ · (2 − ζ · (1 + αi)) + αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+| {z }
+
+> non-negative
+
+·E
+
+"
+
+1 − Fi(eθi)
+
+fi(eθi) · eθi μ(·| i, c, s )
+
+#
+
+ξ(i, d c, ds )= X
+
+> i∈N
+
+·
+
+ˆ   
+
+> [0 ,1] ×T wi×Tl
+> −i×Si
+
+·
+
+ˆ
+
+> Θ
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2 + αi · (1 − αi · ζ) · (1 − ζ · α2 
+
+> i
+
+)1 − (1 − αi) · αi
+
+− α4 
+
+> i
+
+· (1 − αi · ζ)2
+
+2(1 − (1 − αi) · αi)2
+
+ · θ2
+
+> i
+
+−(1 − αi) ·
+
+
+
+ζ · (2 − ζ · (1 + αi)) + αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+ϱ(dθ|i, c, s )ξ(i, d c, ds )= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 
+
+> Tl
+> −i
+
+ˆ 
+
+> [0 ,1] ×T wi
+
+·
+
+ˆ
+
+> Si
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2 + αi · (1 − αi · ζ) · (1 − ζ · α2 
+
+> i
+
+)1 − (1 − αi) · αi
+
+− α4 
+
+> i
+
+· (1 − αi · ζ)2
+
+2(1 − (1 − αi) · αi)2
+
+ · θ2
+
+> i
+
+−(1 − αi) ·
+
+
+
+ζ · (2 − ζ · (1 + αi)) + αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+πi(ds |i, c, θ)
+
+· κi(dα i, dt wi |θ)νl
+
+> −i
+
+(dtl
+
+> −i
+
+|θ)f (θ)dθ
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) ·
+
+ˆ 10
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2 + αi · (1 − αi · ζ) · (1 − ζ · α2 
+
+> i
+
+)1 − (1 − αi) · αi
+
+− α4 
+
+> i
+
+· (1 − αi · ζ)2
+
+2(1 − (1 − αi) · αi)2
+
+
+
+· θ2
+
+> i
+
+−(1 − αi) ·
+
+
+
+ζ · (2 − ζ · (1 + αi)) + αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+
+
+· σi(dα i|θ)f (θ)dθ,
+
+67 where the equalities follow from a change-of-measure and the marginal probability measure 
+
+σi(·| θ). We next maximize over σi(·| θ). For any profile of bidders’ types θ ∈ Θ, we solve: max 
+
+> σi(dα i|θ)
+
+ˆ 10
+
+
+
+ζ − ζ2 · (1 + α2 
+
+> i
+
+)2 + αi · (1 − αi · ζ) · (1 − ζ · α2 
+
+> i
+
+)1 − (1 − αi) · αi
+
+− α4 
+
+> i
+
+· (1 − αi · ζ)2
+
+2(1 − (1 − αi) · αi)2
+
+
+
+· θ2
+
+> i
+
+−(1 − αi) ·
+
+
+
+ζ · (2 − ζ · (1 + αi)) + αi · (1 − αi · ζ)2
+
+1 − (1 − αi) · αi
+
+
+
+· 1 − Fi(θi)
+
+fi(θi) · θi
+
+| {z } 
+
+> defined as Ψ opt i(αi,θ i,ζ )
+
+σi(dα i|θ).
+
+The maximizer, denoted σopt −max  
+
+> i
+
+(·| θ) ∈ ∆([0 , 1]), is a Dirac measure that places unit mass on αopt −max  
+
+> i
+
+= αopt −max  
+
+> i
+
+(θi, ζ ), where αopt −max  
+
+> i
+
+(θi, ζ ) ∈ argmax αi∈[0 ,1] Ψopt i (αi, θ i, ζ ). We define the corresponding maximal value as bidder i’s virtual surplus: 
+
+ϕopt i (θi, ζ ) ≜
+
+ˆ 10
+
+Ψopt i (αi, θ i, ζ )σopt −max  
+
+> i
+
+(dα i|θ) = Ψ opt i (αopt −max  
+
+> i
+
+, θ i, ζ ). (89) Hence, for any feasible direct linear mechanism ( q, c, π), the seller’s expected payoff is therefore bounded above by Rev opt (q, c, π), characterized by: Rev opt (q, c, π) ≜ max  
+
+> 0≤qi(θ)≤1; P
+> i∈N qi(θ)≤1
+
+X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qi(θ) · ϕopt i (θi, ζ )f (θ)dθ
+
+=
+
+ˆ
+
+> Θ
+
+max ϕopt  
+
+> 1
+
+(θ1, ζ ), · · · , ϕ opt i (θi, ζ ), · · · , ϕ opt n (θn, ζ ) f (θ)dθ.
+
+(90) 
+
+# Appendix P Proof of Proposition 7 
+
+We show the existence of an optimal mechanism by providing a mechanism which is feasible and attaining the upper bound payoff. Specifically, 
+
+Proposition 9. Under assumptions in Proposition 7, a feasible optimal mechanism exists, characterized as: (i) The allocation rule is given by: 
+
+qopt ∗ 
+
+> i
+
+(θ) = 
+
+
+
+1, if ϕopt i (θi, ζ ) > max j̸ =i ϕopt j (θj , ζ )0, otherwise 
+
+(91) 
+
+for all i ∈ N , where ϕopt i (θi, ζ ) is each bidder’s virtual surplus. Ties are broken uni-formly at random. 
+
+68 (ii) The payment rule copt ∗
+
+induces a deterministic value-sharing rule for the winner: 
+
+αopt ∗ 
+
+> i
+
+(θi, ζ ) = αopt −max  
+
+> i
+
+(θi, ζ ).
+
+The cash payments upon winning and losing are determined by νopt ∗−wi (·| θ) and νopt ∗−li (·| θ)
+
+that satisfy: 
+
+ˆ
+
+> Θ−i
+
+
+
+qopt ∗ 
+
+> i
+
+(θi, θ−i) ·
+
+ˆ 
+
+> Twi
+
+twi νopt ∗−wi (dt wi |θi, θ−i)+
+
+
+
+1 − qopt ∗ 
+
+> i
+
+(θi, θ−i)
+
+ ˆ 
+
+> Tli
+
+tliνopt ∗−li (dt li|θi, θ−i)
+
+
+
+f−i(θ−i)dθ−i
+
+=
+
+ˆ
+
+> Θ−i
+
+
+
+qopt ∗ 
+
+> i
+
+(θi, θ−i) · (1 − αopt −max  
+
+> i
+
+(θi, ζ )) 2
+
+2
+
+·
+
+
+
+ζ · θi + αopt −max  
+
+> i
+
+(θi, ζ ) · (1 − αopt −max  
+
+> i
+
+(θi, ζ ) · ζ) · θi
+
+1 − (1 − αopt −max  
+
+> i
+
+(θi, ζ )) · αopt −max  
+
+> i
+
+(θi, ζ )
+
+2
+
+−
+
+ˆ θi
+
+> θi
+
+qopt ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αopt −max  
+
+> i
+
+(τ, ζ )) 2
+
+·
+
+
+
+ζ · τ + αopt −max  
+
+> i
+
+(τ, ζ ) · (1 − αopt −max  
+
+> i
+
+(τ, ζ ) · ζ) · τ
+
+1 − (1 − αopt −max  
+
+> i
+
+(τ, ζ )) · αopt −max  
+
+> i
+
+(τ, ζ )
+
+
+
+dτ 
+
+
+
+f−i(θ−i)dθ−i.
+
+This expression (integration form) shows that the cash payments for both the winner and the losers can be constructed in multiple ways. (iii) The signal realization rule πopt ∗ 
+
+> i
+
+(·| i, c, θ) ∈ ∆( Si), conditional on the profile of bidders’ reported types, winner’s identity, and bidders’ payments, is a Dirac measure: 
+
+πopt ∗ 
+
+> i
+
+(·| i, c, θ) = δ{θi},
+
+which assigns probability mass one to the winner’s truthfully reported type θi.
+
+Proof . we show Proposition 9 through two steps: feasibility and optimality. 
+
+Feasibility. Note that bidder i’s expected payoff from truthfully reporting θi under the mechanism ( qopt ∗
+
+, copt ∗
+
+, πopt ∗
+
+): 
+
+U opt i (θi, ζ ) = 
+
+ˆ
+
+> Θ−i
+
+ˆ θi
+
+> θi
+
+
+
+qopt ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αopt −max  
+
+> i
+
+(τ, ζ )) 2
+
+·
+
+
+
+ζ · τ + αopt −max  
+
+> i
+
+(τ, ζ ) · (1 − αopt −max  
+
+> i
+
+(τ, ζ ) · ζ) · τ
+
+1 − (1 − αopt −max  
+
+> i
+
+(τ, ζ )) · αopt −max  
+
+> i
+
+(τ, ζ )
+
+ dτ f−i(θ−i)dθ−i,
+
+69 which is increasing in θi and satisfies individual rationality, thus, the demanding feasibility requires that: 
+
+U opt i (θi, ζ ) − U opt i (ˆθi, θ i, ζ )=
+
+ˆ
+
+> Θ−i
+
+
+
+ˆ θi
+
+> ˆθi
+
+
+
+qopt ∗ 
+
+> i
+
+(τ, θ−i) · (1 − αopt −max  
+
+> i
+
+(τ, ζ )) 2
+
+·
+
+
+
+ζ · τ + αopt −max  
+
+> i
+
+(τ, ζ ) · (1 − αopt −max  
+
+> i
+
+(τ, ζ ) · ζ) · τ
+
+1 − (1 − αopt −max  
+
+> i
+
+(τ, ζ )) · αopt −max  
+
+> i
+
+(τ, ζ )
+
+ dτ 
+
+−qopt ∗ 
+
+> i
+
+(ˆθi, θ−i) · (1 − αopt −max  
+
+> i
+
+(ˆθi, ζ )) 2
+
+2
+
+·
+
+
+
+θi + ˆθi + 2 ζ · (θi + ˆθi)+2 · αopt −max  
+
+> i
+
+(ˆθi, ζ ) · (1 − αopt −max  
+
+> i
+
+(ˆθi, ζ ) · ζ) · ˆθi
+
+1 − (1 − αopt −max  
+
+> i
+
+(ˆθi, ζ )) · αopt −max  
+
+> i
+
+(ˆθi, ζ )
+
+ ·
+
+
+
+θi − ˆθi
+
+| {z }
+
+> ≜Iopt (θi,ζ )
+
+f−i(θ−i)dθ−i ≥ 0,
+
+(92) for any θi, ˆθi ∈ Θi (without loss of generality, assume θi > ˆθi). Similar to the proof of feasibility in winner- and seller-pivotal cases, the important inter-mediate step is: 
+
+ddθ i
+
+
+
+(1 − αopt −max  
+
+> i
+
+(θi, ζ )) 2 ·
+
+
+
+ζ · θi + αopt −max  
+
+> i
+
+(θi, ζ ) · (1 − αopt −max  
+
+> i
+
+(θi, ζ ) · ζ) · θi
+
+1 − (1 − αopt −max  
+
+> i
+
+(θi, ζ )) · αopt −max  
+
+> i
+
+(θi, ζ )
+
+ 
+
+≥ 0,
+
+(93) which critically rely on dα opt −max   
+
+> i(θi,ζ )
+> dθ i
+
+≤ 0. 
+
+Claim 3. αopt −max  
+
+> i
+
+(θi, ζ ) is non-increasing in θi, i.e., dα opt −max   
+
+> i(θi,ζ )
+> dθ i
+
+≤ 0
+
+Proof . We first derive: 
+
+∂Ψopt i
+
+∂α i αi=0 
+
+=A′(0 , ζ )θ2 
+
+> i
+
+− B′(0 , ζ )1 − Fi(θi)
+
+fi(θi) θi
+
+=θ2 
+
+> i
+
++ 2 ζ(1 − ζ)1 − Fi(θi)
+
+fi(θi) θi ≥ θ2 
+
+> i
+
+≥ θ2 
+
+> i
+
+> 0.
+
+Given that ∂Ψopt i 
+
+> ∂α i
+
+is continuous in αi and strictly positive at αi = 0 with a uniform lower bound θ2 
+
+> i
+
+, there exists a uniform δ > 0 (independent of θi, ζ ) such that: 
+
+∂Ψopt i
+
+∂α i
+
+> θ2
+
+> i
+
+2 > 0 for all αi ∈ [0 , δ ],
+
+which implies the maximizer αopt −max  
+
+> i
+
+(θi, ζ ) > δ for all ( θi, ζ ) ∈ [θi, θ i] × [0 , 1]. Therefore the 70 maximizer αopt −max  
+
+> i
+
+can either be interior or at the corner αopt −max  
+
+> i
+
+= 1, which coincide with the two cases. When αopt −max  
+
+> i
+
+is a corner maximizer, it is non-increasing in θi; for an interior maximizer, α∗ 
+
+> i
+
+= αopt −max  
+
+> i
+
+(θi, ζ ), by first-order condition (FOC): 
+
+∂Ψopt i
+
+∂α i αi=α∗
+
+> i
+
+= A′(α∗ 
+
+> i
+
+, ζ ) · θ2 
+
+> i
+
+− B′(α∗ 
+
+> i
+
+, ζ ) · H(θi) · θi = 0 , (94) where primes denote derivatives with respect to αi and H(θi) = 1−Fi(θi) 
+
+> fi(θi)
+
+. Rearranged as: 
+
+A′(α∗ 
+
+> i
+
+, ζ )
+
+B′(α∗ 
+
+> i
+
+, ζ ) = H(θi)
+
+θi
+
+, (95) which implies A′(α∗ 
+
+> i
+
+, ζ ) and B′(α∗ 
+
+> i
+
+, ζ ) have the same sign at the optimum since H(θi) 
+
+> θi
+
+> 0. Meanwhile, the following second-order condition (SOC) holds for the interior maximizer: 
+
+∂2Ψopt i
+
+∂α 2 
+
+> iαi=α∗
+> i
+
+= A′′ (α∗ 
+
+> i
+
+, ζ ) · θ2 
+
+> i
+
+− B′′ (α∗ 
+
+> i
+
+, ζ ) · H(θi) · θi < 0. (96) Substituting (95) into the SOC (96): SOC = A′′ (α∗ 
+
+> i
+
+, ζ ) · θi ·
+
+B′(α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) · H(θi)
+
+
+
+− B′′ (α∗ 
+
+> i
+
+, ζ ) · H(θi) · θi
+
+= H(θi) · θi ·
+
+A′′ (α∗ 
+
+> i
+
+, ζ ) · B′(α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) − B′′ (α∗ 
+
+> i
+
+, ζ )
+
+
+
+< 0,
+
+which further implies: 
+
+A′′ (α∗ 
+
+> i
+
+, ζ ) · B′(α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) − B′′ (α∗ 
+
+> i
+
+, ζ ) < 0, (97) because H(θi) > 0 and θi > 0. By assumptions in Proposition 7, we have A′(α∗ 
+
+> i
+
+, ζ ) < 0 and 
+
+B′(α∗ 
+
+> i
+
+, ζ ) < 0. Thus, (97) yields: 
+
+A′′ (α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) − B′′ (α∗ 
+
+> i
+
+, ζ )
+
+B′(α∗ 
+
+> i
+
+, ζ ) > 0. (98) 71 Differentiating the FOC (94) with respect to θi using the implicit function theorem: 
+
+ddθ i
+
+ A′(α∗ 
+
+> i
+
+, ζ ) · θ2 
+
+> i
+
+− B′(α∗ 
+
+> i
+
+, ζ ) · H(θi) · θi
+
+ = 0 
+
+⇒ A′′ (α∗ 
+
+> i
+
+, ζ ) · dα ∗
+
+> i
+
+dθ i
+
+· θ2 
+
+> i
+
++ A′(α∗ 
+
+> i
+
+, ζ ) · 2θi
+
+− B′′ (α∗ 
+
+> i
+
+, ζ ) · dα ∗
+
+> i
+
+dθ i
+
+· H(θi) · θi − B′(α∗ 
+
+> i
+
+, ζ ) · (H′(θi) · θi + H(θi)) = 0 
+
+⇒  A′′ (α∗ 
+
+> i
+
+, ζ ) · θ2 
+
+> i
+
+− B′′ (α∗ 
+
+> i
+
+, ζ ) · H(θi) · θi
+
+ · dα ∗
+
+> i
+
+dθ i
+
+= B′(α∗ 
+
+> i
+
+, ζ ) · (H′(θi) · θi + H(θi)) − A′(α∗ 
+
+> i
+
+, ζ ) · 2θi.
+
+Dividing both sides by θ2 
+
+> i
+
+and use the FOC (95), we obtain: 
+
+dα ∗
+
+> i
+
+dθ i
+
+
+
+A′′ (α∗ 
+
+> i
+
+, ζ ) − B′′ (α∗ 
+
+> i
+
+, ζ ) · H(θi)
+
+θi
+
+
+
+= B′(α∗ 
+
+> i
+
+, ζ ) · H′(θi) · θi + H(θi)
+
+θ2
+
+> i
+
+− A′(α∗ 
+
+> i
+
+, ζ ) · 2
+
+θi
+
+⇒
+
+A′′ (α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) − B′′ (α∗ 
+
+> i
+
+, ζ )
+
+B′(α∗ 
+
+> i
+
+, ζ )
+
+
+
+· dα ∗
+
+> i
+
+dθ i
+
+= B′(α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) · H′(θi) · θi + H(θi)
+
+θ2
+
+> i
+
+− 2
+
+θi
+
+⇒
+
+A′′ (α∗ 
+
+> i
+
+, ζ )
+
+A′(α∗ 
+
+> i
+
+, ζ ) − B′′ (α∗ 
+
+> i
+
+, ζ )
+
+B′(α∗ 
+
+> i
+
+, ζ )
+
+| {z } 
+
+> >0 by (98)
+
+·dα ∗
+
+> i
+
+dθ i
+
+= H′(θi)
+
+H(θi) − 1
+
+θi
+
+,
+
+| {z }  
+
+> <0 by log-concavity of F
+
+which implies dα ∗ 
+
+> i
+> dθ i
+
+< 0. Thus, αopt −max  
+
+> i
+
+(θi, ζ ) is non-increasing in θi. ■
+
+Therefore, we show the desired result in (93) through: 
+
+ddθ i
+
+
+
+(1 − αopt −max  
+
+> i
+
+(θi, ζ )) 2 ·
+
+
+
+ζ · θi + αopt −max  
+
+> i
+
+(θi, ζ ) · (1 − αopt −max  
+
+> i
+
+(θi, ζ ) · ζ) · θi
+
+1 − (1 − αopt −max  
+
+> i
+
+(θi, ζ )) · αopt −max  
+
+> i
+
+(θi, ζ )
+
+ 
+
+= (1 − αopt −max  
+
+> i
+
+(θi, ζ )) 2 ·
+
+
+
+ζ + αopt −max  
+
+> i
+
+(θi, ζ ) · (1 − αopt −max  
+
+> i
+
+(θi, ζ ) · ζ)1 − (1 − αopt −max  
+
+> i
+
+(θi, ζ )) · αopt −max  
+
+> i
+
+(θi, ζ )
+
+| {z }    
+
+> =H(αopt −max
+> i, ζ )≥0
+
++ θi ·
+
+
+
+(1 − αopt −max  
+
+> i
+
+(θi, ζ )) 2 ·
+
+
+
+ζ + αopt −max  
+
+> i
+
+(θi, ζ ) · (1 − αopt −max  
+
+> i
+
+(θi, ζ ) · ζ)1 − (1 − αopt −max  
+
+> i
+
+(θi, ζ )) · αopt −max  
+
+> i
+
+(θi, ζ )
+
+ ′
+
+| {z }    
+
+> =H′(αopt −max
+> i, ζ )<0 by assumption in Proposition 7
+
+· dα opt −max  
+
+> i
+
+(θi, ζ )
+
+dθ i
+
+| {z } 
+
+> ≤0 by Claim 3
+
+≥0.
+
+Furthermore, we show that: 
+
+Claim 4. The virtual surplus ϕopt i (θi, ζ ) defined in (89) is non-negative and non-decreasing. 
+
+72 Proof . We first show the non-negative virtual surplus according to: 
+
+ϕopt i (θi, ζ ) = max  
+
+> αi∈[0 ,1]
+
+Ψopt i (αi, θ i, ζ ) ≥ Ψopt i (1 , θ i, ζ ) = 1 − ζ2
+
+2 · θ2 
+
+> i
+
+≥ 0, (99) for ζ ∈ [0 , 1] and θi ≥ 0. For non-decreasing, using the Envelope Theorem, differentiating with respect to θi yields: 
+
+∂ϕ opt i (θi, ζ )
+
+∂θ i
+
+= 2 A · θi − B ·
+
+1 − Fi(θi)
+
+fi(θi) + θi ·
+
+1 − Fi(θi)
+
+fi(θi)
+
+′
+
+.
+
+According to the non-negativity in (99): 
+
+A · θ2 
+
+> i
+
+≥ B · 1 − Fi(θi)
+
+fi(θi) · θi =⇒ 2A · θi ≥ 2B · 1 − Fi(θi)
+
+fi(θi) ,
+
+which implies: 
+
+∂ϕ opt i (θi, ζ )
+
+∂θ i
+
+≥2B · 1 − Fi(θi)
+
+fi(θi) − B ·
+
+1 − Fi(θi)
+
+fi(θi) + θi ·
+
+1 − Fi(θi)
+
+fi(θi)
+
+′
+
+=B ·
+
+1 − Fi(θi)
+
+fi(θi) − θi ·
+
+1 − Fi(θi)
+
+fi(θi)
+
+′
+
+≥ 0,
+
+since 1−Fi(θi) 
+
+> fi(θi)
+
+is decreasing in θi under the log-concavity of fi(·). Thus, ∂ϕ opt i (θi,ζ ) 
+
+> ∂θ i
+
+≥ 0. ■
+
+Back to the demanding inequality (92), we denote Υ i(θi, ζ ) = θi · H(αopt −max  
+
+> i
+
+(θi, ζ ), ζ ), then for θi > ˆθi, we obtain: 
+
+U opt i (θi, ζ ) − U opt i (ˆθi, θ i, ζ ) ≥qopt ∗ 
+
+> i
+
+(ˆθi, θ−i) ·
+
+ˆ θi
+
+> ˆθi
+
+Υi(τ, ζ ) dτ 
+
+− qopt ∗ 
+
+> i
+
+(ˆθi, θ−i) · (1 − αopt −max  
+
+> i
+
+(ˆθi, ζ )) 2 ·
+
+
+
+θi − ˆθi
+
+
+
+· ζ · θi + αopt −max  
+
+> i
+
+(ˆθi, ζ ) · (1 − αopt −max  
+
+> i
+
+(ˆθi, ζ ) · ζ) · ˆθi
+
+1 − (1 − αopt −max  
+
+> i
+
+(ˆθi, ζ )) · αopt −max  
+
+> i
+
+(ˆθi, ζ )
+
+!
+
+>q opt ∗ 
+
+> i
+
+(ˆθi, θ−i) ·
+
+ˆ θi
+
+> ˆθi
+
+Υi(ˆθi, ζ )dτ − Υi(ˆθi, ζ ) · (θi − ˆθi)
+
+
+
+= 0 ,
+
+in which the first inequality follows because qopt ∗ 
+
+> i
+
+(θi, θ−i) is increasing in θi (since virtual surplus ϕopt i is increasing), and the second inequality follows from (93), that implies Υ i(τ, ζ ) >
+
+Υi(ˆθi, ζ ) for τ > ˆθi.73 Optimality. We demonstrate that this mechanism yields an expected payoff for the seller that attains the upper bound Rev opt (q, c, π) given in (90). Under the feasible linear mecha-nism ( qopt ∗
+
+, copt ∗
+
+, πopt ∗
+
+), using the definitions from (88) and substituting the optimal values 
+
+αopt ∗ 
+
+> i
+
+= αopt −max  
+
+> i
+
+, we have: Rev opt (qopt ∗
+
+, copt ∗
+
+, πopt ∗
+
+)= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qopt ∗ 
+
+> i
+
+(θ) ·
+
+
+
+A(αopt −max  
+
+> i
+
+(θi, ζ ), ζ ) · θ2
+
+> i
+
+−B(αopt −max  
+
+> i
+
+(θi, ζ ), ζ ) · 1 − Fi(θi)
+
+fi(θi) · θi
+
+ f (θ)dθ
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qopt ∗ 
+
+> i
+
+(θ) · Ψopt i (αopt −max  
+
+> i
+
+(θi, ζ ), θ i, ζ )f (θ)dθ
+
+= X
+
+> i∈N
+
+ˆ
+
+> Θ
+
+qopt ∗ 
+
+> i
+
+(θ) · ϕopt i (θi, ζ )f (θ)dθ.
+
+Since the allocation rule qopt ∗ 
+
+> i
+
+(θ) is defined in (91) to select the bidder with the highest virtual surplus ϕopt i (θi, ζ ) (provided it is non-negative and non-decreasing by Claim 4), the integral is maximized pointwise. Thus: Rev opt (qopt ∗
+
+, copt ∗
+
+, πopt ∗
+
+) = 
+
+ˆ
+
+> Θ
+
+max 0, ϕ opt  
+
+> 1
+
+(θ1, ζ ), · · · , ϕ opt n (θn, ζ ) f (θ)dθ
+
+= Rev opt (q, c, π).
+
+This confirms that the proposed mechanism achieves the upper bound of the seller’s expected payoff and is therefore optimal. ■
+
+# Appendix Q Proof of Proposition 8 
+
+We prove the result through the following four steps. 
+
+Step 1: Establish A(αi, ζ ) = A(1 − αi, 1 − ζ). We denote D(αi) = 1 − αi + α2 
+
+> i
+
+and we have D(αi) = D(1 − αi). Then, we derive: 2D2(αi) · A(αi, ζ ) = 2 αi − 2α2 
+
+> i
+
++ 2 α3 
+
+> i
+
+− α4
+
+> i
+
+| {z }
+
+> ≜C0(αi)
+
++  2 − 4αi + 4 α2 
+
+> i
+
+− 4α3 
+
+> i
+
++ 2 α4
+
+> i
+
+| {z }
+
+> ≜C1(αi)
+
+·ζ
+
++  −1 + 2 αi − 4α2 
+
+> i
+
++ 4 α3 
+
+> i
+
+− 2α4
+
+> i
+
+| {z }
+
+> ≜C2(αi)
+
+·ζ2, (100) 74 where the coefficients satisfy: 
+
+
+
+C2(αi) = C2(1 − αi)
+
+C1(αi) = −C1(1 − αi) − 2C2(1 − αi)
+
+C0(αi) = C0(1 − αi) + C1(1 − αi) + C2(1 − αi)(101) Therefore, (100) implies that: 2D2(1 − αi) · A(1 − αi, 1 − ζ)=C0(1 − αi) + C1(1 − αi) · (1 − ζ) + C2(1 − αi) · (1 − ζ)2
+
+= C0(1 − αi) + C1(1 − αi) + C2(1 − αi)
+
+| {z }
+
+> =C0(αi)
+
++ ( −C1(1 − αi) − 2C2(1 − αi)) 
+
+| {z }
+
+> =C1(αi)
+
+·ζ + C2(1 − αi)
+
+| {z }
+
+> =C2(αi)
+
+·ζ2
+
+=2 D2(αi) · A(αi, ζ ),
+
+where the last equality follows from (101). Combined with D(αi) = D(1 − αi), we obtain 
+
+A(αi, ζ ) = A(1 − αi, 1 − ζ) for any αi ∈ [0 , 1] and ζ ∈ [0 , 1]. 
+
+Step 2: Establish max αi∈[0 ,1] A(αi, ζ ) = max αi∈[0 ,1] A(αi, 1 − ζ). We denote S∗ and S∗∗ as the sets of all achievable values of A given parameters ζ and 1 − ζ, respectively, i.e., 
+
+S∗ ≜ {v ∈ R|∃ αi ∈ [0 , 1] such that v = A(αi, ζ )} ,S∗∗ ≜ {v ∈ R|∃ αi ∈ [0 , 1] such that v = A(αi, 1 − ζ)} .
+
+For any ˆ v ∈ S∗, there exists some ˆ αi ∈ [0 , 1] such that ˆ v = A(ˆ αi, ζ ), which implies ˆv = A(1 − ˆαi, 1 − ζ) by Step 1. Let ˆ α′ 
+
+> i
+
+= 1 − ˆαi ∈ [0 , 1]. Thus, ˆ v = A(ˆ α′
+
+> i
+
+, 1 − ζ) for some ˆ α′ 
+
+> i
+
+∈ [0 , 1], implying ˆ v ∈ S∗∗ . Therefore, we obtain S∗ ⊆ S∗∗ . Applying similar arguments, we establish the reverse inclusion S∗∗ ⊆ S∗. Thus, we have S∗ = S∗∗ , which implies max( S∗) = max( S∗∗ ). This yields the desired result. 
+
+Step 3: Comparing B(αi, ζ ) and B(1 − αi, 1 − ζ). We define E(ζ) ≜ ζ · (2 − ζ). We then simplify B(αi, ζ ) as: 
+
+B(αi, ζ ) = 1 − αi
+
+D(αi) · ((1 − αi) · E(ζ) + αi · E(1 − ζ)) .
+
+75 Next, we compute the difference Diff ≜ B(αi, ζ ) − B(1 − αi, 1 − ζ): 
+
+D(αi) · Diff =(1 − αi) · ((1 − αi) · E(ζ) + αi · E(1 − ζ)) − αi · (αi · E(1 − ζ) + (1 − αi) · E(ζ)) =(1 − 2αi) · ((1 − αi) · E(ζ) + αi · E(1 − ζ)) .
+
+Note that the term in brackets (1 − αi) · E(ζ) + αi · E(1 − ζ) is strictly positive for 
+
+αi ∈ [0 , 1] and ζ ∈ (0 , 1), and D(αi) is strictly positive as well. Hence, the sign of the difference B(αi, ζ ) − B(1 − αi, 1 − ζ) is determined entirely by the sign of 1 − 2αi. That is, 
+
+B(αi, ζ ) > B (1 − αi, 1 − ζ) if αi < 12 , and B(αi, ζ ) < B (1 − αi, 1 − ζ) if αi > 12 .
+
+Step 4: Optimal ζ∗ ≤ 12 . We prove by contradiction that for any ζ′ > 12 , ζ∗ = 1 − ζ′
+
+yields strictly higher revenue for the seller. We first claim that αmax  
+
+> i
+
+(θi, ζ ) < 12 for ζ > 12 .Differentiating both sides of (100) with respect to α,2D2(α) · A(α, ζ ) = C0(α) + C1(α) · ζ + C2(α) · ζ2,
+
+yields: 2
+
+
+
+2D(α) · D′(α) · A + D2(α) · ∂A ∂α 
+
+
+
+= C′
+
+> 0
+
+(α) + C′
+
+> 1
+
+(α) · ζ + C′
+
+> 2
+
+(α) · ζ2.
+
+Evaluating at the midpoint α = 12 , we obtain: 2 0 + 
+
+34
+
+2
+
+· ∂A ∂α α=1 /2
+
+!
+
+= 98
+
+∂A ∂α α=1 /2
+
+= 1 − 2ζ + 0 · ζ2 = 1 − 2ζ, 
+
+which is negative for ζ > 12 . Therefore, a strictly negative slope at the midpoint α = 12 implies that the peak must occur strictly to the left of the midpoint, i.e., αopt −max  
+
+> i
+
+(θi, ζ ) < 12 .19 
+
+Therefore, for any ζ′ > 12 , we have the optimal α′ 
+
+> i
+
+= αopt −max  
+
+> i
+
+(θi, ζ ′) < 12 . Then, according to Steps 1 and 3, there exists ζ∗ = 1 − ζ′ and α∗ 
+
+> i
+
+= 1 − α′ 
+
+> i
+
+such that: 
+
+A(α∗ 
+
+> i
+
+, ζ ∗) = A(α′
+
+> i
+
+, ζ ′),B(α∗ 
+
+> i
+
+, ζ ∗) < B (α′
+
+> i
+
+, ζ ′).
+
+Therefore, ϕi(θi, ζ ∗) > ϕ i(θi, ζ ′) holds pointwise for all θi. Consequently, the expected 
+
+> 19
+
+Intuitively, from the value creation function in (39), Vi = ( ζ · θi + esi ) · ((1 − ζ) · θi + ebi ). Note that ζ · θi
+
+is strictly larger than (1 − ζ) · θi for ζ > 12 , which implies the marginal productivity of the winner’s effort, 
+
+ζθ i + esi , is higher than that of the seller’s effort, (1 − ζ)θi + ebi . Hence, surplus maximization requires a higher incentive for the bidder than the seller, i.e., 1 − αi > α i, which implies αi < 12 .
+
+76 revenue upper bound Rev( q, c, π|ζ∗) is strictly greater than Rev( q, c, π|ζ′) for any ζ′ > 12 .Furthermore, if such ζ∗ ≤ 12 satisfies the conditions in Proposition 7, then the seller will choose this ζ∗ such that Rev ∗(ζ∗) = Rev( q, c, π|ζ∗). 
+
+# References 
+
+Abhishek, V., B. Hajek, and S. R. Williams (2013): “Auctions with a profit sharing contract,” Games and Economic Behavior , 77(1), 247–270. 
+
+Arrow, K. (1984): The Economics of Agency , Institute for Mathematical Studies in the Social Sciences, Stanford University. 
+
+Bagnoli, M. and T. Bergstrom (2005): “Log-Concave Probability and Its Applica-tions,” Economic Theory , 26(2), 445–469. 
+
+Bernhardt, D., T. Liu, and T. Sogo (2020): “Costly auction entry, royalty payments, and the optimality of asymmetric designs,” Journal of Economic Theory , 188, 105041. 
+
+Bester, H. and R. Strausz (2007): “Contracting with imperfect commitment and noisy communication,” Journal of Economic Theory , 136(1), 236–259. 
+
+Bhattacharyya, S. and F. Lafontaine (1995): “Double-Sided Moral Hazard and the Nature of Share Contracts,” The RAND Journal of Economics , 26(4), 761–781. 
+
+Bolton, P. and M. Dewatripont (2005): Contract Theory , vol. 1 of MIT Press Books ,The MIT Press, 1 ed. 
+
+Bos, O. and M. Pollrich (2025): “Auctions with signaling bidders: Optimal design and information disclosure,” Games and Economic Behavior , 150, 1–25. 
+
+Carroll, G. and L. Bolte (2023): “Robust contracting under double moral hazard,” 
+
+Theoretical Economics , 18(4). 
+
+Chen, Y., A. Hu, and J. Zhang (2024): “Optimal auction design with aftermarket Cournot competition,” Games and Economic Behavior , 145, 54–65. 
+
+DeMarzo, P. M., I. Kremer, and A. Skrzypacz (2005): “Bidding with Securities: Auctions and Security Design,” The American Economic Review , 95(4), 936–959. 
+
+Doval, L. and V. Skreta (2022): “Mechanism Design With Limited Commitment,” 
+
+Econometrica , 90(4), 1463–1500. 
+
+Dworczak, P. (2020): “Mechanism Design With Aftermarkets: Cutoff Mechanisms,” 
+
+Econometrica , 88(6), 2629–2661. 77 Eswaran, M. and A. Kotwal (1985): “A Theory of Contractual Structure in Agricul-ture,” The American Economic Review , 75(3), 352–367. 
+
+Gibbons, R. and K. J. Murphy (1992): “Optimal Incentive Contracts in the Presence of Career Concerns: Theory and Evidence,” Journal of Political Economy , 100(3), 468–505. 
+
+Giovannoni, F. and M. Makris (2014): “Reputational Bidding,” International Economic Review , 55(3), 693–710. 
+
+Goeree, J. K. (2003): “Bidding for the future: signaling in auctions with an aftermarket,” 
+
+Journal of Economic Theory , 108(2), 345–364. 
+
+Gorbenko, A. S. and A. Malenko (2011): “Competition among Sellers in Securities Auctions,” American Economic Review , 101(5), 1806–1841. 
+
+Hagiu, A. and J. Wright (2019): “The Optimality of Ad Valorem Contracts,” Manage-ment Science , 65(11), 5219–5233. 
+
+Haile, P. A. (2003): “Auctions with private uncertainty and resale opportunities,” Journal of Economic Theory , 108(1), 72–110. 
+
+Holmstrom, B. and P. Milgrom (1987): “Aggregation and Linearity in the Provision of Intertemporal Incentives,” Econometrica , 55(2), 303–328. ——— (1991): “Multitask Principal–Agent Analyses: Incentive Contracts, Asset Ownership, and Job Design,” The Journal of Law, Economics, and Organization , 7(special issue), 24– 52. 
+
+Huang, Z. and Y. Li (2023): “Security-bid Auctions with Information Acquisition,” Work-ing Paper , available at SSRN: https://ssrn.com/abstract=3850243. 
+
+Kamenica, E. and M. Gentzkow (2011): “Bayesian Persuasion,” American Economic Review , 101(6), 2590–2615. 
+
+Kim, S. K. and S. Wang (1998): “Linear Contracts and the Double Moral-Hazard,” 
+
+Journal of Economic Theory , 82(2), 342–378. 
+
+Kirkegaard, R. (2012): “A Mechanism Design Approach to Ranking Asymmetric Auc-tions,” Econometrica , 80(5), 2349–2364. 
+
+Laffont, J.-J. and D. Martimort (2002): The Theory of Incentives: The Principal-Agent Model , Princeton University Press. 
+
+Laffont, J.-J. and J. Tirole (1987): “Auctioning Incentive Contracts,” Journal of Political Economy , 95(5), 921–937. ——— (1988): “The Dynamics of Incentive Contracts,” Econometrica , 56, 1153–1175. 
+
+Liu, T. (2016): “Optimal equity auctions with heterogeneous bidders,” Journal of Economic Theory , 166, 94 – 123. 78 Liu, T. and D. Bernhardt (2019): “Optimal equity auctions with two-dimensional types,” Journal of Economic Theory , 184, 104913. ——— (2021): “Rent Extraction with Securities Plus Cash,” The Journal of Finance , 76(4), 1869–1912. 
+
+McAfee, R. P. and J. McMillan (1986): “Bidding for Contracts: A Principal-Agent Analysis,” The RAND Journal of Economics , 17(3), 326–338. ——— (1987): “Competition for Agency Contracts,” RAND Journal of Economics , 18(2), 296–307. 
+
+Milgrom, P. and I. Segal (2002): “Envelope Theorems for Arbitrary Choice Sets,” 
+
+Econometrica , 70(2), 583–601. 
+
+Myerson, R. B. (1981): “Optimal Auction Design,” Mathematics of Operations Research ,6(1), 58–73. ——— (1982): “Optimal coordination mechanisms in generalized principal-agent problems,” 
+
+Journal of Mathematical Economics , 10(1), 67–81. 
+
+Rao, R. C. and S. Srinivasan (1995): “Why Are Royalty Rates Higher in Service-type Franchises?” Journal of Economics & Management Strategy , 4(1), 7–31. 
+
+Romano, R. E. (1994): “Double Moral Hazard and Resale Price Maintenance,” The RAND Journal of Economics , 25(3), 455–466. 
+
+Schmidt, K. D. (2014): “On inequalities for moments and the covariance of monotone functions,” Insurance: Mathematics and Economics , 55, 91–95. 
+
+Shaked, M. and J. G. Shanthikumar (1994): Stochastic Orders and Their Applications ,Academic Press. 
+
+Skreta, V. (2015): “Optimal auction design under non-commitment,” Journal of Economic Theory , 159, 854–890, symposium Issue on Dynamic Contracts and Mechanism Design. 
+
+Sogo, T. (2017): “Effects of seller’s information disclosure in equity auctions requiring post-auction investment,” Journal of Mathematical Economics , 73, 137–154. 
+
+Stiglitz, J. E. (1974): “Incentives and Risk Sharing in Sharecropping,” The Review of Economic Studies , 41(2), 219–255. 
+
+Wang, D. and X. Xu (2022): “Optimal equity auction with interdependent valuations,” 
+
+Journal of Mathematical Economics , 100, 102623. 
+
+Wang, D., X. Xu, and X. Zeng (2023): “Comparisons of standard royalty auctions with seller post-auction effort,” Journal of Mathematical Economics , 107, 102864. 
+
+Weitzman, M. (1980): “Efficient Incentive Contracts,” The Quarterly Journal of Eco-nomics , 94(4), 719–730. 79

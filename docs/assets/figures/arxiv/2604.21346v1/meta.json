@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-001.webp",
+      "caption": "Table 1: Summary of key results across experimental conditions on Bongard-LOGO. The first five rows and the randomization rows are mean accuracy (%) across 12 language models. Rows marked with † are averaged over the matched 4-model VLM-capable subset (Gemma3 12B/27B, LLaVA-Llama3, Qwen2.5-VL 32B) and should be compared only within that subset. ‘Base’ denotes the minimal-context symbolic baseline. AP = Action Program (formal LOGO-style grammar), AD = Action Description (natural-language description of actions).",
+      "page": 6,
+      "index": 1,
+      "width": 433,
+      "height": 287
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-002.webp",
+      "caption": "Table A.9: Performance of C–G (Action Program) under two randomization controls. Categories Shuffle randomly permutes the assignment of support examples to positive vs. negative sets within each problem, while leaving the query and its gold label unchanged. Test Sequence Shuffle randomly shuffles the order of drawing actions in the query program at inference time, leaving the support examples, query image, and gold label unchanged. Values show accuracy (%) on Basic (BD) and Free-form (FF) problems for each model.",
+      "page": 25,
+      "index": 2,
+      "width": 417,
+      "height": 513
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-003.webp",
+      "caption": "Table A.3: C-G paradigm performance on Bongard-LOGO. Results show accuracy (%) for Action Desc. and Action Prog. across problem categories with concept (C) and without concept (NC) guidance. BD = Basic Shapes, FF = Free-form, HD = Human-designed. Action Desc. = Action description and Action Prog. = Action program.",
+      "page": 21,
+      "index": 3,
+      "width": 883,
+      "height": 1371
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-004.webp",
+      "caption": "Figure 3: Per-model percentage-point change under symbolic interventions, aggregated from Table A.3. Each gray dot is one model; black diamonds mark mean deltas. ‘AD−Base’ and ‘AP−Base’ measure gains over the minimal-context symbolic baseline, while ‘+C on AP’ isolates the incremental change from AP to AP+C. The zero line marks no change. This makes the reviewer-facing pattern explicit: Action Descriptions help most on FF and BD, AP is slightly more stable on HD, and concept conditioning yields modest but heterogeneous model-level effects.",
+      "page": 7,
+      "index": 4,
+      "width": 815,
+      "height": 278
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-005.webp",
+      "caption": "Table A.4: Mean accuracy improvement (%) over baseline across all regimes, stratified by model. The effect of symbolic input and concept conditioning is heterogeneous: larger models show slightly more consistent positive averages, while smaller and instruction-sensitive models exhibit mixed gains.",
+      "page": 22,
+      "index": 5,
+      "width": 493,
+      "height": 318
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-006.webp",
+      "caption": "Table A.1: Action programs for one negative and one positive example in the BD instance.",
+      "page": 13,
+      "index": 6,
+      "width": 810,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-007.webp",
+      "caption": "Figure A.1: Example Basic (BD) Bongard-LOGO problem. Both the images conforming to the “unbalanced trapezoid right_triangle AND uneven band four arcs” concept.",
+      "page": 12,
+      "index": 7,
+      "width": 954,
+      "height": 461
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-008.webp",
+      "caption": "Table A.7: Grounded C–G performance for VLM-capable models. Each entry is accuracy (%) on Bongard-LOGO categories when symbolic input (Action Description or Action Program) is augmented with the rendered query image. BD = Basic, FF = Free-form, HD Comb/HD Novel = Human-designed shape subsets.",
+      "page": 24,
+      "index": 8,
+      "width": 613,
+      "height": 248
+    },
+    {
+      "url": "assets/figures/arxiv/2604.21346v1/fig-009.webp",
+      "caption": "Figure 2: Comparison of visual and symbolic pipelines on Bongard-LOGO. In the visual route (top), a Vision– Language Model (VLM) receives images directly and must infer both structure and rules, typically yielding near-chance accuracy. In the symbolic route (bottom), problem instances are represented by LOGO-style action programs; a language model then performs rule induction and classification using these symbolic representations, achieving substantially higher performance on the same task.",
+      "page": 5,
+      "index": 9,
+      "width": 808,
+      "height": 350
+    }
+  ]
+}

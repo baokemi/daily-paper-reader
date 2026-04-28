@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-001.webp",
+      "caption": "Figure 1. (a) Prior CLIP-based methods rely on multi-modal image-text representations at inference time while our DEC (b) uses only single-modal visual features, making it more efficient for open-set 3DOR task. (c) Our DEC significantly outperforms existing methods on open-set 3D object retrieval.",
+      "page": 1,
+      "index": 1,
+      "width": 494,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-002.webp",
+      "caption": "Table 1. Performance comparisons (%) on open-set 3DOR benchmarks. Bold and underline indicate the best and second best results, respectively. PB-CLIP refers to PointBERT-CLIP. P., I., V., and T. stand for Point Cloud, Multi-view Images,Voxel and Text, respectively.",
+      "page": 6,
+      "index": 2,
+      "width": 1026,
+      "height": 680
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-003.webp",
+      "caption": "Figure 8. Effect of view numbers (N) on OS-MN40-core.",
+      "page": 11,
+      "index": 3,
+      "width": 471,
+      "height": 322
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-004.webp",
+      "caption": "Figure 5. Performance comparison on OS-MN40-core. Left: Selection schemes with different E value. Right: Impact of fusion weight λ.",
+      "page": 8,
+      "index": 4,
+      "width": 679,
+      "height": 224
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-005.webp",
+      "caption": "Figure 2. Overview of our framework. During training, it processes known-category images by frozen DINO and CLIP image encoders, while encoding known and unseen (e.g., ImageNet) class labels via CLIP’s text encoder using the prompt ”a photo of [class]”. Based on them, we synthesize virtual features to train our chunking and adapting (CAM) adapter jointly with an end-to-end metric learning loss, encouraging it to produce generalized view-based 3D descriptors to unseen categories.",
+      "page": 4,
+      "index": 5,
+      "width": 984,
+      "height": 312
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-006.webp",
+      "caption": "Figure 3. Illustration of our chunking and adapting module.",
+      "page": 4,
+      "index": 6,
+      "width": 471,
+      "height": 266
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-007.webp",
+      "caption": "Table 9. Separate retrieval results on seen and unseen classes.",
+      "page": 12,
+      "index": 7,
+      "width": 487,
+      "height": 317
+    },
+    {
+      "url": "assets/figures/arxiv/2604.19432v1/fig-008.webp",
+      "caption": "Figure 9. More retrieval examples of our method on OS-MN40core. Incorrect matches are in red boxes.",
+      "page": 12,
+      "index": 8,
+      "width": 483,
+      "height": 270
+    }
+  ]
+}
